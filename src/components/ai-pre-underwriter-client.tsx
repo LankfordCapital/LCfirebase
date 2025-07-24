@@ -12,6 +12,7 @@ import { Loader2, Upload, FileText, AlertTriangle, CheckCircle } from 'lucide-re
 import { useToast } from '@/hooks/use-toast';
 import { Label } from './ui/label';
 import { Checkbox } from './ui/checkbox';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 
 const fileToDataUri = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -110,22 +111,33 @@ export function AIPReUnderwriterClient() {
     }
   };
 
-  const renderChecklist = (documents: string[], category: string) => {
+  const renderChecklist = (documents: string[], category: string, missing: string[] = []) => {
     if (documents.length === 0) return null;
     return (
         <div key={category}>
-            <h4 className="font-semibold mt-4 mb-2 capitalize">{category}</h4>
+            <h4 className="font-semibold mt-4 mb-2 capitalize text-primary">{category}</h4>
             <div className="space-y-2">
-            {documents.map((doc, i) => (
-                <div key={i} className="flex items-center space-x-2">
-                    <Checkbox id={`${category}-${i}`} />
-                    <Label htmlFor={`${category}-${i}`} className="font-normal">{doc}</Label>
-                </div>
-            ))}
+            {documents.map((doc, i) => {
+                const isMissing = missing.includes(doc);
+                const id = `${category}-${i}-${doc.replace(/\s+/g, '-')}`;
+                return (
+                    <div key={id} className="flex items-center space-x-2">
+                        <Checkbox id={id} checked={!isMissing} disabled />
+                        <Label htmlFor={id} className={`font-normal ${isMissing ? 'text-destructive' : ''}`}>{doc}</Label>
+                    </div>
+                )
+            })}
             </div>
         </div>
     );
   };
+  
+  const allMissingDocs = result ? [
+      ...result.missingDocuments.borrower,
+      ...result.missingDocuments.company,
+      ...result.missingDocuments.subjectProperty
+  ] : [];
+
 
   return (
     <Card>
@@ -203,38 +215,38 @@ export function AIPReUnderwriterClient() {
               <AlertTitle>Prequalification Status: {getPrequalificationStatusProps(result.prequalificationStatus).title}</AlertTitle>
             </Alert>
             
-            {result.potentialIssues && result.potentialIssues.length > 0 && <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base"><AlertTriangle className="h-5 w-5 text-destructive" /> Potential Issues</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <ul className="list-disc list-inside text-sm space-y-1">
-                        {result.potentialIssues.map((issue, i) => <li key={i}>{issue}</li>)}
-                    </ul>
-                </CardContent>
-            </Card>}
+            {result.potentialIssues && result.potentialIssues.length > 0 && (
+                <Collapsible>
+                    <CollapsibleTrigger asChild>
+                         <Button variant="outline" className="w-full justify-start">
+                            <AlertTriangle className="h-5 w-5 text-destructive mr-2" /> Potential Issues Found
+                        </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                        <Card className="mt-2">
+                            <CardContent className="pt-6">
+                                <ul className="list-disc list-inside text-sm space-y-1">
+                                    {result.potentialIssues.map((issue, i) => <li key={i}>{issue}</li>)}
+                                </ul>
+                            </CardContent>
+                        </Card>
+                    </CollapsibleContent>
+                </Collapsible>
+            )}
 
-            {result.missingDocuments && (result.missingDocuments.borrower.length > 0 || result.missingDocuments.company.length > 0 || result.missingDocuments.subjectProperty.length > 0) && <Card>
+            {result.documentRequestList && (result.documentRequestList.borrower.length > 0 || result.documentRequestList.company.length > 0 || result.documentRequestList.subjectProperty.length > 0) && (
+            <Card>
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base"><FileText className="h-5 w-5 text-yellow-600" /> Missing Documents</CardTitle>
+                    <CardTitle className="flex items-center gap-2 text-base"><FileText className="h-5 w-5 text-primary" /> Document Checklist</CardTitle>
+                    <CardDescription>Documents in <span className="text-destructive font-semibold">red</span> are still required.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {renderChecklist(result.missingDocuments.borrower, 'borrower')}
-                    {renderChecklist(result.missingDocuments.company, 'company')}
-                    {renderChecklist(result.missingDocuments.subjectProperty, 'subjectProperty')}
+                    {renderChecklist(result.documentRequestList.borrower, 'borrower', result.missingDocuments.borrower)}
+                    {renderChecklist(result.documentRequestList.company, 'company', result.missingDocuments.company)}
+                    {renderChecklist(result.documentRequestList.subjectProperty, 'subjectProperty', result.missingDocuments.subjectProperty)}
                 </CardContent>
-            </Card>}
-
-            {result.documentRequestList && (result.documentRequestList.borrower.length > 0 || result.documentRequestList.company.length > 0 || result.documentRequestList.subjectProperty.length > 0) && <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base"><FileText className="h-5 w-5 text-primary" /> Full Document Request List</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    {renderChecklist(result.documentRequestList.borrower, 'borrower')}
-                    {renderChecklist(result.documentRequestList.company, 'company')}
-                    {renderChecklist(result.documentRequestList.subjectProperty, 'subjectProperty')}
-                </CardContent>
-            </Card>}
+            </Card>
+            )}
           </div>
         )}
       </CardContent>
