@@ -56,6 +56,8 @@ The documents in the 'documentRequestList' field MUST be categorized into 'borro
 *   Personal Asset Statement (Borrower)
 *   Purchase HUD-1 (if applicable) (Borrower)
 *   Disposition HUD-1 (if applicable) (Borrower)
+
+**Company Profile Documents (Required for most loans):**
 *   Company Asset Statement (Company)
 *   EIN Certificate (Company)
 *   Formation Documentation (Company)
@@ -143,7 +145,7 @@ The documents in the 'documentRequestList' field MUST be categorized into 'borro
     *   Business License (Company)
     *   Certificate of Good Standing (Company)
     *   Business Debt Schedule (Company)
-    *   Signed Purchase Agreement (Subject Property)
+    *   Purchase and Sale Agreement (or HUD-1 if refinance) (Subject Property)
     *   Lease Agreements for subject property (if applicable) (Subject Property)
     *   Projected Lease Comparables (if vacant) (Subject Property)
     *   Commercial Liability Insurance Quote (Subject Property)
@@ -152,9 +154,7 @@ The documents in the 'documentRequestList' field MUST be categorized into 'borro
     *   Escrow Instructions (Subject Property)
     *   Closing Protection Letter (Subject Property)
     *   Title/Escrow Agent Details (Name, Company, Phone, Email) (Subject Property)
-    *   Property HUD-1/Settlement Statement (if a refinance) (Subject Property)
     *   30-Day Payoff Statement with Per Diem (if a refinance) (Subject Property)
-
 
 *   **Residential NOO - Bridge:**
     *   ID/Driver's License (Borrower)
@@ -196,10 +196,22 @@ The documents in the 'documentRequestList' field MUST be categorized into 'borro
     *   Business License (Company)
     *   Certificate of Good Standing (Company)
     *   Business Debt Schedule (Company)
-    *   Pro-forma projections for the project (Subject Property)
-    *   Construction Plans and Budget (Subject Property)
+    *   Executive Summary (Subject Property)
+    *   Pro-forma Projections (5 years, month-by-month) (Subject Property)
+    *   Sources and Uses Statement (Subject Property)
+    *   Construction Plans (Subject Property)
+    *   Construction Budget (Subject Property)
     *   Appraisal Report (Subject Property)
     *   Environmental Report (Subject Property)
+    *   Purchase and Sale Agreement (or HUD-1 if refinance) (Subject Property)
+    *   30-Day Payoff Statement with Per Diem (if refinance) (Subject Property)
+    *   Preliminary Title Commitment (Subject Property)
+    *   Escrow Instructions (Subject Property)
+    *   Closing Protection Letter (Subject Property)
+    *   Title/Escrow Agent Details (Name, Company, Phone, Email) (Subject Property)
+    *   Builder's Risk Insurance Quote (Subject Property)
+    *   Commercial Liability Insurance Quote (Subject Property)
+    *   Insurance Agent Details (Name, Company, Phone, Email) (Subject Property)
 
 *   **Commercial - Rehab Loans:**
     *   ID/Driver's License (Borrower)
