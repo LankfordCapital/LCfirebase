@@ -6,9 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Upload, PlusCircle, Trash2 } from "lucide-react";
+import { Upload, PlusCircle, Trash2, ScanLine, Loader2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast';
+import { scanCreditReport, type ScanCreditReportOutput } from '@/ai/flows/credit-score-scanner';
 
 type Deal = {
   id: number;
@@ -18,10 +20,24 @@ type Deal = {
   disposition: string;
 };
 
+const fileToDataUri = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+};
+
 export default function ProfilePage() {
   const [deals, setDeals] = useState<Deal[]>([
     { id: 1, address: '', purchasePrice: '', rehabAmount: '', disposition: '' },
   ]);
+
+  const [creditReportFile, setCreditReportFile] = useState<File | null>(null);
+  const [creditScores, setCreditScores] = useState<ScanCreditReportOutput | null>(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const { toast } = useToast();
 
   const handleAddDeal = () => {
     if (deals.length < 10) {
@@ -36,6 +52,46 @@ export default function ProfilePage() {
   const handleDealChange = (id: number, field: keyof Omit<Deal, 'id'>, value: string) => {
     setDeals(deals.map(deal => (deal.id === id ? { ...deal, [field]: value } : deal)));
   };
+
+  const handleCreditReportUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setCreditReportFile(event.target.files[0]);
+    }
+  };
+
+  const handleScanCreditReport = async () => {
+    if (!creditReportFile) {
+      toast({
+        variant: 'destructive',
+        title: 'No file selected',
+        description: 'Please upload a credit report to scan.',
+      });
+      return;
+    }
+
+    setIsScanning(true);
+    setCreditScores(null);
+
+    try {
+      const dataUri = await fileToDataUri(creditReportFile);
+      const result = await scanCreditReport({ creditReportDataUri: dataUri });
+      setCreditScores(result);
+      toast({
+        title: 'Scan Complete',
+        description: 'Credit scores have been extracted.',
+      });
+    } catch (error) {
+      console.error('Credit Score Scan Error:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Scan Failed',
+        description: 'Could not extract credit scores from the document. Please try again.',
+      });
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
 
   return (
     <div className="space-y-6">
@@ -69,6 +125,45 @@ export default function ProfilePage() {
                   <Input id="lastName" defaultValue="Doe" />
                 </div>
               </div>
+               <div className="space-y-3 pt-2">
+                 <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Upload ID/Driver's License</Button>
+               </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+                <CardTitle>AI Credit Score Analysis</CardTitle>
+                <CardDescription>Upload your tri-merged credit report to have our AI extract your scores.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="credit-report-upload">Upload Tri-Merged Credit Report</Label>
+                    <div className="flex gap-2">
+                        <Input id="credit-report-upload" type="file" onChange={handleCreditReportUpload} />
+                        <Button onClick={handleScanCreditReport} disabled={isScanning || !creditReportFile}>
+                            {isScanning ? <Loader2 className="animate-spin" /> : <ScanLine />}
+                            <span className="ml-2 hidden sm:inline">Scan Report</span>
+                        </Button>
+                    </div>
+                </div>
+
+                {creditScores && (
+                    <div className="grid grid-cols-3 gap-4 rounded-md border p-4">
+                        <div className="text-center">
+                            <p className="text-sm font-medium text-muted-foreground">Equifax</p>
+                            <p className="text-2xl font-bold">{creditScores.equifaxScore}</p>
+                        </div>
+                         <div className="text-center">
+                            <p className="text-sm font-medium text-muted-foreground">Experian</p>
+                            <p className="text-2xl font-bold">{creditScores.experianScore}</p>
+                        </div>
+                         <div className="text-center">
+                            <p className="text-sm font-medium text-muted-foreground">TransUnion</p>
+                            <p className="text-2xl font-bold">{creditScores.transunionScore}</p>
+                        </div>
+                    </div>
+                )}
             </CardContent>
           </Card>
 
