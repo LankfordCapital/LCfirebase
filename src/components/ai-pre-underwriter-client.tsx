@@ -41,36 +41,33 @@ export function AIPReUnderwriterClient() {
         title: 'Missing Loan Program',
         description: 'Please select a loan program to get a document list.',
       });
-      // Set a dummy result just to show the doc list
-      const dummyResult: AiPreUnderwriterOutput = {
-        prequalificationStatus: 'Needs Documents',
-        missingDocuments: [],
-        potentialIssues: [],
-        documentRequestList: [],
-      };
-      
-      setIsLoading(true);
-      setResult(null);
-      try {
-        const response = await aiPreUnderwriter({ loanProgram, uploadedDocuments: []});
-        dummyResult.documentRequestList = response.documentRequestList;
-        dummyResult.missingDocuments = response.documentRequestList;
-        setResult(dummyResult)
-      } catch (error) {
-         console.error('AI Pre-Underwriter Error:', error);
-      } finally {
-        setIsLoading(false);
-      }
       return;
     }
     
     if (files.length === 0) {
-       toast({
-        variant: 'destructive',
-        title: 'No Documents Uploaded',
-        description: 'Please upload documents to analyze.',
-      });
-      return;
+       // If no files, just get the document list
+       setIsLoading(true);
+       setResult(null);
+       try {
+         const response = await aiPreUnderwriter({ loanProgram, uploadedDocuments: []});
+         const dummyResult: AiPreUnderwriterOutput = {
+           prequalificationStatus: 'Needs Documents',
+           missingDocuments: response.documentRequestList,
+           potentialIssues: [],
+           documentRequestList: response.documentRequestList,
+         };
+         setResult(dummyResult)
+       } catch (error) {
+          console.error('AI Pre-Underwriter Error:', error);
+          toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'Could not fetch document list.',
+          });
+       } finally {
+         setIsLoading(false);
+       }
+       return;
     }
 
     setIsLoading(true);
@@ -198,7 +195,7 @@ export function AIPReUnderwriterClient() {
         
         <Button onClick={handleSubmit} disabled={isLoading}>
           {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-          Analyze Documents
+          {files.length > 0 ? 'Analyze Documents' : 'Get Document List'}
         </Button>
 
         {result && (
