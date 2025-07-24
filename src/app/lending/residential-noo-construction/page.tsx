@@ -5,11 +5,16 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 
 const features = [
-    "Financing for single-family, multi-family (2-4 units), and townhomes",
-    "Competitive interest rates and flexible draw schedules",
-    "Loan-to-Cost (LTC) up to 85%",
-    "Loan-to-Value (LTV) up to 75%",
-    "Experienced support team to guide you through the process"
+    "Loan-to-Cost (LTC) up to 90%",
+    "Up to 70% of After Constructed Value",
+    "Terms from 12-24 months with extension options",
+    "No prepayment penalty",
+    "Minimum FICO score of 660",
+    "3+ ground up deals or GC license with experience required",
+    "Land acquisition can be included",
+    "Fast Draws up to $50,000 with no inspection",
+    "Interest reserves can be financed",
+    "Rates starting at 9.99% and 2 points"
 ];
 
 export default function ResidentialNooConstructionPage() {
