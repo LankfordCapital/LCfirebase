@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   description:
     'Lankford Capital offers a wide range of loan products including residential, commercial, industrial, and SBA loans. We provide tailored financing solutions for construction, acquisition, and development projects. Your trusted partner for real estate and business financing.',
   keywords:
-    'lending, loan, residential lending, commercial lending, industrial loans, sba loans, construction financing, fix and flip, dscr loans, land acquisition, equipment financing, broker services, capital group',
+    'lending, loan, residential lending, commercial lending, industrial loans, sba loans, construction financing, fix and flip, dscr loans, land acquisition, equipment financing, broker services, capital',
 };
 
 export default function RootLayout({
