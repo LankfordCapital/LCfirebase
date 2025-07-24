@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -173,7 +174,7 @@ export default function Home() {
             </div>
             <div className="relative h-80 lg:h-full w-full rounded-lg overflow-hidden shadow-2xl">
                 <Image
-                    src="https://placehold.co/600x700.png"
+                    src="https://firebasestorage.googleapis.com/v0/b/lankford-homebase.firebasestorage.app/o/shutterstock_2142010187.jpg?alt=media&token=e0145a4a-dd04-445c-ba23-e764980f713e"
                     alt="Business meeting about financing"
                     layout="fill"
                     objectFit="cover"
