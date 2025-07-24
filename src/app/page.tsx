@@ -96,7 +96,7 @@ export default function Home() {
             Building Futures, Funding Dreams
           </h1>
           <p className="mt-6 max-w-3xl mx-auto text-lg text-foreground/80 md:text-xl">
-            Lankford Capital Group provides tailored, innovative financing solutions to power your real estate and business ambitions.
+            Lankford Capital provides tailored, innovative financing solutions to power your real estate and business ambitions.
             From ground-up construction to strategic acquisitions, we are your dedicated financial partner.
           </p>
           <div className="mt-10 flex justify-center gap-4">
@@ -145,7 +145,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="font-headline text-3xl font-bold text-primary md:text-4xl">Why Partner with Lankford Capital Group?</h2>
+              <h2 className="font-headline text-3xl font-bold text-primary md:text-4xl">Why Partner with Lankford Capital?</h2>
               <p className="mt-4 text-lg text-foreground/70">
                 Choosing the right lender is crucial. We combine cutting-edge technology with personalized service to deliver unparalleled results.
               </p>

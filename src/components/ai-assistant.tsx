@@ -30,7 +30,7 @@ export function AIAssistant() {
         setMessages([
             {
                 id: 'initial',
-                text: "Hello! I'm Lankford Capital Group's AI Assistant. How can I help you today? Feel free to ask about our loan products, eligibility, or the application process.",
+                text: "Hello! I'm Lankford Capital's AI Assistant. How can I help you today? Feel free to ask about our loan products, eligibility, or the application process.",
                 sender: 'ai'
             }
         ])
