@@ -13,10 +13,6 @@ const loanPrograms = [
     title: "SBA 504 Loans",
     description: "Provides long-term, fixed-rate financing for major fixed assets that promote business growth and job creation.",
   },
-  {
-    title: "SBA Microloans",
-    description: "Smaller loans up to $50,000 to help small businesses and certain non-profit childcare centers start up and expand.",
-  },
 ];
 
 export default function SbaLoansPage() {
@@ -36,7 +32,7 @@ export default function SbaLoansPage() {
           <div className="text-center mb-12">
             <h2 className="font-headline text-3xl font-bold text-primary">Explore SBA Loan Programs</h2>
           </div>
-          <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-8">
             {loanPrograms.map((loan) => (
               <Card key={loan.title} className="flex flex-col">
                 <CardHeader>
