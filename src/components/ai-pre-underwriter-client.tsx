@@ -68,7 +68,7 @@ export function AIPReUnderwriterClient() {
         uploadedDocuments
       });
       setResult(response);
-    } catch (error) => {
+    } catch (error) {
       console.error('AI Pre-Underwriter Error:', error);
       toast({
         variant: 'destructive',
