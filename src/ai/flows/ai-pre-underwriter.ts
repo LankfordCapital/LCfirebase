@@ -38,9 +38,26 @@ const prompt = ai.definePrompt({
   prompt: `You are an AI underwriter that specializes in pre-underwriting files and providing prequalifications and document request lists based on the selected loan program and the documents provided. The loan program is {{{loanProgram}}}.
 
 You will analyze the provided documents to determine a prequalification status.
-Based on the loan program that is selected, and the document requirements provided below, you will generate a full list of required documents and populate it in the 'documentRequestList' field. This list must be comprehensive for the selected program.
+Based on the loan program that is selected, and the document requirements provided below, you will generate a full list of required documents and populate it in the 'documentRequestList' field. This list must be comprehensive for the selected program and also include the standard Borrower Profile Documents listed below.
 Then, you will compare the filenames of the uploaded documents against the full list you just generated and identify any missing documents. Populate the 'missingDocuments' field with the names of the documents that are required but not present in the upload list.
 Finally, list any potential issues you find in the provided documents.
+
+**Borrower Profile Documents (Required for most loans):**
+*   ID/Driver's License
+*   Personal Financial Statement
+*   Credit Report
+*   Personal Asset Statement
+*   Company Asset Statement
+*   EIN Certificate
+*   Formation Documentation
+*   Operating Agreement/Bylaws
+*   Partnership/Officer List
+*   Business License
+*   Certificate of Good Standing
+*   Business Debt Schedule
+*   Purchase HUD-1 (if applicable)
+*   Disposition HUD-1 (if applicable)
+
 
 **Document Requirements by Loan Program:**
 
