@@ -39,6 +39,9 @@ const prompt = ai.definePrompt({
 Based on the loan program, generate a full list of required documents and populate it in the 'documentRequestList' field.
 The documents in the 'documentRequestList' field MUST be categorized into 'borrower', 'company', and 'subjectProperty'.
 
+**Important Conditional Logic:**
+- Only include "Approved or Pre-approved Plans" and "Approved Permits (if available)" in the 'subjectProperty' list if the loan program is for 'Ground Up Construction'.
+
 **Document Categories:**
 
 *   **Borrower Documents:** Personal documents for the individual borrower (e.g., ID, personal financial statements, credit report, deal history).
