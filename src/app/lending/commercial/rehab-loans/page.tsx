@@ -7,8 +7,13 @@ const features = [
     "Financing for property acquisition and renovation costs",
     "Ideal for value-add and repositioning strategies",
     "Cover both hard and soft costs",
-    "Quick closing to secure your next project",
-    "Flexible terms for various project scopes"
+    "Flexible terms for various project scopes",
+    "Up to 80% loan to cost, up to 90% with mezzanine",
+    "Up to 70% of the after-rehab value",
+    "Available in 40 states",
+    "Quick closings available",
+    "Competitive rate and fee structure",
+    "Syndications OK"
 ];
 
 export default function CommercialRehabLoansPage() {
