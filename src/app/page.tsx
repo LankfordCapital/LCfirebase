@@ -98,7 +98,7 @@ export default function Home() {
           playsInline
           className="absolute top-0 left-0 w-full h-full object-cover z-0"
         >
-          <source src="https://storage.googleapis.com/aip-dev-images-us-central1/public/home-video.mp4" type="video/mp4" />
+          <source src="https://storage.googleapis.com/lankford-homebase.firebasestorage.app/Adobe%20Express%20-%20shutterstock_1058475664%20(1).mp4" type="video/mp4" />
         </video>
         <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
         <div className="container relative z-20 mx-auto px-4 text-center">
