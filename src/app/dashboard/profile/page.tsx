@@ -6,12 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Upload, PlusCircle, Trash2, ScanLine, Loader2, Landmark } from "lucide-react";
+import { Upload, PlusCircle, Trash2, ScanLine, Loader2, Landmark, FileText } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { scanCreditReport, type ScanCreditReportOutput } from '@/ai/flows/credit-score-scanner';
 import { scanAssetStatement, type ScanAssetStatementOutput } from '@/ai/flows/asset-statement-scanner';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { PersonalFinancialStatement } from '@/components/personal-financial-statement';
 
 type Deal = {
   id: number;
@@ -219,6 +221,19 @@ export default function ProfilePage() {
                <div className="space-y-3 pt-2">
                  <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Upload ID/Driver's License</Button>
                </div>
+               <Collapsible>
+                <CollapsibleTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start">
+                    <FileText className="mr-2" />
+                    Complete Personal Financial Statement
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <div className="py-4">
+                      <PersonalFinancialStatement />
+                    </div>
+                </CollapsibleContent>
+               </Collapsible>
             </CardContent>
           </Card>
           
