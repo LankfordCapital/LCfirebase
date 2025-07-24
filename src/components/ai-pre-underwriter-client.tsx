@@ -11,6 +11,7 @@ import { aiPreUnderwriter, type AiPreUnderwriterOutput } from '@/ai/flows/ai-pre
 import { Loader2, Upload, FileText, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from './ui/label';
+import { Checkbox } from './ui/checkbox';
 
 const fileToDataUri = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -109,6 +110,23 @@ export function AIPReUnderwriterClient() {
     }
   };
 
+  const renderChecklist = (documents: string[], category: string) => {
+    if (documents.length === 0) return null;
+    return (
+        <div key={category}>
+            <h4 className="font-semibold mt-4 mb-2 capitalize">{category}</h4>
+            <div className="space-y-2">
+            {documents.map((doc, i) => (
+                <div key={i} className="flex items-center space-x-2">
+                    <Checkbox id={`${category}-${i}`} />
+                    <Label htmlFor={`${category}-${i}`} className="font-normal">{doc}</Label>
+                </div>
+            ))}
+            </div>
+        </div>
+    );
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -125,6 +143,7 @@ export function AIPReUnderwriterClient() {
                 <SelectContent>
                     <SelectGroup>
                         <SelectLabel>Residential NOO</SelectLabel>
+                        <SelectItem value="Residential NOO - Ground Up Construction">Ground Up Construction</SelectItem>
                         <SelectItem value="Residential NOO - Fix and Flip">Fix and Flip</SelectItem>
                         <SelectItem value="Residential NOO - DSCR">DSCR Loan</SelectItem>
                         <SelectItem value="Residential NOO - Bridge">Bridge Loan</SelectItem>
@@ -184,17 +203,6 @@ export function AIPReUnderwriterClient() {
               <AlertTitle>Prequalification Status: {getPrequalificationStatusProps(result.prequalificationStatus).title}</AlertTitle>
             </Alert>
             
-            {result.missingDocuments && (result.missingDocuments.borrower.length > 0 || result.missingDocuments.company.length > 0 || result.missingDocuments.subjectProperty.length > 0) && <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base"><FileText className="h-5 w-5 text-primary" /> Missing Documents</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <ul className="list-disc list-inside text-sm space-y-1">
-                        {[...result.missingDocuments.borrower, ...result.missingDocuments.company, ...result.missingDocuments.subjectProperty].map((doc, i) => <li key={i}>{doc}</li>)}
-                    </ul>
-                </CardContent>
-            </Card>}
-
             {result.potentialIssues && result.potentialIssues.length > 0 && <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-base"><AlertTriangle className="h-5 w-5 text-destructive" /> Potential Issues</CardTitle>
@@ -206,14 +214,25 @@ export function AIPReUnderwriterClient() {
                 </CardContent>
             </Card>}
 
+            {result.missingDocuments && (result.missingDocuments.borrower.length > 0 || result.missingDocuments.company.length > 0 || result.missingDocuments.subjectProperty.length > 0) && <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-base"><FileText className="h-5 w-5 text-yellow-600" /> Missing Documents</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {renderChecklist(result.missingDocuments.borrower, 'borrower')}
+                    {renderChecklist(result.missingDocuments.company, 'company')}
+                    {renderChecklist(result.missingDocuments.subjectProperty, 'subjectProperty')}
+                </CardContent>
+            </Card>}
+
             {result.documentRequestList && (result.documentRequestList.borrower.length > 0 || result.documentRequestList.company.length > 0 || result.documentRequestList.subjectProperty.length > 0) && <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-base"><FileText className="h-5 w-5 text-primary" /> Full Document Request List</CardTitle>
                 </CardHeader>
                 <CardContent>
-                     <ul className="list-disc list-inside text-sm space-y-1">
-                        {[...result.documentRequestList.borrower, ...result.documentRequestList.company, ...result.documentRequestList.subjectProperty].map((doc, i) => <li key={i}>{doc}</li>)}
-                    </ul>
+                    {renderChecklist(result.documentRequestList.borrower, 'borrower')}
+                    {renderChecklist(result.documentRequestList.company, 'company')}
+                    {renderChecklist(result.documentRequestList.subjectProperty, 'subjectProperty')}
                 </CardContent>
             </Card>}
           </div>
