@@ -46,8 +46,8 @@ export default function DashboardLayout({
             <Link href="/">
               <Logo className="h-8 w-auto" />
             </Link>
-            <SidebarTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden"><ChevronLeft /></Button>
+            <SidebarTrigger variant="ghost" size="icon" className="md:hidden">
+              <ChevronLeft />
             </SidebarTrigger>
           </div>
         </SidebarHeader>
