@@ -9,7 +9,15 @@ const features = [
     "Qualify based on the property's cash flow",
     "Loans for purchase, rate/term refinance, and cash-out refinance",
     "Financing for short-term and long-term rental properties",
-    "Streamlined process for experienced investors"
+    "Streamlined process for experienced investors",
+    "650 Minimum FICO",
+    "Portfolio loans available",
+    "Low DSCR requirements of 1.15",
+    "Up to 80% LTV for purchases and rate/term refinances",
+    "Up to 75% LTV for cash-out refinances",
+    "Quick closings in 2-3 weeks",
+    "Vacant properties OK (if leased within 90 days)",
+    "Experience preferred but not required"
 ];
 
 export default function ResidentialNooDscrPage() {
