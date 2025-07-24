@@ -41,7 +41,7 @@ The documents in the 'documentRequestList' field MUST be categorized into 'borro
 
 **Document Categories:**
 
-*   **Borrower Documents:** Personal documents for the individual borrower (e.g., ID, personal financial statements, credit report).
+*   **Borrower Documents:** Personal documents for the individual borrower (e.g., ID, personal financial statements, credit report, deal history).
 *   **Company Documents:** Documents related to the business entity (e.g., EIN, formation docs, operating agreements).
 *   **Subject Property Documents:** Documents related to the property being financed (e.g., purchase contract, plans, permits, insurance).
 
@@ -51,6 +51,8 @@ The documents in the 'documentRequestList' field MUST be categorized into 'borro
 *   Personal Financial Statement (Borrower)
 *   Credit Report (Borrower)
 *   Personal Asset Statement (Borrower)
+*   Purchase HUD-1 (if applicable) (Borrower)
+*   Disposition HUD-1 (if applicable) (Borrower)
 *   Company Asset Statement (Company)
 *   EIN Certificate (Company)
 *   Formation Documentation (Company)
@@ -59,8 +61,6 @@ The documents in the 'documentRequestList' field MUST be categorized into 'borro
 *   Business License (Company)
 *   Certificate of Good Standing (Company)
 *   Business Debt Schedule (Company)
-*   Purchase HUD-1 (if applicable) (Subject Property)
-*   Disposition HUD-1 (if applicable) (Subject Property)
 
 
 **Document Requirements by Loan Program:**
