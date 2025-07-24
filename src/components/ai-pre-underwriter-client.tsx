@@ -7,9 +7,10 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { aiPreUnderwriter, type AiPreUnderwriterOutput } from '@/ai/flows/ai-pre-underwriter';
-import { Loader2, Upload, FileText, AlertTriangle, CheckCircle, ListTodo } from 'lucide-react';
+import { Loader2, Upload, FileText, AlertTriangle, CheckCircle, ListTodo, Circle, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from './ui/label';
+import { cn } from '@/lib/utils';
 
 const fileToDataUri = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -34,11 +35,40 @@ export function AIPReUnderwriterClient() {
   };
 
   const handleSubmit = async () => {
-    if (!loanProgram || files.length === 0) {
-      toast({
+    if (!loanProgram) {
+       toast({
         variant: 'destructive',
-        title: 'Missing Information',
-        description: 'Please select a loan program and upload at least one document.',
+        title: 'Missing Loan Program',
+        description: 'Please select a loan program to get a document list.',
+      });
+      // Set a dummy result just to show the doc list
+      const dummyResult: AiPreUnderwriterOutput = {
+        prequalificationStatus: 'Needs Documents',
+        missingDocuments: [],
+        potentialIssues: [],
+        documentRequestList: [],
+      };
+      
+      setIsLoading(true);
+      setResult(null);
+      try {
+        const response = await aiPreUnderwriter({ loanProgram, uploadedDocuments: []});
+        dummyResult.documentRequestList = response.documentRequestList;
+        dummyResult.missingDocuments = response.documentRequestList;
+        setResult(dummyResult)
+      } catch (error) {
+         console.error('AI Pre-Underwriter Error:', error);
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
+    
+    if (files.length === 0) {
+       toast({
+        variant: 'destructive',
+        title: 'No Documents Uploaded',
+        description: 'Please upload documents to analyze.',
       });
       return;
     }
@@ -71,11 +101,43 @@ export function AIPReUnderwriterClient() {
     }
   };
 
+  const getPrequalificationStatusProps = (status: string | undefined) => {
+    switch (status) {
+      case 'Prequalified':
+        return {
+          className: 'border-green-500 bg-green-500/10',
+          icon: <CheckCircle className="h-4 w-4 text-green-700" />,
+          title: 'Prequalified',
+        };
+      case 'Needs Review':
+        return {
+          className: 'border-yellow-500 bg-yellow-500/10',
+          icon: <AlertTriangle className="h-4 w-4 text-yellow-700" />,
+          title: 'Needs Review',
+        };
+       case 'Not Prequalified':
+        return {
+          className: 'border-red-500 bg-red-500/10',
+          icon: <AlertTriangle className="h-4 w-4 text-red-700" />,
+          title: 'Not Prequalified',
+        };
+      default:
+        return {
+           className: 'border-blue-500 bg-blue-500/10',
+           icon: <FileText className="h-4 w-4 text-blue-700" />,
+           title: 'Needs Documents'
+        }
+    }
+  };
+
+  const prequalProps = getPrequalificationStatusProps(result?.prequalificationStatus);
+
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>AI-Powered Pre-Underwriting</CardTitle>
-        <CardDescription>Select a loan program and upload your documents to get an instant pre-qualification analysis.</CardDescription>
+        <CardDescription>Select a loan program and upload your documents to get an instant pre-qualification analysis and document checklist.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid md:grid-cols-2 gap-4">
@@ -142,16 +204,38 @@ export function AIPReUnderwriterClient() {
         {result && (
           <div className="space-y-4 pt-4">
             <h3 className="text-lg font-semibold font-headline">Analysis Result</h3>
-            <Alert className={
-                result.prequalificationStatus === 'Prequalified' ? 'border-green-500' :
-                result.prequalificationStatus === 'Needs Review' ? 'border-yellow-500' : 'border-red-500'
-            }>
-              <CheckCircle className="h-4 w-4" />
-              <AlertTitle>Prequalification Status: {result.prequalificationStatus}</AlertTitle>
+            <Alert className={prequalProps.className}>
+              {prequalProps.icon}
+              <AlertTitle>Prequalification Status: {prequalProps.title}</AlertTitle>
             </Alert>
             
             <div className="grid md:grid-cols-2 gap-4">
-                {result.potentialIssues.length > 0 && <Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-base"><ListTodo className="h-5 w-5 text-primary" /> Document Checklist</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {result.documentRequestList.length > 0 ? (
+                             <ul className="space-y-3">
+                                {result.documentRequestList.map((doc, i) => {
+                                    const isUploaded = !result.missingDocuments.includes(doc);
+                                    return (
+                                        <li key={i} className="flex items-center gap-3 text-sm">
+                                            {isUploaded ? (
+                                                <Check className="h-5 w-5 text-green-600 bg-green-100 rounded-full p-0.5" />
+                                            ) : (
+                                                <Circle className="h-5 w-5 text-muted-foreground" />
+                                            )}
+                                            <span className={cn(isUploaded && "line-through text-muted-foreground")}>{doc}</span>
+                                        </li>
+                                    )
+                                })}
+                            </ul>
+                        ) : <p className="text-sm text-muted-foreground">Select a loan program to see the required documents.</p>}
+                    </CardContent>
+                </Card>
+
+                 {result.potentialIssues.length > 0 && <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-base"><AlertTriangle className="h-5 w-5 text-destructive" /> Potential Issues</CardTitle>
                     </CardHeader>
@@ -162,29 +246,7 @@ export function AIPReUnderwriterClient() {
                     </CardContent>
                 </Card>}
 
-                {result.missingDocuments.length > 0 && <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-base"><FileText className="h-5 w-5 text-yellow-600" /> Missing Documents</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <ul className="list-disc list-inside text-sm space-y-1">
-                            {result.missingDocuments.map((doc, i) => <li key={i}>{doc}</li>)}
-                        </ul>
-                    </CardContent>
-                </Card>}
             </div>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base"><ListTodo className="h-5 w-5 text-primary" /> Full Document Request List</CardTitle>
-                </CardHeader>
-                <CardContent>
-                     <ul className="list-disc list-inside text-sm space-y-1">
-                        {result.documentRequestList.map((doc, i) => <li key={i}>{doc}</li>)}
-                    </ul>
-                </CardContent>
-            </Card>
-
           </div>
         )}
       </CardContent>

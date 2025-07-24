@@ -23,7 +23,7 @@ const AiPreUnderwriterOutputSchema = z.object({
   prequalificationStatus: z.string().describe('The prequalification status based on the provided information (e.g., Prequalified, Needs Review, Not Prequalified).'),
   missingDocuments: z.array(z.string()).describe('A list of required documents that are missing from the uploadedDocuments array based on the loan program.'),
   potentialIssues: z.array(z.string()).describe('A list of potential issues identified during the pre-underwriting process.'),
-  documentRequestList: z.array(z.string()).describe('A list of documents required to close the loan, specific to the selected loan program.'),
+  documentRequestList: z.array(z.string()).describe('A list of all documents required to close the loan, specific to the selected loan program. This list should be comprehensive based on the requirements provided.'),
 });
 export type AiPreUnderwriterOutput = z.infer<typeof AiPreUnderwriterOutputSchema>;
 
@@ -38,8 +38,8 @@ const prompt = ai.definePrompt({
   prompt: `You are an AI underwriter that specializes in pre-underwriting files and providing prequalifications and document request lists based on the selected loan program and the documents provided. The loan program is {{{loanProgram}}}.
 
 You will analyze the provided documents to determine a prequalification status.
-Based on the loan program that is selected, and the document requirements provided below, you will generate a full list of required documents for the 'documentRequestList' field.
-Then, you will compare the uploaded documents against the full list and identify any missing documents for the 'missingDocuments' field.
+Based on the loan program that is selected, and the document requirements provided below, you will generate a full list of required documents and populate it in the 'documentRequestList' field. This list must be comprehensive for the selected program.
+Then, you will compare the filenames of the uploaded documents against the full list you just generated and identify any missing documents. Populate the 'missingDocuments' field with the names of the documents that are required but not present in the upload list.
 Finally, list any potential issues you find in the provided documents.
 
 **Document Requirements by Loan Program:**
