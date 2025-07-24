@@ -21,6 +21,14 @@ type Deal = {
   disposition: string;
 };
 
+type Company = {
+  id: number;
+  companyName: string;
+  companyAddress: string;
+  companyPhone: string;
+  companyEin: string;
+};
+
 const fileToDataUri = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -33,6 +41,10 @@ const fileToDataUri = (file: File): Promise<string> => {
 export default function ProfilePage() {
   const [deals, setDeals] = useState<Deal[]>([
     { id: 1, address: '', purchasePrice: '', rehabAmount: '', disposition: '' },
+  ]);
+
+  const [companies, setCompanies] = useState<Company[]>([
+    { id: Date.now(), companyName: '', companyAddress: '', companyPhone: '', companyEin: '' },
   ]);
 
   const [creditReportFile, setCreditReportFile] = useState<File | null>(null);
@@ -61,6 +73,18 @@ export default function ProfilePage() {
 
   const handleDealChange = (id: number, field: keyof Omit<Deal, 'id'>, value: string) => {
     setDeals(deals.map(deal => (deal.id === id ? { ...deal, [field]: value } : deal)));
+  };
+
+  const handleAddCompany = () => {
+    setCompanies([...companies, { id: Date.now(), companyName: '', companyAddress: '', companyPhone: '', companyEin: '' }]);
+  };
+
+  const handleRemoveCompany = (id: number) => {
+    setCompanies(companies.filter(company => company.id !== id));
+  };
+
+  const handleCompanyChange = (id: number, field: keyof Omit<Company, 'id'>, value: string) => {
+    setCompanies(companies.map(company => (company.id === id ? { ...company, [field]: value } : company)));
   };
 
   const handleCreditReportUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -299,40 +323,59 @@ export default function ProfilePage() {
           </Card>
         </div>
 
-        <div className="lg:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle>Company Information</CardTitle>
-              <CardDescription>Manage your business details and documents.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="companyName">Company Name</Label>
-                <Input id="companyName" placeholder="Acme Inc." />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="companyAddress">Address</Label>
-                <Input id="companyAddress" placeholder="123 Business Rd." />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="companyPhone">Phone Number</Label>
-                <Input id="companyPhone" placeholder="(555) 123-4567" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="companyEin">EIN #</Label>
-                <Input id="companyEin" placeholder="12-3456789" />
-              </div>
-              
-              <div className="space-y-3 pt-2">
-                <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> EIN Certificate</Button>
-                <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Formation Documentation</Button>
-                <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Operating Agreement/Bylaws</Button>
-                <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Partnership/Officer List</Button>
-                <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Business License</Button>
-                <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Certificate of Good Standing</Button>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="lg:col-span-1 space-y-6">
+          {companies.map((company, index) => (
+             <Card key={company.id}>
+                <CardHeader>
+                <div className="flex justify-between items-center">
+                  <CardTitle>Company Information</CardTitle>
+                  {companies.length > 1 && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => handleRemoveCompany(company.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span className="sr-only">Remove Company</span>
+                    </Button>
+                  )}
+                  </div>
+                  <CardDescription>Manage your business details and documents.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor={`companyName-${company.id}`}>Company Name</Label>
+                    <Input id={`companyName-${company.id}`} placeholder="Acme Inc." value={company.companyName} onChange={e => handleCompanyChange(company.id, 'companyName', e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor={`companyAddress-${company.id}`}>Address</Label>
+                    <Input id={`companyAddress-${company.id}`} placeholder="123 Business Rd." value={company.companyAddress} onChange={e => handleCompanyChange(company.id, 'companyAddress', e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor={`companyPhone-${company.id}`}>Phone Number</Label>
+                    <Input id={`companyPhone-${company.id}`} placeholder="(555) 123-4567" value={company.companyPhone} onChange={e => handleCompanyChange(company.id, 'companyPhone', e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor={`companyEin-${company.id}`}>EIN #</Label>
+                    <Input id={`companyEin-${company.id}`} placeholder="12-3456789" value={company.companyEin} onChange={e => handleCompanyChange(company.id, 'companyEin', e.target.value)} />
+                  </div>
+                  
+                  <div className="space-y-3 pt-2">
+                    <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> EIN Certificate</Button>
+                    <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Formation Documentation</Button>
+                    <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Operating Agreement/Bylaws</Button>
+                    <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Partnership/Officer List</Button>
+                    <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Business License</Button>
+                    <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Certificate of Good Standing</Button>
+                  </div>
+                </CardContent>
+              </Card>
+          ))}
+          <Button variant="outline" onClick={handleAddCompany}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Add Another Company
+          </Button>
         </div>
       </div>
       
