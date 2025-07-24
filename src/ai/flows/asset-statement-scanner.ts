@@ -33,9 +33,9 @@ const prompt = ai.definePrompt({
   name: 'scanAssetStatementPrompt',
   input: {schema: ScanAssetStatementInputSchema},
   output: {schema: ScanAssetStatementOutputSchema},
-  prompt: `You are an expert financial data extraction tool. Your task is to scan the provided asset statement document and extract the most recent balance. Look for terms like "Ending Balance", "Current Balance", or the last balance listed in a transaction history.
+  prompt: `You are an expert financial data extraction tool. Your task is to scan the provided asset statement document and extract the most recent balance. If multiple statements are provided, identify the one with the latest date. Look for terms like "Ending Balance", "Current Balance", or the last balance listed in a transaction history.
 
-Analyze the document content and identify the most recent balance. Return it in the specified JSON format. If a balance cannot be found, return "N/A".
+Analyze the document content and identify the most recent balance from the latest statement. Return it in the specified JSON format. If a balance cannot be found, return "N/A".
 
 Asset Statement: {{media url=statementDataUri}}`,
 });
