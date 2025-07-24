@@ -9,6 +9,7 @@ const features = [
     "Minimum FICO score of 650",
     "No experience required",
     "Up to 70% of the as-is market value",
+    "Loan amounts from $100,000 to $3.5M (case-by-case for higher)",
     "Fast funding for time-sensitive acquisitions",
     "Short-term financing from 12-24 months",
     "Interest-only payments to maximize cash flow",
