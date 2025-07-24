@@ -11,7 +11,10 @@ const features = [
     "Terms from 12-24 months with no prepayment penalty",
     "Rehab budgets can exceed purchase price",
     "Close in as little as 10 days",
-    "Financing for single-family, 2-4 units, condos, and townhomes"
+    "Financing for single-family, 2-4 units, condos, and townhomes",
+    "Loan amounts from $100,000 to $3.5M (case-by-case for higher)",
+    "1st lien position required",
+    "Purchase and refinance options available"
 ];
 
 export default function ResidentialNooFixAndFlipPage() {
