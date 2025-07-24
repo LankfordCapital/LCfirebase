@@ -324,6 +324,7 @@ export default function ProfilePage() {
               </div>
               
               <div className="space-y-3 pt-2">
+                <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> EIN Certificate</Button>
                 <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Formation Documentation</Button>
                 <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Operating Agreement/Bylaws</Button>
                 <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Partnership/Officer List</Button>
