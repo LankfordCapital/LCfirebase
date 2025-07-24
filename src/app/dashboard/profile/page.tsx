@@ -6,11 +6,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Upload, PlusCircle, Trash2, ScanLine, Loader2 } from "lucide-react";
+import { Upload, PlusCircle, Trash2, ScanLine, Loader2, Landmark } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { scanCreditReport, type ScanCreditReportOutput } from '@/ai/flows/credit-score-scanner';
+import { scanAssetStatement, type ScanAssetStatementOutput } from '@/ai/flows/asset-statement-scanner';
 
 type Deal = {
   id: number;
@@ -36,7 +37,16 @@ export default function ProfilePage() {
 
   const [creditReportFile, setCreditReportFile] = useState<File | null>(null);
   const [creditScores, setCreditScores] = useState<ScanCreditReportOutput | null>(null);
-  const [isScanning, setIsScanning] = useState(false);
+  const [isScanningCredit, setIsScanningCredit] = useState(false);
+
+  const [personalAssetFile, setPersonalAssetFile] = useState<File | null>(null);
+  const [personalAssetBalance, setPersonalAssetBalance] = useState<ScanAssetStatementOutput | null>(null);
+  const [isScanningPersonalAsset, setIsScanningPersonalAsset] = useState(false);
+  
+  const [companyAssetFile, setCompanyAssetFile] = useState<File | null>(null);
+  const [companyAssetBalance, setCompanyAssetBalance] = useState<ScanAssetStatementOutput | null>(null);
+  const [isScanningCompanyAsset, setIsScanningCompanyAsset] = useState(false);
+
   const { toast } = useToast();
 
   const handleAddDeal = () => {
@@ -69,7 +79,7 @@ export default function ProfilePage() {
       return;
     }
 
-    setIsScanning(true);
+    setIsScanningCredit(true);
     setCreditScores(null);
 
     try {
@@ -88,7 +98,64 @@ export default function ProfilePage() {
         description: 'Could not extract credit scores from the document. Please try again.',
       });
     } finally {
-      setIsScanning(false);
+      setIsScanningCredit(false);
+    }
+  };
+  
+  const handleAssetStatementUpload = (type: 'personal' | 'company', event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+        if(type === 'personal') {
+            setPersonalAssetFile(event.target.files[0]);
+        } else {
+            setCompanyAssetFile(event.target.files[0]);
+        }
+    }
+  }
+
+  const handleScanAssetStatement = async (type: 'personal' | 'company') => {
+    const file = type === 'personal' ? personalAssetFile : companyAssetFile;
+    if (!file) {
+      toast({
+        variant: 'destructive',
+        title: 'No file selected',
+        description: `Please upload a ${type} asset statement to scan.`,
+      });
+      return;
+    }
+
+    if(type === 'personal') {
+        setIsScanningPersonalAsset(true);
+        setPersonalAssetBalance(null);
+    } else {
+        setIsScanningCompanyAsset(true);
+        setCompanyAssetBalance(null);
+    }
+    
+    try {
+        const dataUri = await fileToDataUri(file);
+        const result = await scanAssetStatement({ statementDataUri: dataUri });
+        if(type === 'personal') {
+            setPersonalAssetBalance(result);
+        } else {
+            setCompanyAssetBalance(result);
+        }
+        toast({
+            title: 'Scan Complete',
+            description: `The account balance has been extracted.`,
+        });
+    } catch (error) {
+      console.error('Asset Scan Error:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Scan Failed',
+        description: 'Could not extract the balance from the document. Please try again.',
+      });
+    } finally {
+        if(type === 'personal') {
+            setIsScanningPersonalAsset(false);
+        } else {
+            setIsScanningCompanyAsset(false);
+        }
     }
   };
 
@@ -141,8 +208,8 @@ export default function ProfilePage() {
                     <Label htmlFor="credit-report-upload">Upload Tri-Merged Credit Report</Label>
                     <div className="flex gap-2">
                         <Input id="credit-report-upload" type="file" onChange={handleCreditReportUpload} />
-                        <Button onClick={handleScanCreditReport} disabled={isScanning || !creditReportFile}>
-                            {isScanning ? <Loader2 className="animate-spin" /> : <ScanLine />}
+                        <Button onClick={handleScanCreditReport} disabled={isScanningCredit || !creditReportFile}>
+                            {isScanningCredit ? <Loader2 className="animate-spin" /> : <ScanLine />}
                             <span className="ml-2 hidden sm:inline">Scan Report</span>
                         </Button>
                     </div>
@@ -164,6 +231,54 @@ export default function ProfilePage() {
                         </div>
                     </div>
                 )}
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+                <CardTitle>AI Asset Verification</CardTitle>
+                <CardDescription>Upload asset statements to have our AI extract the most recent balances.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="space-y-4 rounded-md border p-4">
+                     <h4 className="font-semibold">Personal Assets</h4>
+                     <div className="space-y-2">
+                        <Label htmlFor="personal-asset-upload">Upload Latest Personal Asset Statement</Label>
+                        <div className="flex gap-2">
+                            <Input id="personal-asset-upload" type="file" onChange={(e) => handleAssetStatementUpload('personal', e)} />
+                            <Button onClick={() => handleScanAssetStatement('personal')} disabled={isScanningPersonalAsset || !personalAssetFile}>
+                                {isScanningPersonalAsset ? <Loader2 className="animate-spin" /> : <Landmark />}
+                                <span className="ml-2 hidden sm:inline">Scan</span>
+                            </Button>
+                        </div>
+                    </div>
+                    {personalAssetBalance && (
+                        <div>
+                            <p className="text-sm font-medium text-muted-foreground">Most Recent Balance</p>
+                            <p className="text-2xl font-bold">{personalAssetBalance.balance}</p>
+                        </div>
+                    )}
+                </div>
+
+                 <div className="space-y-4 rounded-md border p-4">
+                     <h4 className="font-semibold">Company Assets</h4>
+                     <div className="space-y-2">
+                        <Label htmlFor="company-asset-upload">Upload Latest Company Asset Statement</Label>
+                        <div className="flex gap-2">
+                            <Input id="company-asset-upload" type="file" onChange={(e) => handleAssetStatementUpload('company', e)} />
+                            <Button onClick={() => handleScanAssetStatement('company')} disabled={isScanningCompanyAsset || !companyAssetFile}>
+                                {isScanningCompanyAsset ? <Loader2 className="animate-spin" /> : <Landmark />}
+                                <span className="ml-2 hidden sm:inline">Scan</span>
+                            </Button>
+                        </div>
+                    </div>
+                    {companyAssetBalance && (
+                        <div>
+                            <p className="text-sm font-medium text-muted-foreground">Most Recent Balance</p>
+                            <p className="text-2xl font-bold">{companyAssetBalance.balance}</p>
+                        </div>
+                    )}
+                </div>
             </CardContent>
           </Card>
 
