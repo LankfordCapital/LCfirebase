@@ -8,7 +8,13 @@ const features = [
     "Competitive interest rates and terms",
     "Flexible draw schedules to match construction milestones",
     "Expert support from experienced commercial lenders",
-    "Financing for a variety of property types"
+    "Financing for a variety of property types",
+    "No experience required",
+    "660 minimum FICO Score",
+    "Up to 80% loan to cost, with mezzanine financing up to 90% loan to cost",
+    "Up to 70% of the after constructed value depending on collateral type",
+    "Syndications are OK",
+    "Available in 40 States"
 ];
 
 export default function CommercialGroundUpConstructionPage() {
