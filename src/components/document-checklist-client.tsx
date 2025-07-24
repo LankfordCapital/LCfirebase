@@ -146,7 +146,7 @@ function DocumentChecklistComponent() {
 
   if (!loanProgram) {
     return (
-        <div className="flex flex-col items-center justify-center h-full text-center">
+        <div className="flex flex-col items-center justify-center h-full text-center p-8">
             <h2 className="text-2xl font-bold mb-2">No Loan Program Selected</h2>
             <p className="text-muted-foreground mb-4">Please go back and select a loan program to view the checklist.</p>
             <Button asChild>
@@ -171,8 +171,9 @@ function DocumentChecklistComponent() {
                 </CardHeader>
                 <CardContent>
                     {isLoading ? (
-                        <div className="space-y-2">
-                           <Loader2 className="mr-2 h-4 w-4 animate-spin"/> Loading checklist...
+                        <div className="flex items-center space-x-2 text-muted-foreground">
+                           <Loader2 className="h-4 w-4 animate-spin"/>
+                           <span>Loading checklist...</span>
                         </div>
                     ) : result ? (
                         <Accordion type="multiple" defaultValue={['borrower', 'company', 'subjectProperty']} className="w-full">
