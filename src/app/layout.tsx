@@ -6,6 +6,7 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { AIAssistant } from '@/components/ai-assistant';
+import { Providers } from '@/components/providers';
 
 const fontBody = Inter({
   subsets: ['latin'],
@@ -33,13 +34,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn(fontBody.variable, fontHeadline.variable)}>
       <body className="font-body antialiased">
-        <div className="flex min-h-screen flex-col">
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </div>
-        <AIAssistant />
-        <Toaster />
+        <Providers>
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+          <AIAssistant />
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );
