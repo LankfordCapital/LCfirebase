@@ -18,6 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { BusinessDebtSchedule } from '@/components/business-debt-schedule';
 
 type Deal = {
   id: number;
@@ -421,6 +422,19 @@ export default function ProfilePage() {
                     <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Business License</Button>
                     <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Certificate of Good Standing</Button>
                   </div>
+                   <Collapsible>
+                    <CollapsibleTrigger asChild>
+                      <Button variant="outline" className="w-full justify-start">
+                        <FileText className="mr-2" />
+                        Business Debt Schedule
+                      </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                        <div className="py-4">
+                          <BusinessDebtSchedule />
+                        </div>
+                    </CollapsibleContent>
+                   </Collapsible>
                 </CardContent>
               </Card>
           ))}
@@ -500,5 +514,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-
-    
