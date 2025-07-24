@@ -5,10 +5,13 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 
 const features = [
+    "Rates starting at 9.5% and 2 points",
+    "Minimum FICO score of 650",
+    "No experience required",
+    "Up to 70% of the as-is market value",
     "Fast funding for time-sensitive acquisitions",
     "Short-term financing from 12-24 months",
     "Interest-only payments to maximize cash flow",
-    "Financing for non-owner occupied residential properties",
     "Clear path to permanent financing"
 ];
 
