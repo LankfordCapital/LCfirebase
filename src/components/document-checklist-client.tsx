@@ -94,24 +94,26 @@ function DocumentChecklistComponent() {
     if (event.target.files && event.target.files[0] && checklist) {
       const file = event.target.files[0];
       
-      const newDoc: Document = {
+      const newDoc: Omit<Document, 'dataUri'> = {
         name: itemName,
         file,
-        dataUri: '',
         status: 'uploaded',
       };
-      await addDocument(newDoc);
       
-      const updatedChecklist = { ...checklist };
-      const itemIndex = updatedChecklist[category].findIndex(item => item.name === itemName);
-      if (itemIndex > -1) {
-        updatedChecklist[category][itemIndex] = {
-          ...updatedChecklist[category][itemIndex],
-          status: 'uploaded',
-          file: file,
-          dataUri: (await documents[itemName])?.dataUri,
-        };
-        setChecklist(updatedChecklist);
+      const success = await addDocument(newDoc);
+      
+      if (success) {
+        const updatedChecklist = { ...checklist };
+        const itemIndex = updatedChecklist[category].findIndex(item => item.name === itemName);
+        if (itemIndex > -1) {
+          updatedChecklist[category][itemIndex] = {
+            ...updatedChecklist[category][itemIndex],
+            status: 'uploaded',
+            file: file,
+            dataUri: (await documents[itemName])?.dataUri,
+          };
+          setChecklist(updatedChecklist);
+        }
       }
     }
   };

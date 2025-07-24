@@ -39,15 +39,6 @@ type Company = {
   companyEin: string;
 };
 
-const fileToDataUri = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-};
-
 export default function ProfilePage() {
   const { addDocument, documents } = useDocumentContext();
   const { toast } = useToast();
@@ -84,26 +75,11 @@ export default function ProfilePage() {
   const handleDocumentUpload = async (docName: string, event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
         const file = event.target.files[0];
-        try {
-            const dataUri = await fileToDataUri(file);
-            addDocument({
-                name: docName,
-                file,
-                dataUri,
-                status: 'uploaded'
-            });
-            toast({
-                title: 'Document Uploaded',
-                description: `${docName} has been uploaded and saved.`,
-            });
-        } catch (error) {
-            console.error('File to Data URI conversion failed', error);
-            toast({
-                variant: 'destructive',
-                title: 'Upload Failed',
-                description: `Could not process ${file.name}. Please try again.`,
-            });
-        }
+        addDocument({
+            name: docName,
+            file,
+            status: 'uploaded'
+        });
     }
   };
 
