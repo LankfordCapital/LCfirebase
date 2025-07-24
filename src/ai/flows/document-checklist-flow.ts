@@ -145,7 +145,16 @@ The documents in the 'documentRequestList' field MUST be categorized into 'borro
     *   Business Debt Schedule (Company)
     *   Signed Purchase Agreement (Subject Property)
     *   Lease Agreements for subject property (if applicable) (Subject Property)
-    *   Insurance Quote (Subject Property)
+    *   Projected Lease Comparables (if vacant) (Subject Property)
+    *   Commercial Liability Insurance Quote (Subject Property)
+    *   Insurance Agent Details (Name, Company, Phone, Email) (Subject Property)
+    *   Preliminary Title Commitment (Subject Property)
+    *   Escrow Instructions (Subject Property)
+    *   Closing Protection Letter (Subject Property)
+    *   Title/Escrow Agent Details (Name, Company, Phone, Email) (Subject Property)
+    *   Property HUD-1/Settlement Statement (if a refinance) (Subject Property)
+    *   30-Day Payoff Statement with Per Diem (if a refinance) (Subject Property)
+
 
 *   **Residential NOO - Bridge:**
     *   ID/Driver's License (Borrower)
