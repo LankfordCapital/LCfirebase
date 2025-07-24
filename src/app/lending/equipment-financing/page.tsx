@@ -9,7 +9,12 @@ const features = [
     "Competitive rates and flexible repayment terms",
     "Potential tax advantages through Section 179",
     "Preserve working capital for other business needs",
-    "Simple and fast application process"
+    "Simple and fast application process",
+    "Leasing or a Loan Available",
+    "Up to 97% of the purchase price available",
+    "Minimum FICO Score of 660",
+    "Low-doc, full-doc, and application-only options",
+    "Fast approvals and funding"
 ];
 
 export default function EquipmentFinancingPage() {
