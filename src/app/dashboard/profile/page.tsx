@@ -171,6 +171,10 @@ export default function ProfilePage() {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="grid md:grid-cols-2 gap-4 pt-2">
+                  <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Purchase HUD-1</Button>
+                  <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Disposition HUD-1</Button>
+              </div>
               {index < deals.length - 1 && <Separator />}
             </div>
           ))}
