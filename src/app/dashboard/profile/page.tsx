@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Upload, PlusCircle, Trash2, ScanLine, Loader2, Landmark, FileText } from "lucide-react";
+import { Upload, PlusCircle, Trash2, ScanLine, Loader2, Landmark, FileText, Calendar as CalendarIcon } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
@@ -14,6 +14,10 @@ import { scanCreditReport, type ScanCreditReportOutput } from '@/ai/flows/credit
 import { scanAssetStatement, type ScanAssetStatementOutput } from '@/ai/flows/asset-statement-scanner';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { PersonalFinancialStatement } from '@/components/personal-financial-statement';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 type Deal = {
   id: number;
@@ -60,6 +64,8 @@ export default function ProfilePage() {
   const [companyAssetFile, setCompanyAssetFile] = useState<File | null>(null);
   const [companyAssetBalance, setCompanyAssetBalance] = useState<ScanAssetStatementOutput | null>(null);
   const [isScanningCompanyAsset, setIsScanningCompanyAsset] = useState(false);
+
+  const [dateOfBirth, setDateOfBirth] = useState<Date>();
 
   const { toast } = useToast();
 
@@ -218,6 +224,37 @@ export default function ProfilePage() {
                   <Input id="lastName" defaultValue="Doe" />
                 </div>
               </div>
+               <div className="grid md:grid-cols-2 gap-4">
+                 <div className="space-y-2">
+                   <Label htmlFor="ssn">Social Security Number</Label>
+                   <Input id="ssn" placeholder="***-**-****" />
+                 </div>
+                 <div className="space-y-2">
+                   <Label htmlFor="dob">Date of Birth</Label>
+                   <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !dateOfBirth && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {dateOfBirth ? format(dateOfBirth, "PPP") : <span>Pick a date</span>}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={dateOfBirth}
+                          onSelect={setDateOfBirth}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                 </div>
+               </div>
                <div className="space-y-3 pt-2">
                  <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Upload ID/Driver's License</Button>
                </div>
@@ -463,3 +500,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+    

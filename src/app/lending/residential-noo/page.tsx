@@ -76,7 +76,7 @@ export default function ResidentialNooPage() {
       <section className="bg-primary/5 py-16 md:py-24">
         <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
           <div className="relative h-80 w-full rounded-lg overflow-hidden shadow-lg">
-             <Image src="https://storage.googleapis.com/aip-dev-images-us-central1/public/b6a221a4-9252-4d1a-85d7-010515152554" alt="Modern residential house" layout="fill" objectFit="cover" data-ai-hint="family home" />
+             <img src="https://storage.googleapis.com/aip-dev-images-us-central1/public/b6a221a4-9252-4d1a-85d7-010515152554" alt="Modern residential house" className="w-full h-full object-cover" data-ai-hint="family home" />
           </div>
           <div>
             <h2 className="font-headline text-3xl font-bold text-primary">Partner with the Experts</h2>
@@ -92,3 +92,5 @@ export default function ResidentialNooPage() {
     </div>
   );
 }
+
+    
