@@ -7,11 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { aiPreUnderwriter, type AiPreUnderwriterOutput } from '@/ai/flows/ai-pre-underwriter';
-import { Loader2, Upload, FileText, AlertTriangle, CheckCircle, ListTodo, Circle, Check } from 'lucide-react';
+import { Loader2, Upload, FileText, AlertTriangle, CheckCircle, ListTodo, Circle, Check, User, Building, Home } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from './ui/label';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 
 const fileToDataUri = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -21,6 +22,15 @@ const fileToDataUri = (file: File): Promise<string> => {
       reader.readAsDataURL(file);
     });
 };
+
+type ChecklistCategory = 'borrower' | 'company' | 'subjectProperty';
+
+const categoryDetails: Record<ChecklistCategory, { title: string; icon: React.ReactNode }> = {
+    borrower: { title: 'Borrower Documents', icon: <User className="h-5 w-5 text-primary" /> },
+    company: { title: 'Company Documents', icon: <Building className="h-5 w-5 text-primary" /> },
+    subjectProperty: { title: 'Subject Property Documents', icon: <Home className="h-5 w-5 text-primary" /> },
+};
+
 
 function DocumentChecklistComponent() {
   const searchParams = useSearchParams();
@@ -165,21 +175,42 @@ function DocumentChecklistComponent() {
                            <Loader2 className="mr-2 h-4 w-4 animate-spin"/> Loading checklist...
                         </div>
                     ) : result ? (
-                         <ul className="space-y-3">
-                            {result.documentRequestList.map((doc, i) => {
-                                const isUploaded = !result.missingDocuments.includes(doc);
+                        <Accordion type="multiple" defaultValue={['borrower', 'company', 'subjectProperty']} className="w-full">
+                           {(Object.keys(categoryDetails) as ChecklistCategory[]).map(category => {
+                                const requestList = result.documentRequestList?.[category] || [];
+                                const missingList = result.missingDocuments?.[category] || [];
+
+                                if (requestList.length === 0) return null;
+
                                 return (
-                                    <li key={i} className="flex items-center gap-3 text-sm">
-                                        {isUploaded ? (
-                                            <Check className="h-5 w-5 text-green-600 bg-green-100 rounded-full p-0.5" />
-                                        ) : (
-                                            <Circle className="h-5 w-5 text-muted-foreground" />
-                                        )}
-                                        <span className={cn(isUploaded && "line-through text-muted-foreground")}>{doc}</span>
-                                    </li>
+                                    <AccordionItem key={category} value={category}>
+                                        <AccordionTrigger className="text-lg font-semibold">
+                                            <div className="flex items-center gap-2">
+                                                {categoryDetails[category].icon}
+                                                {categoryDetails[category].title}
+                                            </div>
+                                        </AccordionTrigger>
+                                        <AccordionContent>
+                                            <ul className="space-y-3 pt-2">
+                                                {requestList.map((doc, i) => {
+                                                    const isUploaded = !missingList.includes(doc);
+                                                    return (
+                                                        <li key={i} className="flex items-center gap-3 text-sm">
+                                                            {isUploaded ? (
+                                                                <Check className="h-5 w-5 text-green-600 bg-green-100 rounded-full p-0.5" />
+                                                            ) : (
+                                                                <Circle className="h-5 w-5 text-muted-foreground" />
+                                                            )}
+                                                            <span className={cn(isUploaded && "line-through text-muted-foreground")}>{doc}</span>
+                                                        </li>
+                                                    )
+                                                })}
+                                            </ul>
+                                        </AccordionContent>
+                                    </AccordionItem>
                                 )
-                            })}
-                        </ul>
+                           })}
+                        </Accordion>
                     ) : <p className="text-sm text-muted-foreground">Select a loan program to see the required documents.</p>}
                 </CardContent>
             </Card>
@@ -220,7 +251,7 @@ function DocumentChecklistComponent() {
                         {result.potentialIssues.length > 0 && <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-base"><AlertTriangle className="h-5 w-5 text-destructive" /> Potential Issues</CardTitle>
-                            </CardHeader>
+                            </Header>
                             <CardContent>
                                 <ul className="list-disc list-inside text-sm space-y-1">
                                     {result.potentialIssues.map((issue, i) => <li key={i}>{issue}</li>)}
