@@ -9,16 +9,25 @@ const loanTypes = [
     title: "Ground Up Construction",
     description: "Financing for new residential construction projects from the ground up.",
     features: ["Competitive rates", "Flexible draw schedules", "Experienced support"],
+    href: "/lending/residential-noo-construction",
   },
   {
     title: "Fix and Flip",
     description: "Short-term loans for purchasing and renovating properties to sell for a profit.",
     features: ["Fast funding", "Up to 90% of purchase price", "Interest-only payments"],
+    href: "/lending/residential-noo-fix-and-flip",
   },
   {
     title: "DSCR Loans",
     description: "Loans qualified based on property cash flow (Debt Service Coverage Ratio), not personal income.",
     features: ["No personal income verification", "Ideal for investors", "Streamlined process"],
+    href: "/lending/residential-noo-dscr",
+  },
+  {
+    title: "Bridge Loans",
+    description: "Short-term financing to bridge the gap between property acquisitions.",
+    features: ["Quick closing", "Flexible terms", "Secure opportunities fast"],
+    href: "/lending/residential-noo-bridge",
   }
 ];
 
@@ -36,7 +45,7 @@ export default function ResidentialNooPage() {
 
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {loanTypes.map((loan) => (
               <Card key={loan.title} className="flex flex-col">
                 <CardHeader>
@@ -55,7 +64,7 @@ export default function ResidentialNooPage() {
                 </CardContent>
                 <div className="p-6 pt-0">
                   <Button asChild className="w-full">
-                    <Link href="/dashboard">Apply Now</Link>
+                    <Link href={loan.href}>Learn More</Link>
                   </Button>
                 </div>
               </Card>

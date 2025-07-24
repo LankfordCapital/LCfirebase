@@ -17,6 +17,7 @@ import React from 'react';
 
 const lendingProducts = [
   { href: '/lending/residential-noo', label: 'Residential NOO', icon: Building },
+  { href: '/lending/residential-noo-bridge', label: 'Residential NOO Bridge', icon: Building },
   { href: '/lending/commercial', label: 'Commercial', icon: Wrench },
   { href: '/lending/industrial', label: 'Industrial', icon: Factory },
   { href: '/lending/land-acquisition', label: 'Land Acquisition', icon: LandPlot },
