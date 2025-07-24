@@ -1,3 +1,6 @@
+
+'use client';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -8,6 +11,10 @@ import { PlusCircle, Users, DollarSign, BarChart, MoreHorizontal, Calendar, Mail
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useDocumentContext } from "@/contexts/document-context";
+import { useState } from "react";
+
 
 const summaryCards = [
     { title: "Active Borrowers", value: "5", icon: <Users className="h-4 w-4 text-muted-foreground" /> },
@@ -22,12 +29,54 @@ const borrowerLoans = [
 ];
 
 export default function BrokerOfficePage() {
+    const { addDocument, documents } = useDocumentContext();
+
+    const handleDocumentUpload = async (docName: string, event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+            const file = event.target.files[0];
+            addDocument({
+                name: docName,
+                file,
+                status: 'uploaded'
+            });
+        }
+    };
+
+    const UploadButton = ({ docName }: { docName: string }) => {
+        const fileInputId = `upload-${docName.replace(/\s+/g, '-')}`;
+        const doc = documents[docName];
+        return (
+            <div className="space-y-2">
+                <Label htmlFor={fileInputId}>{docName}</Label>
+                <div className="flex items-center gap-2">
+                    <Input 
+                        id={fileInputId} 
+                        type="file" 
+                        onChange={(e) => handleDocumentUpload(docName, e)} 
+                    />
+                    <Button size="icon" variant="ghost">
+                        <Upload className="h-4 w-4"/>
+                        {doc && <span className="text-green-500 ml-2">(Uploaded)</span>}
+                    </Button>
+                </div>
+            </div>
+        );
+    };
+
+
   return (
     <div className="container mx-auto p-4 md:p-8 space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="font-headline text-3xl font-bold">Broker Back Office</h1>
-          <p className="text-muted-foreground">Broker Name | Broker Company LLC</p>
+        <div className="flex items-center gap-4">
+            <Avatar className="h-20 w-20">
+              <AvatarImage src="https://placehold.co/80x80.png" />
+              <AvatarFallback>BD</AvatarFallback>
+            </Avatar>
+            <div>
+              <h1 className="font-headline text-3xl font-bold">Broker Back Office</h1>
+              <p className="text-muted-foreground">Broker Name | Broker Company LLC</p>
+              <Button variant="outline" size="sm" className="mt-2">Change Photo</Button>
+            </div>
         </div>
         <Button asChild>
             <Link href="/dashboard/documents"><PlusCircle className="mr-2 h-4 w-4"/> Start New Application</Link>
@@ -126,27 +175,9 @@ export default function BrokerOfficePage() {
                     <CardDescription>Upload your compliance documents here.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="w9-upload">W-9</Label>
-                        <div className="flex items-center gap-2">
-                           <Input id="w9-upload" type="file" />
-                           <Button size="icon" variant="ghost"><Upload className="h-4 w-4"/></Button>
-                        </div>
-                    </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="wiring-upload">Wiring Instructions</Label>
-                        <div className="flex items-center gap-2">
-                           <Input id="wiring-upload" type="file" />
-                           <Button size="icon" variant="ghost"><Upload className="h-4 w-4"/></Button>
-                        </div>
-                    </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="id-upload">ID / Driver's License</Label>
-                        <div className="flex items-center gap-2">
-                           <Input id="id-upload" type="file" />
-                           <Button size="icon" variant="ghost"><Upload className="h-4 w-4"/></Button>
-                        </div>
-                    </div>
+                    <UploadButton docName="W-9 (Broker)" />
+                    <UploadButton docName="Wiring Instructions (Broker)" />
+                    <UploadButton docName="ID/Driver's License (Broker)" />
                 </CardContent>
             </Card>
         </div>
@@ -154,3 +185,4 @@ export default function BrokerOfficePage() {
     </div>
   );
 }
+
