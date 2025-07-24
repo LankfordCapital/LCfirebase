@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,12 +8,13 @@ import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { PlusCircle, Users, BarChart, DollarSign, MoreHorizontal, FileWarning, Search } from "lucide-react";
+import { PlusCircle, Users, BarChart, DollarSign, MoreHorizontal, FileWarning, Search, Briefcase } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 
 const summaryCards = [
@@ -27,6 +29,13 @@ const clientLoans = [
     { id: "LL-00127", borrower: "Sam Wilson", broker: "Mortgage Pro", property: "789 Pine Ln", type: "Ground Up", status: "Missing Docs", progress: 25, missingDocuments: ["Approved Plans", "Builder's Risk Insurance"] },
     { id: "LL-00128", borrower: "Alpha Corp", broker: "Direct", property: "101 Factory Rd", type: "Industrial Rehab", status: "Initial Review", progress: 15, missingDocuments: ["Business Financials (3 years)"] },
     { id: "LL-00129", borrower: "Bridge Holdings", broker: "Capital Partners", property: "210 Commerce St", type: "Commercial Bridge", status: "Funded", progress: 100, missingDocuments: [] },
+];
+
+const brokerPipeline = [
+    { id: "BRK-001", name: "Alice Johnson", company: "Creative Capital", activeLoans: 5, totalVolume: "$2.1M", status: "Approved" },
+    { id: "BRK-002", name: "Bob Williams", company: "Mortgage Pro", activeLoans: 8, totalVolume: "$3.5M", status: "Approved" },
+    { id: "BRK-003", name: "Charlie Brown", company: "Prestige Lending", activeLoans: 2, totalVolume: "$850K", status: "Approved" },
+    { id: "BRK-004", name: "Diana Prince", company: "Capital Partners", activeLoans: 12, totalVolume: "$7.2M", status: "Approved" },
 ];
 
 export default function WorkforceOfficePage() {
@@ -70,45 +79,125 @@ export default function WorkforceOfficePage() {
         ))}
       </div>
       
-        <Card>
-            <CardHeader>
-                <CardTitle>Client Loan Pipeline</CardTitle>
-                <CardDescription>Manage and track all client loan applications.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Dialog>
+       <Tabs defaultValue="client-pipeline">
+        <TabsList className="grid w-full grid-cols-2 md:w-[400px]">
+          <TabsTrigger value="client-pipeline"><Users className="mr-2 h-4 w-4" /> Client Pipeline</TabsTrigger>
+          <TabsTrigger value="broker-pipeline"><Briefcase className="mr-2 h-4 w-4" /> Broker Pipeline</TabsTrigger>
+        </TabsList>
+        <TabsContent value="client-pipeline">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Client Loan Pipeline</CardTitle>
+                    <CardDescription>Manage and track all client loan applications.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Dialog>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Borrower</TableHead>
+                                    <TableHead>Broker</TableHead>
+                                    <TableHead>Loan ID</TableHead>
+                                    <TableHead>Type</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Progress</TableHead>
+                                    <TableHead><span className="sr-only">Actions</span></TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {clientLoans.map(loan => (
+                                    <TableRow key={loan.id} className="hover:bg-muted/50">
+                                        <TableCell className="font-medium">{loan.borrower}</TableCell>
+                                        <TableCell>{loan.broker}</TableCell>
+                                        <TableCell>{loan.id}</TableCell>
+                                        <TableCell>{loan.type}</TableCell>
+                                        <TableCell>
+                                            <Badge 
+                                            variant={loan.status === 'Approved' ? 'default' : loan.status === 'Missing Docs' ? 'destructive' : loan.status === 'Funded' ? 'default' : 'secondary'}
+                                            className={loan.status === 'Approved' || loan.status === 'Funded' ? 'bg-green-500 hover:bg-green-600' : ''}
+                                            >
+                                            {loan.status}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-2">
+                                            <Progress value={loan.progress} className="w-full md:w-32" />
+                                            <span className="text-xs text-muted-foreground">{loan.progress}%</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                                    <span className="sr-only">Open menu</span>
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DialogTrigger asChild>
+                                                    <DropdownMenuItem onSelect={() => setSelectedLoan(loan)}>View Details</DropdownMenuItem>
+                                                </DialogTrigger>
+                                                <DropdownMenuItem>Manage Documents</DropdownMenuItem>
+                                                <DropdownMenuItem>Send Reminder</DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                         <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Loan Details for {selectedLoan?.borrower}</DialogTitle>
+                                <DialogDescription>Loan ID: {selectedLoan?.id} | Property: {selectedLoan?.property}</DialogDescription>
+                            </DialogHeader>
+                            {selectedLoan?.missingDocuments && selectedLoan.missingDocuments.length > 0 ? (
+                                <div>
+                                    <h3 className="font-semibold mb-2">Missing Documents:</h3>
+                                    <ul className="space-y-2">
+                                        {selectedLoan.missingDocuments.map((doc, index) => (
+                                            <li key={index} className="flex items-center gap-2 text-sm p-2 bg-destructive/10 rounded-md">
+                                                <FileWarning className="h-4 w-4 text-destructive" />
+                                                <span>{doc}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ) : (
+                                <p>All documents have been submitted for this loan.</p>
+                            )}
+                        </DialogContent>
+                    </Dialog>
+                </CardContent>
+            </Card>
+        </TabsContent>
+        <TabsContent value="broker-pipeline">
+             <Card>
+                <CardHeader>
+                    <CardTitle>Approved Broker Pipeline</CardTitle>
+                    <CardDescription>Manage and track all approved broker pipelines.</CardDescription>
+                </CardHeader>
+                <CardContent>
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Borrower</TableHead>
-                                <TableHead>Broker</TableHead>
-                                <TableHead>Loan ID</TableHead>
-                                <TableHead>Type</TableHead>
+                                <TableHead>Broker Name</TableHead>
+                                <TableHead>Company</TableHead>
+                                <TableHead>Active Loans</TableHead>
+                                <TableHead>Total Volume</TableHead>
                                 <TableHead>Status</TableHead>
-                                <TableHead>Progress</TableHead>
                                 <TableHead><span className="sr-only">Actions</span></TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {clientLoans.map(loan => (
-                                <TableRow key={loan.id} className="hover:bg-muted/50">
-                                    <TableCell className="font-medium">{loan.borrower}</TableCell>
-                                    <TableCell>{loan.broker}</TableCell>
-                                    <TableCell>{loan.id}</TableCell>
-                                    <TableCell>{loan.type}</TableCell>
+                            {brokerPipeline.map(broker => (
+                                <TableRow key={broker.id} className="hover:bg-muted/50">
+                                    <TableCell className="font-medium">{broker.name}</TableCell>
+                                    <TableCell>{broker.company}</TableCell>
+                                    <TableCell>{broker.activeLoans}</TableCell>
+                                    <TableCell>{broker.totalVolume}</TableCell>
                                     <TableCell>
-                                        <Badge 
-                                        variant={loan.status === 'Approved' ? 'default' : loan.status === 'Missing Docs' ? 'destructive' : loan.status === 'Funded' ? 'default' : 'secondary'}
-                                        className={loan.status === 'Approved' || loan.status === 'Funded' ? 'bg-green-500 hover:bg-green-600' : ''}
-                                        >
-                                        {loan.status}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center gap-2">
-                                        <Progress value={loan.progress} className="w-full md:w-32" />
-                                        <span className="text-xs text-muted-foreground">{loan.progress}%</span>
-                                        </div>
+                                        <Badge className="bg-green-500 hover:bg-green-600">{broker.status}</Badge>
                                     </TableCell>
                                     <TableCell>
                                     <DropdownMenu>
@@ -119,11 +208,9 @@ export default function WorkforceOfficePage() {
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            <DialogTrigger asChild>
-                                                <DropdownMenuItem onSelect={() => setSelectedLoan(loan)}>View Details</DropdownMenuItem>
-                                            </DialogTrigger>
-                                            <DropdownMenuItem>Manage Documents</DropdownMenuItem>
-                                            <DropdownMenuItem>Send Reminder</DropdownMenuItem>
+                                            <DropdownMenuItem>View Pipeline</DropdownMenuItem>
+                                            <DropdownMenuItem>Manage Broker</DropdownMenuItem>
+                                            <DropdownMenuItem>Send Communication</DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                     </TableCell>
@@ -131,30 +218,10 @@ export default function WorkforceOfficePage() {
                             ))}
                         </TableBody>
                     </Table>
-                     <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Loan Details for {selectedLoan?.borrower}</DialogTitle>
-                            <DialogDescription>Loan ID: {selectedLoan?.id} | Property: {selectedLoan?.property}</DialogDescription>
-                        </DialogHeader>
-                        {selectedLoan?.missingDocuments && selectedLoan.missingDocuments.length > 0 ? (
-                            <div>
-                                <h3 className="font-semibold mb-2">Missing Documents:</h3>
-                                <ul className="space-y-2">
-                                    {selectedLoan.missingDocuments.map((doc, index) => (
-                                        <li key={index} className="flex items-center gap-2 text-sm p-2 bg-destructive/10 rounded-md">
-                                            <FileWarning className="h-4 w-4 text-destructive" />
-                                            <span>{doc}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ) : (
-                            <p>All documents have been submitted for this loan.</p>
-                        )}
-                    </DialogContent>
-                </Dialog>
-            </CardContent>
-        </Card>
+                </CardContent>
+            </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
