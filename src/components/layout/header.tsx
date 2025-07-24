@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, ChevronDown, Building, Wrench, Warehouse, LandPlot, Layers, Truck, Handshake, Factory } from 'lucide-react';
+import { Menu, ChevronDown, Building, Wrench, Warehouse, LandPlot, Layers, Truck, Handshake, Factory, LayoutDashboard } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -89,14 +89,41 @@ export function Header() {
                     Workforce Sign In
                   </Link>
                 </DropdownMenuItem>
+                 <DropdownMenuItem asChild>
+                  <Link href="/broker-office">
+                    Broker Sign In
+                  </Link>
+                </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </nav>
 
         <div className="hidden md:flex items-center gap-2">
-          <Button asChild>
-            <Link href="/dashboard">Borrower Dashboard</Link>
-          </Button>
+           <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button>
+                <LayoutDashboard className="mr-2"/>
+                Dashboards
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-64">
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard">
+                    Borrower Dashboard
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/broker-office">
+                    Broker Dashboard
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/workforce-office">
+                    Workforce Dashboard
+                  </Link>
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div className="md:hidden">
@@ -140,6 +167,9 @@ export function Header() {
                 <div className="flex flex-col gap-2">
                    <Button variant="ghost" asChild onClick={() => setIsOpen(false)}>
                     <Link href="/auth/signin">Borrower Sign In</Link>
+                  </Button>
+                   <Button variant="ghost" asChild onClick={() => setIsOpen(false)}>
+                    <Link href="/broker-office">Broker Sign In</Link>
                   </Button>
                   <Button variant="ghost" asChild onClick={() => setIsOpen(false)}>
                     <Link href="/auth/workforce-signin">Workforce Sign In</Link>
