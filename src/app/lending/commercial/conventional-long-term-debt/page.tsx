@@ -8,7 +8,13 @@ const features = [
     "Competitive fixed and variable interest rates",
     "Amortization periods up to 30 years",
     "Purchase or refinance options",
-    "Suitable for a wide range of commercial property types"
+    "Suitable for a wide range of commercial property types",
+    "Access to hundreds of banks and debt funds",
+    "5, 7, or 10 year fixed rate terms",
+    "Up to 80% for purchase or rate/term refinancing",
+    "Up to 75% for cash-out refinancing",
+    "Full documentation required",
+    "660 minimum FICO Score"
 ];
 
 export default function CommercialConventionalLongTermDebtPage() {
