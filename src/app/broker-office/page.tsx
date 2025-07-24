@@ -178,6 +178,7 @@ export default function BrokerOfficePage() {
                     <UploadButton docName="W-9 (Broker)" />
                     <UploadButton docName="Wiring Instructions (Broker)" />
                     <UploadButton docName="ID/Driver's License (Broker)" />
+                    <UploadButton docName="Signed Broker Agreement" />
                 </CardContent>
             </Card>
         </div>
@@ -185,4 +186,3 @@ export default function BrokerOfficePage() {
     </div>
   );
 }
-
