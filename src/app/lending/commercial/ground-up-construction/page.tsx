@@ -49,7 +49,7 @@ export default function CommercialGroundUpConstructionPage() {
             </Button>
           </div>
            <div className="relative h-96 w-full rounded-lg overflow-hidden shadow-lg">
-             <Image src="https://placehold.co/600x400.png" alt="Commercial construction site with cranes" layout="fill" objectFit="cover" data-ai-hint="commercial construction" />
+             <Image src="https://storage.googleapis.com/aip-dev-images-us-central1/public/11e54854-c8c7-4389-9a2e-461ca125e1fb" alt="Two construction workers reviewing blueprints on a laptop at a construction site." layout="fill" objectFit="cover" data-ai-hint="commercial construction" />
           </div>
         </div>
       </section>
