@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { aiPreUnderwriter, type AiPreUnderwriterOutput } from '@/ai/flows/ai-pre-underwriter';
@@ -86,10 +86,36 @@ export function AIPReUnderwriterClient() {
                         <SelectValue placeholder="Select a program..." />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="Ground Up Construction">Ground Up Construction</SelectItem>
-                        <SelectItem value="Fix and Flip">Fix and Flip</SelectItem>
-                        <SelectItem value="DSCR">DSCR Loan</SelectItem>
-                        <SelectItem value="SBA">SBA Loan</SelectItem>
+                        <SelectGroup>
+                            <SelectLabel>Residential NOO</SelectLabel>
+                            <SelectItem value="Residential NOO - Ground Up Construction">Ground Up Construction</SelectItem>
+                            <SelectItem value="Residential NOO - Fix and Flip">Fix and Flip</SelectItem>
+                            <SelectItem value="Residential NOO - DSCR">DSCR Loan</SelectItem>
+                            <SelectItem value="Residential NOO - Bridge">Bridge Loan</SelectItem>
+                        </SelectGroup>
+                        <SelectGroup>
+                             <SelectLabel>Commercial</SelectLabel>
+                            <SelectItem value="Commercial - Ground Up Construction">Ground Up Construction</SelectItem>
+                            <SelectItem value="Commercial - Rehab Loans">Rehab Loans</SelectItem>
+                            <SelectItem value="Commercial - Acquisition & Bridge">Acquisition & Bridge</SelectItem>
+                            <SelectItem value="Commercial - Conventional Long Term Debt">Conventional Long Term Debt</SelectItem>
+                        </SelectGroup>
+                         <SelectGroup>
+                             <SelectLabel>Industrial</SelectLabel>
+                            <SelectItem value="Industrial - Ground Up Construction">Ground Up Construction</SelectItem>
+                            <SelectItem value="Industrial - Rehab & Expansion">Rehab & Expansion</SelectItem>
+                             <SelectItem value="Industrial - Acquisition & Bridge">Acquisition & Bridge</SelectItem>
+                            <SelectItem value="Industrial - Long Term Debt">Long Term Debt</SelectItem>
+                        </SelectGroup>
+                         <SelectGroup>
+                             <SelectLabel>Other</SelectLabel>
+                            <SelectItem value="SBA 7(a)">SBA 7(a)</SelectItem>
+                            <SelectItem value="SBA 504">SBA 504</SelectItem>
+                            <SelectItem value="Land Acquisition">Land Acquisition</SelectItem>
+                             <SelectItem value="Mezzanine Loans">Mezzanine Loans</SelectItem>
+                             <SelectItem value="Mobilization Funding">Mobilization Funding</SelectItem>
+                             <SelectItem value="Equipment Financing">Equipment Financing</SelectItem>
+                        </SelectGroup>
                     </SelectContent>
                 </Select>
             </div>
