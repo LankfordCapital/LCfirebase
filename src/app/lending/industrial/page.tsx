@@ -8,18 +8,22 @@ const loanTypes = [
   {
     title: "Ground Up Construction",
     description: "Financing for the construction of new warehouses, distribution centers, and manufacturing facilities.",
+    href: "/lending/industrial/ground-up-construction",
   },
   {
     title: "Rehab & Expansion Loans",
     description: "Funding to renovate, expand, or modernize your existing industrial properties.",
+    href: "/lending/industrial/rehab-expansion-loans",
   },
   {
     title: "Acquisition & Bridge Loans",
     description: "Secure capital quickly to acquire new industrial assets or bridge financing periods.",
+    href: "/lending/industrial/acquisition-bridge-loans",
   },
   {
     title: "Long Term Debt",
     description: "Stable, long-term financing for your income-producing industrial portfolio.",
+    href: "/lending/industrial/long-term-debt",
   },
 ];
 
@@ -50,7 +54,7 @@ export default function IndustrialLendingPage() {
                 <CardContent>
                   <p className="text-muted-foreground">{loan.description}</p>
                    <Button asChild className="w-full mt-6">
-                    <Link href="/dashboard">Learn More</Link>
+                    <Link href={loan.href}>Learn More</Link>
                   </Button>
                 </CardContent>
               </Card>
