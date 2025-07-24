@@ -90,12 +90,22 @@ const whyChooseUs = [
 export default function Home() {
   return (
     <div className="flex flex-col">
-      <section className="relative bg-primary/5 py-20 md:py-32">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="font-headline text-4xl font-bold tracking-tight text-primary md:text-6xl lg:text-7xl">
+      <section className="relative h-[60vh] md:h-[80vh] flex items-center justify-center text-white">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute top-0 left-0 w-full h-full object-cover z-0"
+        >
+          <source src="https://storage.googleapis.com/aip-dev-images-us-central1/public/home-video.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
+        <div className="container relative z-20 mx-auto px-4 text-center">
+          <h1 className="font-headline text-4xl font-bold tracking-tight text-white md:text-6xl lg:text-7xl">
             Building Futures, Funding Dreams
           </h1>
-          <p className="mt-6 max-w-3xl mx-auto text-lg text-foreground/80 md:text-xl">
+          <p className="mt-6 max-w-3xl mx-auto text-lg text-white/90 md:text-xl">
             Lankford Capital provides tailored, innovative financing solutions to power your real estate and business ambitions.
             From ground-up construction to strategic acquisitions, we are your dedicated financial partner.
           </p>
@@ -103,7 +113,7 @@ export default function Home() {
             <Button asChild size="lg" className="font-semibold">
               <Link href="/dashboard">Get Started</Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="font-semibold">
+            <Button asChild size="lg" variant="secondary" className="font-semibold">
               <Link href="/lending/commercial">Explore Loans</Link>
             </Button>
           </div>
