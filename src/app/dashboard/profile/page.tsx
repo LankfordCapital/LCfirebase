@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import { BusinessDebtSchedule } from '@/components/business-debt-schedule';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { useDocumentContext } from '@/contexts/document-context';
 
 type Deal = {
   id: string;
@@ -48,26 +49,26 @@ const fileToDataUri = (file: File): Promise<string> => {
 };
 
 export default function ProfilePage() {
-  const initialDealId = useId();
-  const initialCompanyId = useId();
+  const { addDocument, documents } = useDocumentContext();
+  const { toast } = useToast();
+
+  const dealId = useId();
+  const companyId = useId();
 
   const [deals, setDeals] = useState<Deal[]>([
-    { id: initialDealId, address: '', purchasePrice: '', rehabAmount: '', disposition: '' },
+    { id: dealId, address: '', purchasePrice: '', rehabAmount: '', disposition: '' },
   ]);
 
   const [companies, setCompanies] = useState<Company[]>([
-    { id: initialCompanyId, companyName: '', companyAddress: '', companyPhone: '', companyEin: '' },
+    { id: companyId, companyName: '', companyAddress: '', companyPhone: '', companyEin: '' },
   ]);
-
-  const [creditReportFile, setCreditReportFile] = useState<File | null>(null);
+  
   const [creditScores, setCreditScores] = useState<ScanCreditReportOutput | null>(null);
   const [isScanningCredit, setIsScanningCredit] = useState(false);
 
-  const [personalAssetFile, setPersonalAssetFile] = useState<File | null>(null);
   const [personalAssetBalance, setPersonalAssetBalance] = useState<ScanAssetStatementOutput | null>(null);
   const [isScanningPersonalAsset, setIsScanningPersonalAsset] = useState(false);
   
-  const [companyAssetFile, setCompanyAssetFile] = useState<File | null>(null);
   const [companyAssetBalance, setCompanyAssetBalance] = useState<ScanAssetStatementOutput | null>(null);
   const [isScanningCompanyAsset, setIsScanningCompanyAsset] = useState(false);
 
@@ -80,8 +81,32 @@ export default function ProfilePage() {
   const companyRefs = useRef<(HTMLDivElement | null)[]>([]);
   const dealRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const { toast } = useToast();
-  
+  const handleDocumentUpload = async (docName: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+        const file = event.target.files[0];
+        try {
+            const dataUri = await fileToDataUri(file);
+            addDocument({
+                name: docName,
+                file,
+                dataUri,
+                status: 'uploaded'
+            });
+            toast({
+                title: 'Document Uploaded',
+                description: `${docName} has been uploaded and saved.`,
+            });
+        } catch (error) {
+            console.error('File to Data URI conversion failed', error);
+            toast({
+                variant: 'destructive',
+                title: 'Upload Failed',
+                description: `Could not process ${file.name}. Please try again.`,
+            });
+        }
+    }
+  };
+
   const handleExportPdf = async (element: HTMLElement | null, fileName: string) => {
     if (!element) return;
     const canvas = await html2canvas(element);
@@ -98,7 +123,7 @@ export default function ProfilePage() {
 
   const handleAddDeal = () => {
     if (deals.length < 10) {
-      const newId = `deal-${deals.length}-${Date.now()}`; // Simple unique ID generation
+      const newId = `deal-${deals.length}-${Date.now()}`;
       setDeals([...deals, { id: newId, address: '', purchasePrice: '', rehabAmount: '', disposition: '' }]);
     }
   };
@@ -112,7 +137,7 @@ export default function ProfilePage() {
   };
 
   const handleAddCompany = () => {
-    const newId = `company-${companies.length}-${Date.now()}`; // Simple unique ID generation
+    const newId = `company-${companies.length}-${Date.now()}`;
     setCompanies([...companies, { id: newId, companyName: '', companyAddress: '', companyPhone: '', companyEin: '' }]);
   };
 
@@ -124,14 +149,9 @@ export default function ProfilePage() {
     setCompanies(companies.map(company => (company.id === id ? { ...company, [field]: value } : company)));
   };
 
-  const handleCreditReportUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      setCreditReportFile(event.target.files[0]);
-    }
-  };
-
   const handleScanCreditReport = async () => {
-    if (!creditReportFile) {
+    const creditReport = documents['Credit Report'];
+    if (!creditReport?.file) {
       toast({
         variant: 'destructive',
         title: 'No file selected',
@@ -144,7 +164,7 @@ export default function ProfilePage() {
     setCreditScores(null);
 
     try {
-      const dataUri = await fileToDataUri(creditReportFile);
+      const dataUri = creditReport.dataUri;
       const result = await scanCreditReport({ creditReportDataUri: dataUri });
       setCreditScores(result);
       toast({
@@ -163,19 +183,11 @@ export default function ProfilePage() {
     }
   };
   
-  const handleAssetStatementUpload = (type: 'personal' | 'company', event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-        if(type === 'personal') {
-            setPersonalAssetFile(event.target.files[0]);
-        } else {
-            setCompanyAssetFile(event.target.files[0]);
-        }
-    }
-  }
-
   const handleScanAssetStatement = async (type: 'personal' | 'company') => {
-    const file = type === 'personal' ? personalAssetFile : companyAssetFile;
-    if (!file) {
+    const docName = type === 'personal' ? 'Personal Asset Statement' : 'Company Asset Statement';
+    const assetStatement = documents[docName];
+
+    if (!assetStatement?.file) {
       toast({
         variant: 'destructive',
         title: 'No file selected',
@@ -193,7 +205,7 @@ export default function ProfilePage() {
     }
     
     try {
-        const dataUri = await fileToDataUri(file);
+        const dataUri = assetStatement.dataUri;
         const result = await scanAssetStatement({ statementDataUri: dataUri });
         if(type === 'personal') {
             setPersonalAssetBalance(result);
@@ -218,6 +230,28 @@ export default function ProfilePage() {
             setIsScanningCompanyAsset(false);
         }
     }
+  };
+
+  const UploadButton = ({ docName }: { docName: string }) => {
+    const fileInputId = `upload-${docName.replace(/\s+/g, '-')}`;
+    const doc = documents[docName];
+    return (
+        <div className="relative">
+            <Button variant="outline" className="w-full justify-start" asChild>
+                <Label htmlFor={fileInputId} className="cursor-pointer">
+                    <Upload className="mr-2" /> 
+                    {docName}
+                    {doc && <span className="text-green-500 ml-2">(Uploaded)</span>}
+                </Label>
+            </Button>
+            <Input 
+                id={fileInputId} 
+                type="file" 
+                className="sr-only" 
+                onChange={(e) => handleDocumentUpload(docName, e)} 
+            />
+        </div>
+    );
   };
 
 
@@ -290,7 +324,7 @@ export default function ProfilePage() {
                  </div>
                </div>
                <div className="space-y-3 pt-2">
-                 <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Upload ID/Driver's License</Button>
+                 <UploadButton docName="ID/Driver's License (Borrower)" />
                </div>
                <Collapsible>
                 <CollapsibleTrigger asChild>
@@ -322,8 +356,8 @@ export default function ProfilePage() {
                 <div className="space-y-2">
                     <Label htmlFor="credit-report-upload">Upload Tri-Merged Credit Report</Label>
                     <div className="flex gap-2">
-                        <Input id="credit-report-upload" type="file" onChange={handleCreditReportUpload} />
-                        <Button onClick={handleScanCreditReport} disabled={isScanningCredit || !creditReportFile}>
+                        <Input id="credit-report-upload" type="file" onChange={(e) => handleDocumentUpload('Credit Report (Borrower)', e)} />
+                        <Button onClick={handleScanCreditReport} disabled={isScanningCredit || !documents['Credit Report (Borrower)']}>
                             {isScanningCredit ? <Loader2 className="animate-spin" /> : <ScanLine />}
                             <span className="ml-2 hidden sm:inline">Scan Report</span>
                         </Button>
@@ -365,8 +399,8 @@ export default function ProfilePage() {
                      <div className="space-y-2">
                         <Label htmlFor="personal-asset-upload">Upload Latest Personal Asset Statement</Label>
                         <div className="flex gap-2">
-                            <Input id="personal-asset-upload" type="file" onChange={(e) => handleAssetStatementUpload('personal', e)} />
-                            <Button onClick={() => handleScanAssetStatement('personal')} disabled={isScanningPersonalAsset || !personalAssetFile}>
+                            <Input id="personal-asset-upload" type="file" onChange={(e) => handleDocumentUpload('Personal Asset Statement (Borrower)', e)} />
+                            <Button onClick={() => handleScanAssetStatement('personal')} disabled={isScanningPersonalAsset || !documents['Personal Asset Statement (Borrower)']}>
                                 {isScanningPersonalAsset ? <Loader2 className="animate-spin" /> : <Landmark />}
                                 <span className="ml-2 hidden sm:inline">Scan</span>
                             </Button>
@@ -385,8 +419,8 @@ export default function ProfilePage() {
                      <div className="space-y-2">
                         <Label htmlFor="company-asset-upload">Upload Latest Company Asset Statement</Label>
                         <div className="flex gap-2">
-                            <Input id="company-asset-upload" type="file" onChange={(e) => handleAssetStatementUpload('company', e)} />
-                            <Button onClick={() => handleScanAssetStatement('company')} disabled={isScanningCompanyAsset || !companyAssetFile}>
+                            <Input id="company-asset-upload" type="file" onChange={(e) => handleDocumentUpload('Company Asset Statement (Company)', e)} />
+                            <Button onClick={() => handleScanAssetStatement('company')} disabled={isScanningCompanyAsset || !documents['Company Asset Statement (Company)']}>
                                 {isScanningCompanyAsset ? <Loader2 className="animate-spin" /> : <Landmark />}
                                 <span className="ml-2 hidden sm:inline">Scan</span>
                             </Button>
@@ -468,12 +502,12 @@ export default function ProfilePage() {
                   </div>
                   
                   <div className="space-y-3 pt-2">
-                    <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> EIN Certificate</Button>
-                    <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Formation Documentation</Button>
-                    <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Operating Agreement/Bylaws</Button>
-                    <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Partnership/Officer List</Button>
-                    <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Business License</Button>
-                    <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Certificate of Good Standing</Button>
+                    <UploadButton docName="EIN Certificate (Company)" />
+                    <UploadButton docName="Formation Documentation (Company)" />
+                    <UploadButton docName="Operating Agreement/Bylaws (Company)" />
+                    <UploadButton docName="Partnership/Officer List (Company)" />
+                    <UploadButton docName="Business License (Company)" />
+                    <UploadButton docName="Certificate of Good Standing (Company)" />
                   </div>
                    <Collapsible>
                     <CollapsibleTrigger asChild>
@@ -557,8 +591,8 @@ export default function ProfilePage() {
                 </Select>
               </div>
               <div className="grid md:grid-cols-2 gap-4 pt-2">
-                  <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Purchase HUD-1</Button>
-                  <Button variant="outline" className="w-full justify-start"><Upload className="mr-2" /> Disposition HUD-1</Button>
+                  <UploadButton docName={`Purchase HUD-1 (Deal #${index + 1})`} />
+                  <UploadButton docName={`Disposition HUD-1 (Deal #${index + 1})`} />
               </div>
               {index < deals.length - 1 && <Separator />}
             </div>

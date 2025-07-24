@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,35 +10,23 @@ import { Loader2, Upload, FileText, AlertTriangle, CheckCircle, FileUp, Check } 
 import { useToast } from '@/hooks/use-toast';
 import { Label } from './ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
-import { getDocumentChecklist, type GetDocumentChecklistOutput } from '@/ai/flows/document-checklist-flow';
+import { getDocumentChecklist } from '@/ai/flows/document-checklist-flow';
 import { aiPreUnderwriter, type AiPreUnderwriterOutput } from '@/ai/flows/ai-pre-underwriter';
-
-type UploadedFile = {
-    file: File;
-    dataUri: string;
-};
+import { useDocumentContext, type Document } from '@/contexts/document-context';
 
 type UploadStatus = 'pending' | 'uploaded' | 'verified' | 'missing';
 
 type DocumentItem = {
     name: string;
     status: UploadStatus;
-    file?: UploadedFile;
+    file?: File;
+    dataUri?: string;
 };
 
 type CategorizedDocuments = {
     borrower: DocumentItem[];
     company: DocumentItem[];
     subjectProperty: DocumentItem[];
-};
-
-const fileToDataUri = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
 };
 
 function DocumentChecklistComponent() {
@@ -50,7 +38,27 @@ function DocumentChecklistComponent() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AiPreUnderwriterOutput | null>(null);
 
+  const { documents, addDocument } = useDocumentContext();
   const { toast } = useToast();
+
+  const syncChecklistWithContext = useCallback((checklistData: CategorizedDocuments) => {
+    const newChecklist = { ...checklistData };
+    (Object.keys(newChecklist) as Array<keyof CategorizedDocuments>).forEach(category => {
+        newChecklist[category] = newChecklist[category].map(item => {
+            const docFromContext = documents[item.name];
+            if (docFromContext) {
+                return {
+                    ...item,
+                    status: 'uploaded',
+                    file: docFromContext.file,
+                    dataUri: docFromContext.dataUri,
+                };
+            }
+            return item;
+        });
+    });
+    return newChecklist;
+  }, [documents]);
 
   useEffect(() => {
     if (loanProgram) {
@@ -58,12 +66,15 @@ function DocumentChecklistComponent() {
         setIsLoadingChecklist(true);
         try {
           const { documentRequestList } = await getDocumentChecklist({ loanProgram });
-          const initialChecklist: CategorizedDocuments = {
+          let initialChecklist: CategorizedDocuments = {
             borrower: documentRequestList.borrower.map(name => ({ name, status: 'missing' })),
             company: documentRequestList.company.map(name => ({ name, status: 'missing' })),
             subjectProperty: documentRequestList.subjectProperty.map(name => ({ name, status: 'missing' })),
           };
+          
+          initialChecklist = syncChecklistWithContext(initialChecklist);
           setChecklist(initialChecklist);
+
         } catch (error) {
           console.error("Failed to fetch document checklist", error);
           toast({
@@ -77,20 +88,28 @@ function DocumentChecklistComponent() {
       };
       fetchChecklist();
     }
-  }, [loanProgram, toast]);
+  }, [loanProgram, toast, syncChecklistWithContext]);
 
   const handleFileChange = async (category: keyof CategorizedDocuments, itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0] && checklist) {
       const file = event.target.files[0];
-      const dataUri = await fileToDataUri(file);
-      const updatedChecklist = { ...checklist };
       
+      const newDoc: Document = {
+        name: itemName,
+        file,
+        dataUri: '',
+        status: 'uploaded',
+      };
+      await addDocument(newDoc);
+      
+      const updatedChecklist = { ...checklist };
       const itemIndex = updatedChecklist[category].findIndex(item => item.name === itemName);
       if (itemIndex > -1) {
         updatedChecklist[category][itemIndex] = {
           ...updatedChecklist[category][itemIndex],
           status: 'uploaded',
-          file: { file, dataUri }
+          file: file,
+          dataUri: (await documents[itemName])?.dataUri,
         };
         setChecklist(updatedChecklist);
       }
@@ -100,13 +119,11 @@ function DocumentChecklistComponent() {
   const handleAnalyzeDocuments = async () => {
     if (!checklist) return;
     
-    const uploadedDocuments = (Object.keys(checklist) as Array<keyof CategorizedDocuments>).flatMap(category => 
-        checklist[category]
-            .filter(item => item.status === 'uploaded' && item.file)
-            .map(item => ({ filename: item.file!.file.name, dataUri: item.file!.dataUri }))
-    );
-
-    if (uploadedDocuments.length === 0) {
+    const uploadedDocumentsForAnalysis = Object.values(documents)
+      .filter(doc => doc.status === 'uploaded' && doc.file && doc.dataUri)
+      .map(doc => ({ filename: doc.file.name, dataUri: doc.dataUri }));
+      
+    if (uploadedDocumentsForAnalysis.length === 0) {
         toast({
             variant: "destructive",
             title: "No Documents Uploaded",
@@ -124,7 +141,7 @@ function DocumentChecklistComponent() {
              company: checklist.company.map(i => i.name),
              subjectProperty: checklist.subjectProperty.map(i => i.name),
         }
-        const result = await aiPreUnderwriter({ loanProgram, uploadedDocuments, documentRequestList: fullRequestList });
+        const result = await aiPreUnderwriter({ loanProgram, uploadedDocuments: uploadedDocumentsForAnalysis, documentRequestList: fullRequestList });
         setAnalysisResult(result);
 
         // Update checklist status based on analysis
@@ -175,12 +192,12 @@ function DocumentChecklistComponent() {
                   <div key={item.name} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-md border">
                       <div className="flex items-center gap-3">
                         {item.status === 'verified' && <CheckCircle className="h-5 w-5 text-green-500" />}
-                        {item.status === 'uploaded' && <FileUp className="h-5 w-5 text-blue-500" />}
-                        {item.status === 'missing' && <FileText className="h-5 w-5 text-muted-foreground" />}
+                        {(item.status === 'uploaded' || documents[item.name]?.status === 'uploaded') && <FileUp className="h-5 w-5 text-blue-500" />}
+                        {item.status === 'missing' && !documents[item.name] && <FileText className="h-5 w-5 text-muted-foreground" />}
                         <Label htmlFor={item.name} className="font-medium">{item.name}</Label>
                       </div>
                       <div className="flex items-center gap-2 w-full sm:w-auto">
-                        <Input id={item.name} type="file" className="w-full sm:w-auto" onChange={(e) => handleFileChange(category, item.name, e)} disabled={isAnalyzing} />
+                        <Input id={item.name} type="file" className="w-full sm:w-auto" onChange={(e) => handleFileChange(category, item.name, e)} disabled={isAnalyzing || !!documents[item.name]} />
                       </div>
                   </div>
               ))}
