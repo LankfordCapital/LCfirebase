@@ -5,11 +5,13 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 
 const features = [
-    "Up to 90% of purchase price and 100% of renovation costs",
-    "Fast closing to secure your next deal quickly",
-    "Interest-only payments during the project term",
-    "No prepayment penalties",
-    "Loans for single-family and 2-4 unit properties"
+    "Minimum FICO score of 650",
+    "No experience required; better terms with more completed deals",
+    "Rates starting at 9.5% and 1.5 points",
+    "Terms from 12-24 months with no prepayment penalty",
+    "Rehab budgets can exceed purchase price",
+    "Close in as little as 10 days",
+    "Financing for single-family, 2-4 units, condos, and townhomes"
 ];
 
 export default function ResidentialNooFixAndFlipPage() {
