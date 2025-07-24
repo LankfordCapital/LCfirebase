@@ -8,7 +8,12 @@ const features = [
     "Bridge financing gaps between purchase and long-term loans",
     "Solutions for complex or non-traditional transactions",
     "Flexible terms tailored to your specific needs",
-    "Interest-only payment options available"
+    "Interest-only payment options available",
+    "Minimum 660 FICO",
+    "'Make sense' lending at its best",
+    "Up to 80% of purchase (90% with mezzanine)",
+    "Flexible and fast execution",
+    "Competitive interest rates"
 ];
 
 export default function CommercialAcquisitionBridgeLoansPage() {
