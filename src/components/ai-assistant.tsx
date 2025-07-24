@@ -30,7 +30,7 @@ export function AIAssistant() {
         setMessages([
             {
                 id: 'initial',
-                text: "Hello! I'm Lankford Lending's AI Assistant. How can I help you today? Feel free to ask about our loan products, eligibility, or the application process.",
+                text: "Hello! I'm Lankford Capital Group's AI Assistant. How can I help you today? Feel free to ask about our loan products, eligibility, or the application process.",
                 sender: 'ai'
             }
         ])
@@ -120,7 +120,7 @@ export function AIAssistant() {
               >
                 {message.sender === 'ai' && (
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-primary text-primary-foreground">LL</AvatarFallback>
+                    <AvatarFallback className="bg-primary text-primary-foreground">LC</AvatarFallback>
                   </Avatar>
                 )}
                 <div
@@ -143,7 +143,7 @@ export function AIAssistant() {
              {isLoading && (
                  <div className="flex items-start gap-3 justify-start">
                     <Avatar className="h-8 w-8">
-                        <AvatarFallback className="bg-primary text-primary-foreground">LL</AvatarFallback>
+                        <AvatarFallback className="bg-primary text-primary-foreground">LC</AvatarFallback>
                     </Avatar>
                     <div className="bg-muted rounded-lg px-4 py-2 flex items-center">
                         <Loader2 className="h-5 w-5 animate-spin text-muted-foreground"/>

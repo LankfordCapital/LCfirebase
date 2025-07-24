@@ -18,7 +18,7 @@ export default function SignUpPage() {
         <CardHeader className="text-center">
           <CardTitle className="font-headline text-2xl">Create an Account</CardTitle>
           <CardDescription>
-            Join Lankford Lending to start your application.
+            Join Lankford Capital Group to start your application.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">

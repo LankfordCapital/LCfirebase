@@ -18,11 +18,11 @@ const fontHeadline = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: 'Lankford Lending - Your Partner in Financial Growth',
+  title: 'Lankford Capital Group - Your Partner in Financial Growth',
   description:
-    'Lankford Lending offers a wide range of loan products including residential, commercial, industrial, and SBA loans. We provide tailored financing solutions for construction, acquisition, and development projects. Your trusted partner for real estate and business financing.',
+    'Lankford Capital Group offers a wide range of loan products including residential, commercial, industrial, and SBA loans. We provide tailored financing solutions for construction, acquisition, and development projects. Your trusted partner for real estate and business financing.',
   keywords:
-    'lending, loan, residential lending, commercial lending, industrial loans, sba loans, construction financing, fix and flip, dscr loans, land acquisition, equipment financing, broker services',
+    'lending, loan, residential lending, commercial lending, industrial loans, sba loans, construction financing, fix and flip, dscr loans, land acquisition, equipment financing, broker services, capital group',
 };
 
 export default function RootLayout({

@@ -72,12 +72,28 @@ export function Header() {
               {item.label}
             </Link>
           ))}
+           <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="font-semibold">
+                Sign In <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-64">
+                <DropdownMenuItem asChild>
+                  <Link href="/auth/signin">
+                    Borrower Sign In
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/auth/workforce-signin">
+                    Workforce Sign In
+                  </Link>
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </nav>
 
         <div className="hidden md:flex items-center gap-2">
-          <Button variant="ghost" asChild>
-            <Link href="/auth/signin">Sign In</Link>
-          </Button>
           <Button asChild>
             <Link href="/dashboard">Borrower Dashboard</Link>
           </Button>
@@ -122,8 +138,11 @@ export function Header() {
                 </div>
                 <hr />
                 <div className="flex flex-col gap-2">
+                   <Button variant="ghost" asChild onClick={() => setIsOpen(false)}>
+                    <Link href="/auth/signin">Borrower Sign In</Link>
+                  </Button>
                   <Button variant="ghost" asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/auth/signin">Sign In</Link>
+                    <Link href="/auth/workforce-signin">Workforce Sign In</Link>
                   </Button>
                   <Button asChild onClick={() => setIsOpen(false)}>
                     <Link href="/dashboard">Borrower Dashboard</Link>

@@ -4,9 +4,9 @@ export function Logo({ className }: { className?: string }) {
   return (
     <svg
       className={className}
-      viewBox="0 0 150 40"
+      viewBox="0 0 200 40"
       xmlns="http://www.w3.org/2000/svg"
-      aria-label="Lankford Lending Logo"
+      aria-label="Lankford Capital Group Logo"
     >
       <g className="font-headline">
         <text
@@ -24,7 +24,7 @@ export function Logo({ className }: { className?: string }) {
           fontSize="30"
           className="fill-accent"
         >
-          Lending
+          Capital
         </text>
       </g>
     </svg>
