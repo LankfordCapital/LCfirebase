@@ -15,7 +15,7 @@ export default function DocumentsPage() {
         <TabsList className="grid w-full grid-cols-2 md:w-[400px]">
           <TabsTrigger value="pre-underwriter">
             <FileUp className="mr-2 h-4 w-4" />
-            AI Pre-Underwriter
+            New Application
           </TabsTrigger>
           <TabsTrigger value="optimizer">
             <Sparkles className="mr-2 h-4 w-4" />
