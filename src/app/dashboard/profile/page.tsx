@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useId } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -23,7 +23,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 type Deal = {
-  id: number;
+  id: string;
   address: string;
   purchasePrice: string;
   rehabAmount: string;
@@ -31,7 +31,7 @@ type Deal = {
 };
 
 type Company = {
-  id: number;
+  id: string;
   companyName: string;
   companyAddress: string;
   companyPhone: string;
@@ -48,12 +48,15 @@ const fileToDataUri = (file: File): Promise<string> => {
 };
 
 export default function ProfilePage() {
+  const initialDealId = useId();
+  const initialCompanyId = useId();
+
   const [deals, setDeals] = useState<Deal[]>([
-    { id: 1, address: '', purchasePrice: '', rehabAmount: '', disposition: '' },
+    { id: initialDealId, address: '', purchasePrice: '', rehabAmount: '', disposition: '' },
   ]);
 
   const [companies, setCompanies] = useState<Company[]>([
-    { id: Date.now(), companyName: '', companyAddress: '', companyPhone: '', companyEin: '' },
+    { id: initialCompanyId, companyName: '', companyAddress: '', companyPhone: '', companyEin: '' },
   ]);
 
   const [creditReportFile, setCreditReportFile] = useState<File | null>(null);
@@ -95,27 +98,29 @@ export default function ProfilePage() {
 
   const handleAddDeal = () => {
     if (deals.length < 10) {
-      setDeals([...deals, { id: Date.now(), address: '', purchasePrice: '', rehabAmount: '', disposition: '' }]);
+      const newId = `deal-${deals.length}-${Date.now()}`; // Simple unique ID generation
+      setDeals([...deals, { id: newId, address: '', purchasePrice: '', rehabAmount: '', disposition: '' }]);
     }
   };
 
-  const handleRemoveDeal = (id: number) => {
+  const handleRemoveDeal = (id: string) => {
     setDeals(deals.filter(deal => deal.id !== id));
   };
 
-  const handleDealChange = (id: number, field: keyof Omit<Deal, 'id'>, value: string) => {
+  const handleDealChange = (id: string, field: keyof Omit<Deal, 'id'>, value: string) => {
     setDeals(deals.map(deal => (deal.id === id ? { ...deal, [field]: value } : deal)));
   };
 
   const handleAddCompany = () => {
-    setCompanies([...companies, { id: Date.now(), companyName: '', companyAddress: '', companyPhone: '', companyEin: '' }]);
+    const newId = `company-${companies.length}-${Date.now()}`; // Simple unique ID generation
+    setCompanies([...companies, { id: newId, companyName: '', companyAddress: '', companyPhone: '', companyEin: '' }]);
   };
 
-  const handleRemoveCompany = (id: number) => {
+  const handleRemoveCompany = (id: string) => {
     setCompanies(companies.filter(company => company.id !== id));
   };
 
-  const handleCompanyChange = (id: number, field: keyof Omit<Company, 'id'>, value: string) => {
+  const handleCompanyChange = (id: string, field: keyof Omit<Company, 'id'>, value: string) => {
     setCompanies(companies.map(company => (company.id === id ? { ...company, [field]: value } : company)));
   };
 
