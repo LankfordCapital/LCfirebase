@@ -9,21 +9,25 @@ const loanTypes = [
     title: "Ground Up Construction",
     description: "Comprehensive financing for new commercial building projects.",
     features: ["Loans for various property types", "Structured financing", "Expert project analysis"],
+    href: "/lending/commercial/ground-up-construction"
   },
   {
     title: "Rehab Loans",
     description: "Funding for the renovation and improvement of existing commercial properties.",
     features: ["Value-add opportunities", "Cover hard and soft costs", "Quick closing"],
+    href: "/lending/commercial/rehab-loans"
   },
   {
     title: "Acquisition & Bridge Loans",
     description: "Short-term financing to acquire property or bridge funding gaps.",
     features: ["Fast access to capital", "Flexible terms", "Solutions for complex deals"],
+    href: "/lending/commercial/acquisition-bridge-loans"
   },
   {
     title: "Conventional / Long Term Debt",
     description: "Stable, long-term financing solutions for stabilized commercial properties.",
     features: ["Competitive fixed rates", "Amortization up to 30 years", "Refinancing options"],
+    href: "/lending/commercial/conventional-long-term-debt"
   },
 ];
 
@@ -64,7 +68,7 @@ export default function CommercialLendingPage() {
                 </CardContent>
                 <div className="p-6 pt-0 w-full">
                   <Button asChild className="w-full">
-                    <Link href="/dashboard">Inquire Now</Link>
+                    <Link href={loan.href}>Inquire Now</Link>
                   </Button>
                 </div>
               </Card>
