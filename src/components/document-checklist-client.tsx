@@ -153,7 +153,7 @@ function DocumentChecklistComponent() {
                 <Link href="/dashboard/documents">Go Back</Link>
             </Button>
         </div>
-    )
+    );
   }
 
   return (
@@ -263,7 +263,7 @@ function DocumentChecklistComponent() {
             </div>
         </div>
     </div>
-  )
+  );
 }
 
 export function DocumentChecklistClient() {
@@ -271,5 +271,5 @@ export function DocumentChecklistClient() {
         <Suspense fallback={<div>Loading...</div>}>
             <DocumentChecklistComponent />
         </Suspense>
-    )
+    );
 }
