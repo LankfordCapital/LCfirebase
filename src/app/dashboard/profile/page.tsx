@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Upload, PlusCircle, Trash2, ScanLine, Loader2, Landmark, FileText, Calendar as CalendarIcon } from "lucide-react";
+import { Upload, PlusCircle, Trash2, ScanLine, Loader2, Landmark, FileText, Calendar as CalendarIcon, Download } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
@@ -19,6 +19,8 @@ import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { BusinessDebtSchedule } from '@/components/business-debt-schedule';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 type Deal = {
   id: number;
@@ -67,8 +69,29 @@ export default function ProfilePage() {
   const [isScanningCompanyAsset, setIsScanningCompanyAsset] = useState(false);
 
   const [dateOfBirth, setDateOfBirth] = useState<Date>();
+  
+  const profileRef = useRef<HTMLDivElement>(null);
+  const creditRef = useRef<HTMLDivElement>(null);
+  const assetRef = useRef<HTMLDivElement>(null);
+  const contactRef = useRef<HTMLDivElement>(null);
+  const companyRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const dealRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const { toast } = useToast();
+  
+  const handleExportPdf = async (element: HTMLElement | null, fileName: string) => {
+    if (!element) return;
+    const canvas = await html2canvas(element);
+    const data = canvas.toDataURL('image/png');
+
+    const pdf = new jsPDF();
+    const imgProperties = pdf.getImageProperties(data);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProperties.height * pdfWidth) / imgProperties.width;
+
+    pdf.addImage(data, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`${fileName}.pdf`);
+  };
 
   const handleAddDeal = () => {
     if (deals.length < 10) {
@@ -202,9 +225,14 @@ export default function ProfilePage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card>
+          <Card ref={profileRef}>
             <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
+              <div className="flex justify-between items-center">
+                <CardTitle>Personal Information</CardTitle>
+                <Button variant="outline" size="icon" onClick={() => handleExportPdf(profileRef.current, 'personal-information')}>
+                  <Download className="h-4 w-4" />
+                </Button>
+              </div>
               <CardDescription>This information will be used for your loan applications.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -275,9 +303,14 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card ref={creditRef}>
             <CardHeader>
-                <CardTitle>AI Credit Score Analysis</CardTitle>
+                <div className="flex justify-between items-center">
+                  <CardTitle>AI Credit Score Analysis</CardTitle>
+                  <Button variant="outline" size="icon" onClick={() => handleExportPdf(creditRef.current, 'credit-score-analysis')}>
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </div>
                 <CardDescription>Upload your tri-merged credit report to have our AI extract your scores.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -311,9 +344,14 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card ref={assetRef}>
             <CardHeader>
-                <CardTitle>AI Asset Verification</CardTitle>
+                <div className="flex justify-between items-center">
+                  <CardTitle>AI Asset Verification</CardTitle>
+                  <Button variant="outline" size="icon" onClick={() => handleExportPdf(assetRef.current, 'asset-verification')}>
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </div>
                 <CardDescription>Upload asset statements to have our AI extract the most recent balances.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -359,9 +397,14 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card ref={contactRef}>
             <CardHeader>
-              <CardTitle>Contact Information</CardTitle>
+              <div className="flex justify-between items-center">
+                <CardTitle>Contact Information</CardTitle>
+                <Button variant="outline" size="icon" onClick={() => handleExportPdf(contactRef.current, 'contact-information')}>
+                  <Download className="h-4 w-4" />
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -378,21 +421,26 @@ export default function ProfilePage() {
 
         <div className="lg:col-span-1 space-y-6">
           {companies.map((company, index) => (
-             <Card key={company.id}>
+             <Card key={company.id} ref={el => companyRefs.current[index] = el}>
                 <CardHeader>
                 <div className="flex justify-between items-center">
                   <CardTitle>Company Information</CardTitle>
-                  {companies.length > 1 && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7"
-                      onClick={() => handleRemoveCompany(company.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Remove Company</span>
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="icon" onClick={() => handleExportPdf(companyRefs.current[index], `company-information-${company.companyName || index + 1}`)}>
+                      <Download className="h-4 w-4" />
                     </Button>
-                  )}
+                    {companies.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => handleRemoveCompany(company.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Remove Company</span>
+                      </Button>
+                    )}
+                  </div>
                   </div>
                   <CardDescription>Manage your business details and documents.</CardDescription>
                 </CardHeader>
@@ -447,24 +495,36 @@ export default function ProfilePage() {
       
       <Card>
         <CardHeader>
-          <CardTitle>Deal History</CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle>Deal History</CardTitle>
+             <Button variant="outline" size="icon" onClick={() => handleExportPdf(document.getElementById('deal-history-card'), 'deal-history')}>
+                <Download className="h-4 w-4" />
+            </Button>
+          </div>
           <CardDescription>Please provide details on your past real estate deals (up to 10).</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent id="deal-history-card" className="space-y-6">
           {deals.map((deal, index) => (
-            <div key={deal.id} className="space-y-4 rounded-md border p-4 relative">
-              <h4 className="font-semibold">Deal #{index + 1}</h4>
-              {deals.length > 1 && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute top-2 right-2 h-7 w-7"
-                  onClick={() => handleRemoveDeal(deal.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                  <span className="sr-only">Remove Deal</span>
-                </Button>
-              )}
+            <div key={deal.id} ref={el => dealRefs.current[index] = el} className="space-y-4 rounded-md border p-4 relative">
+              <div className="flex justify-between items-center">
+                <h4 className="font-semibold">Deal #{index + 1}</h4>
+                 <div className="flex items-center gap-2">
+                    <Button variant="outline" size="icon" onClick={() => handleExportPdf(dealRefs.current[index], `deal-${index + 1}`)}>
+                      <Download className="h-4 w-4" />
+                    </Button>
+                    {deals.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => handleRemoveDeal(deal.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Remove Deal</span>
+                      </Button>
+                    )}
+                 </div>
+              </div>
               <div className="space-y-2">
                 <Label htmlFor={`address-${deal.id}`}>Property Address</Label>
                 <Input id={`address-${deal.id}`} placeholder="123 Main St, Anytown, USA" value={deal.address} onChange={e => handleDealChange(deal.id, 'address', e.target.value)} />
