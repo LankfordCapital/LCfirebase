@@ -45,12 +45,24 @@ Finally, list any potential issues you find in the provided documents.
 **Document Requirements by Loan Program:**
 
 *   **Residential NOO - Ground Up Construction:**
-    *   2023 Personal and Business Tax Returns
-    *   Signed Purchase Agreement
-    *   Driver's License
-    *   Articles of Organization and Operating Agreement
-    *   Construction Budget and Plans
-    *   Proof of Funds for down payment and reserves
+    *   Executed Purchase Contract
+    *   Evidence of Earnest Money Deposit
+    *   Preliminary Title Commitment
+    *   Escrow Instructions
+    *   Closing Protection Letter
+    *   Title/Escrow Agent Details (Name, Company, Phone, Email)
+    *   General Contractor Details (Name, Phone, Email)
+    *   General Contractor License
+    *   General Contractor Insurance
+    *   General Contractor Bond (if required by location)
+    *   General Contractor's Contract to Build
+    *   Builder's Risk Insurance Quote
+    *   Commercial Liability Insurance Quote
+    *   Insurance Agent Details (Name, Company, Phone, Email)
+    *   Approved or Pre-approved Plans
+    *   Approved Permits (if available)
+    *   Property HUD-1/Settlement Statement (if already purchased)
+    *   30-Day Payoff Statement with Per Diem (if property has a mortgage)
 
 *   **Residential NOO - Fix and Flip:**
     *   2023 Personal and Business Tax Returns
