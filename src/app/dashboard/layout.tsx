@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -37,6 +38,7 @@ export default function DashboardLayout({
   ];
 
   return (
+    <>
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center justify-between">
@@ -97,5 +99,6 @@ export default function DashboardLayout({
           {children}
         </div>
       </SidebarInset>
+    </>
   );
 }
