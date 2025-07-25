@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
@@ -29,7 +28,7 @@ type CategorizedDocuments = {
     subjectProperty: DocumentItem[];
 };
 
-export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: string}) {
+export default function LoanApplicationPage3({ loanProgram }: { loanProgram: string}) {
   const [checklist, setChecklist] = useState<CategorizedDocuments | null>(null);
   const [isLoadingChecklist, setIsLoadingChecklist] = useState(true);
 
@@ -202,3 +201,5 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
     </div>
   );
 }
+
+    

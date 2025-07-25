@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
-export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: string}) {
+export default function LoanApplicationPage6({ loanProgram }: { loanProgram: string}) {
   const router = useRouter();
   const { toast } = useToast();
   
@@ -168,3 +168,5 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
     </div>
   );
 }
+
+    
