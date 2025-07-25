@@ -28,11 +28,6 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
   const [photos, setPhotos] = useState<PhotoFile[]>([]);
   const [propertyType, setPropertyType] = useState('');
   const [numberOfUnits, setNumberOfUnits] = useState('');
-  const [gcName, setGcName] = useState('');
-  const [gcPhone, setGcPhone] = useState('');
-  const [gcEmail, setGcEmail] = useState('');
-
-  const showConstructionFields = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('fix and flip') || loanProgram.toLowerCase().includes('rehab');
 
   const handleContinue = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
@@ -135,36 +130,6 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
                 </div>
             </CardContent>
         </Card>
-
-        {showConstructionFields && (
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="grid md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="gcName">Contractor Name</Label>
-                            <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="gcPhone">Contractor Phone</Label>
-                            <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} />
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="gcEmail">Contractor Email</Label>
-                        <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} />
-                    </div>
-                     <DocumentUploadInput name="General Contractor License" />
-                     <DocumentUploadInput name="General Contractor Insurance" />
-                     <DocumentUploadInput name="General Contractor Bond" />
-                     <DocumentUploadInput name="General Contractor's Contract to Build" />
-                     <DocumentUploadInput name="Construction Budget" />
-                     <DocumentUploadInput name="Projected Draw Schedule" />
-                </CardContent>
-            </Card>
-        )}
 
         <ComparableSales />
 

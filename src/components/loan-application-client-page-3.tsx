@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from './ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
-import { CheckCircle, ArrowLeft, ArrowRight, FileText, FileUp, Check, AlertTriangle } from 'lucide-react';
+import { CheckCircle, ArrowLeft, ArrowRight, FileText, FileUp, Check, AlertTriangle, Briefcase } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { getDocumentChecklist } from '@/ai/flows/document-checklist-flow';
 import { useAuth } from '@/contexts/auth-context';
@@ -31,6 +31,9 @@ type CategorizedDocuments = {
 export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: string}) {
   const [checklist, setChecklist] = useState<CategorizedDocuments | null>(null);
   const [isLoadingChecklist, setIsLoadingChecklist] = useState(true);
+  const [gcName, setGcName] = useState('');
+  const [gcPhone, setGcPhone] = useState('');
+  const [gcEmail, setGcEmail] = useState('');
 
   const { documents, addDocument, getDocument } = useDocumentContext();
   const { user } = useAuth();
@@ -39,6 +42,8 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
 
   const isWorkforce = user?.email?.endsWith('@lankfordcapital.com') && user?.email !== 'admin@lankfordcapital.com';
   const workforceOnlyDocs = ["Appraisal", "Collateral Desktop Analysis"];
+  const showConstructionFields = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('fix and flip') || loanProgram.toLowerCase().includes('rehab');
+
 
   const syncChecklistWithContext = useCallback((checklistData: CategorizedDocuments) => {
     const newChecklist = { ...checklistData };
@@ -151,6 +156,20 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
         </div>
     );
   };
+  
+    const DocUploadInputSimple = ({ name }: { name: string }) => {
+    const doc = documents[name];
+    const fileInputId = `upload-${name.replace(/\s+/g, '-')}`;
+    return (
+        <div className="space-y-2">
+            <Label htmlFor={fileInputId}>{name}</Label>
+            <div className="flex items-center gap-2">
+                <Input id={fileInputId} type="file" onChange={(e) => handleFileChange(name, e)} disabled={!!doc} />
+                {doc && <CheckCircle className="h-5 w-5 text-green-500" />}
+            </div>
+        </div>
+    );
+  };
 
   if (isLoadingChecklist) {
     return <div>Loading document checklist...</div>
@@ -174,7 +193,37 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
           <CardContent className="space-y-4">
               {checklist.subjectProperty.map(item => <DocumentUploadInput key={item.name} name={item.name} />)}
           </CardContent>
-      </Card>
+        </Card>
+        
+        {showConstructionFields && (
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="gcName">Contractor Name</Label>
+                            <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="gcPhone">Contractor Phone</Label>
+                            <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} />
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="gcEmail">Contractor Email</Label>
+                        <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} />
+                    </div>
+                     <DocUploadInputSimple name="General Contractor License" />
+                     <DocUploadInputSimple name="General Contractor Insurance" />
+                     <DocUploadInputSimple name="General Contractor Bond" />
+                     <DocUploadInputSimple name="General Contractor's Contract to Build" />
+                     <DocUploadInputSimple name="Construction Budget" />
+                     <DocUploadInputSimple name="Projected Draw Schedule" />
+                </CardContent>
+            </Card>
+        )}
         
         <div className="flex justify-between items-center">
             <Button variant="outline" onClick={() => router.back()}>
