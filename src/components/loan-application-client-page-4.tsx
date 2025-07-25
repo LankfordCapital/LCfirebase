@@ -143,10 +143,6 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
     "General Contractor's Contract to Build",
     "Construction Budget",
     "Projected Draw Schedule",
-    "Construction Plans",
-    "Construction Plans, Budget, and Timeline",
-    "Approved or Pre-approved Plans",
-    "Approved Permits",
   ];
 
   const gcDocuments = checklist?.subjectProperty.filter(item => constructionDocs.includes(item.name));

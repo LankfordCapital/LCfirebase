@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { PlusCircle, Trash2, Download } from 'lucide-react';
 import { Label } from './ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
-import { Separator } from '@/components/ui/separator';
+import { Separator } from './ui/separator';
 
 type Deal = {
   id: string;

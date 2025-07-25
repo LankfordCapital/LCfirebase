@@ -438,6 +438,9 @@ export default function ProfilePage() {
               </div>
             </CardContent>
           </Card>
+           
+          <DealHistory />
+
         </div>
 
         <div className="lg:col-span-1 space-y-6">
@@ -514,8 +517,6 @@ export default function ProfilePage() {
         </div>
       </div>
       
-      <DealHistory />
-
       <div className="flex justify-end">
         <Button onClick={handleSaveChanges}>Save Changes</Button>
       </div>

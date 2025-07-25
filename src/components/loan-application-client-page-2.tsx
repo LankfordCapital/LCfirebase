@@ -13,7 +13,6 @@ import { CheckCircle, ArrowLeft, ArrowRight, User, Briefcase, FileText, FileUp, 
 import { useRouter } from 'next/navigation';
 import { getDocumentChecklist } from '@/ai/flows/document-checklist-flow';
 import { useAuth } from '@/contexts/auth-context';
-import { DealHistory } from './deal-history';
 import { scanAssetStatement, type ScanAssetStatementOutput } from '@/ai/flows/asset-statement-scanner';
 
 type UploadStatus = 'pending' | 'uploaded' | 'verified' | 'missing';
@@ -252,8 +251,6 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
             </CardContent>
         </Card>
         
-        <DealHistory />
-        
         <div className="flex justify-between items-center">
             <Button variant="outline" onClick={() => router.back()}>
                <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 1
@@ -265,4 +262,3 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
     </div>
   );
 }
-
