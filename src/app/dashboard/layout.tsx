@@ -101,13 +101,13 @@ export default function DashboardLayout({
 }) {
 
   return (
-    <>
+    <div className="flex">
       <DashboardNav />
       <SidebarInset>
-        <div className="p-4 md:p-6 lg:p-8 bg-primary/5 min-h-full">
+        <div className="p-4 md:p-6 lg:p-8 bg-primary/5 min-h-screen w-full">
           {children}
         </div>
       </SidebarInset>
-    </>
+    </div>
   );
 }
