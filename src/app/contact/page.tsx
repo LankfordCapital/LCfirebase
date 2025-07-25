@@ -31,7 +31,7 @@ export default function ContactPage() {
                 <Mail className="h-6 w-6 text-accent mt-1 flex-shrink-0" />
                 <div>
                     <h3 className="font-semibold">Email Us</h3>
-                    <p className="text-muted-foreground">Underwriting@lankfordcapital.com</p>
+                    <p className="text-muted-foreground">Info@lankfordcapital.com</p>
                 </div>
              </div>
               <div className="flex items-start gap-4">
