@@ -103,25 +103,27 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                         <Input id="lotSize" placeholder="e.g., 10,000 sq. ft. or 0.23 acres" value={lotSize} onChange={e => setLotSize(e.target.value)} />
                     </div>
                 </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="project-change">Is any of the following happening?</Label>
-                    <Select onValueChange={setProjectChange} value={projectChange}>
-                        <SelectTrigger id="project-change">
-                            <SelectValue placeholder="Select an option..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="no">No</SelectItem>
-                            <SelectItem value="expand-horizontal">Expanding the square footage (Horizontally)</SelectItem>
-                            <SelectItem value="expand-vertical">Expanding the square footage (Vertically)</SelectItem>
-                            <SelectItem value="expand-both">Expanding the square footage (Horizontally and Vertically)</SelectItem>
-                            <SelectItem value="change-units">Changing the unit count</SelectItem>
-                            <SelectItem value="convert-condo">Converting to Condominiums</SelectItem>
-                            <SelectItem value="add-adu">Adding or Converting to an ADU (accessory dwelling unit)</SelectItem>
-                            <SelectItem value="repair-fire">Repairing fire damage</SelectItem>
-                            <SelectItem value="repair-water">Repairing water damage</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
+                {loanProgram === 'Residential NOO - Fix and Flip' && (
+                    <div className="space-y-2">
+                        <Label htmlFor="project-change">Is any of the following happening?</Label>
+                        <Select onValueChange={setProjectChange} value={projectChange}>
+                            <SelectTrigger id="project-change">
+                                <SelectValue placeholder="Select an option..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="no">No</SelectItem>
+                                <SelectItem value="expand-horizontal">Expanding the square footage (Horizontally)</SelectItem>
+                                <SelectItem value="expand-vertical">Expanding the square footage (Vertically)</SelectItem>
+                                <SelectItem value="expand-both">Expanding the square footage (Horizontally and Vertically)</SelectItem>
+                                <SelectItem value="change-units">Changing the unit count</SelectItem>
+                                <SelectItem value="convert-condo">Converting to Condominiums</SelectItem>
+                                <SelectItem value="add-adu">Adding or Converting to an ADU (accessory dwelling unit)</SelectItem>
+                                <SelectItem value="repair-fire">Repairing fire damage</SelectItem>
+                                <SelectItem value="repair-water">Repairing water damage</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                )}
                 <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="constructionTime">Estimated Time to Construct (in months)</Label>
