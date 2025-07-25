@@ -277,8 +277,6 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Personal Financial Statement",
             "Credit Report",
             "Personal Asset Statement",
-            "Purchase HUD-1 (if applicable)",
-            "Disposition HUD-1 (if applicable)",
             "Proof of Equity Injection",
         ],
         company: [
