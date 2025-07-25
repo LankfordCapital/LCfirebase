@@ -22,8 +22,8 @@ import { updateProfile } from "firebase/auth";
 
 export default function AdminSignUpPage() {
   const [fullName, setFullName] = useState('Admin User');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('admin@lankfordcapital.com');
+  const [password, setPassword] = useState('admin123');
   const [isLoading, setIsLoading] = useState(false);
   const { signUp } = useAuth();
   const router = useRouter();
@@ -58,19 +58,19 @@ export default function AdminSignUpPage() {
       <Card className="w-full max-w-sm shadow-2xl">
         <form onSubmit={handleSubmit}>
           <CardHeader className="text-center">
-            <CardTitle className="font-headline text-2xl">Admin/Test User Creation</CardTitle>
+            <CardTitle className="font-headline text-2xl">Admin User Creation</CardTitle>
             <CardDescription>
-              Create a user to access any dashboard.
+              Click the button below to create your admin user. You can then use these credentials to sign into any dashboard.
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="admin@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input id="email" type="email" value={email} readOnly />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+              <Input id="password" type="password" value={password} readOnly />
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
