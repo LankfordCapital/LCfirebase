@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview This file defines a Genkit flow for generating a document checklist for a specific loan program.
@@ -43,9 +44,6 @@ const prompt = ai.definePrompt({
 Based on the provided document list for the program, generate a full list of required documents and populate it in the 'documentRequestList' field.
 The documents in the 'documentRequestList' field MUST be categorized into 'borrower', 'company', and 'subjectProperty'.
 
-**Important Conditional Logic:**
-- Only include "Approved or Pre-approved Plans" and "Approved Permits (if available)" in the 'subjectProperty' list if the loan program contains 'Ground Up Construction'.
-
 **Document List for {{loanProgram}}:**
 Borrower: {{#each documentList.borrower}}- {{{this}}} {{/each}}
 Company: {{#each documentList.company}}- {{{this}}} {{/each}}
@@ -60,10 +58,9 @@ const getDocumentChecklistFlow = ai.defineFlow(
     outputSchema: GetDocumentChecklistOutputSchema,
   },
   async input => {
-    const documentList = loanProgramDocumentLists[input.loanProgram as keyof typeof loanProgramDocumentLists] || loanProgramDocumentLists['Default'];
-    
     // The prompt-based generation is causing inconsistencies.
     // We will return the list directly from the object.
+    const documentList = loanProgramDocumentLists[input.loanProgram as keyof typeof loanProgramDocumentLists] || loanProgramDocumentLists['Default'];
     return { documentRequestList: documentList };
   }
 );
