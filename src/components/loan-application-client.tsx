@@ -75,12 +75,10 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                         <Input id="purchasePrice" type="number" placeholder="e.g., 400000" value={purchasePrice} onChange={e => setPurchasePrice(e.target.value)} />
                     </div>
                 </div>
-                {showConstructionFields && (
-                    <div className="space-y-2">
-                        <Label htmlFor="rehabCost">Requested Rehab Amount</Label>
-                        <Input id="rehabCost" type="number" placeholder="e.g., 50000" value={rehabCost} onChange={e => setRehabCost(e.target.value)} />
-                    </div>
-                )}
+                <div className="space-y-2">
+                    <Label htmlFor="rehabCost">Requested Rehab Amount</Label>
+                    <Input id="rehabCost" type="number" placeholder="e.g., 50000" value={rehabCost} onChange={e => setRehabCost(e.target.value)} />
+                </div>
                 <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="lotSize">Lot Size (in sq. ft. or acres)</Label>
