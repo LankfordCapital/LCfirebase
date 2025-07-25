@@ -12,7 +12,7 @@ import { Label } from './ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { getDocumentChecklist } from '@/ai/flows/document-checklist-flow';
 import { aiPreUnderwriter, type AiPreUnderwriterOutput } from '@/ai/flows/ai-pre-underwriter';
-import { useDocumentContext, type Document } from '@/contexts/document-context';
+import { useDocumentContext } from '@/contexts/document-context';
 import { ComparableSales } from './comparable-sales';
 
 type UploadStatus = 'pending' | 'uploaded' | 'verified' | 'missing';
@@ -57,14 +57,14 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [titleAgentPhone, setTitleAgentPhone] = useState('');
   const [titleAgentEmail, setTitleAgentEmail] = useState('');
 
-  const { documents, addDocument } = useDocumentContext();
+  const { documents, addDocument, getDocument } = useDocumentContext();
   const { toast } = useToast();
 
   const syncChecklistWithContext = useCallback((checklistData: CategorizedDocuments) => {
     const newChecklist = { ...checklistData };
     (Object.keys(newChecklist) as Array<keyof CategorizedDocuments>).forEach(category => {
         newChecklist[category] = newChecklist[category].map(item => {
-            const docFromContext = documents[item.name];
+            const docFromContext = getDocument(item.name);
             if (docFromContext) {
                 return {
                     ...item,
@@ -77,7 +77,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
         });
     });
     return newChecklist;
-  }, [documents]);
+  }, [getDocument]);
 
   useEffect(() => {
     if (loanProgram) {
@@ -108,32 +108,23 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
       fetchChecklist();
     }
   }, [loanProgram, toast, syncChecklistWithContext]);
+  
+  useEffect(() => {
+    if (checklist) {
+        setChecklist(syncChecklistWithContext(checklist));
+    }
+  }, [documents, syncChecklistWithContext]);
 
-  const handleFileChange = async (category: keyof CategorizedDocuments, itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0] && checklist) {
+
+  const handleFileChange = async (itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
       
-      const newDoc: Omit<Document, 'dataUri'> = {
+      await addDocument({
         name: itemName,
         file,
         status: 'uploaded',
-      };
-      
-      const success = await addDocument(newDoc);
-      
-      if (success) {
-        const updatedChecklist = { ...checklist };
-        const itemIndex = updatedChecklist[category].findIndex(item => item.name === itemName);
-        if (itemIndex > -1) {
-          updatedChecklist[category][itemIndex] = {
-            ...updatedChecklist[category][itemIndex],
-            status: 'uploaded',
-            file: file,
-            dataUri: (await documents[itemName])?.dataUri,
-          };
-          setChecklist(updatedChecklist);
-        }
-      }
+      });
     }
   };
 
@@ -197,14 +188,14 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   
   const showConstructionFields = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('fix and flip') || loanProgram.toLowerCase().includes('rehab');
 
-  const DocumentUploadInput = ({ name, category = 'subjectProperty' }: { name: string, category?: keyof CategorizedDocuments }) => {
+  const DocumentUploadInput = ({ name }: { name: string }) => {
     const doc = documents[name];
     const fileInputId = `upload-${name.replace(/\s+/g, '-')}`;
     return (
         <div className="space-y-2">
             <Label htmlFor={fileInputId}>{name}</Label>
             <div className="flex items-center gap-2">
-                <Input id={fileInputId} type="file" onChange={(e) => handleFileChange(category, name, e)} disabled={isAnalyzing || !!doc} />
+                <Input id={fileInputId} type="file" onChange={(e) => handleFileChange(name, e)} disabled={isAnalyzing || !!doc} />
                 {doc && <CheckCircle className="h-5 w-5 text-green-500" />}
             </div>
         </div>
@@ -225,19 +216,22 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
               <CardTitle>{title}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-              {checklist[category].map(item => (
-                  <div key={item.name} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-md border">
-                      <div className="flex items-center gap-3">
-                        {documents[item.name]?.status === 'verified' && <CheckCircle className="h-5 w-5 text-green-500" />}
-                        {documents[item.name]?.status === 'uploaded' && <FileUp className="h-5 w-5 text-blue-500" />}
-                        {!documents[item.name] && <FileText className="h-5 w-5 text-muted-foreground" />}
-                        <Label htmlFor={item.name} className="font-medium">{item.name}</Label>
-                      </div>
-                      <div className="flex items-center gap-2 w-full sm:w-auto">
-                        <Input id={item.name} type="file" className="w-full sm:w-auto" onChange={(e) => handleFileChange(category, item.name, e)} disabled={isAnalyzing || !!documents[item.name]} />
-                      </div>
-                  </div>
-              ))}
+              {checklist[category].map(item => {
+                  const doc = getDocument(item.name);
+                  return (
+                    <div key={item.name} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-md border">
+                        <div className="flex items-center gap-3">
+                          {doc?.status === 'verified' && <CheckCircle className="h-5 w-5 text-green-500" />}
+                          {doc?.status === 'uploaded' && <FileUp className="h-5 w-5 text-blue-500" />}
+                          {!doc && <FileText className="h-5 w-5 text-muted-foreground" />}
+                          <Label htmlFor={item.name} className="font-medium">{item.name}</Label>
+                        </div>
+                        <div className="flex items-center gap-2 w-full sm:w-auto">
+                          <Input id={item.name} type="file" className="w-full sm:w-auto" onChange={(e) => handleFileChange(item.name, e)} disabled={isAnalyzing || !!doc} />
+                        </div>
+                    </div>
+                  )
+              })}
           </CardContent>
       </Card>
   );
@@ -439,3 +433,5 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
         )}
     </div>
   );
+
+    

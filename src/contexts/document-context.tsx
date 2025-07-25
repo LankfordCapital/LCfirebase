@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
@@ -74,7 +75,7 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
     
     setDocuments(prev => ({
       ...prev,
-      [doc.name]: { ...doc, dataUri: dataUri! },
+      [doc.name]: { ...doc, dataUri: dataUri!, status: 'uploaded' },
     }));
 
     toast({
@@ -116,3 +117,5 @@ export const useDocumentContext = () => {
   }
   return context;
 };
+
+    
