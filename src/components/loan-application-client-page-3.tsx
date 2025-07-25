@@ -121,6 +121,8 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
     router.push(`/dashboard/application/${programSlug}/page-4`);
   }
+  
+  const showGCSection = loanProgram.includes("Ground Up Construction") || loanProgram.includes("Fix and Flip") || loanProgram.includes("Rehab");
 
   const constructionDocs = [
     "General Contractor License",
@@ -128,10 +130,12 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
     "General Contractor Bond",
     "General Contractor's Contract to Build",
     "Construction Budget",
+    "Rehab Budget",
     "Projected Draw Schedule",
   ];
 
-  const gcDocuments = checklist?.subjectProperty.filter(item => constructionDocs.includes(item.name));
+  const gcDocuments = checklist?.subjectProperty.filter(item => constructionDocs.includes(item.name)) || [];
+
 
   return (
     <div className="space-y-6">
@@ -140,7 +144,7 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
-        {gcDocuments && gcDocuments.length > 0 && (
+        {showGCSection && (
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
