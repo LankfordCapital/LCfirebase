@@ -32,9 +32,6 @@ type CategorizedDocuments = {
 export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: string}) {
   const [checklist, setChecklist] = useState<CategorizedDocuments | null>(null);
   const [isLoadingChecklist, setIsLoadingChecklist] = useState(true);
-  const [gcName, setGcName] = useState('');
-  const [gcPhone, setGcPhone] = useState('');
-  const [gcEmail, setGcEmail] = useState('');
 
   const { documents, addDocument, getDocument } = useDocumentContext();
   const { user } = useAuth();
@@ -205,35 +202,6 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
           <CardContent className="space-y-4">
               {checklist.subjectProperty.map(item => <DocumentUploadInput key={item.name} name={item.name} />)}
           </CardContent>
-        </Card>
-        
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
-                <CardDescription>This section is required for all construction, rehab, and fix & flip loans.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="gcName">Contractor Name</Label>
-                        <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} placeholder="GC Company Name" />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="gcPhone">Contractor Phone</Label>
-                        <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} placeholder="(555) 123-4567" />
-                    </div>
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="gcEmail">Contractor Email</Label>
-                    <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} placeholder="contact@gccompany.com"/>
-                </div>
-                 <DocUploadInputSimple name="General Contractor License" />
-                 <DocUploadInputSimple name="General Contractor Insurance" />
-                 <DocUploadInputSimple name="General Contractor Bond" />
-                 <DocUploadInputSimple name="General Contractor's Contract to Build" />
-                 <DocUploadInputSimple name="Construction Budget" />
-                 <DocUploadInputSimple name="Projected Draw Schedule" />
-            </CardContent>
         </Card>
         
         <div className="flex justify-between items-center">

@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from './ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
-import { CheckCircle, ArrowLeft, ArrowRight, BookUser, Building, Shield } from 'lucide-react';
+import { CheckCircle, ArrowLeft, ArrowRight, BookUser, Building, Shield, Briefcase } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: string}) {
@@ -26,6 +26,10 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
   const [escrowAgentCompany, setEscrowAgentCompany] = useState('');
   const [escrowAgentPhone, setEscrowAgentPhone] = useState('');
   const [escrowAgentEmail, setEscrowAgentEmail] = useState('');
+
+  const [gcName, setGcName] = useState('');
+  const [gcPhone, setGcPhone] = useState('');
+  const [gcEmail, setGcEmail] = useState('');
 
   const { documents, addDocument } = useDocumentContext();
   const router = useRouter();
@@ -68,6 +72,35 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
+                <CardDescription>This section is required for all construction, rehab, and fix & flip loans.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="gcName">Contractor Name</Label>
+                        <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} placeholder="GC Company Name" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="gcPhone">Contractor Phone</Label>
+                        <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} placeholder="(555) 123-4567" />
+                    </div>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="gcEmail">Contractor Email</Label>
+                    <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} placeholder="contact@gccompany.com"/>
+                </div>
+                 <DocumentUploadInput name="General Contractor License" />
+                 <DocumentUploadInput name="General Contractor Insurance" />
+                 <DocumentUploadInput name="General Contractor Bond" />
+                 <DocumentUploadInput name="General Contractor's Contract to Build" />
+                 <DocumentUploadInput name="Construction Budget" />
+                 <DocumentUploadInput name="Projected Draw Schedule" />
+            </CardContent>
+        </Card>
+
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2"><Shield className="h-5 w-5 text-primary" /> Insurance Agent Details</CardTitle>
