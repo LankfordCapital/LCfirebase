@@ -13,8 +13,6 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Personal Financial Statement",
             "Credit Report",
             "Personal Asset Statement (Borrower)",
-            "Purchase HUD-1 (if applicable)",
-            "Disposition HUD-1 (if applicable)",
         ],
         company: [
             "Company Asset Statement (Company)",
@@ -54,8 +52,6 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Personal Financial Statement",
             "Credit Report",
             "Personal Asset Statement (Borrower)",
-            "Purchase HUD-1 (if applicable)",
-            "Disposition HUD-1 (if applicable)",
             "Proof of Funds for down payment and reserves"
         ],
         company: [
@@ -93,8 +89,6 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Personal Financial Statement",
             "Credit Report",
             "Personal Asset Statement (Borrower)",
-            "Purchase HUD-1 (if applicable)",
-            "Disposition HUD-1 (if applicable)",
         ],
         company: [
             "Company Asset Statement (Company)",
@@ -107,6 +101,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         ],
         subjectProperty: [
             "Purchase and Sale Agreement (or HUD-1 if refinance)",
+            "Evidence of Earnest Money Deposit",
             "Lease Agreements for subject property (if applicable)",
             "Projected Lease Comparables (if vacant)",
             "Commercial Liability Insurance Quote",
@@ -125,8 +120,6 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Personal Financial Statement",
             "Credit Report",
             "Personal Asset Statement (Borrower)",
-            "Purchase HUD-1 (if applicable)",
-            "Disposition HUD-1 (if applicable)",
             "Proof of Funds for down payment and reserves",
         ],
         company: [
@@ -157,8 +150,6 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Personal Financial Statement",
             "Credit Report",
             "Personal Asset Statement (Borrower)",
-            "Purchase HUD-1 (if applicable)",
-            "Disposition HUD-1 (if applicable)",
         ],
         company: [
             "Company Asset Statement (Company)",
@@ -197,8 +188,6 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Personal Financial Statement",
             "Credit Report",
             "Personal Asset Statement (Borrower)",
-            "Purchase HUD-1 (if applicable)",
-            "Disposition HUD-1 (if applicable)",
         ],
         company: [
             "Company Asset Statement (Company)",
@@ -213,6 +202,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Current Rent Roll",
             "Rehab Budget and Plans",
             "Purchase Agreement (if applicable)",
+            "Evidence of Earnest Money Deposit",
             "Property Tax Certificate",
             "Appraisal",
             "Collateral Desktop Analysis",
@@ -227,8 +217,6 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Personal Financial Statement",
             "Credit Report",
             "Personal Asset Statement (Borrower)",
-            "Purchase HUD-1 (if applicable)",
-            "Disposition HUD-1 (if applicable)",
         ],
         company: [
             "Company Asset Statement (Company)",
@@ -242,6 +230,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         subjectProperty: [
             "Trailing 12-month Operating Statement",
             "Purchase Agreement",
+            "Evidence of Earnest Money Deposit",
             "Property Tax Certificate",
             "Appraisal",
             "Collateral Desktop Analysis",
@@ -253,8 +242,6 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Personal Financial Statement",
             "Credit Report",
             "Personal Asset Statement (Borrower)",
-            "Purchase HUD-1 (if applicable)",
-            "Disposition HUD-1 (if applicable)",
         ],
         company: [
             "Company Asset Statement (Company)",
@@ -268,6 +255,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         subjectProperty: [
             "Current Rent Roll",
             "Lease Agreements",
+            "Purchase Agreement (if applicable)",
+            "Evidence of Earnest Money Deposit",
             "Property Tax Certificate",
             "Appraisal",
             "Collateral Desktop Analysis",
@@ -292,6 +281,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Business Plan with projections",
         ],
         subjectProperty: [
+            "Purchase and Sale Agreement",
+            "Evidence of Earnest Money Deposit",
             "Construction Plans, Budget, and Timeline",
             "Environmental Reports",
             "Approved or Pre-approved Plans (if available)",
@@ -307,8 +298,6 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Personal Financial Statement",
             "Credit Report",
             "Personal Asset Statement (Borrower)",
-            "Purchase HUD-1 (if applicable)",
-            "Disposition HUD-1 (if applicable)",
         ],
         company: [
             "Company Asset Statement (Company)",
@@ -322,6 +311,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         subjectProperty: [
             "Current Property Operating Statements",
             "Rehab/Expansion Plans and Budget",
+            "Purchase Agreement (if applicable)",
+            "Evidence of Earnest Money Deposit",
             "Property Tax Certificate",
             "Appraisal",
             "Collateral Desktop Analysis",
@@ -333,8 +324,6 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Personal Financial Statement",
             "Credit Report",
             "Personal Asset Statement (Borrower)",
-            "Purchase HUD-1 (if applicable)",
-            "Disposition HUD-1 (if applicable)",
         ],
         company: [
             "Company Asset Statement (Company)",
@@ -348,6 +337,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         subjectProperty: [
             "Trailing 12-month Operating Statement for property",
             "Purchase Agreement",
+            "Evidence of Earnest Money Deposit",
             "Preliminary Title Report",
             "Property Tax Certificate",
             "Appraisal",
@@ -360,8 +350,6 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Personal Financial Statement",
             "Credit Report",
             "Personal Asset Statement (Borrower)",
-            "Purchase HUD-1 (if applicable)",
-            "Disposition HUD-1 (if applicable)",
         ],
         company: [
             "Company Asset Statement (Company)",
@@ -375,6 +363,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         subjectProperty: [
             "Property Operating Statements (3 years)",
             "Lease Agreements",
+            "Purchase Agreement (if applicable)",
+            "Evidence of Earnest Money Deposit",
             "Property Tax Certificate",
             "Appraisal",
             "Collateral Desktop Analysis",
@@ -431,6 +421,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         ],
         subjectProperty: [
             "Purchase Agreement",
+            "Evidence of Earnest Money Deposit",
             "Feasibility Study",
             "Zoning and Entitlement Documents",
             "Environmental Report",
