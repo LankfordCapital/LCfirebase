@@ -1,7 +1,4 @@
 
-
-'use client';
-
 import { Suspense } from 'react';
 import { LoanApplicationClientPage5 } from '@/components/loan-application-client-page-5';
 import { Skeleton } from '@/components/ui/skeleton';
