@@ -16,13 +16,17 @@ type Comp = {
   listPrice: string;
   soldPrice: string;
   daysOnMarket: string;
+  sqFt: string;
+  yrBuilt: string;
+  lotSize: string;
+  distanceToSubject: string;
 };
 
 export function ComparableSales() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [comps, setComps] = useState<Comp[]>([
-    { id: Date.now(), address: '', listPrice: '', soldPrice: '', daysOnMarket: '' },
+    { id: Date.now(), address: '', listPrice: '', soldPrice: '', daysOnMarket: '', sqFt: '', yrBuilt: '', lotSize: '', distanceToSubject: '' },
   ]);
 
   async function onSubmit(e: React.FormEvent) {
@@ -44,7 +48,7 @@ export function ComparableSales() {
 
   const handleAddComp = () => {
     if (comps.length < 5) {
-        setComps([...comps, { id: Date.now(), address: '', listPrice: '', soldPrice: '', daysOnMarket: '' }]);
+        setComps([...comps, { id: Date.now(), address: '', listPrice: '', soldPrice: '', daysOnMarket: '', sqFt: '', yrBuilt: '', lotSize: '', distanceToSubject: '' }]);
     } else {
         toast({
             variant: 'destructive',
@@ -77,6 +81,24 @@ export function ComparableSales() {
                         <div className="space-y-2">
                             <Label htmlFor={`address-${comp.id}`}>Property Address</Label>
                             <Input id={`address-${comp.id}`} value={comp.address} onChange={(e) => handleCompChange(comp.id, 'address', e.target.value)} />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor={`sqFt-${comp.id}`}>Sq Ft</Label>
+                                <Input id={`sqFt-${comp.id}`} type="number" value={comp.sqFt} onChange={(e) => handleCompChange(comp.id, 'sqFt', e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor={`yrBuilt-${comp.id}`}>Yr Built</Label>
+                                <Input id={`yrBuilt-${comp.id}`} type="number" value={comp.yrBuilt} onChange={(e) => handleCompChange(comp.id, 'yrBuilt', e.target.value)} />
+                            </div>
+                             <div className="space-y-2">
+                                <Label htmlFor={`lotSize-${comp.id}`}>Lot Size</Label>
+                                <Input id={`lotSize-${comp.id}`} value={comp.lotSize} onChange={(e) => handleCompChange(comp.id, 'lotSize', e.target.value)} />
+                            </div>
+                             <div className="space-y-2">
+                                <Label htmlFor={`distance-${comp.id}`}>Distance</Label>
+                                <Input id={`distance-${comp.id}`} value={comp.distanceToSubject} onChange={(e) => handleCompChange(comp.id, 'distanceToSubject', e.target.value)} />
+                            </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="space-y-2">
