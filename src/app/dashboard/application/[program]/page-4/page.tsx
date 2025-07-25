@@ -1,5 +1,4 @@
 
-
 import { Suspense } from 'react';
 import { LoanApplicationClientPage4 } from '@/components/loan-application-client-page-4';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -28,3 +27,4 @@ export default function LoanApplicationPage4({ params }: { params: { program: st
         </Suspense>
     )
 }
+
