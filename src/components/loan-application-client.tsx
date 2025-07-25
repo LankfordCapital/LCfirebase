@@ -19,6 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Calendar } from './ui/calendar';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { useAuth } from '@/contexts/auth-context';
 
 
 type UploadStatus = 'pending' | 'uploaded' | 'verified' | 'missing';
@@ -54,8 +55,12 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
 
 
   const { documents, addDocument, getDocument } = useDocumentContext();
+  const { user } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
+  
+  const isWorkforce = user?.email?.endsWith('@lankfordcapital.com') && user?.email !== 'admin@lankfordcapital.com';
+
 
   const syncChecklistWithContext = useCallback((checklistData: CategorizedDocuments) => {
     const newChecklist = { ...checklistData };
@@ -192,16 +197,37 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   };
   
   const showConstructionFields = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('fix and flip') || loanProgram.toLowerCase().includes('rehab');
+  
+  const workforceOnlyDocs = ["Appraisal", "Collateral Desktop Analysis"];
 
   const DocumentUploadInput = ({ name }: { name: string }) => {
     const doc = documents[name];
     const fileInputId = `upload-${name.replace(/\s+/g, '-')}`;
+    
+    if (workforceOnlyDocs.includes(name) && !isWorkforce) {
+        return (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-md border bg-muted/50">
+                <div className="flex items-center gap-3">
+                    {doc?.status === 'verified' && <CheckCircle className="h-5 w-5 text-green-500" />}
+                    {doc?.status === 'uploaded' && <FileUp className="h-5 w-5 text-blue-500" />}
+                    {!doc && <FileText className="h-5 w-5 text-muted-foreground" />}
+                    <Label htmlFor={fileInputId} className="font-medium">{name}</Label>
+                </div>
+                <div className="text-sm text-muted-foreground italic w-full sm:w-auto text-left sm:text-right">Workforce upload only</div>
+            </div>
+        )
+    }
+
     return (
-        <div className="space-y-2">
-            <Label htmlFor={fileInputId}>{name}</Label>
-            <div className="flex items-center gap-2">
-                <Input id={fileInputId} type="file" onChange={(e) => handleFileChange(name, e)} disabled={isAnalyzing || !!doc} />
-                {doc && <CheckCircle className="h-5 w-5 text-green-500" />}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-md border">
+            <div className="flex items-center gap-3">
+              {doc?.status === 'verified' && <CheckCircle className="h-5 w-5 text-green-500" />}
+              {doc?.status === 'uploaded' && <FileUp className="h-5 w-5 text-blue-500" />}
+              {!doc && <FileText className="h-5 w-5 text-muted-foreground" />}
+              <Label htmlFor={fileInputId} className="font-medium">{name}</Label>
+            </div>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Input id={fileInputId} type="file" className="w-full sm:w-auto" onChange={(e) => handleFileChange(name, e)} disabled={isAnalyzing || !!doc} />
             </div>
         </div>
     );
@@ -221,22 +247,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
               <CardTitle className="flex items-center gap-2">{icon} {title}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-              {checklist[category].map(item => {
-                  const doc = getDocument(item.name);
-                  return (
-                    <div key={item.name} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-md border">
-                        <div className="flex items-center gap-3">
-                          {doc?.status === 'verified' && <CheckCircle className="h-5 w-5 text-green-500" />}
-                          {doc?.status === 'uploaded' && <FileUp className="h-5 w-5 text-blue-500" />}
-                          {!doc && <FileText className="h-5 w-5 text-muted-foreground" />}
-                          <Label htmlFor={item.name} className="font-medium">{item.name}</Label>
-                        </div>
-                        <div className="flex items-center gap-2 w-full sm:w-auto">
-                          <Input id={item.name} type="file" className="w-full sm:w-auto" onChange={(e) => handleFileChange(item.name, e)} disabled={isAnalyzing || !!doc} />
-                        </div>
-                    </div>
-                  )
-              })}
+              {checklist[category].map(item => <DocumentUploadInput key={item.name} name={item.name} />)}
           </CardContent>
       </Card>
   );

@@ -42,6 +42,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Escrow Instructions",
             "Closing Protection Letter",
             "Property Tax Certificate",
+            "Appraisal",
+            "Collateral Desktop Analysis",
         ]
     },
     "Residential NOO - Fix and Flip": {
@@ -74,6 +76,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Property HUD-1/Settlement Statement (if already purchased)",
             "30-Day Payoff Statement with Per Diem (if property has a mortgage)",
             "Property Tax Certificate",
+            "Appraisal",
+            "Collateral Desktop Analysis",
         ]
     },
     "Residential NOO - DSCR": {
@@ -105,6 +109,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Closing Protection Letter",
             "30-Day Payoff Statement with Per Diem (if a refinance)",
             "Property Tax Certificate",
+            "Appraisal",
+            "Collateral Desktop Analysis",
         ]
     },
     "Residential NOO - Bridge": {
@@ -136,6 +142,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Property HUD-1/Settlement Statement (if already purchased)",
             "30-Day Payoff Statement with Per diem (if property has a mortgage)",
             "Property Tax Certificate",
+            "Appraisal",
+            "Collateral Desktop Analysis",
         ]
     },
     "Commercial - Ground Up Construction": {
@@ -163,7 +171,6 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Sources and Uses Statement",
             "Construction Plans",
             "Construction Budget",
-            "Appraisal Report",
             "Environmental Report",
             "Purchase and Sale Agreement (or HUD-1 if refinance)",
             "Evidence of Earnest Money Deposit",
@@ -176,6 +183,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Approved or Pre-approved Plans (if available)",
             "Approved Permits (if available)",
             "Property Tax Certificate",
+            "Appraisal",
+            "Collateral Desktop Analysis",
         ]
     },
     "Commercial - Rehab Loans": {
@@ -201,8 +210,9 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Current Rent Roll",
             "Rehab Budget and Plans",
             "Purchase Agreement (if applicable)",
-            "Appraisal Report",
             "Property Tax Certificate",
+            "Appraisal",
+            "Collateral Desktop Analysis",
         ]
     },
     "Commercial - Acquisition & Bridge": {
@@ -227,8 +237,9 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         subjectProperty: [
             "Trailing 12-month Operating Statement",
             "Purchase Agreement",
-            "Appraisal Report",
             "Property Tax Certificate",
+            "Appraisal",
+            "Collateral Desktop Analysis",
         ]
     },
     "Commercial - Conventional Long Term Debt": {
@@ -253,8 +264,9 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         subjectProperty: [
             "Current Rent Roll",
             "Lease Agreements",
-            "Appraisal Report",
             "Property Tax Certificate",
+            "Appraisal",
+            "Collateral Desktop Analysis",
         ]
     },
     "Industrial - Ground Up Construction": {
@@ -280,10 +292,12 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         ],
         subjectProperty: [
             "Construction Plans, Budget, and Timeline",
-            "Appraisal and Environmental Reports",
+            "Environmental Reports",
             "Approved or Pre-approved Plans (if available)",
             "Approved Permits (if available)",
             "Property Tax Certificate",
+            "Appraisal",
+            "Collateral Desktop Analysis",
         ]
     },
     "Industrial - Rehab & Expansion": {
@@ -308,8 +322,9 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         subjectProperty: [
             "Current Property Operating Statements",
             "Rehab/Expansion Plans and Budget",
-            "Appraisal Report",
             "Property Tax Certificate",
+            "Appraisal",
+            "Collateral Desktop Analysis",
         ]
     },
     "Industrial - Acquisition & Bridge": {
@@ -336,6 +351,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Purchase Agreement",
             "Preliminary Title Report",
             "Property Tax Certificate",
+            "Appraisal",
+            "Collateral Desktop Analysis",
         ]
     },
     "Industrial - Long Term Debt": {
@@ -360,8 +377,9 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         subjectProperty: [
             "Property Operating Statements (3 years)",
             "Lease Agreements",
-            "Appraisal Report",
             "Property Tax Certificate",
+            "Appraisal",
+            "Collateral Desktop Analysis",
         ]
     },
     "SBA 7(a)": {
@@ -374,7 +392,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Business Tax Returns (3 years)",
             "Business Plan and Projections",
         ],
-        subjectProperty: []
+        subjectProperty: ["Appraisal", "Collateral Desktop Analysis"]
     },
     "SBA 504": {
         borrower: [
@@ -387,6 +405,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         subjectProperty: [
             "Project Cost Details",
             "Property Tax Certificate",
+            "Appraisal",
+            "Collateral Desktop Analysis",
         ]
     },
     "Land Acquisition": {
@@ -411,8 +431,9 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Feasibility Study",
             "Zoning and Entitlement Documents",
             "Environmental Report",
-            "Appraisal",
             "Property Tax Certificate",
+            "Appraisal",
+            "Collateral Desktop Analysis",
         ]
     },
     "Mezzanine Loans": {
