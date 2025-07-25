@@ -36,7 +36,7 @@ export default function AdminSignUpPage() {
       await signIn(email, password);
       router.push('/dashboard');
     } catch (error: any) {
-      if(error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+      if (error.code === 'auth/user-not-found') {
         // If user not found, try to sign up
         try {
             const userCredential = await signUp(email, password);
@@ -46,8 +46,8 @@ export default function AdminSignUpPage() {
             toast({
                 title: 'Admin User Created',
                 description: `Successfully created user: ${email}`,
-            })
-            await signIn(email, password);
+            });
+            // Firebase automatically signs in the user after signUp, so we just need to redirect.
             router.push('/dashboard');
         } catch (signUpError: any) {
             toast({
@@ -60,7 +60,7 @@ export default function AdminSignUpPage() {
          toast({
             variant: 'destructive',
             title: 'Sign In Failed',
-            description: error.message,
+            description: "Please check your password or if the user already exists with a different password.",
         });
       }
     } finally {
