@@ -141,7 +141,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
     
     const uploadedDocumentsForAnalysis = Object.values(documents)
       .filter(doc => doc.status === 'uploaded' && doc.file && doc.dataUri)
-      .map(doc => ({ filename: doc.file.name, dataUri: doc.dataUri }));
+      .map(doc => ({ filename: doc.file!.name, dataUri: doc.dataUri! }));
       
     if (uploadedDocumentsForAnalysis.length === 0) {
         toast({
@@ -196,13 +196,14 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   
   const showConstructionFields = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('fix and flip') || loanProgram.toLowerCase().includes('rehab');
 
-  const DocumentUploadInput = ({ name }: { name: string }) => {
+  const DocumentUploadInput = ({ name, category = 'subjectProperty' }: { name: string, category?: keyof CategorizedDocuments }) => {
     const doc = documents[name];
+    const fileInputId = `upload-${name.replace(/\s+/g, '-')}`;
     return (
         <div className="space-y-2">
-            <Label htmlFor={name}>{name}</Label>
+            <Label htmlFor={fileInputId}>{name}</Label>
             <div className="flex items-center gap-2">
-                <Input id={name} type="file" onChange={(e) => handleFileChange('subjectProperty', name, e)} disabled={isAnalyzing || !!doc} />
+                <Input id={fileInputId} type="file" onChange={(e) => handleFileChange(category, name, e)} disabled={isAnalyzing || !!doc} />
                 {doc && <CheckCircle className="h-5 w-5 text-green-500" />}
             </div>
         </div>
@@ -226,9 +227,9 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
               {checklist[category].map(item => (
                   <div key={item.name} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-md border">
                       <div className="flex items-center gap-3">
-                        {item.status === 'verified' && <CheckCircle className="h-5 w-5 text-green-500" />}
-                        {(item.status === 'uploaded' || documents[item.name]?.status === 'uploaded') && <FileUp className="h-5 w-5 text-blue-500" />}
-                        {item.status === 'missing' && !documents[item.name] && <FileText className="h-5 w-5 text-muted-foreground" />}
+                        {documents[item.name]?.status === 'verified' && <CheckCircle className="h-5 w-5 text-green-500" />}
+                        {documents[item.name]?.status === 'uploaded' && <FileUp className="h-5 w-5 text-blue-500" />}
+                        {!documents[item.name] && <FileText className="h-5 w-5 text-muted-foreground" />}
                         <Label htmlFor={item.name} className="font-medium">{item.name}</Label>
                       </div>
                       <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -309,6 +310,10 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                         <Label htmlFor="gcEmail">Contractor Email</Label>
                         <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} />
                     </div>
+                     <DocumentUploadInput name="General Contractor License" />
+                     <DocumentUploadInput name="General Contractor Insurance" />
+                     <DocumentUploadInput name="General Contractor Bond" />
+                     <DocumentUploadInput name="General Contractor's Contract to Build" />
                 </CardContent>
             </Card>
 
@@ -337,6 +342,8 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                             <Input id="insuranceAgentEmail" type="email" value={insuranceAgentEmail} onChange={e => setInsuranceAgentEmail(e.target.value)} />
                         </div>
                     </div>
+                     <DocumentUploadInput name="Builder's Risk Insurance Quote" />
+                     <DocumentUploadInput name="Commercial Liability Insurance Quote" />
                 </CardContent>
             </Card>
 
@@ -365,6 +372,9 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                             <Input id="titleAgentEmail" type="email" value={titleAgentEmail} onChange={e => setTitleAgentEmail(e.target.value)} />
                         </div>
                     </div>
+                     <DocumentUploadInput name="Preliminary Title Commitment" />
+                     <DocumentUploadInput name="Escrow Instructions" />
+                     <DocumentUploadInput name="Closing Protection Letter" />
                 </CardContent>
             </Card>
             </>
@@ -412,6 +422,5 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
         )}
     </div>
   );
-}
 
     
