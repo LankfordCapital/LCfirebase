@@ -64,7 +64,6 @@ export default function PrivacyPolicyPage() {
                     </p>
                     <p>
                     Lankford Capital <br/>
-                    [Your Company Address] <br/>
                     Underwriting@lankfordcapital.com <br/>
                     888-708-6146
                     </p>
