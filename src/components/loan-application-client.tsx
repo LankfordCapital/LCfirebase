@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -38,6 +39,8 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [loanAmount, setLoanAmount] = useState('');
   const [purchasePrice, setPurchasePrice] = useState('');
   const [rehabCost, setRehabCost] = useState('');
+  const [lotSize, setLotSize] = useState('');
+  const [constructionTime, setConstructionTime] = useState('');
 
   const { documents, addDocument } = useDocumentContext();
   const { toast } = useToast();
@@ -177,7 +180,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
     }
   };
 
-  const showRehabCost = loanProgram.toLowerCase().includes('fix and flip') || loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('rehab');
+  const showConstructionFields = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('fix and flip') || loanProgram.toLowerCase().includes('rehab');
 
   if (isLoadingChecklist) {
     return <div>Loading Application...</div>;
@@ -237,11 +240,21 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                         <Input id="purchasePrice" type="number" placeholder="e.g., 400000" value={purchasePrice} onChange={e => setPurchasePrice(e.target.value)} />
                     </div>
                 </div>
-                {showRehabCost && (
-                    <div className="space-y-2">
-                        <Label htmlFor="rehabCost">Estimated Rehab/Construction Cost</Label>
-                        <Input id="rehabCost" type="number" placeholder="e.g., 50000" value={rehabCost} onChange={e => setRehabCost(e.target.value)} />
-                    </div>
+                <div className="space-y-2">
+                    <Label htmlFor="lotSize">Lot Size (in sq. ft. or acres)</Label>
+                    <Input id="lotSize" placeholder="e.g., 10,000 sq. ft. or 0.23 acres" value={lotSize} onChange={e => setLotSize(e.target.value)} />
+                </div>
+                {showConstructionFields && (
+                    <>
+                        <div className="space-y-2">
+                            <Label htmlFor="rehabCost">Estimated Rehab/Construction Cost</Label>
+                            <Input id="rehabCost" type="number" placeholder="e.g., 50000" value={rehabCost} onChange={e => setRehabCost(e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="constructionTime">Estimated Time to Construct (in months)</Label>
+                            <Input id="constructionTime" type="number" placeholder="e.g., 6" value={constructionTime} onChange={e => setConstructionTime(e.target.value)} />
+                        </div>
+                    </>
                 )}
             </CardContent>
         </Card>
