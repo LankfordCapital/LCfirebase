@@ -109,28 +109,28 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
     }
   }, [loanProgram, toast, syncChecklistWithContext]);
   
+  const handleFileChange = useCallback(async (itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+        const file = event.target.files[0];
+        
+        const success = await addDocument({
+            name: itemName,
+            file,
+            status: 'uploaded',
+        });
+
+        if (success && checklist) {
+            setChecklist(syncChecklistWithContext(checklist));
+        }
+    }
+  }, [addDocument, checklist, syncChecklistWithContext]);
+  
   useEffect(() => {
     if (checklist) {
         setChecklist(syncChecklistWithContext(checklist));
     }
-  }, [documents, syncChecklistWithContext]);
+  }, [documents, syncChecklistWithContext, checklist]);
 
-
-  const handleFileChange = async (itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      
-      const success = await addDocument({
-        name: itemName,
-        file,
-        status: 'uploaded',
-      });
-
-      if (success && checklist) {
-        setChecklist(syncChecklistWithContext(checklist));
-      }
-    }
-  };
 
   const handleAnalyzeDocuments = async () => {
     if (!checklist) return;
