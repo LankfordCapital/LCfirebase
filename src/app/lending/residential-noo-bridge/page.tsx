@@ -16,7 +16,7 @@ const features = [
     "Clear path to permanent financing"
 ];
 
-export default function ResidentialNooBridgePage() {
+export default function ResidentialNOOBridgePage() {
   return (
     <div>
       <section className="relative bg-primary/5 py-20 md:py-28 text-center">

@@ -17,7 +17,7 @@ const features = [
     "Rates starting at 9.99% and 2 points"
 ];
 
-export default function ResidentialNooConstructionPage() {
+export default function ResidentialNOOConstructionPage() {
   return (
     <div>
       <section className="relative bg-primary/5 py-20 md:py-28 text-center">

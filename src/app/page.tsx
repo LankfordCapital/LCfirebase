@@ -24,7 +24,7 @@ const loanProducts = [
     icon: <Building className="h-8 w-8 text-primary" />,
     title: 'Residential NOO',
     description: 'Financing for non-owner occupied residential properties.',
-    href: '/lending/residential-noo',
+    href: '/lending/residential-NOO',
   },
   {
     icon: <Wrench className="h-8 w-8 text-primary" />,

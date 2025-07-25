@@ -20,7 +20,7 @@ const features = [
     "Experience preferred but not required"
 ];
 
-export default function ResidentialNooDscrPage() {
+export default function ResidentialNOODscrPage() {
   return (
     <div>
       <section className="relative bg-primary/5 py-20 md:py-28 text-center">

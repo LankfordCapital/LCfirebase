@@ -9,29 +9,29 @@ const loanTypes = [
     title: "Ground Up Construction",
     description: "Financing for new residential construction projects from the ground up.",
     features: ["Competitive rates", "Flexible draw schedules", "Experienced support"],
-    href: "/lending/residential-noo-construction",
+    href: "/lending/residential-NOO-construction",
   },
   {
     title: "Fix and Flip",
     description: "Short-term loans for purchasing and renovating properties to sell for a profit.",
     features: ["Fast funding", "Up to 90% of purchase price", "Interest-only payments"],
-    href: "/lending/residential-noo-fix-and-flip",
+    href: "/lending/residential-NOO-fix-and-flip",
   },
   {
     title: "DSCR Loans",
     description: "Loans qualified based on property cash flow (Debt Service Coverage Ratio), not personal income.",
     features: ["No personal income verification", "Ideal for investors", "Streamlined process"],
-    href: "/lending/residential-noo-dscr",
+    href: "/lending/residential-NOO-dscr",
   },
   {
     title: "Bridge Loans",
     description: "Short-term financing to bridge the gap between property acquisitions.",
     features: ["Quick closing", "Flexible terms", "Secure opportunities fast"],
-    href: "/lending/residential-noo-bridge",
+    href: "/lending/residential-NOO-bridge",
   }
 ];
 
-export default function ResidentialNooPage() {
+export default function ResidentialNOOPage() {
   return (
     <div>
       <section className="relative h-[50vh] flex items-center justify-center text-white py-20 md:py-28">

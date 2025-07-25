@@ -17,7 +17,7 @@ const features = [
     "Purchase and refinance options available"
 ];
 
-export default function ResidentialNooFixAndFlipPage() {
+export default function ResidentialNOOFixAndFlipPage() {
   return (
     <div>
       <section className="relative bg-primary/5 py-20 md:py-28 text-center">

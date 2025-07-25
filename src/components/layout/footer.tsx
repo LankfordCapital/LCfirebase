@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Twitter, Linkedin, Facebook } from 'lucide-react';
 
 const lendingProducts1 = [
-    { href: '/lending/residential-noo', label: 'Residential NOO' },
+    { href: '/lending/residential-NOO', label: 'Residential NOO' },
     { href: '/lending/commercial', label: 'Commercial' },
     { href: '/lending/industrial', label: 'Industrial' },
     { href: '/lending/land-acquisition', label: 'Land Acquisition' },
