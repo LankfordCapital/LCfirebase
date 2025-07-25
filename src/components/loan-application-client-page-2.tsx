@@ -31,11 +31,21 @@ type CategorizedDocuments = {
     subjectProperty: DocumentItem[];
 };
 
+type AssetScanState = {
+    balance: ScanAssetStatementOutput | null;
+    isScanning: boolean;
+};
+
 export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: string}) {
   const [checklist, setChecklist] = useState<CategorizedDocuments | null>(null);
   const [isLoadingChecklist, setIsLoadingChecklist] = useState(true);
-  const [personalAssetBalance, setPersonalAssetBalance] = useState<ScanAssetStatementOutput | null>(null);
-  const [isScanningPersonalAsset, setIsScanningPersonalAsset] = useState(false);
+  
+  const [assetScanStates, setAssetScanStates] = useState({
+      month1: { balance: null, isScanning: false },
+      month2: { balance: null, isScanning: false },
+      month3: { balance: null, isScanning: false },
+  });
+
 
   const { documents, addDocument, getDocument } = useDocumentContext();
   const { user } = useAuth();
@@ -109,39 +119,37 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
     }
   }, [addDocument, checklist, syncChecklistWithContext]);
 
-   const handleScanAssetStatement = async () => {
-    const docName = 'Personal Asset Statement (Borrower)';
+   const handleScanAssetStatement = async (monthKey: keyof typeof assetScanStates) => {
+    const docName = `Personal Asset Statement (Month ${monthKey === 'month1' ? 1 : monthKey === 'month2' ? 2 : 3})`;
     const assetStatement = documents[docName];
 
     if (!assetStatement?.file) {
       toast({
         variant: 'destructive',
         title: 'No file selected',
-        description: `Please upload a personal asset statement to scan.`,
+        description: `Please upload the asset statement for Month ${monthKey === 'month1' ? 1 : monthKey === 'month2' ? 2 : 3} to scan.`,
       });
       return;
     }
 
-    setIsScanningPersonalAsset(true);
-    setPersonalAssetBalance(null);
+    setAssetScanStates(prev => ({ ...prev, [monthKey]: { balance: null, isScanning: true } }));
     
     try {
         const dataUri = assetStatement.dataUri;
         const result = await scanAssetStatement({ statementDataUri: dataUri });
-        setPersonalAssetBalance(result);
+        setAssetScanStates(prev => ({ ...prev, [monthKey]: { balance: result, isScanning: false } }));
         toast({
             title: 'Scan Complete',
-            description: `The account balance has been extracted.`,
+            description: `The account balance for Month ${monthKey === 'month1' ? 1 : monthKey === 'month2' ? 2 : 3} has been extracted.`,
         });
     } catch (error) {
       console.error('Asset Scan Error:', error);
       toast({
         variant: 'destructive',
         title: 'Scan Failed',
-        description: 'Could not extract the balance from the document. Please try again.',
+        description: `Could not extract the balance from the document for Month ${monthKey === 'month1' ? 1 : monthKey === 'month2' ? 2 : 3}. Please try again.`,
       });
-    } finally {
-        setIsScanningPersonalAsset(false);
+      setAssetScanStates(prev => ({ ...prev, [monthKey]: { ...prev[monthKey], isScanning: false } }));
     }
   };
 
@@ -178,6 +186,32 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
     );
   };
   
+    const AssetStatementUploader = ({ month, monthKey }: { month: number, monthKey: keyof typeof assetScanStates }) => {
+        const docName = `Personal Asset Statement (Month ${month})`;
+        const scanState = assetScanStates[monthKey];
+        return (
+             <div className="space-y-4 rounded-md border p-4">
+                 <h4 className="font-semibold">Personal Asset Statement - Month {month}</h4>
+                 <div className="space-y-2">
+                    <Label htmlFor={`personal-asset-upload-${month}`}>Upload Asset Statement (Month {month})</Label>
+                    <div className="flex gap-2">
+                        <Input id={`personal-asset-upload-${month}`} type="file" onChange={(e) => handleFileChange(docName, e)} />
+                        <Button onClick={() => handleScanAssetStatement(monthKey)} disabled={scanState.isScanning || !documents[docName]}>
+                            {scanState.isScanning ? <Loader2 className="animate-spin" /> : <Landmark />}
+                            <span className="ml-2 hidden sm:inline">Scan</span>
+                        </Button>
+                    </div>
+                </div>
+                {scanState.balance && (
+                    <div>
+                        <p className="text-sm font-medium text-muted-foreground">Most Recent Balance</p>
+                        <p className="text-2xl font-bold">{scanState.balance.balance}</p>
+                    </div>
+                )}
+            </div>
+        )
+    }
+  
   if (isLoadingChecklist) {
     return <div>Loading document checklist...</div>
   }
@@ -209,28 +243,12 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
         <Card>
             <CardHeader>
                 <CardTitle>AI Asset Verification</CardTitle>
-                <CardDescription>Upload an asset statement to have our AI extract the most recent balance.</CardDescription>
+                <CardDescription>Upload the last three months of personal asset statements to have our AI extract the most recent balances.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                 <div className="space-y-4 rounded-md border p-4">
-                     <h4 className="font-semibold">Personal Assets</h4>
-                     <div className="space-y-2">
-                        <Label htmlFor="personal-asset-upload">Upload Latest Personal Asset Statement</Label>
-                        <div className="flex gap-2">
-                            <Input id="personal-asset-upload" type="file" onChange={(e) => handleFileChange('Personal Asset Statement (Borrower)', e)} />
-                            <Button onClick={handleScanAssetStatement} disabled={isScanningPersonalAsset || !documents['Personal Asset Statement (Borrower)']}>
-                                {isScanningPersonalAsset ? <Loader2 className="animate-spin" /> : <Landmark />}
-                                <span className="ml-2 hidden sm:inline">Scan</span>
-                            </Button>
-                        </div>
-                    </div>
-                    {personalAssetBalance && (
-                        <div>
-                            <p className="text-sm font-medium text-muted-foreground">Most Recent Balance</p>
-                            <p className="text-2xl font-bold">{personalAssetBalance.balance}</p>
-                        </div>
-                    )}
-                </div>
+                <AssetStatementUploader month={1} monthKey="month1" />
+                <AssetStatementUploader month={2} monthKey="month2" />
+                <AssetStatementUploader month={3} monthKey="month3" />
             </CardContent>
         </Card>
         
@@ -247,3 +265,4 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
     </div>
   );
 }
+
