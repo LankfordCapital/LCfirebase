@@ -43,9 +43,7 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
 
   const isWorkforce = user?.email?.endsWith('@lankfordcapital.com') && user?.email !== 'admin@lankfordcapital.com';
   const workforceOnlyDocs = ["Appraisal", "Collateral Desktop Analysis"];
-  const showConstructionFields = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('fix and flip') || loanProgram.toLowerCase().includes('rehab');
-
-
+  
   const syncChecklistWithContext = useCallback((checklistData: CategorizedDocuments) => {
     const newChecklist = { ...checklistData };
     (Object.keys(newChecklist) as Array<keyof CategorizedDocuments>).forEach(category => {
@@ -196,35 +194,34 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
           </CardContent>
         </Card>
         
-        {showConstructionFields && (
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="grid md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="gcName">Contractor Name</Label>
-                            <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="gcPhone">Contractor Phone</Label>
-                            <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} />
-                        </div>
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
+                <CardDescription>This section is required for all construction, rehab, and fix & flip loans.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="gcName">Contractor Name</Label>
+                        <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} placeholder="GC Company Name" />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="gcEmail">Contractor Email</Label>
-                        <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} />
+                        <Label htmlFor="gcPhone">Contractor Phone</Label>
+                        <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} placeholder="(555) 123-4567" />
                     </div>
-                     <DocUploadInputSimple name="General Contractor License" />
-                     <DocUploadInputSimple name="General Contractor Insurance" />
-                     <DocUploadInputSimple name="General Contractor Bond" />
-                     <DocUploadInputSimple name="General Contractor's Contract to Build" />
-                     <DocUploadInputSimple name="Construction Budget" />
-                     <DocUploadInputSimple name="Projected Draw Schedule" />
-                </CardContent>
-            </Card>
-        )}
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="gcEmail">Contractor Email</Label>
+                    <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} placeholder="contact@gccompany.com"/>
+                </div>
+                 <DocUploadInputSimple name="General Contractor License" />
+                 <DocUploadInputSimple name="General Contractor Insurance" />
+                 <DocUploadInputSimple name="General Contractor Bond" />
+                 <DocUploadInputSimple name="General Contractor's Contract to Build" />
+                 <DocUploadInputSimple name="Construction Budget" />
+                 <DocUploadInputSimple name="Projected Draw Schedule" />
+            </CardContent>
+        </Card>
         
         <div className="flex justify-between items-center">
             <Button variant="outline" onClick={() => router.back()}>
