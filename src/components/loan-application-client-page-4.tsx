@@ -9,6 +9,8 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
 
 export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: string}) {
   const router = useRouter();
@@ -17,15 +19,26 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
   const [creditAuth, setCreditAuth] = useState(false);
   const [backgroundAuth, setBackgroundAuth] = useState(false);
   const [appraisalAuth, setAppraisalAuth] = useState(false);
+  const [signature, setSignature] = useState('');
   
-  const allConsentsGiven = creditAuth && backgroundAuth && appraisalAuth;
+  const allConsentsAndSignatureGiven = creditAuth && backgroundAuth && appraisalAuth && signature.trim() !== '';
+  const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
   const handleSubmitApplication = () => {
-    if (!allConsentsGiven) {
+    if (!creditAuth || !backgroundAuth || !appraisalAuth) {
         toast({
             variant: 'destructive',
             title: 'Authorizations Required',
             description: 'Please check all disclosure boxes to continue.',
+        });
+        return;
+    }
+    
+    if (signature.trim() === '') {
+        toast({
+            variant: 'destructive',
+            title: 'Signature Required',
+            description: 'Please sign the application by typing your full name.',
         });
         return;
     }
@@ -86,6 +99,32 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
                     </p>
                   </div>
                 </div>
+                
+                <Separator className="my-6" />
+
+                <div className="space-y-4">
+                    <h3 className="font-headline text-lg font-semibold">E-Signature</h3>
+                     <p className="text-sm text-muted-foreground">
+                      By typing your full name below, you are electronically signing this application and certifying that all information provided is true and correct to the best of your knowledge.
+                    </p>
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="signature">Borrower's Signature</Label>
+                            <Input 
+                                id="signature" 
+                                placeholder="Type your full name" 
+                                value={signature} 
+                                onChange={(e) => setSignature(e.target.value)} 
+                                className="font-serif text-lg"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                             <Label htmlFor="date">Date</Label>
+                            <Input id="date" value={currentDate} readOnly disabled />
+                        </div>
+                    </div>
+                </div>
+
             </CardContent>
         </Card>
         
@@ -93,7 +132,7 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
             <Button variant="outline" onClick={() => router.back()}>
                <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 3
             </Button>
-            <Button onClick={handleSubmitApplication} disabled={!allConsentsGiven}>
+            <Button onClick={handleSubmitApplication} disabled={!allConsentsAndSignatureGiven}>
                 Submit Final Application
             </Button>
         </div>
