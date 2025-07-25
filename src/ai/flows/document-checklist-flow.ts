@@ -9,6 +9,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { loanProgramDocumentLists } from '@/lib/document-lists';
 
 const GetDocumentChecklistInputSchema = z.object({
   loanProgram: z.string().describe('The selected loan program (e.g., Ground Up Construction, Fix and Flip, DSCR).'),
@@ -32,391 +33,23 @@ export async function getDocumentChecklist(input: GetDocumentChecklistInput): Pr
 
 const prompt = ai.definePrompt({
   name: 'getDocumentChecklistPrompt',
-  input: {schema: GetDocumentChecklistInputSchema},
+  input: {schema: z.object({
+    loanProgram: z.string(),
+    documentList: DocumentChecklistSchema,
+  })},
   output: {schema: GetDocumentChecklistOutputSchema},
   prompt: `You are an AI assistant that generates a categorized list of required documents for a specific loan program. The loan program is {{{loanProgram}}}.
 
-Based on the loan program, generate a full list of required documents and populate it in the 'documentRequestList' field.
+Based on the provided document list for the program, generate a full list of required documents and populate it in the 'documentRequestList' field.
 The documents in the 'documentRequestList' field MUST be categorized into 'borrower', 'company', and 'subjectProperty'.
 
 **Important Conditional Logic:**
 - Only include "Approved or Pre-approved Plans" and "Approved Permits (if available)" in the 'subjectProperty' list if the loan program contains 'Ground Up Construction'.
 
-**Document Categories:**
-
-*   **Borrower Documents:** Personal documents for the individual borrower (e.g., ID, personal financial statements, credit report, deal history).
-*   **Company Documents:** Documents related to the business entity (e.g., EIN, formation docs, operating agreements).
-*   **Subject Property Documents:** Documents related to the property being financed (e.g., purchase contract, plans, permits, insurance).
-
-
-**Document Requirements by Loan Program:**
-
-*   **Residential NOO - Ground Up Construction:**
-    *   ID/Driver's License (Borrower)
-    *   Personal Financial Statement (Borrower)
-    *   Credit Report (Borrower)
-    *   Personal Asset Statement (Borrower)
-    *   Purchase HUD-1 (if applicable) (Borrower)
-    *   Disposition HUD-1 (if applicable) (Borrower)
-    *   Company Asset Statement (Company)
-    *   EIN Certificate (Company)
-    *   Formation Documentation (Company)
-    *   Operating Agreement/Bylaws (Company)
-    *   Partnership/Officer List (Company)
-    *   Business License (Company)
-    *   Certificate of Good Standing (Company)
-    *   Business Debt Schedule (Company)
-    *   Executed Purchase Contract (Subject Property)
-    *   Evidence of Earnest Money Deposit (Subject Property)
-    *   Preliminary Title Commitment (Subject Property)
-    *   Escrow Instructions (Subject Property)
-    *   Closing Protection Letter (Subject Property)
-    *   Title/Escrow Agent Details (Name, Company, Phone, Email) (Subject Property)
-    *   General Contractor Details (Name, Phone, Email) (Subject Property)
-    *   General Contractor License (Subject Property)
-    *   General Contractor Insurance (Subject Property)
-    *   General Contractor Bond (if required by location) (Subject Property)
-    *   General Contractor's Contract to Build (Subject Property)
-    *   Builder's Risk Insurance Quote (Subject Property)
-    *   Commercial Liability Insurance Quote (Subject Property)
-    *   Insurance Agent Details (Name, Company, Phone, Email) (Subject Property)
-    *   Approved or Pre-approved Plans (Subject Property)
-    *   Approved Permits (if available) (Subject Property)
-    *   Property HUD-1/Settlement Statement (if already purchased) (Subject Property)
-    *   30-Day Payoff Statement with Per Diem (if property has a mortgage) (Subject Property)
-
-*   **Residential NOO - Fix and Flip:**
-    *   ID/Driver's License (Borrower)
-    *   Personal Financial Statement (Borrower)
-    *   Credit Report (Borrower)
-    *   Personal Asset Statement (Borrower)
-    *   Purchase HUD-1 (if applicable) (Borrower)
-    *   Disposition HUD-1 (if applicable) (Borrower)
-    *   Company Asset Statement (Company)
-    *   EIN Certificate (Company)
-    *   Formation Documentation (Company)
-    *   Operating Agreement/Bylaws (Company)
-    *   Partnership/Officer List (Company)
-    *   Business License (Company)
-    *   Certificate of Good Standing (Company)
-    *   Business Debt Schedule (Company)
-    *   Executed Purchase Contract (Subject Property)
-    *   Evidence of Earnest Money Deposit (Subject Property)
-    *   Preliminary Title Commitment (Subject Property)
-    *   Escrow Instructions (Subject Property)
-    *   Closing Protection Letter (Subject Property)
-    *   Title/Escrow Agent Details (Name, Company, Phone, Email) (Subject Property)
-    *   Rehab Budget (Subject Property)
-    *   Proof of Funds for down payment and reserves (Borrower)
-    *   Property HUD-1/Settlement Statement (if already purchased) (Subject Property)
-    *   30-Day Payoff Statement with Per Diem (if property has a mortgage) (Subject Property)
-
-*   **Residential NOO - DSCR:**
-    *   ID/Driver's License (Borrower)
-    *   Personal Financial Statement (Borrower)
-    *   Credit Report (Borrower)
-    *   Personal Asset Statement (Borrower)
-    *   Purchase HUD-1 (if applicable) (Borrower)
-    *   Disposition HUD-1 (if applicable) (Borrower)
-    *   Company Asset Statement (Company)
-    *   EIN Certificate (Company)
-    *   Formation Documentation (Company)
-    *   Operating Agreement/Bylaws (Company)
-    *   Partnership/Officer List (Company)
-    *   Business License (Company)
-    *   Certificate of Good Standing (Company)
-    *   Business Debt Schedule (Company)
-    *   Purchase and Sale Agreement (or HUD-1 if refinance) (Subject Property)
-    *   Lease Agreements for subject property (if applicable) (Subject Property)
-    *   Projected Lease Comparables (if vacant) (Subject Property)
-    *   Commercial Liability Insurance Quote (Subject Property)
-    *   Insurance Agent Details (Name, Company, Phone, Email) (Subject Property)
-    *   Preliminary Title Commitment (Subject Property)
-    *   Escrow Instructions (Subject Property)
-    *   Closing Protection Letter (Subject Property)
-    *   Title/Escrow Agent Details (Name, Company, Phone, Email) (Subject Property)
-    *   30-Day Payoff Statement with Per Diem (if a refinance) (Subject Property)
-
-*   **Residential NOO - Bridge:**
-    *   ID/Driver's License (Borrower)
-    *   Personal Financial Statement (Borrower)
-    *   Credit Report (Borrower)
-    *   Personal Asset Statement (Borrower)
-    *   Purchase HUD-1 (if applicable) (Borrower)
-    *   Disposition HUD-1 (if applicable) (Borrower)
-    *   Company Asset Statement (Company)
-    *   EIN Certificate (Company)
-    *   Formation Documentation (Company)
-    *   Operating Agreement/Bylaws (Company)
-    *   Partnership/Officer List (Company)
-    *   Business License (Company)
-    *   Certificate of Good Standing (Company)
-    *   Business Debt Schedule (Company)
-    *   Executed Purchase Contract (Subject Property)
-    *   Evidence of Earnest Money Deposit (Subject Property)
-    *   Preliminary Title Commitment (Subject Property)
-    *   Escrow Instructions (Subject Property)
-    *   Closing Protection Letter (Subject Property)
-    *   Title/Escrow Agent Details (Name, Company, Phone, Email) (Subject Property)
-    *   Proof of Funds for down payment and reserves (Borrower)
-    *   Property HUD-1/Settlement Statement (if already purchased) (Subject Property)
-    *   30-Day Payoff Statement with Per diem (if property has a mortgage) (Subject Property)
-
-*   **Commercial - Ground Up Construction:**
-    *   ID/Driver's License (Borrower)
-    *   Personal Financial Statement (Borrower)
-    *   Credit Report (Borrower)
-    *   Personal Asset Statement (Borrower)
-    *   Purchase HUD-1 (if applicable) (Borrower)
-    *   Disposition HUD-1 (if applicable) (Borrower)
-    *   Company Asset Statement (Company)
-    *   EIN Certificate (Company)
-    *   Formation Documentation (Company)
-    *   Operating Agreement/Bylaws (Company)
-    *   Partnership/Officer List (Company)
-    *   Business License (Company)
-    *   Certificate of Good Standing (Company)
-    *   Business Debt Schedule (Company)
-    *   Executive Summary (Subject Property)
-    *   Pro-forma Projections (5 years, month-by-month) (Subject Property)
-    *   Sources and Uses Statement (Subject Property)
-    *   Construction Plans (Subject Property)
-    *   Construction Budget (Subject Property)
-    *   Appraisal Report (Subject Property)
-    *   Environmental Report (Subject Property)
-    *   Purchase and Sale Agreement (or HUD-1 if refinance) (Subject Property)
-    *   30-Day Payoff Statement with Per Diem (if refinance) (Subject Property)
-    *   Preliminary Title Commitment (Subject Property)
-    *   Escrow Instructions (Subject Property)
-    *   Closing Protection Letter (Subject Property)
-    *   Title/Escrow Agent Details (Name, Company, Phone, Email) (Subject Property)
-    *   Builder's Risk Insurance Quote (Subject Property)
-    *   Commercial Liability Insurance Quote (Subject Property)
-    *   Insurance Agent Details (Name, Company, Phone, Email) (Subject Property)
-    *   Approved or Pre-approved Plans (Subject Property)
-    *   Approved Permits (if available) (Subject Property)
-
-*   **Commercial - Rehab Loans:**
-    *   ID/Driver's License (Borrower)
-    *   Personal Financial Statement (Borrower)
-    *   Credit Report (Borrower)
-    *   Personal Asset Statement (Borrower)
-    *   Purchase HUD-1 (if applicable) (Borrower)
-    *   Disposition HUD-1 (if applicable) (Borrower)
-    *   Company Asset Statement (Company)
-    *   EIN Certificate (Company)
-    *   Formation Documentation (Company)
-    *   Operating Agreement/Bylaws (Company)
-    *   Partnership/Officer List (Company)
-    *   Business License (Company)
-    *   Certificate of Good Standing (Company)
-    *   Business Debt Schedule (Company)
-    *   Current Rent Roll (Subject Property)
-    *   Rehab Budget and Plans (Subject Property)
-    *   Purchase Agreement (if applicable) (Subject Property)
-    *   Appraisal Report (Subject Property)
-
-*   **Commercial - Acquisition & Bridge:**
-    *   ID/Driver's License (Borrower)
-    *   Personal Financial Statement (Borrower)
-    *   Credit Report (Borrower)
-    *   Personal Asset Statement (Borrower)
-    *   Purchase HUD-1 (if applicable) (Borrower)
-    *   Disposition HUD-1 (if applicable) (Borrower)
-    *   Company Asset Statement (Company)
-    *   EIN Certificate (Company)
-    *   Formation Documentation (Company)
-    *   Operating Agreement/Bylaws (Company)
-    *   Partnership/Officer List (Company)
-    *   Business License (Company)
-    *   Certificate of Good Standing (Company)
-    *   Business Debt Schedule (Company)
-    *   Trailing 12-month Operating Statement (Subject Property)
-    *   Purchase Agreement (Subject Property)
-    *   Appraisal Report (Subject Property)
-
-*   **Commercial - Conventional Long Term Debt:**
-    *   ID/Driver's License (Borrower)
-    *   Personal Financial Statement (Borrower)
-    *   Credit Report (Borrower)
-    *   Personal Asset Statement (Borrower)
-    *   Purchase HUD-1 (if applicable) (Borrower)
-    *   Disposition HUD-1 (if applicable) (Borrower)
-    *   Company Asset Statement (Company)
-    *   EIN Certificate (Company)
-    *   Formation Documentation (Company)
-    *   Operating Agreement/Bylaws (Company)
-    *   Partnership/Officer List (Company)
-    *   Business License (Company)
-    *   Certificate of Good Standing (Company)
-    *   Business Debt Schedule (Company)
-    *   Current Rent Roll (Subject Property)
-    *   Lease Agreements (Subject Property)
-    *   Appraisal Report (Subject Property)
-
-*   **Industrial - Ground Up Construction:**
-    *   ID/Driver's License (Borrower)
-    *   Personal Financial Statement (Borrower)
-    *   Credit Report (Borrower)
-    *   Personal Asset Statement (Borrower)
-    *   Purchase HUD-1 (if applicable) (Borrower)
-    *   Disposition HUD-1 (if applicable) (Borrower)
-    *   Company Asset Statement (Company)
-    *   EIN Certificate (Company)
-    *   Formation Documentation (Company)
-    *   Operating Agreement/Bylaws (Company)
-    *   Partnership/Officer List (Company)
-    *   Business License (Company)
-    *   Certificate of Good Standing (Company)
-    *   Business Debt Schedule (Company)
-    *   Business Plan with projections (Company)
-    *   Construction Plans, Budget, and Timeline (Subject Property)
-    *   Appraisal and Environmental Reports (Subject Property)
-    *   Proof of Equity Injection (Borrower)
-    *   Approved or Pre-approved Plans (Subject Property)
-    *   Approved Permits (if available) (Subject Property)
-
-
-*   **Industrial - Rehab & Expansion:**
-    *   ID/Driver's License (Borrower)
-    *   Personal Financial Statement (Borrower)
-    *   Credit Report (Borrower)
-    *   Personal Asset Statement (Borrower)
-    *   Purchase HUD-1 (if applicable) (Borrower)
-    *   Disposition HUD-1 (if applicable) (Borrower)
-    *   Company Asset Statement (Company)
-    *   EIN Certificate (Company)
-    *   Formation Documentation (Company)
-    *   Operating Agreement/Bylaws (Company)
-    *   Partnership/Officer List (Company)
-    *   Business License (Company)
-    *   Certificate of Good Standing (Company)
-    *   Business Debt Schedule (Company)
-    *   Current Property Operating Statements (Subject Property)
-    *   Rehab/Expansion Plans and Budget (Subject Property)
-    *   Appraisal Report (Subject Property)
-
-*   **Industrial - Acquisition & Bridge:**
-    *   ID/Driver's License (Borrower)
-    *   Personal Financial Statement (Borrower)
-    *   Credit Report (Borrower)
-    *   Personal Asset Statement (Borrower)
-    *   Purchase HUD-1 (if applicable) (Borrower)
-    *   Disposition HUD-1 (if applicable) (Borrower)
-    *   Company Asset Statement (Company)
-    *   EIN Certificate (Company)
-    *   Formation Documentation (Company)
-    *   Operating Agreement/Bylaws (Company)
-    *   Partnership/Officer List (Company)
-    *   Business License (Company)
-    *   Certificate of Good Standing (Company)
-    *   Business Debt Schedule (Company)
-    *   Trailing 12-month Operating Statement for property (Subject Property)
-    *   Purchase Agreement (Subject Property)
-    *   Preliminary Title Report (Subject Property)
-
-*   **Industrial - Long Term Debt:**
-    *   ID/Driver's License (Borrower)
-    *   Personal Financial Statement (Borrower)
-    *   Credit Report (Borrower)
-    *   Personal Asset Statement (Borrower)
-    *   Purchase HUD-1 (if applicable) (Borrower)
-    *   Disposition HUD-1 (if applicable) (Borrower)
-    *   Company Asset Statement (Company)
-    *   EIN Certificate (Company)
-    *   Formation Documentation (Company)
-    *   Operating Agreement/Bylaws (Company)
-    *   Partnership/Officer List (Company)
-    *   Business License (Company)
-    *   Certificate of Good Standing (Company)
-    *   Business Debt Schedule (Company)
-    *   Property Operating Statements (3 years) (Subject Property)
-    *   Lease Agreements (Subject Property)
-    *   Appraisal Report (Subject Property)
-
-*   **SBA 7(a):**
-    *   SBA Form 1919 (Borrower)
-    *   Personal Financial Statement (SBA Form 413) (Borrower)
-    *   Business Financial Statements (3 years) (Company)
-    *   Business Tax Returns (3 years) (Company)
-    *   Business Plan and Projections (Company)
-
-*   **SBA 504:**
-    *   SBA Form 1244 (Company)
-    *   Project Cost Details (Subject Property)
-    *   Business Financial Statements (3 years) (Company)
-    *   Personal Financial Statement for all guarantors (Borrower)
-
-*   **Land Acquisition:**
-    *   ID/Driver's License (Borrower)
-    *   Personal Financial Statement (Borrower)
-    *   Credit Report (Borrower)
-    *   Personal Asset Statement (Borrower)
-    *   Company Asset Statement (Company)
-    *   EIN Certificate (Company)
-    *   Formation Documentation (Company)
-    *   Operating Agreement/Bylaws (Company)
-    *   Partnership/Officer List (Company)
-    *   Business License (Company)
-    *   Certificate of Good Standing (Company)
-    *   Business Debt Schedule (Company)
-    *   Purchase Agreement (Subject Property)
-    *   Feasibility Study (Subject Property)
-    *   Zoning and Entitlement Documents (Subject Property)
-    *   Environmental Report (Subject Property)
-    *   Appraisal (Subject Property)
-
-*   **Mezzanine Loans:**
-    *   ID/Driver's License (Borrower)
-    *   Personal Financial Statement (Borrower)
-    *   Credit Report (Borrower)
-    *   Personal Asset Statement (Borrower)
-    *   Company Asset Statement (Company)
-    *   EIN Certificate (Company)
-    *   Formation Documentation (Company)
-    *   Operating Agreement/Bylaws (Company)
-    *   Partnership/Officer List (Company)
-    *   Business License (Company)
-    *   Certificate of Good Standing (Company)
-    *   Business Debt Schedule (Company)
-    *   Senior Debt Term Sheet (Subject Property)
-    *   Full Project Pro-forma (Subject Property)
-    *   Capital Stack overview (Company)
-    *   Sponsor Financials (Borrower)
-
-*   **Mobilization Funding:**
-    *   ID/Driver's License (Borrower)
-    *   Personal Financial Statement (Borrower)
-    *   Credit Report (Borrower)
-    *   Personal Asset Statement (Borrower)
-    *   Company Asset Statement (Company)
-    *   EIN Certificate (Company)
-    *   Formation Documentation (Company)
-    *   Operating Agreement/Bylaws (Company)
-    *   Partnership/Officer List (Company)
-    *   Business License (Company)
-    *   Certificate of Good Standing (Company)
-    *   Business Debt Schedule (Company)
-    *   Executed Contract for the project (Subject Property)
-    *   Detailed Use of Funds (Subject Property)
-    *   Company Financials (Company)
-
-
-*   **Equipment Financing:**
-    *   Application Form (Borrower)
-    *   ID/Driver's License (Borrower)
-    *   Personal Financial Statement (Borrower)
-    *   Credit Report (Borrower)
-    *   Company Asset Statement (Company)
-    *   EIN Certificate (Company)
-    *   Formation Documentation (Company)
-    *   Operating Agreement/Bylaws (Company)
-    *   Partnership/Officer List (Company)
-    *   Business License (Company)
-    *   Certificate of Good Standing (Company)
-    *   Business Debt Schedule (Company)
-    *   Equipment Quote or Invoice (Subject Property)
-    *   Business Financials (if over $100k) (Company)
+**Document List for {{loanProgram}}:**
+Borrower: {{#each documentList.borrower}}- {{{this}}} {{/each}}
+Company: {{#each documentList.company}}- {{{this}}} {{/each}}
+Subject Property: {{#each documentList.subjectProperty}}- {{{this}}} {{/each}}
 `,
 });
 
@@ -427,7 +60,12 @@ const getDocumentChecklistFlow = ai.defineFlow(
     outputSchema: GetDocumentChecklistOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const documentList = loanProgramDocumentLists[input.loanProgram as keyof typeof loanProgramDocumentLists] || loanProgramDocumentLists['Default'];
+    
+    const {output} = await prompt({
+      loanProgram: input.loanProgram,
+      documentList: documentList
+    });
     return output!;
   }
 );
