@@ -109,7 +109,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                  {showConstructionFields && (
                     <>
                         <div className="space-y-2">
-                            <Label htmlFor="rehabCost">Estimated Rehab/Construction Cost</Label>
+                            <Label htmlFor="rehabCost">Requested Rehab Amount</Label>
                             <Input id="rehabCost" type="number" placeholder="e.g., 50000" value={rehabCost} onChange={e => setRehabCost(e.target.value)} />
                         </div>
                          <div className="space-y-2">
