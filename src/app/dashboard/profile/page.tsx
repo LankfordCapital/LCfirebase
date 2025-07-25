@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState, useRef, useId } from 'react';
+import { useState, useRef, useId, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,6 +23,8 @@ import { BusinessDebtSchedule } from '@/components/business-debt-schedule';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useDocumentContext } from '@/contexts/document-context';
+import { useAuth } from '@/contexts/auth-context';
+import { updateProfile } from 'firebase/auth';
 
 type Deal = {
   id: string;
@@ -41,6 +44,7 @@ type Company = {
 
 export default function ProfilePage() {
   const { addDocument, documents } = useDocumentContext();
+  const { user } = useAuth();
   const { toast } = useToast();
 
   const dealId = useId();
@@ -65,6 +69,17 @@ export default function ProfilePage() {
 
   const [dateOfBirth, setDateOfBirth] = useState<Date>();
   
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+
+  useEffect(() => {
+    if(user?.displayName) {
+        const nameParts = user.displayName.split(' ');
+        setFirstName(nameParts[0] || '');
+        setLastName(nameParts.slice(1).join(' ') || '');
+    }
+  }, [user]);
+
   const profileRef = useRef<HTMLDivElement>(null);
   const creditRef = useRef<HTMLDivElement>(null);
   const assetRef = useRef<HTMLDivElement>(null);
@@ -207,6 +222,24 @@ export default function ProfilePage() {
         }
     }
   };
+  
+  const handleSaveChanges = async () => {
+    if (user) {
+        try {
+            await updateProfile(user, { displayName: `${firstName} ${lastName}`.trim() });
+            toast({
+                title: 'Profile Updated',
+                description: 'Your changes have been saved successfully.',
+            });
+        } catch (error: any) {
+            toast({
+                variant: 'destructive',
+                title: 'Update Failed',
+                description: error.message,
+            });
+        }
+    }
+  }
 
   const UploadButton = ({ docName }: { docName: string }) => {
     const fileInputId = `upload-${docName.replace(/\s+/g, '-')}`;
@@ -253,19 +286,19 @@ export default function ProfilePage() {
             <CardContent className="space-y-6">
               <div className="flex items-center gap-4">
                 <Avatar className="h-20 w-20">
-                  <AvatarImage src="https://placehold.co/80x80.png" />
-                  <AvatarFallback>BD</AvatarFallback>
+                  <AvatarImage src={user?.photoURL || "https://placehold.co/80x80.png"} />
+                  <AvatarFallback>{firstName.charAt(0)}{lastName.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <Button variant="outline">Change Photo</Button>
               </div>
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="firstName">First Name</Label>
-                  <Input id="firstName" defaultValue="Borrower" />
+                  <Input id="firstName" value={firstName} onChange={e => setFirstName(e.target.value)} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lastName">Last Name</Label>
-                  <Input id="lastName" defaultValue="Doe" />
+                  <Input id="lastName" value={lastName} onChange={e => setLastName(e.target.value)} />
                 </div>
               </div>
                <div className="grid md:grid-cols-2 gap-4">
@@ -424,7 +457,7 @@ export default function ProfilePage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email Address</Label>
-                <Input id="email" type="email" defaultValue="borrower@email.com" />
+                <Input id="email" type="email" value={user?.email || ''} readOnly />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone Number</Label>
@@ -584,7 +617,7 @@ export default function ProfilePage() {
       </Card>
 
       <div className="flex justify-end">
-        <Button>Save Changes</Button>
+        <Button onClick={handleSaveChanges}>Save Changes</Button>
       </div>
     </div>
   );
