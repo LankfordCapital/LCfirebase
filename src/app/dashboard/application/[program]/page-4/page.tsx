@@ -1,4 +1,5 @@
 
+
 import { Suspense } from 'react';
 import { LoanApplicationClientPage4 } from '@/components/loan-application-client-page-4';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -19,7 +20,7 @@ function ApplicationSkeleton() {
 }
 
 export default function LoanApplicationPage4({ params }: { params: { program: string } }) {
-    const loanProgram = decodeURIComponent(params.program.replace(/-/g, ' ').replace(/\band\b/g, '&')).replace(/(^\w|\s\w)/g, m => m.toUpperCase()).replace('Noo', 'NOO');
+    const loanProgram = decodeURIComponent(params.program.replace(/-/g, ' ').replace(/\band\b/g, '&')).replace(/(^\w|\s\w)/g, m => m.toUpperCase()).replace('NOO', 'NOO');
 
     return (
         <Suspense fallback={<ApplicationSkeleton />}>

@@ -12,14 +12,13 @@ function ApplicationSkeleton() {
             </div>
             <div className="space-y-4">
                 <Skeleton className="h-64 w-full" />
-                <Skeleton className="h-64 w-full" />
             </div>
         </div>
     )
 }
 
 export default function LoanApplicationPage3({ params }: { params: { program: string } }) {
-    const loanProgram = decodeURIComponent(params.program.replace(/-/g, ' ').replace(/\band\b/g, '&')).replace(/(^\w|\s\w)/g, m => m.toUpperCase()).replace('Noo', 'NOO');
+    const loanProgram = decodeURIComponent(params.program.replace(/-/g, ' ').replace(/\band\b/g, '&')).replace(/(^\w|\s\w)/g, m => m.toUpperCase()).replace('NOO', 'NOO');
 
     return (
         <Suspense fallback={<ApplicationSkeleton />}>

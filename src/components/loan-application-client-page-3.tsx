@@ -6,13 +6,13 @@ import { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
-import { CheckCircle, ArrowLeft, ArrowRight, FileText, FileUp, Check, AlertTriangle, Briefcase } from 'lucide-react';
+import { CheckCircle, ArrowLeft, ArrowRight, Briefcase, FileText, FileUp } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { getDocumentChecklist } from '@/ai/flows/document-checklist-flow';
 import { useAuth } from '@/contexts/auth-context';
+
 
 type UploadStatus = 'pending' | 'uploaded' | 'verified' | 'missing';
 
@@ -29,18 +29,19 @@ type CategorizedDocuments = {
     subjectProperty: DocumentItem[];
 };
 
+
 export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: string}) {
   const [checklist, setChecklist] = useState<CategorizedDocuments | null>(null);
   const [isLoadingChecklist, setIsLoadingChecklist] = useState(true);
 
+  const [gcName, setGcName] = useState('');
+  const [gcPhone, setGcPhone] = useState('');
+  const [gcEmail, setGcEmail] = useState('');
+
   const { documents, addDocument, getDocument } = useDocumentContext();
-  const { user } = useAuth();
-  const { toast } = useToast();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  const isWorkforce = user?.email?.endsWith('@lankfordcapital.com') && user?.email !== 'admin@lankfordcapital.com';
-  const workforceOnlyDocs = ["Appraisal", "Collateral Desktop Analysis"];
-  
   const syncChecklistWithContext = useCallback((checklistData: CategorizedDocuments) => {
     const newChecklist = { ...checklistData };
     (Object.keys(newChecklist) as Array<keyof CategorizedDocuments>).forEach(category => {
@@ -61,7 +62,7 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
   }, [getDocument]);
 
   useEffect(() => {
-    if (loanProgram) {
+    if (loanProgram && !authLoading) {
       const fetchChecklist = async () => {
         setIsLoadingChecklist(true);
         try {
@@ -77,118 +78,92 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
 
         } catch (error) {
           console.error("Failed to fetch document checklist", error);
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Could not load the document checklist for the selected program."
-          });
         } finally {
           setIsLoadingChecklist(false);
         }
       };
       fetchChecklist();
     }
-  }, [loanProgram, toast, syncChecklistWithContext]);
+  }, [loanProgram, authLoading, syncChecklistWithContext]);
 
+  
   const handleFileChange = useCallback(async (itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
         const file = event.target.files[0];
         
-        const success = await addDocument({
+        await addDocument({
             name: itemName,
             file,
             status: 'uploaded',
         });
-
-        if (success && checklist) {
-            setChecklist(syncChecklistWithContext(checklist));
-        }
     }
-  }, [addDocument, checklist, syncChecklistWithContext]);
+  }, [addDocument]);
 
-  useEffect(() => {
-    if (checklist) {
-        const synced = syncChecklistWithContext(checklist);
-        if (JSON.stringify(synced) !== JSON.stringify(checklist)) {
-            setChecklist(synced);
-        }
-    }
-  }, [documents, syncChecklistWithContext, checklist]);
-
+  const DocumentUploadInput = ({ name }: { name: string }) => {
+    const doc = documents[name];
+    const fileInputId = `upload-${name.replace(/\s+/g, '-')}`;
+    return (
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-md border">
+        <div className="flex items-center gap-3">
+          {doc?.status === 'verified' && <CheckCircle className="h-5 w-5 text-green-500" />}
+          {doc?.status === 'uploaded' && <FileUp className="h-5 w-5 text-blue-500" />}
+          {!doc && <FileText className="h-5 w-5 text-muted-foreground" />}
+          <Label htmlFor={fileInputId} className="font-medium">{name}</Label>
+        </div>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Input id={fileInputId} type="file" className="w-full sm:w-auto" onChange={(e) => handleFileChange(name, e)} disabled={!!doc} />
+        </div>
+      </div>
+    );
+  };
+  
   const handleNextPage = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
     router.push(`/dashboard/application/${programSlug}/page-4`);
   }
 
-  const DocumentUploadInput = ({ name }: { name: string }) => {
-    const doc = documents[name];
-    const fileInputId = `upload-${name.replace(/\s+/g, '-')}`;
+  const constructionDocs = [
+    "General Contractor License",
+    "General Contractor Insurance",
+    "General Contractor Bond",
+    "General Contractor's Contract to Build",
+    "Construction Budget",
+    "Projected Draw Schedule",
+  ];
 
-    if (workforceOnlyDocs.includes(name) && !isWorkforce) {
-        return (
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-md border bg-muted/50">
-                <div className="flex items-center gap-3">
-                    {doc?.status === 'verified' && <CheckCircle className="h-5 w-5 text-green-500" />}
-                    {doc?.status === 'uploaded' && <FileUp className="h-5 w-5 text-blue-500" />}
-                    {!doc && <FileText className="h-5 w-5 text-muted-foreground" />}
-                    <Label htmlFor={fileInputId} className="font-medium">{name}</Label>
-                </div>
-                <div className="text-sm text-muted-foreground italic w-full sm:w-auto text-left sm:text-right">Workforce upload only</div>
-            </div>
-        )
-    }
-
-    return (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-md border">
-            <div className="flex items-center gap-3">
-              {doc?.status === 'verified' && <CheckCircle className="h-5 w-5 text-green-500" />}
-              {doc?.status === 'uploaded' && <FileUp className="h-5 w-5 text-blue-500" />}
-              {!doc && <FileText className="h-5 w-5 text-muted-foreground" />}
-              <Label htmlFor={fileInputId} className="font-medium">{name}</Label>
-            </div>
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <Input id={fileInputId} type="file" className="w-full sm:w-auto" onChange={(e) => handleFileChange(name, e)} disabled={!!doc} />
-            </div>
-        </div>
-    );
-  };
-  
-   const renderChecklistCategory = (category: keyof CategorizedDocuments, title: string, icon: React.ReactNode) => {
-    if (!checklist || !checklist[category] || checklist[category].length === 0) return null;
-
-    return (
-      <Card>
-          <CardHeader>
-              <CardTitle className="flex items-center gap-2">{icon} {title}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-              {checklist[category].map(item => <DocumentUploadInput key={item.name} name={item.name} />)}
-          </CardContent>
-      </Card>
-    )
-   };
-
-  if (isLoadingChecklist) {
-    return <div>Loading document checklist...</div>
-  }
-
-  if (!checklist) {
-    return <div>Could not load checklist. Please go back and select a loan program.</div>
-  }
+  const gcDocuments = checklist?.subjectProperty.filter(item => constructionDocs.includes(item.name));
 
   return (
     <div className="space-y-6">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 3 of 7</h1>
+            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 3 of 8</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
-        {renderChecklistCategory('company', 'Company Documents', <Briefcase className="h-5 w-5 text-primary" />)}
-
-        {renderChecklistCategory(
-          'subjectProperty',
-          'Subject Property Documents',
-          <FileText className="h-5 w-5 text-primary" />
+        {gcDocuments && gcDocuments.length > 0 && (
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
+                    <CardDescription>This section is required for all construction, rehab, and fix & flip loans.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="gcName">Contractor Name</Label>
+                            <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} placeholder="GC Company Name" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="gcPhone">Contractor Phone</Label>
+                            <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} placeholder="(555) 123-4567" />
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="gcEmail">Contractor Email</Label>
+                        <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} placeholder="contact@gccompany.com"/>
+                    </div>
+                    {gcDocuments.map(doc => <DocumentUploadInput key={doc.name} name={doc.name} />)}
+                </CardContent>
+            </Card>
         )}
         
         <div className="flex justify-between items-center">

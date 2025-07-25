@@ -48,10 +48,6 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
   const [escrowAgentPhone, setEscrowAgentPhone] = useState('');
   const [escrowAgentEmail, setEscrowAgentEmail] = useState('');
 
-  const [gcName, setGcName] = useState('');
-  const [gcPhone, setGcPhone] = useState('');
-  const [gcEmail, setGcEmail] = useState('');
-
   const { documents, addDocument, getDocument } = useDocumentContext();
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -136,49 +132,12 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
     router.push(`/dashboard/application/${programSlug}/page-5`);
   }
 
-  const constructionDocs = [
-    "General Contractor License",
-    "General Contractor Insurance",
-    "General Contractor Bond",
-    "General Contractor's Contract to Build",
-    "Construction Budget",
-    "Projected Draw Schedule",
-  ];
-
-  const gcDocuments = checklist?.subjectProperty.filter(item => constructionDocs.includes(item.name));
-
   return (
     <div className="space-y-6">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 4 of 7</h1>
+            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 4 of 8</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
-        
-        {gcDocuments && gcDocuments.length > 0 && (
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
-                    <CardDescription>This section is required for all construction, rehab, and fix & flip loans.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="grid md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="gcName">Contractor Name</Label>
-                            <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} placeholder="GC Company Name" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="gcPhone">Contractor Phone</Label>
-                            <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} placeholder="(555) 123-4567" />
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="gcEmail">Contractor Email</Label>
-                        <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} placeholder="contact@gccompany.com"/>
-                    </div>
-                    {gcDocuments.map(doc => <DocumentUploadInput key={doc.name} name={doc.name} />)}
-                </CardContent>
-            </Card>
-        )}
 
         <Card>
             <CardHeader>
