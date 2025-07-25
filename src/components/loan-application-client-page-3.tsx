@@ -169,6 +169,17 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
         </div>
     );
   };
+  
+   const renderChecklistCategory = (category: keyof CategorizedDocuments, title: string, icon: React.ReactNode) => (
+      <Card>
+          <CardHeader>
+              <CardTitle className="flex items-center gap-2">{icon} {title}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+              {checklist && checklist[category].map(item => <DocumentUploadInput key={item.name} name={item.name} />)}
+          </CardContent>
+      </Card>
+  );
 
   if (isLoadingChecklist) {
     return <div>Loading document checklist...</div>
@@ -185,6 +196,8 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
+        {renderChecklistCategory('company', 'Company Documents', <Briefcase className="h-5 w-5 text-primary" />)}
+
         <Card>
           <CardHeader>
               <CardTitle className="flex items-center gap-2"><FileText className="h-5 w-5 text-primary" /> Subject Property Documents</CardTitle>

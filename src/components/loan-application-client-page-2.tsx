@@ -9,11 +9,12 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from './ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
-import { CheckCircle, ArrowLeft, ArrowRight, User, Briefcase, FileText, FileUp, Check, AlertTriangle } from 'lucide-react';
+import { CheckCircle, ArrowLeft, ArrowRight, User, Briefcase, FileText, FileUp, Check, AlertTriangle, Loader2, Landmark } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { getDocumentChecklist } from '@/ai/flows/document-checklist-flow';
 import { useAuth } from '@/contexts/auth-context';
 import { DealHistory } from './deal-history';
+import { scanAssetStatement, type ScanAssetStatementOutput } from '@/ai/flows/asset-statement-scanner';
 
 type UploadStatus = 'pending' | 'uploaded' | 'verified' | 'missing';
 
@@ -33,6 +34,8 @@ type CategorizedDocuments = {
 export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: string}) {
   const [checklist, setChecklist] = useState<CategorizedDocuments | null>(null);
   const [isLoadingChecklist, setIsLoadingChecklist] = useState(true);
+  const [personalAssetBalance, setPersonalAssetBalance] = useState<ScanAssetStatementOutput | null>(null);
+  const [isScanningPersonalAsset, setIsScanningPersonalAsset] = useState(false);
 
   const { documents, addDocument, getDocument } = useDocumentContext();
   const { user } = useAuth();
@@ -106,6 +109,42 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
     }
   }, [addDocument, checklist, syncChecklistWithContext]);
 
+   const handleScanAssetStatement = async () => {
+    const docName = 'Personal Asset Statement (Borrower)';
+    const assetStatement = documents[docName];
+
+    if (!assetStatement?.file) {
+      toast({
+        variant: 'destructive',
+        title: 'No file selected',
+        description: `Please upload a personal asset statement to scan.`,
+      });
+      return;
+    }
+
+    setIsScanningPersonalAsset(true);
+    setPersonalAssetBalance(null);
+    
+    try {
+        const dataUri = assetStatement.dataUri;
+        const result = await scanAssetStatement({ statementDataUri: dataUri });
+        setPersonalAssetBalance(result);
+        toast({
+            title: 'Scan Complete',
+            description: `The account balance has been extracted.`,
+        });
+    } catch (error) {
+      console.error('Asset Scan Error:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Scan Failed',
+        description: 'Could not extract the balance from the document. Please try again.',
+      });
+    } finally {
+        setIsScanningPersonalAsset(false);
+    }
+  };
+
   useEffect(() => {
     if (checklist) {
         const synced = syncChecklistWithContext(checklist);
@@ -166,10 +205,36 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
         </div>
         
         {renderChecklistCategory('borrower', 'Borrower Documents', <User className="h-5 w-5 text-primary" />)}
+
+        <Card>
+            <CardHeader>
+                <CardTitle>AI Asset Verification</CardTitle>
+                <CardDescription>Upload an asset statement to have our AI extract the most recent balance.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                 <div className="space-y-4 rounded-md border p-4">
+                     <h4 className="font-semibold">Personal Assets</h4>
+                     <div className="space-y-2">
+                        <Label htmlFor="personal-asset-upload">Upload Latest Personal Asset Statement</Label>
+                        <div className="flex gap-2">
+                            <Input id="personal-asset-upload" type="file" onChange={(e) => handleFileChange('Personal Asset Statement (Borrower)', e)} />
+                            <Button onClick={handleScanAssetStatement} disabled={isScanningPersonalAsset || !documents['Personal Asset Statement (Borrower)']}>
+                                {isScanningPersonalAsset ? <Loader2 className="animate-spin" /> : <Landmark />}
+                                <span className="ml-2 hidden sm:inline">Scan</span>
+                            </Button>
+                        </div>
+                    </div>
+                    {personalAssetBalance && (
+                        <div>
+                            <p className="text-sm font-medium text-muted-foreground">Most Recent Balance</p>
+                            <p className="text-2xl font-bold">{personalAssetBalance.balance}</p>
+                        </div>
+                    )}
+                </div>
+            </CardContent>
+        </Card>
         
         <DealHistory />
-
-        {renderChecklistCategory('company', 'Company Documents', <Briefcase className="h-5 w-5 text-primary" />)}
         
         <div className="flex justify-between items-center">
             <Button variant="outline" onClick={() => router.back()}>

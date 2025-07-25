@@ -114,7 +114,7 @@ export default function ProfilePage() {
   };
 
   const handleScanCreditReport = async () => {
-    const creditReport = documents['Credit Report'];
+    const creditReport = documents['Credit Report (Borrower)'];
     if (!creditReport?.file) {
       toast({
         variant: 'destructive',
@@ -148,7 +148,7 @@ export default function ProfilePage() {
   };
   
   const handleScanAssetStatement = async (type: 'personal' | 'company') => {
-    const docName = type === 'personal' ? 'Personal Asset Statement' : 'Company Asset Statement';
+    const docName = type === 'personal' ? 'Personal Asset Statement (Borrower)' : 'Company Asset Statement (Company)';
     const assetStatement = documents[docName];
 
     if (!assetStatement?.file) {
