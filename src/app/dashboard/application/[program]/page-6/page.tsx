@@ -1,6 +1,6 @@
 
 import { Suspense } from 'react';
-import { LoanApplicationClientPage2 } from '@/components/loan-application-client-page-2';
+import { LoanApplicationClientPage6 } from '@/components/loan-application-client-page-6';
 import { Skeleton } from '@/components/ui/skeleton';
 
 function ApplicationSkeleton() {
@@ -11,19 +11,19 @@ function ApplicationSkeleton() {
                 <Skeleton className="h-4 w-1/2" />
             </div>
             <div className="space-y-4">
-                <Skeleton className="h-48 w-full" />
-                <Skeleton className="h-48 w-full" />
+                <Skeleton className="h-64 w-full" />
+                <Skeleton className="h-10 w-full" />
             </div>
         </div>
     )
 }
 
-export default function LoanApplicationPage2({ params }: { params: { program: string } }) {
+export default function LoanApplicationPage6({ params }: { params: { program: string } }) {
     const loanProgram = decodeURIComponent(params.program.replace(/-/g, ' ').replace(/\band\b/g, '&')).replace(/(^\w|\s\w)/g, m => m.toUpperCase());
 
     return (
         <Suspense fallback={<ApplicationSkeleton />}>
-            <LoanApplicationClientPage2 loanProgram={loanProgram} />
+            <LoanApplicationClientPage6 loanProgram={loanProgram} />
         </Suspense>
     )
 }
