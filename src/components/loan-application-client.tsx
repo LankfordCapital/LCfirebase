@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Loader2, Upload, FileText, AlertTriangle, CheckCircle, FileUp, Check, Building2, User, Mail, Phone, Shield, File, Briefcase, ArrowRight } from 'lucide-react';
+import { Loader2, Upload, FileText, AlertTriangle, CheckCircle, FileUp, Check, Building2, User, Mail, Phone, Shield, File, Briefcase, ArrowRight, Calendar as CalendarIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from './ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
@@ -15,6 +15,11 @@ import { getDocumentChecklist } from '@/ai/flows/document-checklist-flow';
 import { aiPreUnderwriter, type AiPreUnderwriterOutput } from '@/ai/flows/ai-pre-underwriter';
 import { useDocumentContext } from '@/contexts/document-context';
 import { useRouter } from 'next/navigation';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Calendar } from './ui/calendar';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
+
 
 type UploadStatus = 'pending' | 'uploaded' | 'verified' | 'missing';
 
@@ -45,6 +50,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [rehabCost, setRehabCost] = useState('');
   const [lotSize, setLotSize] = useState('');
   const [constructionTime, setConstructionTime] = useState('');
+  const [requestedClosingDate, setRequestedClosingDate] = useState<Date>();
 
 
   const { documents, addDocument, getDocument } = useDocumentContext();
@@ -272,9 +278,36 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                         <Input id="purchasePrice" type="number" placeholder="e.g., 400000" value={purchasePrice} onChange={e => setPurchasePrice(e.target.value)} />
                     </div>
                 </div>
-                <div className="space-y-2">
-                    <Label htmlFor="lotSize">Lot Size (in sq. ft. or acres)</Label>
-                    <Input id="lotSize" placeholder="e.g., 10,000 sq. ft. or 0.23 acres" value={lotSize} onChange={e => setLotSize(e.target.value)} />
+                <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="lotSize">Lot Size (in sq. ft. or acres)</Label>
+                        <Input id="lotSize" placeholder="e.g., 10,000 sq. ft. or 0.23 acres" value={lotSize} onChange={e => setLotSize(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="closingDate">Requested Closing Date</Label>
+                         <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                variant={"outline"}
+                                className={cn(
+                                    "w-full justify-start text-left font-normal",
+                                    !requestedClosingDate && "text-muted-foreground"
+                                )}
+                                >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {requestedClosingDate ? format(requestedClosingDate, "PPP") : <span>Pick a date</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                mode="single"
+                                selected={requestedClosingDate}
+                                onSelect={setRequestedClosingDate}
+                                initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
+                    </div>
                 </div>
                  {showConstructionFields && (
                     <>
