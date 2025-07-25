@@ -1,17 +1,16 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useId } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { PlusCircle, Trash2 } from 'lucide-react';
 import { Label } from './ui/label';
 
 type Comp = {
-  id: number;
+  id: string;
   address: string;
   listPrice: string;
   soldPrice: string;
@@ -25,8 +24,9 @@ type Comp = {
 export function ComparableSales() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [comps, setComps] = useState<Comp[]>([
-    { id: Date.now(), address: '', listPrice: '', soldPrice: '', daysOnMarket: '', sqFt: '', yrBuilt: '', lotSize: '', distanceToSubject: '' },
+  const initialId = useId();
+  const [comps, setComps] = useState<Comp[]>(() => [
+    { id: initialId, address: '', listPrice: '', soldPrice: '', daysOnMarket: '', sqFt: '', yrBuilt: '', lotSize: '', distanceToSubject: '' },
   ]);
 
   async function onSubmit(e: React.FormEvent) {
@@ -42,13 +42,13 @@ export function ComparableSales() {
     });
   }
   
-  const handleCompChange = (id: number, field: keyof Omit<Comp, 'id'>, value: string) => {
+  const handleCompChange = (id: string, field: keyof Omit<Comp, 'id'>, value: string) => {
     setComps(comps.map(comp => (comp.id === id ? { ...comp, [field]: value } : comp)));
   }
 
   const handleAddComp = () => {
     if (comps.length < 5) {
-        setComps([...comps, { id: Date.now(), address: '', listPrice: '', soldPrice: '', daysOnMarket: '', sqFt: '', yrBuilt: '', lotSize: '', distanceToSubject: '' }]);
+        setComps([...comps, { id: `comp-${Date.now()}`, address: '', listPrice: '', soldPrice: '', daysOnMarket: '', sqFt: '', yrBuilt: '', lotSize: '', distanceToSubject: '' }]);
     } else {
         toast({
             variant: 'destructive',
@@ -58,7 +58,7 @@ export function ComparableSales() {
     }
   }
   
-  const handleRemoveComp = (id: number) => {
+  const handleRemoveComp = (id: string) => {
     setComps(comps.filter(comp => comp.id !== id));
   }
 
