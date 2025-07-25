@@ -148,10 +148,10 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Property Tax Certificate",
             "Appraisal",
             "Collateral Desktop Analysis",
-            "Construction Plans",
-            "Construction Budget",
             "Approved or Pre-approved Plans",
             "Approved Permits",
+            "Construction Plans",
+            "Construction Budget",
         ]
     },
     "Commercial - Rehab Loans": {
@@ -248,9 +248,9 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Property Tax Certificate",
             "Appraisal",
             "Collateral Desktop Analysis",
-            "Construction Plans, Budget, and Timeline",
             "Approved or Pre-approved Plans",
             "Approved Permits",
+            "Construction Plans, Budget, and Timeline",
         ]
     },
     "Industrial - Rehab & Expansion": {
@@ -447,6 +447,6 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
     "Default": {
         borrower: ["ID/Driver's License", "Personal Financial Statement", "Credit Report"],
         company: ["EIN Certificate", "Formation Documentation", "Operating Agreement/Bylaws", "Partnership/Officer List", "Business License", "Certificate of Good Standing"],
-        subjectProperty: ["Purchase and Sale Agreement", "Evidence of Earnest Money Deposit", "Appraisal Report"]
+        subjectProperty: ["Purchase and Sale Agreement", "Evidence of Earnest Money Deposit", "Appraisal Report", "Approved or Pre-approved Plans", "Approved Permits"]
     }
 }
