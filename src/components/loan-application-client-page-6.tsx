@@ -65,7 +65,7 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
                     <CreditCard className="h-5 w-5 text-primary" />
                     Payment Authorization
                 </CardTitle>
-                <CardDescription>Please upload images of the credit card to be used for the appraisal and collateral analysis fees.</CardDescription>
+                <CardDescription>Please upload images of the credit card to be used for the due diligence fees (credit report, background check, CDA, etc.).</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <DocumentUploadInput name="Credit Card (Front)" />
