@@ -6,14 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Loader2, Upload, FileText, AlertTriangle, CheckCircle, FileUp, Check, Building2, User, Mail, Phone, Shield, File, Briefcase } from 'lucide-react';
+import { Loader2, Upload, FileText, AlertTriangle, CheckCircle, FileUp, Check, Building2, User, Mail, Phone, Shield, File, Briefcase, ArrowRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from './ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { getDocumentChecklist } from '@/ai/flows/document-checklist-flow';
 import { aiPreUnderwriter, type AiPreUnderwriterOutput } from '@/ai/flows/ai-pre-underwriter';
 import { useDocumentContext } from '@/contexts/document-context';
-import { ComparableSales } from './comparable-sales';
+import { useRouter } from 'next/navigation';
 
 type UploadStatus = 'pending' | 'uploaded' | 'verified' | 'missing';
 
@@ -43,22 +43,10 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [lotSize, setLotSize] = useState('');
   const [constructionTime, setConstructionTime] = useState('');
 
-  const [gcName, setGcName] = useState('');
-  const [gcPhone, setGcPhone] = useState('');
-  const [gcEmail, setGcEmail] = useState('');
-
-  const [insuranceAgentName, setInsuranceAgentName] = useState('');
-  const [insuranceAgentCompany, setInsuranceAgentCompany] = useState('');
-  const [insuranceAgentPhone, setInsuranceAgentPhone] = useState('');
-  const [insuranceAgentEmail, setInsuranceAgentEmail] = useState('');
-
-  const [titleAgentName, setTitleAgentName] = useState('');
-  const [titleAgentCompany, setTitleAgentCompany] = useState('');
-  const [titleAgentPhone, setTitleAgentPhone] = useState('');
-  const [titleAgentEmail, setTitleAgentEmail] = useState('');
 
   const { documents, addDocument, getDocument } = useDocumentContext();
   const { toast } = useToast();
+  const router = useRouter();
 
   const syncChecklistWithContext = useCallback((checklistData: CategorizedDocuments) => {
     const newChecklist = { ...checklistData };
@@ -127,7 +115,11 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   
   useEffect(() => {
     if (checklist) {
-        setChecklist(syncChecklistWithContext(checklist));
+        const synced = syncChecklistWithContext(checklist);
+        // Avoid infinite loop by checking if state actually changed
+        if (JSON.stringify(synced) !== JSON.stringify(checklist)) {
+            setChecklist(synced);
+        }
     }
   }, [documents, syncChecklistWithContext, checklist]);
 
@@ -243,7 +235,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   return (
     <div className="space-y-6">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Loan Application</h1>
+            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 1 of 2</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
@@ -281,128 +273,22 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                             <Label htmlFor="constructionTime">Estimated Time to Construct (in months)</Label>
                             <Input id="constructionTime" type="number" placeholder="e.g., 6" value={constructionTime} onChange={e => setConstructionTime(e.target.value)} />
                         </div>
-                        <DocumentUploadInput name="Construction Budget" />
-                        <DocumentUploadInput name="Projected Draw Schedule" />
-                        <DocumentUploadInput name="Approved or Pre-approved Plans" />
-                        <DocumentUploadInput name="Evidence of Earnest Money Deposit" />
                     </>
                 )}
             </CardContent>
         </Card>
-        
-        {showConstructionFields && (
-            <>
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="grid md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="gcName">Contractor Name</Label>
-                            <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="gcPhone">Contractor Phone</Label>
-                            <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} />
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="gcEmail">Contractor Email</Label>
-                        <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} />
-                    </div>
-                     <DocumentUploadInput name="General Contractor License" />
-                     <DocumentUploadInput name="General Contractor Insurance" />
-                     <DocumentUploadInput name="General Contractor Bond" />
-                     <DocumentUploadInput name="General Contractor's Contract to Build" />
-                </CardContent>
-            </Card>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Shield className="h-5 w-5 text-primary" /> Insurance Agent Details</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                     <div className="grid md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="insuranceAgentName">Agent Name</Label>
-                            <Input id="insuranceAgentName" value={insuranceAgentName} onChange={e => setInsuranceAgentName(e.target.value)} />
-                        </div>
-                         <div className="space-y-2">
-                            <Label htmlFor="insuranceAgentCompany">Agent Company</Label>
-                            <Input id="insuranceAgentCompany" value={insuranceAgentCompany} onChange={e => setInsuranceAgentCompany(e.target.value)} />
-                        </div>
-                    </div>
-                     <div className="grid md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="insuranceAgentPhone">Agent Phone</Label>
-                            <Input id="insuranceAgentPhone" type="tel" value={insuranceAgentPhone} onChange={e => setInsuranceAgentPhone(e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="insuranceAgentEmail">Agent Email</Label>
-                            <Input id="insuranceAgentEmail" type="email" value={insuranceAgentEmail} onChange={e => setInsuranceAgentEmail(e.target.value)} />
-                        </div>
-                    </div>
-                     <DocumentUploadInput name="Builder's Risk Insurance Quote" />
-                     <DocumentUploadInput name="Commercial Liability Insurance Quote" />
-                </CardContent>
-            </Card>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><FileText className="h-5 w-5 text-primary" /> Title & Escrow Details</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                     <div className="grid md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="titleAgentName">Escrow Agent Name</Label>
-                            <Input id="titleAgentName" value={titleAgentName} onChange={e => setTitleAgentName(e.target.value)} />
-                        </div>
-                         <div className="space-y-2">
-                            <Label htmlFor="titleAgentCompany">Escrow Company</Label>
-                            <Input id="titleAgentCompany" value={titleAgentCompany} onChange={e => setTitleAgentCompany(e.target.value)} />
-                        </div>
-                    </div>
-                     <div className="grid md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="titleAgentPhone">Escrow Agent Phone</Label>
-                            <Input id="titleAgentPhone" type="tel" value={titleAgentPhone} onChange={e => setTitleAgentPhone(e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="titleAgentEmail">Escrow Agent Email</Label>
-                            <Input id="titleAgentEmail" type="email" value={titleAgentEmail} onChange={e => setTitleAgentEmail(e.target.value)} />
-                        </div>
-                    </div>
-                     <DocumentUploadInput name="Preliminary Title Commitment" />
-                     <DocumentUploadInput name="Escrow Instructions" />
-                     <DocumentUploadInput name="Closing Protection Letter" />
-                </CardContent>
-            </Card>
-            </>
-        )}
-        
-        <Collapsible>
-            <CollapsibleTrigger asChild>
-                <Button variant="outline" className="w-full justify-start">
-                    <FileText className="mr-2" />
-                    Comparable Sales
-                </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-                <div className="py-4">
-                    <ComparableSales />
-                </div>
-            </CollapsibleContent>
-        </Collapsible>
 
         {renderChecklistCategory('borrower', 'Borrower Documents')}
         {renderChecklistCategory('company', 'Company Documents')}
         {renderChecklistCategory('subjectProperty', 'Subject Property Documents')}
 
-        <div className="flex justify-end">
+        <div className="flex justify-between items-center">
             <Button onClick={handleAnalyzeDocuments} disabled={isAnalyzing}>
                 {isAnalyzing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
                 Analyze Uploaded Documents
+            </Button>
+            <Button onClick={() => router.push(`/dashboard/application/${loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and')}/page-2`)}>
+                Continue to Page 2 <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
         </div>
 
