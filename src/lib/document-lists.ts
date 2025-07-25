@@ -9,17 +9,20 @@ type DocumentList = {
 export const loanProgramDocumentLists: Record<string, DocumentList> = {
     "Residential NOO - Ground Up Construction": {
         borrower: [
-            "ID/Driver's License",
+            "ID/Driver's License (Borrower)",
             "Personal Financial Statement",
-            "Credit Report",
+            "Credit Report (Borrower)",
+            "Personal Asset Statement (Month 1)",
+            "Personal Asset Statement (Month 2)",
+            "Personal Asset Statement (Month 3)",
         ],
         company: [
-            "EIN Certificate",
-            "Formation Documentation",
-            "Operating Agreement/Bylaws",
-            "Partnership/Officer List",
-            "Business License",
-            "Certificate of Good Standing",
+            "EIN Certificate (Company)",
+            "Formation Documentation (Company)",
+            "Operating Agreement/Bylaws (Company)",
+            "Partnership/Officer List (Company)",
+            "Business License (Company)",
+            "Certificate of Good Standing (Company)",
         ],
         subjectProperty: [
             "Executed Purchase Contract",
@@ -27,6 +30,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Property HUD-1/Settlement Statement (if already purchased)",
             "30-Day Payoff Statement with Per Diem (if property has a mortgage)",
             "Preliminary Title Commitment",
+            "Escrow Instructions",
+            "Closing Protection Letter",
             "Property Tax Certificate",
             "Appraisal",
             "Collateral Desktop Analysis",
@@ -38,6 +43,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Projected Draw Schedule",
             "Approved or Pre-approved Plans",
             "Approved Permits",
+            "Builder's Risk Insurance Quote",
+            "Commercial Liability Insurance Quote"
         ]
     },
     "Residential NOO - Fix and Flip": {
