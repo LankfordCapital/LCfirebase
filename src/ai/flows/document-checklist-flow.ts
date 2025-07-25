@@ -40,32 +40,13 @@ Based on the loan program, generate a full list of required documents and popula
 The documents in the 'documentRequestList' field MUST be categorized into 'borrower', 'company', and 'subjectProperty'.
 
 **Important Conditional Logic:**
-- Only include "Approved or Pre-approved Plans" and "Approved Permits (if available)" in the 'subjectProperty' list if the loan program is for 'Ground Up Construction'.
+- Only include "Approved or Pre-approved Plans" and "Approved Permits (if available)" in the 'subjectProperty' list if the loan program contains 'Ground Up Construction'.
 
 **Document Categories:**
 
 *   **Borrower Documents:** Personal documents for the individual borrower (e.g., ID, personal financial statements, credit report, deal history).
 *   **Company Documents:** Documents related to the business entity (e.g., EIN, formation docs, operating agreements).
 *   **Subject Property Documents:** Documents related to the property being financed (e.g., purchase contract, plans, permits, insurance).
-
-
-**Borrower Profile Documents (Required for most loans):**
-*   ID/Driver's License (Borrower)
-*   Personal Financial Statement (Borrower)
-*   Credit Report (Borrower)
-*   Personal Asset Statement (Borrower)
-*   Purchase HUD-1 (if applicable) (Borrower)
-*   Disposition HUD-1 (if applicable) (Borrower)
-
-**Company Profile Documents (Required for most loans):**
-*   Company Asset Statement (Company)
-*   EIN Certificate (Company)
-*   Formation Documentation (Company)
-*   Operating Agreement/Bylaws (Company)
-*   Partnership/Officer List (Company)
-*   Business License (Company)
-*   Certificate of Good Standing (Company)
-*   Business Debt Schedule (Company)
 
 
 **Document Requirements by Loan Program:**
@@ -212,6 +193,8 @@ The documents in the 'documentRequestList' field MUST be categorized into 'borro
     *   Builder's Risk Insurance Quote (Subject Property)
     *   Commercial Liability Insurance Quote (Subject Property)
     *   Insurance Agent Details (Name, Company, Phone, Email) (Subject Property)
+    *   Approved or Pre-approved Plans (Subject Property)
+    *   Approved Permits (if available) (Subject Property)
 
 *   **Commercial - Rehab Loans:**
     *   ID/Driver's License (Borrower)
@@ -290,6 +273,9 @@ The documents in the 'documentRequestList' field MUST be categorized into 'borro
     *   Construction Plans, Budget, and Timeline (Subject Property)
     *   Appraisal and Environmental Reports (Subject Property)
     *   Proof of Equity Injection (Borrower)
+    *   Approved or Pre-approved Plans (Subject Property)
+    *   Approved Permits (if available) (Subject Property)
+
 
 *   **Industrial - Rehab & Expansion:**
     *   ID/Driver's License (Borrower)
@@ -362,6 +348,18 @@ The documents in the 'documentRequestList' field MUST be categorized into 'borro
     *   Personal Financial Statement for all guarantors (Borrower)
 
 *   **Land Acquisition:**
+    *   ID/Driver's License (Borrower)
+    *   Personal Financial Statement (Borrower)
+    *   Credit Report (Borrower)
+    *   Personal Asset Statement (Borrower)
+    *   Company Asset Statement (Company)
+    *   EIN Certificate (Company)
+    *   Formation Documentation (Company)
+    *   Operating Agreement/Bylaws (Company)
+    *   Partnership/Officer List (Company)
+    *   Business License (Company)
+    *   Certificate of Good Standing (Company)
+    *   Business Debt Schedule (Company)
     *   Purchase Agreement (Subject Property)
     *   Feasibility Study (Subject Property)
     *   Zoning and Entitlement Documents (Subject Property)
@@ -369,20 +367,55 @@ The documents in the 'documentRequestList' field MUST be categorized into 'borro
     *   Appraisal (Subject Property)
 
 *   **Mezzanine Loans:**
+    *   ID/Driver's License (Borrower)
+    *   Personal Financial Statement (Borrower)
+    *   Credit Report (Borrower)
+    *   Personal Asset Statement (Borrower)
+    *   Company Asset Statement (Company)
+    *   EIN Certificate (Company)
+    *   Formation Documentation (Company)
+    *   Operating Agreement/Bylaws (Company)
+    *   Partnership/Officer List (Company)
+    *   Business License (Company)
+    *   Certificate of Good Standing (Company)
+    *   Business Debt Schedule (Company)
     *   Senior Debt Term Sheet (Subject Property)
     *   Full Project Pro-forma (Subject Property)
     *   Capital Stack overview (Company)
     *   Sponsor Financials (Borrower)
 
 *   **Mobilization Funding:**
+    *   ID/Driver's License (Borrower)
+    *   Personal Financial Statement (Borrower)
+    *   Credit Report (Borrower)
+    *   Personal Asset Statement (Borrower)
+    *   Company Asset Statement (Company)
+    *   EIN Certificate (Company)
+    *   Formation Documentation (Company)
+    *   Operating Agreement/Bylaws (Company)
+    *   Partnership/Officer List (Company)
+    *   Business License (Company)
+    *   Certificate of Good Standing (Company)
+    *   Business Debt Schedule (Company)
     *   Executed Contract for the project (Subject Property)
     *   Detailed Use of Funds (Subject Property)
     *   Company Financials (Company)
-    *   Credit Report (Borrower)
+
 
 *   **Equipment Financing:**
-    *   Equipment Quote or Invoice (Subject Property)
     *   Application Form (Borrower)
+    *   ID/Driver's License (Borrower)
+    *   Personal Financial Statement (Borrower)
+    *   Credit Report (Borrower)
+    *   Company Asset Statement (Company)
+    *   EIN Certificate (Company)
+    *   Formation Documentation (Company)
+    *   Operating Agreement/Bylaws (Company)
+    *   Partnership/Officer List (Company)
+    *   Business License (Company)
+    *   Certificate of Good Standing (Company)
+    *   Business Debt Schedule (Company)
+    *   Equipment Quote or Invoice (Subject Property)
     *   Business Financials (if over $100k) (Company)
 `,
 });
