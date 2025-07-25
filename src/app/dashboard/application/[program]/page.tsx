@@ -1,3 +1,6 @@
+
+'use client';
+
 import { Suspense } from 'react';
 import { LoanApplicationClient } from '@/components/loan-application-client';
 import { Skeleton } from '@/components/ui/skeleton';
