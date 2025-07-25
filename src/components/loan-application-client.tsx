@@ -13,6 +13,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collap
 import { getDocumentChecklist } from '@/ai/flows/document-checklist-flow';
 import { aiPreUnderwriter, type AiPreUnderwriterOutput } from '@/ai/flows/ai-pre-underwriter';
 import { useDocumentContext, type Document } from '@/contexts/document-context';
+import { ComparableSales } from './comparable-sales';
 
 type UploadStatus = 'pending' | 'uploaded' | 'verified' | 'missing';
 
@@ -381,6 +382,20 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
             </Card>
             </>
         )}
+        
+        <Collapsible>
+            <CollapsibleTrigger asChild>
+                <Button variant="outline" className="w-full justify-start">
+                    <FileText className="mr-2" />
+                    Comparable Sales
+                </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+                <div className="py-4">
+                    <ComparableSales />
+                </div>
+            </CollapsibleContent>
+        </Collapsible>
 
         {renderChecklistCategory('borrower', 'Borrower Documents')}
         {renderChecklistCategory('company', 'Company Documents')}
