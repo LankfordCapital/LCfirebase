@@ -34,6 +34,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [constructionTime, setConstructionTime] = useState('');
   const [requestedClosingDate, setRequestedClosingDate] = useState<Date>();
   const [projectChange, setProjectChange] = useState('');
+  const [monthlyRentalAmount, setMonthlyRentalAmount] = useState('');
 
   const router = useRouter();
   
@@ -79,19 +80,30 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                         <Input id="purchasePrice" type="number" placeholder="e.g., 400000" value={purchasePrice} onChange={e => setPurchasePrice(e.target.value)} />
                     </div>
                 </div>
-                <div className="space-y-2">
-                    <Label htmlFor="rehabCost">Requested Rehab Amount</Label>
-                    <Input id="rehabCost" type="number" placeholder="e.g., 50000" value={rehabCost} onChange={e => setRehabCost(e.target.value)} />
-                </div>
+
+                {loanProgram === 'Residential NOO - DSCR' ? (
+                  <div className="space-y-2">
+                      <Label htmlFor="monthlyRentalAmount">Monthly Rental Amount</Label>
+                      <Input id="monthlyRentalAmount" type="number" placeholder="e.g., 2500" value={monthlyRentalAmount} onChange={e => setMonthlyRentalAmount(e.target.value)} />
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                      <Label htmlFor="rehabCost">Requested Rehab Amount</Label>
+                      <Input id="rehabCost" type="number" placeholder="e.g., 50000" value={rehabCost} onChange={e => setRehabCost(e.target.value)} />
+                  </div>
+                )}
+
                 <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="asIsValue">As Is Value</Label>
                         <Input id="asIsValue" type="number" placeholder="e.g., 350000" value={asIsValue} onChange={e => setAsIsValue(e.target.value)} />
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="afterRepairValue">After Repair Value (ARV)</Label>
-                        <Input id="afterRepairValue" type="number" placeholder="e.g., 550000" value={afterRepairValue} onChange={e => setAfterRepairValue(e.target.value)} />
-                    </div>
+                    {loanProgram !== 'Residential NOO - DSCR' &&
+                        <div className="space-y-2">
+                            <Label htmlFor="afterRepairValue">After Repair Value (ARV)</Label>
+                            <Input id="afterRepairValue" type="number" placeholder="e.g., 550000" value={afterRepairValue} onChange={e => setAfterRepairValue(e.target.value)} />
+                        </div>
+                    }
                 </div>
                  <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -103,6 +115,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                         <Input id="lotSize" placeholder="e.g., 10,000 sq. ft. or 0.23 acres" value={lotSize} onChange={e => setLotSize(e.target.value)} />
                     </div>
                 </div>
+                
                 <div className="space-y-2">
                     <Label htmlFor="project-change">Is any of the following happening?</Label>
                     <Select onValueChange={setProjectChange} value={projectChange}>
@@ -122,6 +135,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                         </SelectContent>
                     </Select>
                 </div>
+
                 <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="constructionTime">Estimated Time to Construct (in months)</Label>
