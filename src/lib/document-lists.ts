@@ -30,6 +30,14 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Property Tax Certificate",
             "Appraisal",
             "Collateral Desktop Analysis",
+            "General Contractor License",
+            "General Contractor Insurance",
+            "General Contractor Bond",
+            "General Contractor's Contract to Build",
+            "Construction Budget",
+            "Projected Draw Schedule",
+            "Approved or Pre-approved Plans",
+            "Approved Permits",
         ]
     },
     "Residential NOO - Fix and Flip": {
@@ -130,8 +138,6 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Executive Summary",
             "Pro-forma Projections (5 years, month-by-month)",
             "Sources and Uses Statement",
-            "Construction Plans",
-            "Construction Budget",
             "Environmental Report",
             "Purchase and Sale Agreement (or HUD-1 if refinance)",
             "Evidence of Earnest Money Deposit",
@@ -139,11 +145,13 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Preliminary Title Commitment",
             "Builder's Risk Insurance Quote",
             "Commercial Liability Insurance Quote",
-            "Approved or Pre-approved Plans",
-            "Approved Permits (if available)",
             "Property Tax Certificate",
             "Appraisal",
             "Collateral Desktop Analysis",
+            "Construction Plans",
+            "Construction Budget",
+            "Approved or Pre-approved Plans",
+            "Approved Permits",
         ]
     },
     "Commercial - Rehab Loans": {
@@ -236,13 +244,13 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         subjectProperty: [
             "Purchase and Sale Agreement",
             "Evidence of Earnest Money Deposit",
-            "Construction Plans, Budget, and Timeline",
             "Environmental Reports",
-            "Approved or Pre-approved Plans",
-            "Approved Permits (if available)",
             "Property Tax Certificate",
             "Appraisal",
             "Collateral Desktop Analysis",
+            "Construction Plans, Budget, and Timeline",
+            "Approved or Pre-approved Plans",
+            "Approved Permits",
         ]
     },
     "Industrial - Rehab & Expansion": {

@@ -167,16 +167,22 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
     );
   };
   
-   const renderChecklistCategory = (category: keyof CategorizedDocuments, title: string, icon: React.ReactNode) => (
+   const renderChecklistCategory = (category: keyof CategorizedDocuments, title: string, icon: React.ReactNode, filterFn?: (item: DocumentItem) => boolean) => {
+    if (!checklist) return null;
+    const items = filterFn ? checklist[category].filter(filterFn) : checklist[category];
+    if (items.length === 0) return null;
+
+    return (
       <Card>
           <CardHeader>
               <CardTitle className="flex items-center gap-2">{icon} {title}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-              {checklist && checklist[category].map(item => <DocumentUploadInput key={item.name} name={item.name} />)}
+              {items.map(item => <DocumentUploadInput key={item.name} name={item.name} />)}
           </CardContent>
       </Card>
-  );
+    )
+   };
 
   if (isLoadingChecklist) {
     return <div>Loading document checklist...</div>
@@ -185,6 +191,19 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
   if (!checklist) {
     return <div>Could not load checklist. Please go back and select a loan program.</div>
   }
+
+  const constructionDocs = [
+    "General Contractor License",
+    "General Contractor Insurance",
+    "General Contractor Bond",
+    "General Contractor's Contract to Build",
+    "Construction Budget",
+    "Projected Draw Schedule",
+    "Construction Plans",
+    "Construction Plans, Budget, and Timeline",
+    "Approved or Pre-approved Plans",
+    "Approved Permits",
+  ];
 
   return (
     <div className="space-y-6">
@@ -195,14 +214,12 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
         
         {renderChecklistCategory('company', 'Company Documents', <Briefcase className="h-5 w-5 text-primary" />)}
 
-        <Card>
-          <CardHeader>
-              <CardTitle className="flex items-center gap-2"><FileText className="h-5 w-5 text-primary" /> Subject Property Documents</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-              {checklist.subjectProperty.map(item => <DocumentUploadInput key={item.name} name={item.name} />)}
-          </CardContent>
-        </Card>
+        {renderChecklistCategory(
+          'subjectProperty',
+          'Subject Property Documents',
+          <FileText className="h-5 w-5 text-primary" />,
+          (item) => !constructionDocs.includes(item.name)
+        )}
         
         <div className="flex justify-between items-center">
             <Button variant="outline" onClick={() => router.back()}>
