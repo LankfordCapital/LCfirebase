@@ -8,9 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from './ui/label';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { useDocumentContext } from '@/contexts/document-context';
-import { ComparableSales } from './comparable-sales';
 import { CheckCircle, Briefcase, Shield, FileText, ArrowLeft, ArrowRight, BookUser, Building } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -201,20 +199,6 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
                  <DocumentUploadInput name="Closing Protection Letter" />
             </CardContent>
         </Card>
-        
-        <Collapsible>
-            <CollapsibleTrigger asChild>
-                <Button variant="outline" className="w-full justify-start">
-                    <FileText className="mr-2" />
-                    Comparable Sales
-                </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-                <div className="py-4">
-                    <ComparableSales />
-                </div>
-            </CollapsibleContent>
-        </Collapsible>
         
         <div className="flex justify-between items-center">
             <Button variant="outline" onClick={() => router.back()}>

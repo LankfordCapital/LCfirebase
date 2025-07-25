@@ -2,9 +2,9 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { ComparableSales } from './comparable-sales';
 
 export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: string}) {
   const router = useRouter();
@@ -21,15 +21,7 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
-        <Card>
-            <CardHeader>
-                <CardTitle>Additional Information</CardTitle>
-                <CardDescription>This section will house additional questions and fields as needed.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <p className="text-muted-foreground">This is a placeholder for Page 3 content. More fields can be added here as the application requirements evolve.</p>
-            </CardContent>
-        </Card>
+        <ComparableSales />
         
         <div className="flex justify-between items-center">
             <Button variant="outline" onClick={() => router.back()}>
