@@ -1,51 +1,28 @@
 
-
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
-import { CheckCircle, ArrowLeft, ArrowRight, Briefcase, FileText, FileUp } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Briefcase, FileText, FileUp, Building } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { getDocumentChecklist } from '@/ai/flows/document-checklist-flow';
-import { useAuth } from '@/contexts/auth-context';
-
-
-type UploadStatus = 'pending' | 'uploaded' | 'verified' | 'missing';
-
-type DocumentItem = {
-    name: string;
-    status: UploadStatus;
-    file?: File;
-    dataUri?: string;
-};
-
-type CategorizedDocuments = {
-    borrower: DocumentItem[];
-    company: DocumentItem[];
-    subjectProperty: DocumentItem[];
-};
-
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: string}) {
-  const [checklist, setChecklist] = useState<CategorizedDocuments | null>(null);
-  const [isLoadingChecklist, setIsLoadingChecklist] = useState(true);
+  const [managementType, setManagementType] = useState('self');
+  const [managementCompanyName, setManagementCompanyName] = useState('');
+  const [managementCompanyPhone, setManagementCompanyPhone] = useState('');
+  const [managementCompanyEmail, setManagementCompanyEmail] = useState('');
 
-  const [gcName, setGcName] = useState('');
-  const [gcPhone, setGcPhone] = useState('');
-  const [gcEmail, setGcEmail] = useState('');
-
-  const { documents, addDocument, getDocument } = useDocumentContext();
-  const { user, loading: authLoading } = useAuth();
+  const { documents, addDocument } = useDocumentContext();
   const router = useRouter();
 
   const handleFileChange = useCallback(async (itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
         const file = event.target.files[0];
-        
         await addDocument({
             name: itemName,
             file,
@@ -60,7 +37,6 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
     return (
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-md border">
         <div className="flex items-center gap-3">
-          {doc?.status === 'verified' && <CheckCircle className="h-5 w-5 text-green-500" />}
           {doc?.status === 'uploaded' && <FileUp className="h-5 w-5 text-blue-500" />}
           {!doc && <FileText className="h-5 w-5 text-muted-foreground" />}
           <Label htmlFor={fileInputId} className="font-medium">{name}</Label>
@@ -77,17 +53,6 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
     router.push(`/dashboard/application/${programSlug}/page-4`);
   }
 
-  const constructionDocs = [
-    "General Contractor License",
-    "General Contractor Insurance",
-    "General Contractor Bond",
-    "General Contractor's Contract to Build",
-    "Construction Budget",
-    "Rehab Budget",
-    "Projected Draw Schedule",
-  ];
-
-
   return (
     <div className="space-y-6">
         <div>
@@ -97,25 +62,40 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
         
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
-                <CardDescription>This section is required for all construction, rehab, and fix & flip loans.</CardDescription>
+                <CardTitle className="flex items-center gap-2"><Building className="h-5 w-5 text-primary" /> Management Details</CardTitle>
+                <CardDescription>Specify how the property will be managed.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="gcName">Contractor Name</Label>
-                        <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} placeholder="GC Company Name" />
+                <RadioGroup value={managementType} onValueChange={setManagementType} className="flex space-x-4">
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="self" id="self" />
+                        <Label htmlFor="self">Self Managed</Label>
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="gcPhone">Contractor Phone</Label>
-                        <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} placeholder="(555) 123-4567" />
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="professional" id="professional" />
+                        <Label htmlFor="professional">Professionally Managed</Label>
                     </div>
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="gcEmail">Contractor Email</Label>
-                    <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} placeholder="contact@gccompany.com"/>
-                </div>
-                {constructionDocs.map(docName => <DocumentUploadInput key={docName} name={docName} />)}
+                </RadioGroup>
+
+                {managementType === 'professional' && (
+                    <div className="space-y-4 pt-4 border-t mt-4">
+                         <div className="grid md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="managementCompanyName">Management Company Name</Label>
+                                <Input id="managementCompanyName" value={managementCompanyName} onChange={e => setManagementCompanyName(e.target.value)} placeholder="Management Co." />
+                            </div>
+                             <div className="space-y-2">
+                                <Label htmlFor="managementCompanyPhone">Management Company Phone</Label>
+                                <Input id="managementCompanyPhone" type="tel" value={managementCompanyPhone} onChange={e => setManagementCompanyPhone(e.target.value)} placeholder="(555) 123-4567" />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="managementCompanyEmail">Management Company Email</Label>
+                            <Input id="managementCompanyEmail" type="email" value={managementCompanyEmail} onChange={e => setManagementCompanyEmail(e.target.value)} placeholder="contact@managementco.com"/>
+                        </div>
+                        <DocumentUploadInput name="Management Contract" />
+                    </div>
+                )}
             </CardContent>
         </Card>
         
