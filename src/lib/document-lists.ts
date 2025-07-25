@@ -401,6 +401,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Business Financial Statements (3 years)",
             "Business Tax Returns (3 years)",
             "Business Plan and Projections",
+            "Partnership/Officer List",
         ],
         subjectProperty: ["Appraisal", "Collateral Desktop Analysis"]
     },
@@ -411,6 +412,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         company: [
             "SBA Form 1244",
             "Business Financial Statements (3 years)",
+            "Partnership/Officer List",
         ],
         subjectProperty: [
             "Project Cost Details",
@@ -517,7 +519,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
     },
     "Default": {
         borrower: ["ID/Driver's License", "Personal Financial Statement", "Credit Report"],
-        company: ["EIN Certificate", "Formation Documentation", "Operating Agreement/Bylaws"],
+        company: ["EIN Certificate", "Formation Documentation", "Operating Agreement/Bylaws", "Partnership/Officer List"],
         subjectProperty: ["Purchase and Sale Agreement", "Appraisal Report"]
     }
 }
