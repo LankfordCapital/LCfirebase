@@ -120,11 +120,15 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
       
-      await addDocument({
+      const success = await addDocument({
         name: itemName,
         file,
         status: 'uploaded',
       });
+
+      if (success && checklist) {
+        setChecklist(syncChecklistWithContext(checklist));
+      }
     }
   };
 
@@ -351,21 +355,21 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                 <CardContent className="space-y-4">
                      <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="titleAgentName">Agent Name</Label>
+                            <Label htmlFor="titleAgentName">Escrow Agent Name</Label>
                             <Input id="titleAgentName" value={titleAgentName} onChange={e => setTitleAgentName(e.target.value)} />
                         </div>
                          <div className="space-y-2">
-                            <Label htmlFor="titleAgentCompany">Company</Label>
+                            <Label htmlFor="titleAgentCompany">Escrow Company</Label>
                             <Input id="titleAgentCompany" value={titleAgentCompany} onChange={e => setTitleAgentCompany(e.target.value)} />
                         </div>
                     </div>
                      <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="titleAgentPhone">Phone</Label>
+                            <Label htmlFor="titleAgentPhone">Escrow Agent Phone</Label>
                             <Input id="titleAgentPhone" type="tel" value={titleAgentPhone} onChange={e => setTitleAgentPhone(e.target.value)} />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="titleAgentEmail">Email</Label>
+                            <Label htmlFor="titleAgentEmail">Escrow Agent Email</Label>
                             <Input id="titleAgentEmail" type="email" value={titleAgentEmail} onChange={e => setTitleAgentEmail(e.target.value)} />
                         </div>
                     </div>
@@ -433,5 +437,4 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
         )}
     </div>
   );
-
-    
+}
