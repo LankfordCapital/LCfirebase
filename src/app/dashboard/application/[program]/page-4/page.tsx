@@ -6,7 +6,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from './ui/label';
+import { Label } from '@/components/ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
 import { CheckCircle, ArrowLeft, ArrowRight, BookUser, Building, Shield, Briefcase, FileText, FileUp } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -14,7 +14,25 @@ import { getDocumentChecklist } from '@/ai/flows/document-checklist-flow';
 import { useAuth } from '@/contexts/auth-context';
 
 
+type UploadStatus = 'pending' | 'uploaded' | 'verified' | 'missing';
+
+type DocumentItem = {
+    name: string;
+    status: UploadStatus;
+    file?: File;
+    dataUri?: string;
+};
+
+type CategorizedDocuments = {
+    borrower: DocumentItem[];
+    company: DocumentItem[];
+    subjectProperty: DocumentItem[];
+};
+
+
 export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: string}) {
+  const [checklist, setChecklist] = useState<CategorizedDocuments | null>(null);
+  const [isLoadingChecklist, setIsLoadingChecklist] = useState(true);
   const [insuranceAgentName, setInsuranceAgentName] = useState('');
   const [insuranceAgentCompany, setInsuranceAgentCompany] = useState('');
   const [insuranceAgentPhone, setInsuranceAgentPhone] = useState('');
@@ -34,9 +52,55 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
   const [gcPhone, setGcPhone] = useState('');
   const [gcEmail, setGcEmail] = useState('');
 
-  const { documents, addDocument } = useDocumentContext();
+  const { documents, addDocument, getDocument } = useDocumentContext();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
+  const syncChecklistWithContext = useCallback((checklistData: CategorizedDocuments) => {
+    const newChecklist = { ...checklistData };
+    (Object.keys(newChecklist) as Array<keyof CategorizedDocuments>).forEach(category => {
+        newChecklist[category] = newChecklist[category].map(item => {
+            const docFromContext = getDocument(item.name);
+            if (docFromContext) {
+                return {
+                    ...item,
+                    status: 'uploaded',
+                    file: docFromContext.file,
+                    dataUri: docFromContext.dataUri,
+                };
+            }
+            return item;
+        });
+    });
+    return newChecklist;
+  }, [getDocument]);
+
+  useEffect(() => {
+    if (loanProgram && !authLoading) {
+      const fetchChecklist = async () => {
+        setIsLoadingChecklist(true);
+        try {
+          const { documentRequestList } = await getDocumentChecklist({ loanProgram });
+          let initialChecklist: CategorizedDocuments = {
+            borrower: documentRequestList.borrower.map(name => ({ name, status: 'missing' })),
+            company: documentRequestList.company.map(name => ({ name, status: 'missing' })),
+            subjectProperty: documentRequestList.subjectProperty.map(name => ({ name, status: 'missing' })),
+          };
+          
+          initialChecklist = syncChecklistWithContext(initialChecklist);
+          setChecklist(initialChecklist);
+
+        } catch (error) {
+          console.error("Failed to fetch document checklist", error);
+        } finally {
+          setIsLoadingChecklist(false);
+        }
+      };
+      fetchChecklist();
+    }
+  }, [loanProgram, authLoading, syncChecklistWithContext]);
+
+  
   const handleFileChange = useCallback(async (itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
         const file = event.target.files[0];
@@ -72,6 +136,21 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
     router.push(`/dashboard/application/${programSlug}/page-5`);
   }
 
+  const constructionDocs = [
+    "General Contractor License",
+    "General Contractor Insurance",
+    "General Contractor Bond",
+    "General Contractor's Contract to Build",
+    "Construction Budget",
+    "Projected Draw Schedule",
+    "Construction Plans",
+    "Construction Plans, Budget, and Timeline",
+    "Approved or Pre-approved Plans",
+    "Approved Permits",
+  ];
+
+  const gcDocuments = checklist?.subjectProperty.filter(item => constructionDocs.includes(item.name));
+
   return (
     <div className="space-y-6">
         <div>
@@ -79,28 +158,31 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
-                <CardDescription>This section is required for all construction, rehab, and fix & flip loans.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="gcName">Contractor Name</Label>
-                        <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} placeholder="GC Company Name" />
+        {gcDocuments && gcDocuments.length > 0 && (
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
+                    <CardDescription>This section is required for all construction, rehab, and fix & flip loans.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="gcName">Contractor Name</Label>
+                            <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} placeholder="GC Company Name" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="gcPhone">Contractor Phone</Label>
+                            <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} placeholder="(555) 123-4567" />
+                        </div>
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="gcPhone">Contractor Phone</Label>
-                        <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} placeholder="(555) 123-4567" />
+                        <Label htmlFor="gcEmail">Contractor Email</Label>
+                        <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} placeholder="contact@gccompany.com"/>
                     </div>
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="gcEmail">Contractor Email</Label>
-                    <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} placeholder="contact@gccompany.com"/>
-                </div>
-            </CardContent>
-        </Card>
+                    {gcDocuments.map(doc => <DocumentUploadInput key={doc.name} name={doc.name} />)}
+                </CardContent>
+            </Card>
+        )}
 
         <Card>
             <CardHeader>
@@ -127,6 +209,8 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
                         <Input id="insuranceAgentEmail" type="email" value={insuranceAgentEmail} onChange={e => setInsuranceAgentEmail(e.target.value)} />
                     </div>
                 </div>
+                 <DocumentUploadInput name="Builder's Risk Insurance Quote" />
+                 <DocumentUploadInput name="Commercial Liability Insurance Quote" />
             </CardContent>
         </Card>
 
@@ -155,6 +239,7 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
                         <Input id="titleAgentEmail" type="email" value={titleAgentEmail} onChange={e => setTitleAgentEmail(e.target.value)} />
                     </div>
                 </div>
+                <DocumentUploadInput name="Preliminary Title Commitment" />
             </CardContent>
         </Card>
 
