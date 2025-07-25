@@ -46,7 +46,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   return (
     <div className="space-y-6">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 1 of 7</h1>
+            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 1 of 8</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
@@ -81,29 +81,16 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                     </div>
                 </div>
 
-                {loanProgram === 'Residential NOO - DSCR' ? (
-                  <div className="space-y-2">
-                      <Label htmlFor="monthlyRentalAmount">Monthly Rental Amount</Label>
-                      <Input id="monthlyRentalAmount" type="number" placeholder="e.g., 2500" value={monthlyRentalAmount} onChange={e => setMonthlyRentalAmount(e.target.value)} />
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                      <Label htmlFor="rehabCost">Requested Rehab Amount</Label>
-                      <Input id="rehabCost" type="number" placeholder="e.g., 50000" value={rehabCost} onChange={e => setRehabCost(e.target.value)} />
-                  </div>
-                )}
-
+                <div className="space-y-2">
+                    <Label htmlFor="monthlyRentalAmount">Monthly Rental Amount</Label>
+                    <Input id="monthlyRentalAmount" type="number" placeholder="e.g., 2500" value={monthlyRentalAmount} onChange={e => setMonthlyRentalAmount(e.target.value)} />
+                </div>
+                
                 <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="asIsValue">As Is Value</Label>
                         <Input id="asIsValue" type="number" placeholder="e.g., 350000" value={asIsValue} onChange={e => setAsIsValue(e.target.value)} />
                     </div>
-                    {loanProgram !== 'Residential NOO - DSCR' &&
-                        <div className="space-y-2">
-                            <Label htmlFor="afterRepairValue">After Repair Value (ARV)</Label>
-                            <Input id="afterRepairValue" type="number" placeholder="e.g., 550000" value={afterRepairValue} onChange={e => setAfterRepairValue(e.target.value)} />
-                        </div>
-                    }
                 </div>
                  <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
