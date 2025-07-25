@@ -25,12 +25,12 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
   const [titleAgentName, setTitleAgentName] = useState('');
   const [titleAgentCompany, setTitleAgentCompany] = useState('');
   const [titleAgentPhone, setTitleAgentPhone] = useState('');
-  const [titleAgentEmail, setTitleAgentEmail] = useState('');
+  const [titleAgentEmail, setEscrowAgentEmail] = useState('');
   
   const [escrowAgentName, setEscrowAgentName] = useState('');
   const [escrowAgentCompany, setEscrowAgentCompany] = useState('');
   const [escrowAgentPhone, setEscrowAgentPhone] = useState('');
-  const [escrowAgentEmail, setEscrowAgentEmail] = useState('');
+  const [escrowAgentEmail, setTitleAgentEmail] = useState('');
 
   const { documents, addDocument } = useDocumentContext();
   const router = useRouter();

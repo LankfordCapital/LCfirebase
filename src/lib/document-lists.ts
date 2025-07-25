@@ -32,6 +32,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "General Contractor Insurance",
             "General Contractor Bond (if required by location)",
             "General Contractor's Contract to Build",
+            "Construction Budget",
+            "Projected Draw Schedule",
             "Builder's Risk Insurance Quote",
             "Commercial Liability Insurance Quote",
             "Approved or Pre-approved Plans (if available)",
