@@ -11,6 +11,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: string}) {
   const router = useRouter();
@@ -20,11 +21,20 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
   const [backgroundAuth, setBackgroundAuth] = useState(false);
   const [appraisalAuth, setAppraisalAuth] = useState(false);
   const [signature, setSignature] = useState('');
+  const [exitStrategy, setExitStrategy] = useState('');
   
-  const allConsentsAndSignatureGiven = creditAuth && backgroundAuth && appraisalAuth && signature.trim() !== '';
+  const allConsentsAndSignatureGiven = creditAuth && backgroundAuth && appraisalAuth && signature.trim() !== '' && exitStrategy !== '';
   const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
   const handleSubmitApplication = () => {
+     if (!exitStrategy) {
+        toast({
+            variant: 'destructive',
+            title: 'Exit Strategy Required',
+            description: 'Please select an exit strategy to continue.',
+        });
+        return;
+    }
     if (!creditAuth || !backgroundAuth || !appraisalAuth) {
         toast({
             variant: 'destructive',
@@ -57,6 +67,25 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
             <h1 className="font-headline text-3xl font-bold">Loan Application - Page 4 of 4</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
+        
+        <Card>
+            <CardHeader>
+                <CardTitle>Exit Strategy</CardTitle>
+                <CardDescription>What is the intended exit strategy for this property?</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <RadioGroup value={exitStrategy} onValueChange={setExitStrategy} className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="sale" id="sale" />
+                        <Label htmlFor="sale">Sale</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="refinance" id="refinance" />
+                        <Label htmlFor="refinance">Refinance</Label>
+                    </div>
+                </RadioGroup>
+            </CardContent>
+        </Card>
         
         <Card>
             <CardHeader>
