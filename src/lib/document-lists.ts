@@ -28,22 +28,19 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         subjectProperty: [
             "Executed Purchase Contract",
             "Evidence of Earnest Money Deposit",
-            "Preliminary Title Commitment",
-            "Escrow Instructions",
-            "Closing Protection Letter",
-            "Title/Escrow Agent Details (Name, Company, Phone, Email)",
-            "General Contractor Details (Name, Phone, Email)",
             "General Contractor License",
             "General Contractor Insurance",
             "General Contractor Bond (if required by location)",
             "General Contractor's Contract to Build",
             "Builder's Risk Insurance Quote",
             "Commercial Liability Insurance Quote",
-            "Insurance Agent Details (Name, Company, Phone, Email)",
             "Approved or Pre-approved Plans",
             "Approved Permits (if available)",
             "Property HUD-1/Settlement Statement (if already purchased)",
             "30-Day Payoff Statement with Per Diem (if property has a mortgage)",
+            "Preliminary Title Commitment",
+            "Escrow Instructions",
+            "Closing Protection Letter",
         ]
     },
     "Residential NOO - Fix and Flip": {
@@ -72,7 +69,6 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Preliminary Title Commitment",
             "Escrow Instructions",
             "Closing Protection Letter",
-            "Title/Escrow Agent Details (Name, Company, Phone, Email)",
             "Rehab Budget",
             "Property HUD-1/Settlement Statement (if already purchased)",
             "30-Day Payoff Statement with Per Diem (if property has a mortgage)",
@@ -102,11 +98,9 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Lease Agreements for subject property (if applicable)",
             "Projected Lease Comparables (if vacant)",
             "Commercial Liability Insurance Quote",
-            "Insurance Agent Details (Name, Company, Phone, Email)",
             "Preliminary Title Commitment",
             "Escrow Instructions",
             "Closing Protection Letter",
-            "Title/Escrow Agent Details (Name, Company, Phone, Email)",
             "30-Day Payoff Statement with Per Diem (if a refinance)",
         ]
     },
@@ -136,7 +130,6 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Preliminary Title Commitment",
             "Escrow Instructions",
             "Closing Protection Letter",
-            "Title/Escrow Agent Details (Name, Company, Phone, Email)",
             "Property HUD-1/Settlement Statement (if already purchased)",
             "30-Day Payoff Statement with Per diem (if property has a mortgage)",
         ]
@@ -173,10 +166,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Preliminary Title Commitment",
             "Escrow Instructions",
             "Closing Protection Letter",
-            "Title/Escrow Agent Details (Name, Company, Phone, Email)",
             "Builder's Risk Insurance Quote",
             "Commercial Liability Insurance Quote",
-            "Insurance Agent Details (Name, Company, Phone, Email)",
             "Approved or Pre-approved Plans",
             "Approved Permits (if available)",
         ]
@@ -484,3 +475,5 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         subjectProperty: ["Purchase and Sale Agreement", "Appraisal Report"]
     }
 }
+
+    

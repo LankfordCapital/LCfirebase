@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Loader2, Upload, FileText, AlertTriangle, CheckCircle, FileUp, Check, Building2 } from 'lucide-react';
+import { Loader2, Upload, FileText, AlertTriangle, CheckCircle, FileUp, Check, Building2, User, Mail, Phone, Shield, File, Briefcase } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from './ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
@@ -41,6 +41,20 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [rehabCost, setRehabCost] = useState('');
   const [lotSize, setLotSize] = useState('');
   const [constructionTime, setConstructionTime] = useState('');
+
+  const [gcName, setGcName] = useState('');
+  const [gcPhone, setGcPhone] = useState('');
+  const [gcEmail, setGcEmail] = useState('');
+
+  const [insuranceAgentName, setInsuranceAgentName] = useState('');
+  const [insuranceAgentCompany, setInsuranceAgentCompany] = useState('');
+  const [insuranceAgentPhone, setInsuranceAgentPhone] = useState('');
+  const [insuranceAgentEmail, setInsuranceAgentEmail] = useState('');
+
+  const [titleAgentName, setTitleAgentName] = useState('');
+  const [titleAgentCompany, setTitleAgentCompany] = useState('');
+  const [titleAgentPhone, setTitleAgentPhone] = useState('');
+  const [titleAgentEmail, setTitleAgentEmail] = useState('');
 
   const { documents, addDocument } = useDocumentContext();
   const { toast } = useToast();
@@ -179,8 +193,21 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
         setIsAnalyzing(false);
     }
   };
-
+  
   const showConstructionFields = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('fix and flip') || loanProgram.toLowerCase().includes('rehab');
+
+  const DocumentUploadInput = ({ name }: { name: string }) => {
+    const doc = documents[name];
+    return (
+        <div className="space-y-2">
+            <Label htmlFor={name}>{name}</Label>
+            <div className="flex items-center gap-2">
+                <Input id={name} type="file" onChange={(e) => handleFileChange('subjectProperty', name, e)} disabled={isAnalyzing || !!doc} />
+                {doc && <CheckCircle className="h-5 w-5 text-green-500" />}
+            </div>
+        </div>
+    );
+  };
 
   if (isLoadingChecklist) {
     return <div>Loading Application...</div>;
@@ -250,14 +277,98 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                             <Label htmlFor="rehabCost">Estimated Rehab/Construction Cost</Label>
                             <Input id="rehabCost" type="number" placeholder="e.g., 50000" value={rehabCost} onChange={e => setRehabCost(e.target.value)} />
                         </div>
-                        <div className="space-y-2">
+                         <div className="space-y-2">
                             <Label htmlFor="constructionTime">Estimated Time to Construct (in months)</Label>
                             <Input id="constructionTime" type="number" placeholder="e.g., 6" value={constructionTime} onChange={e => setConstructionTime(e.target.value)} />
                         </div>
+                        <DocumentUploadInput name="Construction Budget" />
+                        <DocumentUploadInput name="Projected Draw Schedule" />
                     </>
                 )}
             </CardContent>
         </Card>
+        
+        {showConstructionFields && (
+            <>
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="gcName">Contractor Name</Label>
+                            <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="gcPhone">Contractor Phone</Label>
+                            <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} />
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="gcEmail">Contractor Email</Label>
+                        <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} />
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><Shield className="h-5 w-5 text-primary" /> Insurance Agent Details</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                     <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="insuranceAgentName">Agent Name</Label>
+                            <Input id="insuranceAgentName" value={insuranceAgentName} onChange={e => setInsuranceAgentName(e.target.value)} />
+                        </div>
+                         <div className="space-y-2">
+                            <Label htmlFor="insuranceAgentCompany">Agent Company</Label>
+                            <Input id="insuranceAgentCompany" value={insuranceAgentCompany} onChange={e => setInsuranceAgentCompany(e.target.value)} />
+                        </div>
+                    </div>
+                     <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="insuranceAgentPhone">Agent Phone</Label>
+                            <Input id="insuranceAgentPhone" type="tel" value={insuranceAgentPhone} onChange={e => setInsuranceAgentPhone(e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="insuranceAgentEmail">Agent Email</Label>
+                            <Input id="insuranceAgentEmail" type="email" value={insuranceAgentEmail} onChange={e => setInsuranceAgentEmail(e.target.value)} />
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><FileText className="h-5 w-5 text-primary" /> Title & Escrow Details</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                     <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="titleAgentName">Agent Name</Label>
+                            <Input id="titleAgentName" value={titleAgentName} onChange={e => setTitleAgentName(e.target.value)} />
+                        </div>
+                         <div className="space-y-2">
+                            <Label htmlFor="titleAgentCompany">Company</Label>
+                            <Input id="titleAgentCompany" value={titleAgentCompany} onChange={e => setTitleAgentCompany(e.target.value)} />
+                        </div>
+                    </div>
+                     <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="titleAgentPhone">Phone</Label>
+                            <Input id="titleAgentPhone" type="tel" value={titleAgentPhone} onChange={e => setTitleAgentPhone(e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="titleAgentEmail">Email</Label>
+                            <Input id="titleAgentEmail" type="email" value={titleAgentEmail} onChange={e => setTitleAgentEmail(e.target.value)} />
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+            </>
+        )}
 
         {renderChecklistCategory('borrower', 'Borrower Documents')}
         {renderChecklistCategory('company', 'Company Documents')}
@@ -302,3 +413,5 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
     </div>
   );
 }
+
+    
