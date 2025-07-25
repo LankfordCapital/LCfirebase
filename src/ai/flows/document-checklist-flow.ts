@@ -62,10 +62,8 @@ const getDocumentChecklistFlow = ai.defineFlow(
   async input => {
     const documentList = loanProgramDocumentLists[input.loanProgram as keyof typeof loanProgramDocumentLists] || loanProgramDocumentLists['Default'];
     
-    const {output} = await prompt({
-      loanProgram: input.loanProgram,
-      documentList: documentList
-    });
-    return output!;
+    // The prompt-based generation is causing inconsistencies.
+    // We will return the list directly from the object.
+    return { documentRequestList: documentList };
   }
 );
