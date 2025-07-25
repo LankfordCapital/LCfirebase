@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
-import { DocumentChecklistClient } from '@/components/document-checklist-client';
+import { LoanApplicationClient } from '@/components/loan-application-client';
 import { Skeleton } from '@/components/ui/skeleton';
 
-function ChecklistSkeleton() {
+function ApplicationSkeleton() {
     return (
         <div className="space-y-6">
             <div className="space-y-2">
@@ -19,11 +19,12 @@ function ChecklistSkeleton() {
     )
 }
 
+export default function LoanApplicationPage({ params }: { params: { program: string } }) {
+    const loanProgram = decodeURIComponent(params.program.replace(/-/g, ' ').replace(/\band\b/g, '&')).replace(/(^\w|\s\w)/g, m => m.toUpperCase());
 
-export default function DocumentChecklistPage() {
     return (
-        <Suspense fallback={<ChecklistSkeleton />}>
-            <DocumentChecklistClient />
+        <Suspense fallback={<ApplicationSkeleton />}>
+            <LoanApplicationClient loanProgram={loanProgram} />
         </Suspense>
     )
 }

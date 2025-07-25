@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -29,10 +28,7 @@ type CategorizedDocuments = {
     subjectProperty: DocumentItem[];
 };
 
-function DocumentChecklistComponent() {
-  const searchParams = useSearchParams();
-  const loanProgram = searchParams.get('program') || '';
-
+export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [checklist, setChecklist] = useState<CategorizedDocuments | null>(null);
   const [isLoadingChecklist, setIsLoadingChecklist] = useState(true);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -177,11 +173,11 @@ function DocumentChecklistComponent() {
   };
 
   if (isLoadingChecklist) {
-    return <div>Loading Checklist...</div>;
+    return <div>Loading Application...</div>;
   }
 
   if (!checklist) {
-    return <div>Could not load checklist. Please go back and select a loan program.</div>;
+    return <div>Could not load application. Please go back and select a loan program.</div>;
   }
   
   const renderChecklistCategory = (category: keyof CategorizedDocuments, title: string) => (
@@ -210,7 +206,7 @@ function DocumentChecklistComponent() {
   return (
     <div className="space-y-6">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Document Checklist</h1>
+            <h1 className="font-headline text-3xl font-bold">Loan Application</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
 
@@ -256,12 +252,4 @@ function DocumentChecklistComponent() {
         )}
     </div>
   );
-}
-
-export function DocumentChecklistClient() {
-    return (
-        <Suspense fallback={<div>Loading...</div>}>
-            <DocumentChecklistComponent />
-        </Suspense>
-    )
 }

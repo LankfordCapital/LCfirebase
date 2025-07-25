@@ -25,7 +25,8 @@ export function AIPReUnderwriterClient() {
       });
       return;
     }
-    router.push(`/dashboard/documents/checklist?program=${encodeURIComponent(loanProgram)}`);
+    const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
+    router.push(`/dashboard/application/${programSlug}`);
   };
 
   return (
