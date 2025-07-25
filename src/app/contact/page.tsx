@@ -24,7 +24,7 @@ export default function ContactPage() {
                 <MapPin className="h-6 w-6 text-accent mt-1 flex-shrink-0" />
                 <div>
                     <h3 className="font-semibold">Our Office</h3>
-                    <p className="text-muted-foreground">123 Lending Lane<br/>Finance City, ST 54321</p>
+                    <p className="text-muted-foreground">12747 Olive Blvd<br/>ste 300a<br/>Saint Louis, Missouri 63141<br/>United States</p>
                 </div>
              </div>
               <div className="flex items-start gap-4">
