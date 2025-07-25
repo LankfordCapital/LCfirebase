@@ -56,11 +56,18 @@ export default function AdminSignUpPage() {
                 description: signUpError.message,
             });
         }
-      } else {
+      } else if (error.code === 'auth/invalid-credential') {
+           toast({
+            variant: 'destructive',
+            title: 'Sign In Failed',
+            description: "Password is incorrect. If you have forgotten the password, you may need to reset it in the Firebase console.",
+        });
+      }
+      else {
          toast({
             variant: 'destructive',
             title: 'Sign In Failed',
-            description: "Please check your password or if the user already exists with a different password.",
+            description: error.message,
         });
       }
     } finally {
