@@ -7,17 +7,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, CheckCircle, FileText, FileUp, CreditCard } from 'lucide-react';
+import { ArrowLeft, CheckCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useDocumentContext } from '@/contexts/document-context';
 
-export default function LoanApplicationClientPage7({ loanProgram }: { loanProgram: string}) {
+export function LoanApplicationClientPage7({ loanProgram }: { loanProgram: string}) {
   const router = useRouter();
   const { toast } = useToast();
-  const { documents, addDocument } = useDocumentContext();
   
   const [creditAuth, setCreditAuth] = useState(false);
   const [backgroundAuth, setBackgroundAuth] = useState(false);
@@ -27,36 +25,6 @@ export default function LoanApplicationClientPage7({ loanProgram }: { loanProgra
   
   const allConsentsAndSignatureGiven = creditAuth && backgroundAuth && appraisalAuth && signature.trim() !== '' && exitStrategy !== '';
   const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-
-  const handleFileChange = useCallback(async (itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-        const file = event.target.files[0];
-        
-        await addDocument({
-            name: itemName,
-            file,
-            status: 'uploaded',
-        });
-    }
-  }, [addDocument]);
-
-  const DocumentUploadInput = ({ name }: { name: string }) => {
-    const doc = documents[name];
-    const fileInputId = `upload-${name.replace(/\s+/g, '-')}`;
-    
-    return (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-md border">
-            <div className="flex items-center gap-3">
-              {doc?.status === 'uploaded' && <FileUp className="h-5 w-5 text-blue-500" />}
-              {!doc && <FileText className="h-5 w-5 text-muted-foreground" />}
-              <Label htmlFor={fileInputId} className="font-medium">{name}</Label>
-            </div>
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <Input id={fileInputId} type="file" className="w-full sm:w-auto" onChange={(e) => handleFileChange(name, e)} disabled={!!doc} />
-            </div>
-        </div>
-    );
-  };
 
   const handleSubmitApplication = () => {
      if (!exitStrategy) {
@@ -118,20 +86,6 @@ export default function LoanApplicationClientPage7({ loanProgram }: { loanProgra
             </CardContent>
         </Card>
 
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <CreditCard className="h-5 w-5 text-primary" />
-                    Payment Authorization
-                </CardTitle>
-                <CardDescription>Please upload images of the credit card to be used for the appraisal and collateral analysis fees.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <DocumentUploadInput name="Credit Card (Front)" />
-                <DocumentUploadInput name="Credit Card (Back)" />
-            </CardContent>
-        </Card>
-        
         <Card>
             <CardHeader>
                 <CardTitle>Disclosures and Authorizations</CardTitle>
