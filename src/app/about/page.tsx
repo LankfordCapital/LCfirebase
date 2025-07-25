@@ -1,36 +1,8 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
 import { Target, Users, Handshake } from "lucide-react";
-
-const teamMembers = [
-    {
-        name: "John Lankford",
-        role: "Founder & CEO",
-        avatar: "https://placehold.co/100x100.png",
-        dataAiHint: "man portrait"
-    },
-    {
-        name: "Jane Doe",
-        role: "Head of Underwriting",
-        avatar: "https://placehold.co/100x100.png",
-        dataAiHint: "woman portrait"
-    },
-    {
-        name: "Mike Smith",
-        role: "Senior Loan Officer",
-        avatar: "https://placehold.co/100x100.png",
-        dataAiHint: "man portrait smiling"
-    },
-    {
-        name: "Sarah Johnson",
-        role: "Lead Processor",
-        avatar: "https://placehold.co/100x100.png",
-        dataAiHint: "woman portrait smiling"
-    }
-];
 
 const values = [
     {
@@ -87,27 +59,6 @@ export default function AboutUsPage() {
                         <div className="flex justify-center mb-4">{value.icon}</div>
                         <h3 className="font-headline text-xl font-semibold">{value.title}</h3>
                         <p className="mt-2 text-muted-foreground">{value.description}</p>
-                    </Card>
-                ))}
-            </div>
-        </div>
-      </section>
-
-      <section className="py-16 md:py-24">
-        <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-                <h2 className="font-headline text-3xl font-bold text-primary">Meet the Team</h2>
-                <p className="mt-2 text-muted-foreground">The experienced professionals dedicated to your success.</p>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                {teamMembers.map(member => (
-                    <Card key={member.name} className="text-center p-6">
-                        <Avatar className="h-24 w-24 mx-auto mb-4">
-                            <AvatarImage src={member.avatar} alt={member.name} data-ai-hint={member.dataAiHint} />
-                            <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                        </Avatar>
-                        <h3 className="font-headline text-xl font-semibold">{member.name}</h3>
-                        <p className="text-primary">{member.role}</p>
                     </Card>
                 ))}
             </div>
