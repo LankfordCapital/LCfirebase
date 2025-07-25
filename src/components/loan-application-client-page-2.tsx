@@ -146,13 +146,14 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
     return <div>Could not load checklist. Please go back and select a loan program.</div>
   }
   
-  const renderChecklistCategory = (category: keyof CategorizedDocuments, title: string, icon: React.ReactNode) => (
+  const renderChecklistCategory = (category: keyof CategorizedDocuments, title: string, icon: React.ReactNode, extraDocs?: string[]) => (
       <Card>
           <CardHeader>
               <CardTitle className="flex items-center gap-2">{icon} {title}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
               {checklist[category].map(item => <DocumentUploadInput key={item.name} name={item.name} />)}
+              {extraDocs?.map(docName => <DocumentUploadInput key={docName} name={docName} />)}
           </CardContent>
       </Card>
   );
@@ -164,7 +165,7 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
-        {renderChecklistCategory('borrower', 'Borrower Documents', <User className="h-5 w-5 text-primary" />)}
+        {renderChecklistCategory('borrower', 'Borrower Documents', <User className="h-5 w-5 text-primary" />, ["3 Months Personal Asset Statements"])}
         {renderChecklistCategory('company', 'Company Documents', <Briefcase className="h-5 w-5 text-primary" />)}
         
         <div className="flex justify-between items-center">
