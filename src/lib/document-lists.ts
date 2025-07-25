@@ -34,13 +34,14 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "General Contractor's Contract to Build",
             "Builder's Risk Insurance Quote",
             "Commercial Liability Insurance Quote",
-            "Approved or Pre-approved Plans",
+            "Approved or Pre-approved Plans (if available)",
             "Approved Permits (if available)",
             "Property HUD-1/Settlement Statement (if already purchased)",
             "30-Day Payoff Statement with Per Diem (if property has a mortgage)",
             "Preliminary Title Commitment",
             "Escrow Instructions",
             "Closing Protection Letter",
+            "Property Tax Certificate",
         ]
     },
     "Residential NOO - Fix and Flip": {
@@ -72,6 +73,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Rehab Budget",
             "Property HUD-1/Settlement Statement (if already purchased)",
             "30-Day Payoff Statement with Per Diem (if property has a mortgage)",
+            "Property Tax Certificate",
         ]
     },
     "Residential NOO - DSCR": {
@@ -102,6 +104,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Escrow Instructions",
             "Closing Protection Letter",
             "30-Day Payoff Statement with Per Diem (if a refinance)",
+            "Property Tax Certificate",
         ]
     },
     "Residential NOO - Bridge": {
@@ -132,6 +135,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Closing Protection Letter",
             "Property HUD-1/Settlement Statement (if already purchased)",
             "30-Day Payoff Statement with Per diem (if property has a mortgage)",
+            "Property Tax Certificate",
         ]
     },
     "Commercial - Ground Up Construction": {
@@ -169,8 +173,9 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Closing Protection Letter",
             "Builder's Risk Insurance Quote",
             "Commercial Liability Insurance Quote",
-            "Approved or Pre-approved Plans",
+            "Approved or Pre-approved Plans (if available)",
             "Approved Permits (if available)",
+            "Property Tax Certificate",
         ]
     },
     "Commercial - Rehab Loans": {
@@ -197,6 +202,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Rehab Budget and Plans",
             "Purchase Agreement (if applicable)",
             "Appraisal Report",
+            "Property Tax Certificate",
         ]
     },
     "Commercial - Acquisition & Bridge": {
@@ -222,6 +228,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Trailing 12-month Operating Statement",
             "Purchase Agreement",
             "Appraisal Report",
+            "Property Tax Certificate",
         ]
     },
     "Commercial - Conventional Long Term Debt": {
@@ -247,6 +254,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Current Rent Roll",
             "Lease Agreements",
             "Appraisal Report",
+            "Property Tax Certificate",
         ]
     },
     "Industrial - Ground Up Construction": {
@@ -273,8 +281,9 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         subjectProperty: [
             "Construction Plans, Budget, and Timeline",
             "Appraisal and Environmental Reports",
-            "Approved or Pre-approved Plans",
+            "Approved or Pre-approved Plans (if available)",
             "Approved Permits (if available)",
+            "Property Tax Certificate",
         ]
     },
     "Industrial - Rehab & Expansion": {
@@ -300,6 +309,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Current Property Operating Statements",
             "Rehab/Expansion Plans and Budget",
             "Appraisal Report",
+            "Property Tax Certificate",
         ]
     },
     "Industrial - Acquisition & Bridge": {
@@ -325,6 +335,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Trailing 12-month Operating Statement for property",
             "Purchase Agreement",
             "Preliminary Title Report",
+            "Property Tax Certificate",
         ]
     },
     "Industrial - Long Term Debt": {
@@ -350,6 +361,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Property Operating Statements (3 years)",
             "Lease Agreements",
             "Appraisal Report",
+            "Property Tax Certificate",
         ]
     },
     "SBA 7(a)": {
@@ -374,6 +386,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         ],
         subjectProperty: [
             "Project Cost Details",
+            "Property Tax Certificate",
         ]
     },
     "Land Acquisition": {
@@ -399,6 +412,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Zoning and Entitlement Documents",
             "Environmental Report",
             "Appraisal",
+            "Property Tax Certificate",
         ]
     },
     "Mezzanine Loans": {

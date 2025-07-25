@@ -38,6 +38,8 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [analysisResult, setAnalysisResult] = useState<AiPreUnderwriterOutput | null>(null);
   
   const [propertyAddress, setPropertyAddress] = useState('');
+  const [propertyApn, setPropertyApn] = useState('');
+  const [propertyTaxes, setPropertyTaxes] = useState('');
   const [loanAmount, setLoanAmount] = useState('');
   const [purchasePrice, setPurchasePrice] = useState('');
   const [rehabCost, setRehabCost] = useState('');
@@ -250,6 +252,16 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                     <Label htmlFor="propertyAddress">Subject Property Address</Label>
                     <Input id="propertyAddress" placeholder="123 Main St, Anytown, USA" value={propertyAddress} onChange={e => setPropertyAddress(e.target.value)} />
                 </div>
+                 <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="propertyApn">Property APN</Label>
+                        <Input id="propertyApn" placeholder="e.g., 123-456-789" value={propertyApn} onChange={e => setPropertyApn(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="propertyTaxes">Annual Property Taxes</Label>
+                        <Input id="propertyTaxes" type="number" placeholder="e.g., 5000" value={propertyTaxes} onChange={e => setPropertyTaxes(e.target.value)} />
+                    </div>
+                </div>
                 <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="loanAmount">Loan Amount</Label>
@@ -264,7 +276,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                     <Label htmlFor="lotSize">Lot Size (in sq. ft. or acres)</Label>
                     <Input id="lotSize" placeholder="e.g., 10,000 sq. ft. or 0.23 acres" value={lotSize} onChange={e => setLotSize(e.target.value)} />
                 </div>
-                {showConstructionFields && (
+                 {showConstructionFields && (
                     <>
                         <div className="space-y-2">
                             <Label htmlFor="rehabCost">Estimated Rehab/Construction Cost</Label>
@@ -276,6 +288,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                         </div>
                     </>
                 )}
+                 <DocumentUploadInput name="Property Tax Certificate" />
             </CardContent>
         </Card>
 
