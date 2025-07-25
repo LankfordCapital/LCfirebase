@@ -103,7 +103,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                         <Input id="lotSize" placeholder="e.g., 10,000 sq. ft. or 0.23 acres" value={lotSize} onChange={e => setLotSize(e.target.value)} />
                     </div>
                 </div>
-                {loanProgram === 'Residential NOO - Fix And Flip' && (
+                {loanProgram === 'Residential NOO - Fix and Flip' && (
                     <div className="space-y-2">
                         <Label htmlFor="project-change">Is any of the following happening?</Label>
                         <Select onValueChange={setProjectChange} value={projectChange}>
