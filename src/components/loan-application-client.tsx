@@ -43,6 +43,8 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
     router.push(`/dashboard/application/${programSlug}/page-2`);
   };
 
+  const isBridgeLoan = loanProgram.includes('Bridge');
+
   return (
     <div className="space-y-6">
         <div>
@@ -81,10 +83,12 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                     </div>
                 </div>
 
-                <div className="space-y-2">
-                    <Label htmlFor="monthlyRentalAmount">Monthly Rental Amount</Label>
-                    <Input id="monthlyRentalAmount" type="number" placeholder="e.g., 2500" value={monthlyRentalAmount} onChange={e => setMonthlyRentalAmount(e.target.value)} />
-                </div>
+                {loanProgram.includes('DSCR') && (
+                    <div className="space-y-2">
+                        <Label htmlFor="monthlyRentalAmount">Monthly Rental Amount</Label>
+                        <Input id="monthlyRentalAmount" type="number" placeholder="e.g., 2500" value={monthlyRentalAmount} onChange={e => setMonthlyRentalAmount(e.target.value)} />
+                    </div>
+                )}
                 
                 <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -103,25 +107,28 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                     </div>
                 </div>
                 
-                <div className="space-y-2">
-                    <Label htmlFor="project-change">Is any of the following happening?</Label>
-                    <Select onValueChange={setProjectChange} value={projectChange}>
-                        <SelectTrigger id="project-change">
-                            <SelectValue placeholder="Select an option..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="no">No</SelectItem>
-                            <SelectItem value="expand-horizontal">Expanding the square footage (Horizontally)</SelectItem>
-                            <SelectItem value="expand-vertical">Expanding the square footage (Vertically)</SelectItem>
-                            <SelectItem value="expand-both">Expanding the square footage (Horizontally and Vertically)</SelectItem>
-                            <SelectItem value="change-units">Changing the unit count</SelectItem>
-                            <SelectItem value="convert-condo">Converting to Condominiums</SelectItem>
-                            <SelectItem value="add-adu">Adding or Converting to an ADU (accessory dwelling unit)</SelectItem>
-                            <SelectItem value="repair-fire">Repairing fire damage</SelectItem>
-                            <SelectItem value="repair-water">Repairing water damage</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
+                {!isBridgeLoan && (
+                    <div className="space-y-2">
+                        <Label htmlFor="project-change">Is any of the following happening?</Label>
+                        <Select onValueChange={setProjectChange} value={projectChange}>
+                            <SelectTrigger id="project-change">
+                                <SelectValue placeholder="Select an option..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="no">No</SelectItem>
+                                <SelectItem value="expand-horizontal">Expanding the square footage (Horizontally)</SelectItem>
+                                <SelectItem value="expand-vertical">Expanding the square footage (Vertically)</SelectItem>
+                                <SelectItem value="expand-both">Expanding the square footage (Horizontally and Vertically)</SelectItem>
+                                <SelectItem value="change-units">Changing the unit count</SelectItem>
+                                <SelectItem value="convert-condo">Converting to Condominiums</SelectItem>
+                                <SelectItem value="add-adu">Adding or Converting to an ADU (accessory dwelling unit)</SelectItem>
+                                <SelectItem value="repair-fire">Repairing fire damage</SelectItem>
+                                <SelectItem value="repair-water">Repairing water damage</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                )}
+
 
                 <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
