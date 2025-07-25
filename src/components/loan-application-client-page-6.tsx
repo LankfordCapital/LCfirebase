@@ -10,6 +10,7 @@ import { Label } from './ui/label';
 import { Input } from './ui/input';
 import { useDocumentContext } from '@/contexts/document-context';
 import { useCallback } from 'react';
+import { ComparableRentals } from './comparable-rentals';
 
 export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: string}) {
   const router = useRouter();
@@ -58,6 +59,7 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
         </div>
         
         <ComparableSales />
+        <ComparableRentals />
 
         <Card>
             <CardHeader>
