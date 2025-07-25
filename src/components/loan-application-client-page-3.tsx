@@ -12,6 +12,7 @@ import { useDocumentContext } from '@/contexts/document-context';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useCallback } from 'react';
 import Image from 'next/image';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 type PhotoFile = {
   id: string;
@@ -24,6 +25,9 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
   const { addDocument, documents } = useDocumentContext();
   const { toast } = useToast();
   const [photos, setPhotos] = useState<PhotoFile[]>([]);
+  const [propertyType, setPropertyType] = useState('');
+  const [numberOfUnits, setNumberOfUnits] = useState('');
+
 
   const handleContinue = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
@@ -73,6 +77,35 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
+        <Card>
+            <CardHeader>
+                <CardTitle>Property Details</CardTitle>
+                <CardDescription>Provide details about the property to be built.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="propertyType">Type of Property</Label>
+                        <Select value={propertyType} onValueChange={setPropertyType}>
+                            <SelectTrigger id="propertyType">
+                                <SelectValue placeholder="Select property type..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="sfr">Single Family Home</SelectItem>
+                                <SelectItem value="townhome">Townhome</SelectItem>
+                                <SelectItem value="condo">Condo</SelectItem>
+                                <SelectItem value="plex">Duplex, Triplex, or Quadplex</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="numberOfUnits">Planned Number of Units</Label>
+                        <Input id="numberOfUnits" type="number" placeholder="e.g., 1" value={numberOfUnits} onChange={(e) => setNumberOfUnits(e.target.value)} />
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+
         <ComparableSales />
 
         <Card>
