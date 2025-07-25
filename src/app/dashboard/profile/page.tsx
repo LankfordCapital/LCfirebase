@@ -31,7 +31,8 @@ type Deal = {
   address: string;
   purchasePrice: string;
   rehabAmount: string;
-  disposition: string;
+  salePrice: string;
+  daysOnMarket: string;
 };
 
 type Company = {
@@ -51,7 +52,7 @@ export default function ProfilePage() {
   const companyId = useId();
 
   const [deals, setDeals] = useState<Deal[]>([
-    { id: dealId, address: '', purchasePrice: '', rehabAmount: '', disposition: '' },
+    { id: dealId, address: '', purchasePrice: '', rehabAmount: '', salePrice: '', daysOnMarket: '' },
   ]);
 
   const [companies, setCompanies] = useState<Company[]>([
@@ -115,7 +116,7 @@ export default function ProfilePage() {
   const handleAddDeal = () => {
     if (deals.length < 10) {
       const newId = `deal-${deals.length}-${Date.now()}`;
-      setDeals([...deals, { id: newId, address: '', purchasePrice: '', rehabAmount: '', disposition: '' }]);
+      setDeals([...deals, { id: newId, address: '', purchasePrice: '', rehabAmount: '', salePrice: '', daysOnMarket: '' }]);
     }
   };
 
@@ -587,17 +588,15 @@ export default function ProfilePage() {
                   <Input id={`rehabAmount-${deal.id}`} type="number" placeholder="50000" value={deal.rehabAmount} onChange={e => handleDealChange(deal.id, 'rehabAmount', e.target.value)} />
                 </div>
               </div>
-               <div className="space-y-2">
-                <Label htmlFor={`disposition-${deal.id}`}>Disposition</Label>
-                <Select value={deal.disposition} onValueChange={value => handleDealChange(deal.id, 'disposition', value)}>
-                  <SelectTrigger id={`disposition-${deal.id}`}>
-                    <SelectValue placeholder="Select disposition..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="sale">Sale</SelectItem>
-                    <SelectItem value="refinance">Refinance</SelectItem>
-                  </SelectContent>
-                </Select>
+               <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor={`salePrice-${deal.id}`}>Sale Price</Label>
+                  <Input id={`salePrice-${deal.id}`} type="number" placeholder="300000" value={deal.salePrice} onChange={e => handleDealChange(deal.id, 'salePrice', e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={`daysOnMarket-${deal.id}`}>Days on Market</Label>
+                  <Input id={`daysOnMarket-${deal.id}`} type="number" placeholder="30" value={deal.daysOnMarket} onChange={e => handleDealChange(deal.id, 'daysOnMarket', e.target.value)} />
+                </div>
               </div>
               <div className="grid md:grid-cols-2 gap-4 pt-2">
                   <UploadButton docName={`Purchase HUD-1 (Deal #${index + 1})`} />
@@ -622,3 +621,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+    
