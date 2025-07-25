@@ -42,51 +42,6 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  const syncChecklistWithContext = useCallback((checklistData: CategorizedDocuments) => {
-    const newChecklist = { ...checklistData };
-    (Object.keys(newChecklist) as Array<keyof CategorizedDocuments>).forEach(category => {
-        newChecklist[category] = newChecklist[category].map(item => {
-            const docFromContext = getDocument(item.name);
-            if (docFromContext) {
-                return {
-                    ...item,
-                    status: 'uploaded',
-                    file: docFromContext.file,
-                    dataUri: docFromContext.dataUri,
-                };
-            }
-            return item;
-        });
-    });
-    return newChecklist;
-  }, [getDocument]);
-
-  useEffect(() => {
-    if (loanProgram && !authLoading) {
-      const fetchChecklist = async () => {
-        setIsLoadingChecklist(true);
-        try {
-          const { documentRequestList } = await getDocumentChecklist({ loanProgram });
-          let initialChecklist: CategorizedDocuments = {
-            borrower: documentRequestList.borrower.map(name => ({ name, status: 'missing' })),
-            company: documentRequestList.company.map(name => ({ name, status: 'missing' })),
-            subjectProperty: documentRequestList.subjectProperty.map(name => ({ name, status: 'missing' })),
-          };
-          
-          initialChecklist = syncChecklistWithContext(initialChecklist);
-          setChecklist(initialChecklist);
-
-        } catch (error) {
-          console.error("Failed to fetch document checklist", error);
-        } finally {
-          setIsLoadingChecklist(false);
-        }
-      };
-      fetchChecklist();
-    }
-  }, [loanProgram, authLoading, syncChecklistWithContext]);
-
-  
   const handleFileChange = useCallback(async (itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
         const file = event.target.files[0];
@@ -121,8 +76,6 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
     router.push(`/dashboard/application/${programSlug}/page-4`);
   }
-  
-  const showGCSection = loanProgram.includes("Ground Up Construction") || loanProgram.includes("Fix and Flip") || loanProgram.includes("Rehab");
 
   const constructionDocs = [
     "General Contractor License",
@@ -134,8 +87,6 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
     "Projected Draw Schedule",
   ];
 
-  const gcDocuments = checklist?.subjectProperty.filter(item => constructionDocs.includes(item.name)) || [];
-
 
   return (
     <div className="space-y-6">
@@ -144,31 +95,29 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
-        {showGCSection && (
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
-                    <CardDescription>This section is required for all construction, rehab, and fix & flip loans.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="grid md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="gcName">Contractor Name</Label>
-                            <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} placeholder="GC Company Name" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="gcPhone">Contractor Phone</Label>
-                            <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} placeholder="(555) 123-4567" />
-                        </div>
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
+                <CardDescription>This section is required for all construction, rehab, and fix & flip loans.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="gcName">Contractor Name</Label>
+                        <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} placeholder="GC Company Name" />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="gcEmail">Contractor Email</Label>
-                        <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} placeholder="contact@gccompany.com"/>
+                        <Label htmlFor="gcPhone">Contractor Phone</Label>
+                        <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} placeholder="(555) 123-4567" />
                     </div>
-                    {gcDocuments.map(doc => <DocumentUploadInput key={doc.name} name={doc.name} />)}
-                </CardContent>
-            </Card>
-        )}
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="gcEmail">Contractor Email</Label>
+                    <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} placeholder="contact@gccompany.com"/>
+                </div>
+                {constructionDocs.map(docName => <DocumentUploadInput key={docName} name={docName} />)}
+            </CardContent>
+        </Card>
         
         <div className="flex justify-between items-center">
             <Button variant="outline" onClick={() => router.back()}>
