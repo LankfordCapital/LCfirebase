@@ -31,7 +31,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Evidence of Earnest Money Deposit",
             "General Contractor License",
             "General Contractor Insurance",
-            "General Contractor Bond (if required by location)",
+            "General Contractor Bond",
             "General Contractor's Contract to Build",
             "Construction Budget",
             "Projected Draw Schedule",

@@ -227,7 +227,7 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
                <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 4
             </Button>
             <Button onClick={handleContinue}>
-                Save & Continue to Page 6 <ArrowRight className="ml-2 h-4 w-4" />
+                Continue to Page 6 <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
         </div>
     </div>
