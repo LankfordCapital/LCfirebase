@@ -11,7 +11,7 @@ import { Label } from './ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { useDocumentContext } from '@/contexts/document-context';
 import { ComparableSales } from './comparable-sales';
-import { CheckCircle, Briefcase, Shield, FileText, ArrowLeft, ArrowRight } from 'lucide-react';
+import { CheckCircle, Briefcase, Shield, FileText, ArrowLeft, ArrowRight, BookUser, Building } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: string}) {
@@ -28,7 +28,11 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
   const [titleAgentCompany, setTitleAgentCompany] = useState('');
   const [titleAgentPhone, setTitleAgentPhone] = useState('');
   const [titleAgentEmail, setTitleAgentEmail] = useState('');
-  const [titleAgentAddress, setTitleAgentAddress] = useState('');
+  
+  const [escrowAgentName, setEscrowAgentName] = useState('');
+  const [escrowAgentCompany, setEscrowAgentCompany] = useState('');
+  const [escrowAgentPhone, setEscrowAgentPhone] = useState('');
+  const [escrowAgentEmail, setEscrowAgentEmail] = useState('');
 
   const { documents, addDocument } = useDocumentContext();
   const router = useRouter();
@@ -80,7 +84,6 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
         </div>
         
         {showConstructionFields && (
-            <>
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
@@ -108,73 +111,96 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
                      <DocumentUploadInput name="Projected Draw Schedule" />
                 </CardContent>
             </Card>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Shield className="h-5 w-5 text-primary" /> Insurance Agent Details</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                     <div className="grid md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="insuranceAgentName">Agent Name</Label>
-                            <Input id="insuranceAgentName" value={insuranceAgentName} onChange={e => setInsuranceAgentName(e.target.value)} />
-                        </div>
-                         <div className="space-y-2">
-                            <Label htmlFor="insuranceAgentCompany">Agent Company</Label>
-                            <Input id="insuranceAgentCompany" value={insuranceAgentCompany} onChange={e => setInsuranceAgentCompany(e.target.value)} />
-                        </div>
+        )}
+        
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Shield className="h-5 w-5 text-primary" /> Insurance Agent Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                 <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="insuranceAgentName">Agent Name</Label>
+                        <Input id="insuranceAgentName" value={insuranceAgentName} onChange={e => setInsuranceAgentName(e.target.value)} />
                     </div>
-                     <div className="grid md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="insuranceAgentPhone">Agent Phone</Label>
-                            <Input id="insuranceAgentPhone" type="tel" value={insuranceAgentPhone} onChange={e => setInsuranceAgentPhone(e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="insuranceAgentEmail">Agent Email</Label>
-                            <Input id="insuranceAgentEmail" type="email" value={insuranceAgentEmail} onChange={e => setInsuranceAgentEmail(e.target.value)} />
-                        </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="insuranceAgentCompany">Agent Company</Label>
+                        <Input id="insuranceAgentCompany" value={insuranceAgentCompany} onChange={e => setInsuranceAgentCompany(e.target.value)} />
                     </div>
-                     <DocumentUploadInput name="Builder's Risk Insurance Quote" />
-                     <DocumentUploadInput name="Commercial Liability Insurance Quote" />
-                </CardContent>
-            </Card>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><FileText className="h-5 w-5 text-primary" /> Title & Escrow Details</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                     <div className="grid md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="titleAgentName">Escrow Agent Name</Label>
-                            <Input id="titleAgentName" value={titleAgentName} onChange={e => setTitleAgentName(e.target.value)} />
-                        </div>
-                         <div className="space-y-2">
-                            <Label htmlFor="titleAgentCompany">Escrow Company</Label>
-                            <Input id="titleAgentCompany" value={titleAgentCompany} onChange={e => setTitleAgentCompany(e.target.value)} />
-                        </div>
+                </div>
+                 <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="insuranceAgentPhone">Agent Phone</Label>
+                        <Input id="insuranceAgentPhone" type="tel" value={insuranceAgentPhone} onChange={e => setInsuranceAgentPhone(e.target.value)} />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="titleAgentAddress">Title Company Address</Label>
-                        <Input id="titleAgentAddress" value={titleAgentAddress} onChange={e => setTitleAgentAddress(e.target.value)} />
+                        <Label htmlFor="insuranceAgentEmail">Agent Email</Label>
+                        <Input id="insuranceAgentEmail" type="email" value={insuranceAgentEmail} onChange={e => setInsuranceAgentEmail(e.target.value)} />
                     </div>
-                     <div className="grid md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="titleAgentPhone">Escrow Agent Phone</Label>
-                            <Input id="titleAgentPhone" type="tel" value={titleAgentPhone} onChange={e => setTitleAgentPhone(e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="titleAgentEmail">Escrow Agent Email</Label>
-                            <Input id="titleAgentEmail" type="email" value={titleAgentEmail} onChange={e => setTitleAgentEmail(e.target.value)} />
-                        </div>
+                </div>
+                 <DocumentUploadInput name="Builder's Risk Insurance Quote" />
+                 <DocumentUploadInput name="Commercial Liability Insurance Quote" />
+            </CardContent>
+        </Card>
+
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><BookUser className="h-5 w-5 text-primary" /> Title Agent Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                 <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="titleAgentName">Agent Name</Label>
+                        <Input id="titleAgentName" value={titleAgentName} onChange={e => setTitleAgentName(e.target.value)} />
                     </div>
-                     <DocumentUploadInput name="Preliminary Title Commitment" />
-                     <DocumentUploadInput name="Escrow Instructions" />
-                     <DocumentUploadInput name="Closing Protection Letter" />
-                </CardContent>
-            </Card>
-            </>
-        )}
+                     <div className="space-y-2">
+                        <Label htmlFor="titleAgentCompany">Company Name</Label>
+                        <Input id="titleAgentCompany" value={titleAgentCompany} onChange={e => setTitleAgentCompany(e.target.value)} />
+                    </div>
+                </div>
+                 <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="titleAgentPhone">Agent Phone</Label>
+                        <Input id="titleAgentPhone" type="tel" value={titleAgentPhone} onChange={e => setTitleAgentPhone(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="titleAgentEmail">Agent Email</Label>
+                        <Input id="titleAgentEmail" type="email" value={titleAgentEmail} onChange={e => setTitleAgentEmail(e.target.value)} />
+                    </div>
+                </div>
+                <DocumentUploadInput name="Preliminary Title Commitment" />
+            </CardContent>
+        </Card>
+
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Building className="h-5 w-5 text-primary" /> Escrow Agent Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                 <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="escrowAgentName">Agent Name</Label>
+                        <Input id="escrowAgentName" value={escrowAgentName} onChange={e => setEscrowAgentName(e.target.value)} />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="escrowAgentCompany">Company Name</Label>
+                        <Input id="escrowAgentCompany" value={escrowAgentCompany} onChange={e => setEscrowAgentCompany(e.target.value)} />
+                    </div>
+                </div>
+                 <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="escrowAgentPhone">Agent Phone</Label>
+                        <Input id="escrowAgentPhone" type="tel" value={escrowAgentPhone} onChange={e => setEscrowAgentPhone(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="escrowAgentEmail">Agent Email</Label>
+                        <Input id="escrowAgentEmail" type="email" value={escrowAgentEmail} onChange={e => setEscrowAgentEmail(e.target.value)} />
+                    </div>
+                </div>
+                 <DocumentUploadInput name="Escrow Instructions" />
+                 <DocumentUploadInput name="Closing Protection Letter" />
+            </CardContent>
+        </Card>
         
         <Collapsible>
             <CollapsibleTrigger asChild>
