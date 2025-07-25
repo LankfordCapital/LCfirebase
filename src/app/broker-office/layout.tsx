@@ -10,7 +10,7 @@ export default function BrokerOfficeLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ProtectedRoute redirectTo="/auth/signin?role=broker">
+    <ProtectedRoute redirectTo="/auth/broker-signin">
       <div className="bg-primary/5 min-h-screen">{children}</div>
     </ProtectedRoute>
   );

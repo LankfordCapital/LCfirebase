@@ -90,7 +90,7 @@ export function Header() {
                   </Link>
                 </DropdownMenuItem>
                  <DropdownMenuItem asChild>
-                  <Link href="/broker-office">
+                  <Link href="/auth/broker-signin">
                     Broker Sign In
                   </Link>
                 </DropdownMenuItem>
@@ -169,7 +169,7 @@ export function Header() {
                     <Link href="/auth/signin">Borrower Sign In</Link>
                   </Button>
                    <Button variant="ghost" asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/broker-office">Broker Sign In</Link>
+                    <Link href="/auth/broker-signin">Broker Sign In</Link>
                   </Button>
                   <Button variant="ghost" asChild onClick={() => setIsOpen(false)}>
                     <Link href="/auth/workforce-signin">Workforce Sign In</Link>
