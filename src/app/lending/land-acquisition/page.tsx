@@ -54,7 +54,7 @@ export default function LandAcquisitionPage() {
             </Button>
           </div>
            <div className="relative h-96 w-full rounded-lg overflow-hidden shadow-lg">
-             <Image src="https://placehold.co/600x400.png" alt="Expansive plot of land ready for development" layout="fill" objectFit="cover" data-ai-hint="land development" />
+             <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-homebase.firebasestorage.app/o/shutterstock_2156251239.jpg?alt=media&token=b110baae-7e12-4f5d-89c5-cefcebdf0a0c" alt="Developer reviewing land development plans" layout="fill" objectFit="cover" data-ai-hint="development plans" />
           </div>
         </div>
       </section>
