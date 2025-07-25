@@ -33,8 +33,6 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
 
   const router = useRouter();
   
-  const showConstructionFields = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('fix and flip') || loanProgram.toLowerCase().includes('rehab');
-  
   const handleContinue = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
     router.push(`/dashboard/application/${programSlug}/page-2`);
@@ -122,12 +120,10 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                         </Popover>
                     </div>
                 </div>
-                 {showConstructionFields && (
-                    <div className="space-y-2">
-                        <Label htmlFor="constructionTime">Estimated Time to Construct (in months)</Label>
-                        <Input id="constructionTime" type="number" placeholder="e.g., 6" value={constructionTime} onChange={e => setConstructionTime(e.target.value)} />
-                    </div>
-                )}
+                <div className="space-y-2">
+                    <Label htmlFor="constructionTime">Estimated Time to Construct (in months)</Label>
+                    <Input id="constructionTime" type="number" placeholder="e.g., 6" value={constructionTime} onChange={e => setConstructionTime(e.target.value)} />
+                </div>
             </CardContent>
         </Card>
 
