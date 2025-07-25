@@ -24,7 +24,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/auth-context';
-import { ProtectedRoute } from '@/components/protected-route';
 
 function DashboardNav() {
   const pathname = usePathname();
@@ -102,13 +101,13 @@ export default function DashboardLayout({
 }) {
 
   return (
-    <ProtectedRoute>
+    <>
       <DashboardNav />
       <SidebarInset>
         <div className="p-4 md:p-6 lg:p-8 bg-primary/5 min-h-full">
           {children}
         </div>
       </SidebarInset>
-    </ProtectedRoute>
+    </>
   );
 }

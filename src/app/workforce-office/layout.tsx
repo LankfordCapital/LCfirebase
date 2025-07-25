@@ -2,14 +2,10 @@
 
 'use client';
 
-import {ProtectedRoute} from '@/components/protected-route';
-
 export default function WorkforceOfficeLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <ProtectedRoute redirectTo="/auth/workforce-signin">{children}</ProtectedRoute>
-  );
+  return <>{children}</>;
 }
