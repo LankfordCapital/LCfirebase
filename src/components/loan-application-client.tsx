@@ -28,6 +28,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [asIsValue, setAsIsValue] = useState('');
   const [afterRepairValue, setAfterRepairValue] = useState('');
   const [lotSize, setLotSize] = useState('');
+  const [propertySqFt, setPropertySqFt] = useState('');
   const [constructionTime, setConstructionTime] = useState('');
   const [requestedClosingDate, setRequestedClosingDate] = useState<Date>();
 
@@ -89,12 +90,22 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                         <Input id="afterRepairValue" type="number" placeholder="e.g., 550000" value={afterRepairValue} onChange={e => setAfterRepairValue(e.target.value)} />
                     </div>
                 </div>
-                <div className="grid md:grid-cols-2 gap-4">
+                 <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="propertySqFt">Subject Property Square Footage</Label>
+                        <Input id="propertySqFt" type="number" placeholder="e.g., 2000" value={propertySqFt} onChange={e => setPropertySqFt(e.target.value)} />
+                    </div>
                     <div className="space-y-2">
                         <Label htmlFor="lotSize">Lot Size (in sq. ft. or acres)</Label>
                         <Input id="lotSize" placeholder="e.g., 10,000 sq. ft. or 0.23 acres" value={lotSize} onChange={e => setLotSize(e.target.value)} />
                     </div>
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
+                        <Label htmlFor="constructionTime">Estimated Time to Construct (in months)</Label>
+                        <Input id="constructionTime" type="number" placeholder="e.g., 6" value={constructionTime} onChange={e => setConstructionTime(e.target.value)} />
+                    </div>
+                     <div className="space-y-2">
                         <Label htmlFor="closingDate">Requested Closing Date</Label>
                          <Popover>
                             <PopoverTrigger asChild>
@@ -119,10 +130,6 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                             </PopoverContent>
                         </Popover>
                     </div>
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="constructionTime">Estimated Time to Construct (in months)</Label>
-                    <Input id="constructionTime" type="number" placeholder="e.g., 6" value={constructionTime} onChange={e => setConstructionTime(e.target.value)} />
                 </div>
             </CardContent>
         </Card>
