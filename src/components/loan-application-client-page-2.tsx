@@ -12,6 +12,7 @@ import { useDocumentContext } from '@/contexts/document-context';
 import { CheckCircle, ArrowLeft, ArrowRight, User, Briefcase, FileText, FileUp, Check, AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { getDocumentChecklist } from '@/ai/flows/document-checklist-flow';
+import { useAuth } from '@/contexts/auth-context';
 
 type UploadStatus = 'pending' | 'uploaded' | 'verified' | 'missing';
 
