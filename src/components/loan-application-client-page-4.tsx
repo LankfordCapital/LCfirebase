@@ -6,7 +6,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from './ui/label';
+import { Label } from '@/components/ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
 import { CheckCircle, ArrowLeft, ArrowRight, BookUser, Building, Shield, Briefcase, FileText, FileUp } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -150,7 +150,7 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
   return (
     <div className="space-y-6">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 4 of 6</h1>
+            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 4 of 7</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         

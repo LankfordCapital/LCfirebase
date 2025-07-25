@@ -2,7 +2,7 @@
 'use client';
 
 import { Suspense } from 'react';
-import { LoanApplicationClientPage5 } from '@/components/loan-application-client-page-5';
+import { LoanApplicationClientPage7 } from '@/components/loan-application-client-page-7';
 import { Skeleton } from '@/components/ui/skeleton';
 
 function ApplicationSkeleton() {
@@ -20,12 +20,12 @@ function ApplicationSkeleton() {
     )
 }
 
-export default function LoanApplicationPage5({ params }: { params: { program: string } }) {
+export default function LoanApplicationPage7({ params }: { params: { program: string } }) {
     const loanProgram = decodeURIComponent(params.program.replace(/-/g, ' ').replace(/\band\b/g, '&')).replace(/(^\w|\s\w)/g, m => m.toUpperCase());
 
     return (
         <Suspense fallback={<ApplicationSkeleton />}>
-            <LoanApplicationClientPage5 loanProgram={loanProgram} />
+            <LoanApplicationClientPage7 loanProgram={loanProgram} />
         </Suspense>
     )
 }

@@ -5,7 +5,6 @@
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { ComparableSales } from './comparable-sales';
 import { DealHistory } from './deal-history';
 
 export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: string}) {
@@ -19,13 +18,11 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
   return (
     <div className="space-y-6">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 5 of 6</h1>
+            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 5 of 7</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
         <DealHistory />
-
-        <ComparableSales />
 
         <div className="flex justify-between items-center">
             <Button variant="outline" onClick={() => router.back()}>

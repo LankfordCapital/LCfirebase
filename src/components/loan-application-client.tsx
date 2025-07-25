@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -8,12 +9,12 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2, ArrowRight, Calendar as CalendarIcon, Building2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Label } from './ui/label';
+import { Label } from '@/components/ui/label';
 import { aiPreUnderwriter, type AiPreUnderwriterOutput } from '@/ai/flows/ai-pre-underwriter';
 import { useDocumentContext } from '@/contexts/document-context';
 import { useRouter } from 'next/navigation';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
-import { Calendar } from './ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useAuth } from '@/contexts/auth-context';
@@ -42,7 +43,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   return (
     <div className="space-y-6">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 1 of 6</h1>
+            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 1 of 7</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         

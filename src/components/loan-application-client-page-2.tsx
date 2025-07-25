@@ -7,12 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Label } from './ui/label';
+import { Label } from '@/components/ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
 import { CheckCircle, ArrowLeft, ArrowRight, User, Briefcase, FileText, FileUp, Check, AlertTriangle, Loader2, Landmark } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { getDocumentChecklist } from '@/ai/flows/document-checklist-flow';
 import { useAuth } from '@/contexts/auth-context';
+import { DealHistory } from '@/components/deal-history';
 import { scanAssetStatement, type ScanAssetStatementOutput } from '@/ai/flows/asset-statement-scanner';
 
 type UploadStatus = 'pending' | 'uploaded' | 'verified' | 'missing';
@@ -233,7 +234,7 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
   return (
     <div className="space-y-6">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 2 of 6</h1>
+            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 2 of 7</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
