@@ -13,6 +13,7 @@ import { CheckCircle, ArrowLeft, ArrowRight, User, Briefcase, FileText, FileUp, 
 import { useRouter } from 'next/navigation';
 import { getDocumentChecklist } from '@/ai/flows/document-checklist-flow';
 import { useAuth } from '@/contexts/auth-context';
+import { DealHistory } from './deal-history';
 
 type UploadStatus = 'pending' | 'uploaded' | 'verified' | 'missing';
 
@@ -146,14 +147,13 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
     return <div>Could not load checklist. Please go back and select a loan program.</div>
   }
   
-  const renderChecklistCategory = (category: keyof CategorizedDocuments, title: string, icon: React.ReactNode, extraDocs?: string[]) => (
+  const renderChecklistCategory = (category: keyof CategorizedDocuments, title: string, icon: React.ReactNode) => (
       <Card>
           <CardHeader>
               <CardTitle className="flex items-center gap-2">{icon} {title}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
               {checklist[category].map(item => <DocumentUploadInput key={item.name} name={item.name} />)}
-              {extraDocs?.map(docName => <DocumentUploadInput key={docName} name={docName} />)}
           </CardContent>
       </Card>
   );
@@ -165,7 +165,10 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
-        {renderChecklistCategory('borrower', 'Borrower Documents', <User className="h-5 w-5 text-primary" />, ["3 Months Personal Asset Statements"])}
+        {renderChecklistCategory('borrower', 'Borrower Documents', <User className="h-5 w-5 text-primary" />)}
+        
+        <DealHistory />
+
         {renderChecklistCategory('company', 'Company Documents', <Briefcase className="h-5 w-5 text-primary" />)}
         
         <div className="flex justify-between items-center">
