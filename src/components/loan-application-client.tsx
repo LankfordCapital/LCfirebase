@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -206,10 +207,10 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
     return <div>Could not load application. Please go back and select a loan program.</div>;
   }
   
-  const renderChecklistCategory = (category: keyof CategorizedDocuments, title: string) => (
+  const renderChecklistCategory = (category: keyof CategorizedDocuments, title: string, icon: React.ReactNode) => (
       <Card>
           <CardHeader>
-              <CardTitle>{title}</CardTitle>
+              <CardTitle className="flex items-center gap-2">{icon} {title}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
               {checklist[category].map(item => {
@@ -235,7 +236,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   return (
     <div className="space-y-6">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 1 of 2</h1>
+            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 1 of 4</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
@@ -278,9 +279,9 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
             </CardContent>
         </Card>
 
-        {renderChecklistCategory('borrower', 'Borrower Documents')}
-        {renderChecklistCategory('company', 'Company Documents')}
-        {renderChecklistCategory('subjectProperty', 'Subject Property Documents')}
+        {renderChecklistCategory('borrower', 'Borrower Documents', <User className="h-5 w-5 text-primary" />)}
+        {renderChecklistCategory('company', 'Company Documents', <Briefcase className="h-5 w-5 text-primary" />)}
+        {renderChecklistCategory('subjectProperty', 'Subject Property Documents', <File className="h-5 w-5 text-primary" />)}
 
         <div className="flex justify-between items-center">
             <Button onClick={handleAnalyzeDocuments} disabled={isAnalyzing}>

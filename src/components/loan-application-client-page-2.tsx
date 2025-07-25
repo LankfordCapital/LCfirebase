@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
@@ -10,7 +11,7 @@ import { Label } from './ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { useDocumentContext } from '@/contexts/document-context';
 import { ComparableSales } from './comparable-sales';
-import { CheckCircle, Briefcase, Shield, FileText, ArrowLeft } from 'lucide-react';
+import { CheckCircle, Briefcase, Shield, FileText, ArrowLeft, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: string}) {
@@ -66,12 +67,14 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
         title: "Information Saved",
         description: "All the details from page 2 have been saved.",
     });
+    const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
+    router.push(`/dashboard/application/${programSlug}/page-3`);
   }
 
   return (
     <div className="space-y-6">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 2 of 2</h1>
+            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 2 of 4</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
@@ -157,7 +160,7 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="titleAgentEmail">Escrow Agent Email</Label>
-                            <Input id="titleAgentEmail" type="email" value={titleAgentEmail} onChange={e => setTitleAgentEmail(e.target.value)} />
+                            <Input id="titleAgentEmail" type="email" value={titleAgentEmail} onChange={e => setInsuranceAgentEmail(e.target.value)} />
                         </div>
                     </div>
                      <DocumentUploadInput name="Preliminary Title Commitment" />
@@ -187,10 +190,9 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
                <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 1
             </Button>
             <Button onClick={handleSaveChanges}>
-                Save & Submit Application
+                Save & Continue to Page 3 <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
         </div>
     </div>
   );
 }
-
