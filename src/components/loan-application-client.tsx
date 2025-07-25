@@ -25,6 +25,8 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [loanAmount, setLoanAmount] = useState('');
   const [purchasePrice, setPurchasePrice] = useState('');
   const [rehabCost, setRehabCost] = useState('');
+  const [asIsValue, setAsIsValue] = useState('');
+  const [afterRepairValue, setAfterRepairValue] = useState('');
   const [lotSize, setLotSize] = useState('');
   const [constructionTime, setConstructionTime] = useState('');
   const [requestedClosingDate, setRequestedClosingDate] = useState<Date>();
@@ -78,6 +80,16 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                 <div className="space-y-2">
                     <Label htmlFor="rehabCost">Requested Rehab Amount</Label>
                     <Input id="rehabCost" type="number" placeholder="e.g., 50000" value={rehabCost} onChange={e => setRehabCost(e.target.value)} />
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="asIsValue">As Is Value</Label>
+                        <Input id="asIsValue" type="number" placeholder="e.g., 350000" value={asIsValue} onChange={e => setAsIsValue(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="afterRepairValue">After Repair Value (ARV)</Label>
+                        <Input id="afterRepairValue" type="number" placeholder="e.g., 550000" value={afterRepairValue} onChange={e => setAfterRepairValue(e.target.value)} />
+                    </div>
                 </div>
                 <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
