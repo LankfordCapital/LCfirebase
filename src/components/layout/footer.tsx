@@ -4,11 +4,25 @@ import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
 import { Twitter, Linkedin, Facebook } from 'lucide-react';
 
+const lendingProducts1 = [
+    { href: '/lending/residential-noo', label: 'Residential NOO' },
+    { href: '/lending/commercial', label: 'Commercial' },
+    { href: '/lending/industrial', label: 'Industrial' },
+    { href: '/lending/land-acquisition', label: 'Land Acquisition' },
+];
+
+const lendingProducts2 = [
+    { href: '/lending/mezzanine-loans', label: 'Mezzanine Loans' },
+    { href: '/lending/mobilization-funding', label: 'Mobilization Funding' },
+    { href: '/lending/sba-loans', label: 'SBA Loans' },
+    { href: '/lending/equipment-financing', label: 'Equipment Financing' },
+]
+
 export function Footer() {
   return (
     <footer className="bg-primary/5 border-t">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           <div className="md:col-span-1">
             <Link href="/">
               <Logo className="h-10 w-auto" />
@@ -34,14 +48,24 @@ export function Footer() {
               </Button>
             </div>
           </div>
-          <div>
-            <h3 className="font-headline font-semibold text-primary">Lending</h3>
-            <ul className="mt-4 space-y-2">
-              <li><Link href="/lending/residential-noo" className="text-sm text-muted-foreground hover:text-primary">Residential NOO</Link></li>
-              <li><Link href="/lending/commercial" className="text-sm text-muted-foreground hover:text-primary">Commercial</Link></li>
-              <li><Link href="/lending/industrial" className="text-sm text-muted-foreground hover:text-primary">Industrial</Link></li>
-              <li><Link href="/lending/sba-loans" className="text-sm text-muted-foreground hover:text-primary">SBA Loans</Link></li>
-            </ul>
+          <div className="md:col-span-2">
+            <h3 className="font-headline font-semibold text-primary text-center">Lending</h3>
+            <div className="grid grid-cols-2 gap-8 mt-4">
+                <div>
+                    <ul className="space-y-2">
+                        {lendingProducts1.map(item => (
+                             <li key={item.href}><Link href={item.href} className="text-sm text-muted-foreground hover:text-primary">{item.label}</Link></li>
+                        ))}
+                    </ul>
+                </div>
+                <div>
+                     <ul className="space-y-2">
+                        {lendingProducts2.map(item => (
+                             <li key={item.href}><Link href={item.href} className="text-sm text-muted-foreground hover:text-primary">{item.label}</Link></li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
           </div>
            <div>
             <h3 className="font-headline font-semibold text-primary">Company</h3>
