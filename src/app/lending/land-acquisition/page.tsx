@@ -23,7 +23,7 @@ export default function LandAcquisitionPage() {
           playsInline
           className="absolute top-0 left-0 w-full h-full object-cover z-0"
         >
-          <source src="https://firebasestorage.googleapis.com/v0/b/lankford-homebase.firebasestorage.app/o/Adobe%20Express%20-%20shutterstock_1058475664%20(1).mp4?alt=media&token=8ccb373f-4c35-4f78-abe8-f059193863d6" type="video/mp4" />
+          <source src="https://firebasestorage.googleapis.com/v0/b/lankford-homebase.firebasestorage.app/o/Adobe%20Express%20-%20shutterstock_3610652399.mp4?alt=media&token=e3d9722d-1b03-4c8e-9b91-ce5da80c04e1" type="video/mp4" />
         </video>
         <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
         <div className="container relative z-20 mx-auto px-4 text-center">
