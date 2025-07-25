@@ -25,29 +25,44 @@ export default function AdminSignUpPage() {
   const [email, setEmail] = useState('admin@lankfordcapital.com');
   const [password, setPassword] = useState('admin123');
   const [isLoading, setIsLoading] = useState(false);
-  const { signUp } = useAuth();
+  const { signUp, signIn } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSignIn = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const userCredential = await signUp(email, password);
-      await updateProfile(userCredential.user, {
-        displayName: fullName
-      });
-      toast({
-        title: 'Admin User Created',
-        description: `Successfully created user: ${email}`,
-      })
-      router.push('/auth/signin');
+      await signIn(email, password);
+      router.push('/dashboard');
     } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Sign Up Failed',
-        description: error.message,
-      });
+      if(error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+        // If user not found, try to sign up
+        try {
+            const userCredential = await signUp(email, password);
+            await updateProfile(userCredential.user, {
+                displayName: fullName
+            });
+            toast({
+                title: 'Admin User Created',
+                description: `Successfully created user: ${email}`,
+            })
+            await signIn(email, password);
+            router.push('/dashboard');
+        } catch (signUpError: any) {
+            toast({
+                variant: 'destructive',
+                title: 'Sign Up Failed',
+                description: signUpError.message,
+            });
+        }
+      } else {
+         toast({
+            variant: 'destructive',
+            title: 'Sign In Failed',
+            description: error.message,
+        });
+      }
     } finally {
         setIsLoading(false);
     }
@@ -56,11 +71,11 @@ export default function AdminSignUpPage() {
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-primary/5 p-4">
       <Card className="w-full max-w-sm shadow-2xl">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSignIn}>
           <CardHeader className="text-center">
-            <CardTitle className="font-headline text-2xl">Admin User Creation</CardTitle>
+            <CardTitle className="font-headline text-2xl">Admin Sign In</CardTitle>
             <CardDescription>
-              Click the button below to create your admin user. You can then use these credentials to sign into any dashboard.
+              Use the credentials below to access all dashboards. If the account doesn't exist, it will be created.
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
@@ -76,7 +91,7 @@ export default function AdminSignUpPage() {
           <CardFooter className="flex flex-col gap-4">
             <Button className="w-full" type="submit" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create Admin User
+              Sign In as Admin
             </Button>
           </CardFooter>
         </form>

@@ -94,6 +94,11 @@ export function Header() {
                     Broker Sign In
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/auth/admin-signup">
+                    Admin Sign In
+                  </Link>
+                </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </nav>
