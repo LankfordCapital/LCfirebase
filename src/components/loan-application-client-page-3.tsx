@@ -1,8 +1,9 @@
 
+
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, Upload, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Upload, X, Briefcase, CheckCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ComparableSales } from './comparable-sales';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
@@ -27,14 +28,30 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
   const [photos, setPhotos] = useState<PhotoFile[]>([]);
   const [propertyType, setPropertyType] = useState('');
   const [numberOfUnits, setNumberOfUnits] = useState('');
+  const [gcName, setGcName] = useState('');
+  const [gcPhone, setGcPhone] = useState('');
+  const [gcEmail, setGcEmail] = useState('');
 
+  const showConstructionFields = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('fix and flip') || loanProgram.toLowerCase().includes('rehab');
 
   const handleContinue = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
     router.push(`/dashboard/application/${programSlug}/page-4`);
   }
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDocFileChange = useCallback(async (itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+        const file = event.target.files[0];
+        
+        await addDocument({
+            name: itemName,
+            file,
+            status: 'uploaded',
+        });
+    }
+  }, [addDocument]);
+
+  const handlePhotoFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
         const files = Array.from(event.target.files);
         if (photos.length + files.length > 15) {
@@ -67,6 +84,20 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
 
   const handleRemovePhoto = (id: string) => {
     setPhotos(prevPhotos => prevPhotos.filter(photo => photo.id !== id));
+  };
+
+  const DocumentUploadInput = ({ name }: { name: string }) => {
+    const doc = documents[name];
+    const fileInputId = `upload-${name.replace(/\s+/g, '-')}`;
+    return (
+        <div className="space-y-2">
+            <Label htmlFor={fileInputId}>{name}</Label>
+            <div className="flex items-center gap-2">
+                <Input id={fileInputId} type="file" onChange={(e) => handleDocFileChange(name, e)} disabled={!!doc} />
+                {doc && <CheckCircle className="h-5 w-5 text-green-500" />}
+            </div>
+        </div>
+    );
   };
 
 
@@ -106,6 +137,36 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
             </CardContent>
         </Card>
 
+        {showConstructionFields && (
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="gcName">Contractor Name</Label>
+                            <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="gcPhone">Contractor Phone</Label>
+                            <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} />
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="gcEmail">Contractor Email</Label>
+                        <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} />
+                    </div>
+                     <DocumentUploadInput name="General Contractor License" />
+                     <DocumentUploadInput name="General Contractor Insurance" />
+                     <DocumentUploadInput name="General Contractor Bond" />
+                     <DocumentUploadInput name="General Contractor's Contract to Build" />
+                     <DocumentUploadInput name="Construction Budget" />
+                     <DocumentUploadInput name="Projected Draw Schedule" />
+                </CardContent>
+            </Card>
+        )}
+
         <ComparableSales />
 
         <Card>
@@ -121,7 +182,7 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
                             <Input 
                                 id="property-photos-upload" 
                                 type="file" 
-                                onChange={handleFileChange} 
+                                onChange={handlePhotoFileChange} 
                                 multiple 
                                 accept="image/*"
                                 className="hidden"

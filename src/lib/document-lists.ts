@@ -1,4 +1,5 @@
 
+
 type DocumentList = {
     borrower: string[];
     company: string[];
@@ -80,6 +81,9 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Property Tax Certificate",
             "Appraisal",
             "Collateral Desktop Analysis",
+            "General Contractor License",
+            "General Contractor Insurance",
+            "General Contractor's Contract to Build",
         ]
     },
     "Residential NOO - DSCR": {
@@ -215,6 +219,9 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Property Tax Certificate",
             "Appraisal",
             "Collateral Desktop Analysis",
+            "General Contractor License",
+            "General Contractor Insurance",
+            "General Contractor's Contract to Build",
         ]
     },
     "Commercial - Acquisition & Bridge": {

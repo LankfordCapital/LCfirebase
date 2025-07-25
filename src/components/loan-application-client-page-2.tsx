@@ -9,14 +9,10 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from './ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
-import { CheckCircle, Briefcase, Shield, FileText, ArrowLeft, ArrowRight, BookUser, Building } from 'lucide-react';
+import { CheckCircle, Shield, ArrowLeft, ArrowRight, BookUser, Building } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: string}) {
-  const [gcName, setGcName] = useState('');
-  const [gcPhone, setGcPhone] = useState('');
-  const [gcEmail, setGcEmail] = useState('');
-
   const [insuranceAgentName, setInsuranceAgentName] = useState('');
   const [insuranceAgentCompany, setInsuranceAgentCompany] = useState('');
   const [insuranceAgentPhone, setInsuranceAgentPhone] = useState('');
@@ -25,19 +21,17 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
   const [titleAgentName, setTitleAgentName] = useState('');
   const [titleAgentCompany, setTitleAgentCompany] = useState('');
   const [titleAgentPhone, setTitleAgentPhone] = useState('');
-  const [titleAgentEmail, setEscrowAgentEmail] = useState('');
+  const [titleAgentEmail, setTitleAgentEmail] = useState('');
   
   const [escrowAgentName, setEscrowAgentName] = useState('');
   const [escrowAgentCompany, setEscrowAgentCompany] = useState('');
   const [escrowAgentPhone, setEscrowAgentPhone] = useState('');
-  const [escrowAgentEmail, setTitleAgentEmail] = useState('');
+  const [escrowAgentEmail, setEscrowAgentEmail] = useState('');
 
   const { documents, addDocument } = useDocumentContext();
   const router = useRouter();
   const { toast } = useToast();
   
-  const showConstructionFields = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('fix and flip') || loanProgram.toLowerCase().includes('rehab');
-
   const handleFileChange = useCallback(async (itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
         const file = event.target.files[0];
@@ -80,36 +74,6 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
             <h1 className="font-headline text-3xl font-bold">Loan Application - Page 2 of 4</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
-        
-        {showConstructionFields && (
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="grid md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="gcName">Contractor Name</Label>
-                            <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="gcPhone">Contractor Phone</Label>
-                            <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} />
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="gcEmail">Contractor Email</Label>
-                        <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} />
-                    </div>
-                     <DocumentUploadInput name="General Contractor License" />
-                     <DocumentUploadInput name="General Contractor Insurance" />
-                     <DocumentUploadInput name="General Contractor Bond" />
-                     <DocumentUploadInput name="General Contractor's Contract to Build" />
-                     <DocumentUploadInput name="Construction Budget" />
-                     <DocumentUploadInput name="Projected Draw Schedule" />
-                </CardContent>
-            </Card>
-        )}
         
         <Card>
             <CardHeader>
