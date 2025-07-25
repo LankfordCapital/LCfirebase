@@ -83,7 +83,10 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Collateral Desktop Analysis",
             "General Contractor License",
             "General Contractor Insurance",
+            "General Contractor Bond",
             "General Contractor's Contract to Build",
+            "Construction Budget",
+            "Projected Draw Schedule"
         ]
     },
     "Residential NOO - DSCR": {
