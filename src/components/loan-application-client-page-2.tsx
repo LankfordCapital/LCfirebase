@@ -28,6 +28,7 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
   const [titleAgentCompany, setTitleAgentCompany] = useState('');
   const [titleAgentPhone, setTitleAgentPhone] = useState('');
   const [titleAgentEmail, setTitleAgentEmail] = useState('');
+  const [titleAgentAddress, setTitleAgentAddress] = useState('');
 
   const { documents, addDocument } = useDocumentContext();
   const router = useRouter();
@@ -153,6 +154,10 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
                             <Input id="titleAgentCompany" value={titleAgentCompany} onChange={e => setTitleAgentCompany(e.target.value)} />
                         </div>
                     </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="titleAgentAddress">Title Company Address</Label>
+                        <Input id="titleAgentAddress" value={titleAgentAddress} onChange={e => setTitleAgentAddress(e.target.value)} />
+                    </div>
                      <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="titleAgentPhone">Escrow Agent Phone</Label>
@@ -160,7 +165,7 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="titleAgentEmail">Escrow Agent Email</Label>
-                            <Input id="titleAgentEmail" type="email" value={titleAgentEmail} onChange={e => setInsuranceAgentEmail(e.target.value)} />
+                            <Input id="titleAgentEmail" type="email" value={titleAgentEmail} onChange={e => setTitleAgentEmail(e.target.value)} />
                         </div>
                     </div>
                      <DocumentUploadInput name="Preliminary Title Commitment" />
