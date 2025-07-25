@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Loader2, Upload, FileText, AlertTriangle, CheckCircle, FileUp, Check } from 'lucide-react';
+import { Loader2, Upload, FileText, AlertTriangle, CheckCircle, FileUp, Check, Building2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from './ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
@@ -33,6 +33,11 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [isLoadingChecklist, setIsLoadingChecklist] = useState(true);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AiPreUnderwriterOutput | null>(null);
+  
+  const [propertyAddress, setPropertyAddress] = useState('');
+  const [loanAmount, setLoanAmount] = useState('');
+  const [purchasePrice, setPurchasePrice] = useState('');
+  const [rehabCost, setRehabCost] = useState('');
 
   const { documents, addDocument } = useDocumentContext();
   const { toast } = useToast();
@@ -172,6 +177,8 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
     }
   };
 
+  const showRehabCost = loanProgram.toLowerCase().includes('fix and flip') || loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('rehab');
+
   if (isLoadingChecklist) {
     return <div>Loading Application...</div>;
   }
@@ -209,6 +216,35 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
             <h1 className="font-headline text-3xl font-bold">Loan Application</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
+        
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Building2 className="h-5 w-5 text-primary" /> Loan Details</CardTitle>
+                <CardDescription>Provide the key details about the loan you are requesting.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="propertyAddress">Subject Property Address</Label>
+                    <Input id="propertyAddress" placeholder="123 Main St, Anytown, USA" value={propertyAddress} onChange={e => setPropertyAddress(e.target.value)} />
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="loanAmount">Loan Amount</Label>
+                        <Input id="loanAmount" type="number" placeholder="e.g., 300000" value={loanAmount} onChange={e => setLoanAmount(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="purchasePrice">Purchase Price</Label>
+                        <Input id="purchasePrice" type="number" placeholder="e.g., 400000" value={purchasePrice} onChange={e => setPurchasePrice(e.target.value)} />
+                    </div>
+                </div>
+                {showRehabCost && (
+                    <div className="space-y-2">
+                        <Label htmlFor="rehabCost">Estimated Rehab/Construction Cost</Label>
+                        <Input id="rehabCost" type="number" placeholder="e.g., 50000" value={rehabCost} onChange={e => setRehabCost(e.target.value)} />
+                    </div>
+                )}
+            </CardContent>
+        </Card>
 
         {renderChecklistCategory('borrower', 'Borrower Documents')}
         {renderChecklistCategory('company', 'Company Documents')}
