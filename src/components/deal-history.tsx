@@ -6,9 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { PlusCircle, Trash2, Download, Separator } from 'lucide-react';
+import { PlusCircle, Trash2, Download } from 'lucide-react';
 import { Label } from './ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
+import { Separator } from '@/components/ui/separator';
 
 type Deal = {
   id: string;
