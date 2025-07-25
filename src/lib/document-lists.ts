@@ -162,6 +162,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Appraisal Report",
             "Environmental Report",
             "Purchase and Sale Agreement (or HUD-1 if refinance)",
+            "Evidence of Earnest Money Deposit",
             "30-Day Payoff Statement with Per Diem (if refinance)",
             "Preliminary Title Commitment",
             "Escrow Instructions",
@@ -475,5 +476,3 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         subjectProperty: ["Purchase and Sale Agreement", "Appraisal Report"]
     }
 }
-
-    

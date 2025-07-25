@@ -284,6 +284,8 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                         </div>
                         <DocumentUploadInput name="Construction Budget" />
                         <DocumentUploadInput name="Projected Draw Schedule" />
+                        <DocumentUploadInput name="Approved or Pre-approved Plans" />
+                        <DocumentUploadInput name="Evidence of Earnest Money Deposit" />
                     </>
                 )}
             </CardContent>
@@ -422,5 +424,3 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
         )}
     </div>
   );
-
-    
