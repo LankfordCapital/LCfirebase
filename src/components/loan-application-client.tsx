@@ -40,6 +40,8 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [originalPurchasePrice, setOriginalPurchasePrice] = useState('');
   const [purchaseDate, setPurchaseDate] = useState<Date>();
   const [currentDebt, setCurrentDebt] = useState('');
+  const [afterConstructedValue, setAfterConstructedValue] = useState('');
+  const [stabilizedValue, setStabilizedValue] = useState('');
 
   const router = useRouter();
   
@@ -49,8 +51,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   };
 
   const isBridgeLoan = loanProgram.includes('Bridge');
-  const isDSCR = loanProgram.includes('DSCR');
-  const isFixAndFlip = loanProgram.includes('Fix and Flip');
+  const isCommercialGroundUp = loanProgram === 'Commercial - Ground Up Construction';
 
   return (
     <div className="space-y-6">
@@ -145,25 +146,31 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                     )}
                 </div>
                 
-                {isDSCR && (
-                    <div className="space-y-2">
-                        <Label htmlFor="monthlyRentalAmount">Monthly Rental Amount</Label>
-                        <Input id="monthlyRentalAmount" type="number" placeholder="e.g., 2500" value={monthlyRentalAmount} onChange={e => setMonthlyRentalAmount(e.target.value)} />
-                    </div>
-                )}
+                <div className="space-y-2">
+                    <Label htmlFor="monthlyRentalAmount">Monthly Rental Amount</Label>
+                    <Input id="monthlyRentalAmount" type="number" placeholder="e.g., 2500" value={monthlyRentalAmount} onChange={e => setMonthlyRentalAmount(e.target.value)} />
+                </div>
                 
                 <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="asIsValue">As Is Value</Label>
                         <Input id="asIsValue" type="number" placeholder="e.g., 350000" value={asIsValue} onChange={e => setAsIsValue(e.target.value)} />
                     </div>
-                    {isFixAndFlip && (
-                      <div className="space-y-2">
-                          <Label htmlFor="afterRepairValue">After Repair Value</Label>
-                          <Input id="afterRepairValue" type="number" placeholder="e.g., 500000" value={afterRepairValue} onChange={e => setAfterRepairValue(e.target.value)} />
-                      </div>
-                    )}
                 </div>
+                
+                {isCommercialGroundUp && (
+                     <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="afterConstructedValue">After Constructed Value</Label>
+                            <Input id="afterConstructedValue" type="number" placeholder="e.g., 1000000" value={afterConstructedValue} onChange={e => setAfterConstructedValue(e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="stabilizedValue">Stabilized Value</Label>
+                            <Input id="stabilizedValue" type="number" placeholder="e.g., 1200000" value={stabilizedValue} onChange={e => setStabilizedValue(e.target.value)} />
+                        </div>
+                    </div>
+                )}
+                
                  <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="propertySqFt">Subject Property Square Footage</Label>
