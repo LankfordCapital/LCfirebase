@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useAuth } from '@/contexts/auth-context';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 
 export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [propertyAddress, setPropertyAddress] = useState('');
@@ -35,6 +36,10 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [requestedClosingDate, setRequestedClosingDate] = useState<Date>();
   const [projectChange, setProjectChange] = useState('');
   const [monthlyRentalAmount, setMonthlyRentalAmount] = useState('');
+  const [transactionType, setTransactionType] = useState('purchase');
+  const [originalPurchasePrice, setOriginalPurchasePrice] = useState('');
+  const [purchaseDate, setPurchaseDate] = useState<Date>();
+  const [currentDebt, setCurrentDebt] = useState('');
 
   const router = useRouter();
   
@@ -44,6 +49,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   };
 
   const isBridgeLoan = loanProgram.includes('Bridge');
+  const isCommercialGUC = loanProgram === 'Commercial - Ground Up Construction';
 
   return (
     <div className="space-y-6">
@@ -72,16 +78,80 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                         <Input id="propertyTaxes" type="number" placeholder="e.g., 5000" value={propertyTaxes} onChange={e => setPropertyTaxes(e.target.value)} />
                     </div>
                 </div>
-                <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="loanAmount">Loan Amount</Label>
-                        <Input id="loanAmount" type="number" placeholder="e.g., 300000" value={loanAmount} onChange={e => setLoanAmount(e.target.value)} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="purchasePrice">Purchase Price</Label>
-                        <Input id="purchasePrice" type="number" placeholder="e.g., 400000" value={purchasePrice} onChange={e => setPurchasePrice(e.target.value)} />
-                    </div>
+                <div className="space-y-2">
+                    <Label htmlFor="loanAmount">Loan Amount</Label>
+                    <Input id="loanAmount" type="number" placeholder="e.g., 300000" value={loanAmount} onChange={e => setLoanAmount(e.target.value)} />
                 </div>
+                
+                {isCommercialGUC && (
+                  <div className="space-y-4 pt-4 border-t">
+                      <Label className="font-semibold">Transaction Type</Label>
+                      <RadioGroup value={transactionType} onValueChange={setTransactionType} className="flex space-x-4">
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="purchase" id="purchase" />
+                          <Label htmlFor="purchase">Purchase</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="refinance" id="refinance" />
+                          <Label htmlFor="refinance">Refinance</Label>
+                        </div>
+                      </RadioGroup>
+
+                      {transactionType === 'purchase' && (
+                          <div className="space-y-2">
+                              <Label htmlFor="purchasePrice">Purchase Price</Label>
+                              <Input id="purchasePrice" type="number" placeholder="e.g., 400000" value={purchasePrice} onChange={e => setPurchasePrice(e.target.value)} />
+                          </div>
+                      )}
+
+                      {transactionType === 'refinance' && (
+                          <div className="space-y-4">
+                              <div className="grid md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="originalPurchasePrice">Original Purchase Price</Label>
+                                    <Input id="originalPurchasePrice" type="number" placeholder="e.g., 350000" value={originalPurchasePrice} onChange={e => setOriginalPurchasePrice(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="purchaseDate">Date of Purchase</Label>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                            variant={"outline"}
+                                            className={cn(
+                                                "w-full justify-start text-left font-normal",
+                                                !purchaseDate && "text-muted-foreground"
+                                            )}
+                                            >
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            {purchaseDate ? format(purchaseDate, "PPP") : <span>Pick a date</span>}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0">
+                                            <Calendar
+                                            mode="single"
+                                            selected={purchaseDate}
+                                            onSelect={setPurchaseDate}
+                                            initialFocus
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                  <Label htmlFor="currentDebt">Current Debt on Property</Label>
+                                  <Input id="currentDebt" type="number" placeholder="e.g., 150000" value={currentDebt} onChange={e => setCurrentDebt(e.target.value)} />
+                              </div>
+                          </div>
+                      )}
+                  </div>
+                )}
+                
+                {!isCommercialGUC && (
+                  <div className="space-y-2">
+                      <Label htmlFor="purchasePrice">Purchase Price</Label>
+                      <Input id="purchasePrice" type="number" placeholder="e.g., 400000" value={purchasePrice} onChange={e => setPurchasePrice(e.target.value)} />
+                  </div>
+                )}
 
                 {loanProgram.includes('DSCR') && (
                     <div className="space-y-2">
