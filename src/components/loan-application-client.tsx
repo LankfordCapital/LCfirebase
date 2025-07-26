@@ -34,13 +34,14 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [propertySqFt, setPropertySqFt] = useState('');
   const [constructionTime, setConstructionTime] = useState('');
   const [requestedClosingDate, setRequestedClosingDate] = useState<Date>();
-  const [projectChange, setProjectChange] = useState('');
   const [transactionType, setTransactionType] = useState('purchase');
   const [originalPurchasePrice, setOriginalPurchasePrice] = useState('');
   const [purchaseDate, setPurchaseDate] = useState<Date>();
   const [currentDebt, setCurrentDebt] = useState('');
   const [afterConstructedValue, setAfterConstructedValue] = useState('');
   const [stabilizedValue, setStabilizedValue] = useState('');
+  const [propertyType, setPropertyType] = useState('');
+  const [otherPropertyType, setOtherPropertyType] = useState('');
 
   const router = useRouter();
   
@@ -48,8 +49,6 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
     router.push(`/dashboard/application/${programSlug}/page-2`);
   };
-
-  const isBridgeLoan = loanProgram.includes('Bridge');
 
   return (
     <div className="space-y-6">
@@ -78,6 +77,33 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                         <Input id="propertyTaxes" type="number" placeholder="e.g., 5000" value={propertyTaxes} onChange={e => setPropertyTaxes(e.target.value)} />
                     </div>
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="propertyType">Property Type</Label>
+                  <Select onValueChange={setPropertyType} value={propertyType}>
+                    <SelectTrigger id="propertyType">
+                      <SelectValue placeholder="Select a property type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="multi-family">Multi Family</SelectItem>
+                      <SelectItem value="mixed-use">Mixed Use</SelectItem>
+                      <SelectItem value="retail">Retail</SelectItem>
+                      <SelectItem value="restaurant">Restaurant</SelectItem>
+                      <SelectItem value="hospitality">Hospitality</SelectItem>
+                      <SelectItem value="office">Office</SelectItem>
+                      <SelectItem value="medical">Medical</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {propertyType === 'other' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="otherPropertyType">Please specify property type</Label>
+                    <Input id="otherPropertyType" value={otherPropertyType} onChange={e => setOtherPropertyType(e.target.value)} />
+                  </div>
+                )}
+
                 <div className="space-y-2">
                     <Label htmlFor="loanAmount">Loan Amount</Label>
                     <Input id="loanAmount" type="number" placeholder="e.g., 300000" value={loanAmount} onChange={e => setLoanAmount(e.target.value)} />
