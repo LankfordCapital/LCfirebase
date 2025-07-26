@@ -1,21 +1,51 @@
 
-
 'use client';
 
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
+import { Label } from '@/components/ui/label';
+import { useDocumentContext } from '@/contexts/document-context';
+import { ArrowLeft, ArrowRight, User, FileText, FileUp, Shield } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
+  const [gcName, setGcName] = useState('');
+  const [gcCompanyName, setGcCompanyName] = useState('');
+  const [gcPhone, setGcPhone] = useState('');
+  const [gcEmail, setGcEmail] = useState('');
+  
+  const { documents, addDocument } = useDocumentContext();
   const router = useRouter();
-  const { toast } = useToast();
+
+  const handleFileChange = useCallback(async (itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+        const file = event.target.files[0];
+        await addDocument({
+            name: itemName,
+            file,
+            status: 'uploaded',
+        });
+    }
+  }, [addDocument]);
+
+  const DocumentUploadInput = ({ name }: { name: string }) => {
+    const doc = documents[name];
+    const fileInputId = `upload-${name.replace(/\s+/g, '-')}`;
+    return (
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-md border">
+        <div className="flex items-center gap-3">
+          {doc?.status === 'uploaded' && <FileUp className="h-5 w-5 text-blue-500" />}
+          {!doc && <FileText className="h-5 w-5 text-muted-foreground" />}
+          <Label htmlFor={fileInputId} className="font-medium">{name}</Label>
+        </div>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Input id={fileInputId} type="file" className="w-full sm:w-auto" onChange={(e) => handleFileChange(name, e)} disabled={!!doc} />
+        </div>
+      </div>
+    );
+  };
   
   const handleContinue = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
@@ -31,11 +61,37 @@ export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: strin
         
         <Card>
             <CardHeader>
-                <CardTitle>Disclosures and Authorizations</CardTitle>
-                <CardDescription>This is a placeholder for page 8.</CardDescription>
+                <CardTitle className="flex items-center gap-2"><User className="h-5 w-5 text-primary"/> General Contractor Details</CardTitle>
+                <CardDescription>Provide the contact information and required documents for your General Contractor.</CardDescription>
             </CardHeader>
-            <CardContent>
-                <p>Content for page 8 will go here.</p>
+            <CardContent className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="gcName">GC Name</Label>
+                        <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} placeholder="John Builder" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="gcCompanyName">GC Company Name</Label>
+                        <Input id="gcCompanyName" value={gcCompanyName} onChange={e => setGcCompanyName(e.target.value)} placeholder="Builder Co." />
+                    </div>
+                </div>
+                 <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="gcPhone">GC Phone</Label>
+                        <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} placeholder="(555) 555-5555" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="gcEmail">GC Email</Label>
+                        <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} placeholder="john@builderco.com" />
+                    </div>
+                </div>
+
+                <div className="space-y-3 pt-4 border-t">
+                    <DocumentUploadInput name="General Contractor's Contract to Build" />
+                    <DocumentUploadInput name="General Contractor License" />
+                    <DocumentUploadInput name="General Contractor Bond" />
+                    <DocumentUploadInput name="General Contractor Insurance" />
+                </div>
             </CardContent>
         </Card>
         
