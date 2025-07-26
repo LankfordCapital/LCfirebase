@@ -42,11 +42,7 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
   const [isLoadingChecklist, setIsLoadingChecklist] = useState(true);
   const [numberOfSponsors, setNumberOfSponsors] = useState(1);
   
-  const [assetScanStates, setAssetScanStates] = useState({
-      month1: { balance: null, isScanning: false },
-      month2: { balance: null, isScanning: false },
-      month3: { balance: null, isScanning: false },
-  });
+  const [assetScanStates, setAssetScanStates] = useState<Record<string, Record<string, AssetScanState>>>({});
 
 
   const { documents, addDocument, getDocument } = useDocumentContext();
@@ -74,6 +70,18 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
     });
     return newChecklist;
   }, [getDocument]);
+  
+  useEffect(() => {
+    const initialStates: Record<string, Record<string, AssetScanState>> = {};
+    for (let i = 0; i < numberOfSponsors; i++) {
+        initialStates[i] = {
+            month1: { balance: null, isScanning: false },
+            month2: { balance: null, isScanning: false },
+            month3: { balance: null, isScanning: false },
+        };
+    }
+    setAssetScanStates(initialStates);
+  }, [numberOfSponsors]);
 
   useEffect(() => {
     if (loanProgram) {
@@ -121,7 +129,7 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
     }
   }, [addDocument, checklist, syncChecklistWithContext]);
 
-   const handleScanAssetStatement = async (monthKey: keyof typeof assetScanStates, sponsorIndex: number) => {
+   const handleScanAssetStatement = async (monthKey: keyof AssetScanState, sponsorIndex: number) => {
     const docName = `Personal Asset Statement (Month ${monthKey === 'month1' ? 1 : monthKey === 'month2' ? 2 : 3}) (Sponsor ${sponsorIndex + 1})`;
     const assetStatement = documents[docName];
 
@@ -134,12 +142,24 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
       return;
     }
 
-    setAssetScanStates(prev => ({ ...prev, [monthKey]: { balance: null, isScanning: true } }));
+    setAssetScanStates(prev => ({ 
+        ...prev, 
+        [sponsorIndex]: {
+            ...prev[sponsorIndex],
+            [monthKey]: { balance: null, isScanning: true }
+        }
+    }));
     
     try {
         const dataUri = assetStatement.dataUri;
         const result = await scanAssetStatement({ statementDataUri: dataUri });
-        setAssetScanStates(prev => ({ ...prev, [monthKey]: { balance: result, isScanning: false } }));
+        setAssetScanStates(prev => ({
+             ...prev,
+             [sponsorIndex]: {
+                ...prev[sponsorIndex],
+                [monthKey]: { balance: result, isScanning: false }
+             }
+        }));
         toast({
             title: 'Scan Complete',
             description: `The account balance for Month ${monthKey === 'month1' ? 1 : monthKey === 'month2' ? 2 : 3} has been extracted.`,
@@ -151,7 +171,13 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
         title: 'Scan Failed',
         description: `Could not extract the balance from the document for Month ${monthKey === 'month1' ? 1 : monthKey === 'month2' ? 2 : 3}. Please try again.`,
       });
-      setAssetScanStates(prev => ({ ...prev, [monthKey]: { ...prev[monthKey], isScanning: false } }));
+      setAssetScanStates(prev => ({ 
+          ...prev, 
+          [sponsorIndex]: {
+            ...prev[sponsorIndex],
+            [monthKey]: { ...prev[sponsorIndex][monthKey], isScanning: false }
+          }
+      }));
     }
   };
 
@@ -188,9 +214,12 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
     );
   };
   
-    const AssetStatementUploader = ({ month, monthKey, sponsorIndex }: { month: number, monthKey: keyof typeof assetScanStates, sponsorIndex: number }) => {
+    const AssetStatementUploader = ({ month, monthKey, sponsorIndex }: { month: number, monthKey: 'month1' | 'month2' | 'month3', sponsorIndex: number }) => {
         const docName = `Personal Asset Statement (Month ${month}) (Sponsor ${sponsorIndex + 1})`;
-        const scanState = assetScanStates[monthKey];
+        const scanState = assetScanStates[sponsorIndex]?.[monthKey];
+
+        if (!scanState) return null;
+
         return (
              <div className="space-y-4 rounded-md border p-4">
                  <h4 className="font-semibold">Personal Asset Statement - Month {month}</h4>
