@@ -109,6 +109,7 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
                 <DocumentUploadInput name="Executive Summary" />
                 <DocumentUploadInput name="Sources and Uses Statement" />
                 <DocumentUploadInput name="Marketing Plan" />
+                <DocumentUploadInput name="5 Years of Financial Projections" />
             </CardContent>
         </Card>
 
