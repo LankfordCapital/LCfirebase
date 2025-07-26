@@ -2,149 +2,62 @@
 
 'use client';
 
-import { useState, useId } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, ArrowRight, DollarSign, PlusCircle, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, FileText, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { Label } from './ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Separator } from './ui/separator';
 import { Input } from './ui/input';
-import { Textarea } from './ui/textarea';
-
-type BudgetItem = {
-  cost: number;
-  narrative: string;
-  timeToComplete: string;
-};
-
-type BudgetSection = {
-  [key: string]: BudgetItem;
-};
-
-const initialBudgetItem: BudgetItem = { cost: 0, narrative: '', timeToComplete: '' };
-
-const initialBudgetStructure: Record<string, string[]> = {
-    "Soft Costs": ["Permits & Fees", "Architectural & Engineering", "Legal & Accounting", "Developer Fees", "Contingency (Soft)"],
-    "Site Work": ["Demolition", "Excavation & Grading", "Utilities (Sewer, Water, Gas)", "Paving & Sidewalks", "Landscaping & Irrigation", "Fencing"],
-    "Foundation & Structure": ["Foundation Concrete", "Structural Steel / Rebar", "Framing Labor & Materials", "Sheathing"],
-    "Exterior": ["Roofing", "Siding/Stucco/Masonry", "Windows & Doors", "Exterior Paint", "Gutters & Downspouts"],
-    "Interior Systems": ["Plumbing (Rough-in & Finish)", "HVAC (Rough-in & Finish)", "Electrical (Rough-in & Finish)", "Low Voltage (Security, AV)", "Fire Sprinklers", "Insulation"],
-    "Interior Finishes": ["Drywall & Taping", "Interior Paint", "Flooring (Tile, Wood, Carpet)", "Cabinetry & Countertops", "Interior Doors & Trim", "Appliances", "Fixtures (Lighting & Plumbing)"],
-    "Amenities": ["Pool & Spa", "Outdoor Kitchen", "Decks & Patios", "Hardscaping", "Other Amenities"],
-    "Project Management": ["Supervision", "General Conditions", "Contingency (Hard)", "Final Cleanup"],
-};
+import { useDocumentContext } from '@/contexts/document-context';
 
 export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: string}) {
   const router = useRouter();
-  const [budgetStructure, setBudgetStructure] = useState(initialBudgetStructure);
-  const [budget, setBudget] = useState<Record<string, BudgetSection>>(() => {
-    const initialState: Record<string, BudgetSection> = {};
-    Object.keys(initialBudgetStructure).forEach(section => {
-        initialState[section] = {};
-        initialBudgetStructure[section].forEach(item => {
-            initialState[section][item] = { ...initialBudgetItem };
+  const [numberOfSponsors, setNumberOfSponsors] = useState(1);
+  const { documents, addDocument } = useDocumentContext();
+
+  const handleFileChange = async (itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+        const file = event.target.files[0];
+        await addDocument({
+            name: itemName,
+            file,
+            status: 'uploaded',
         });
-    });
-    return initialState;
-  });
-  
-  const [newSectionName, setNewSectionName] = useState('');
-
-  const handleBudgetChange = (section: string, item: string, field: keyof BudgetItem, value: string | number) => {
-    setBudget(prev => ({
-        ...prev,
-        [section]: {
-            ...prev[section],
-            [item]: {
-                ...prev[section][item],
-                [field]: value
-            }
-        }
-    }))
-  }
-  
-  const handleAddBudgetItem = (section: string) => {
-    const newItemName = `Custom Item ${Object.keys(budget[section]).length + 1}`;
-    setBudget(prev => ({
-        ...prev,
-        [section]: {
-            ...prev[section],
-            [newItemName]: { ...initialBudgetItem }
-        }
-    }))
-  }
-  
-  const handleRemoveBudgetItem = (section: string, item: string) => {
-    const newSection = { ...budget[section] };
-    delete newSection[item];
-    setBudget(prev => ({ ...prev, [section]: newSection }));
-  }
-
-  const handleAddSection = () => {
-    if (newSectionName && !budgetStructure[newSectionName]) {
-        setBudgetStructure(prev => ({...prev, [newSectionName]: [] }));
-        setBudget(prev => ({...prev, [newSectionName]: {} }));
-        setNewSectionName('');
     }
-  }
+  };
 
-
-  const calculateSectionTotal = (section: string) => {
-    return Object.values(budget[section] || {}).reduce((total, item) => total + (Number(item.cost) || 0), 0);
-  }
-
-  const calculateGrandTotal = () => {
-    return Object.keys(budget).reduce((total, section) => total + calculateSectionTotal(section), 0);
-  }
+  const DocumentUploadInput = ({ name }: { name: string }) => {
+    const doc = documents[name];
+    const fileInputId = `upload-${name.replace(/\s+/g, '-')}`;
+    return (
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-md border">
+        <div className="flex items-center gap-3">
+          <FileText className="h-5 w-5 text-muted-foreground" />
+          <Label htmlFor={fileInputId} className="font-medium">{name}</Label>
+        </div>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Input id={fileInputId} type="file" className="w-full sm:w-auto" onChange={(e) => handleFileChange(name, e)} disabled={!!doc} />
+        </div>
+      </div>
+    );
+  };
+  
+  const SponsorTaxSection = ({ sponsorIndex }: { sponsorIndex: number }) => (
+    <div key={sponsorIndex} className="space-y-4 pt-4 mt-4 border-t">
+      <h4 className="font-semibold text-lg">Sponsor #{sponsorIndex + 1} Personal Tax Returns</h4>
+      <DocumentUploadInput name={`Personal Tax Returns - Year 1 (Sponsor ${sponsorIndex + 1})`} />
+      <DocumentUploadInput name={`Personal Tax Returns - Year 2 (Sponsor ${sponsorIndex + 1})`} />
+      <DocumentUploadInput name={`Personal Tax Returns - Year 3 (Sponsor ${sponsorIndex + 1})`} />
+    </div>
+  );
 
   const handleContinue = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
     router.push(`/dashboard/application/${programSlug}/page-7`);
-  }
-  
-  const BudgetInputRow = ({ section, item }: { section: string, item: string }) => (
-    <div className="py-4 border-b relative">
-        <div className="flex justify-between items-center">
-             <Label className="font-semibold">{item}</Label>
-            {!initialBudgetStructure[section]?.includes(item) && (
-                <Button variant="ghost" size="icon" onClick={() => handleRemoveBudgetItem(section, item)} className="h-7 w-7">
-                    <Trash2 className="h-4 w-4" />
-                </Button>
-            )}
-        </div>
-        <div className="grid md:grid-cols-3 gap-4 mt-2">
-            <div className="space-y-2">
-                <Label htmlFor={`${section}-${item}-cost`} className="text-xs">Cost</Label>
-                <Input 
-                    id={`${section}-${item}-cost`} 
-                    type="number"
-                    placeholder="0.00" 
-                    value={budget[section][item].cost || ''}
-                    onChange={(e) => handleBudgetChange(section, item, 'cost', Number(e.target.value))}
-                />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor={`${section}-${item}-time`} className="text-xs">Time to Complete</Label>
-                <Input 
-                    id={`${section}-${item}-time`}
-                    placeholder="e.g., 2 weeks" 
-                    value={budget[section][item].timeToComplete}
-                    onChange={(e) => handleBudgetChange(section, item, 'timeToComplete', e.target.value)}
-                />
-            </div>
-             <div className="space-y-2 md:col-span-3">
-                <Label htmlFor={`${section}-${item}-narrative`} className="text-xs">Narrative Description</Label>
-                <Textarea 
-                    id={`${section}-${item}-narrative`}
-                    placeholder="Describe the scope of work for this item..." 
-                    value={budget[section][item].narrative}
-                    onChange={(e) => handleBudgetChange(section, item, 'narrative', e.target.value)}
-                />
-            </div>
-        </div>
-    </div>
-  );
+  };
 
   return (
     <div className="space-y-6">
@@ -155,49 +68,28 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
         
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2"><DollarSign className="h-5 w-5 text-primary"/> Construction Budget</CardTitle>
-                <CardDescription>Provide a detailed breakdown of the construction costs. This information is critical for underwriting.</CardDescription>
+                <CardTitle className="flex items-center gap-2"><User className="h-5 w-5 text-primary"/> Personal Tax Returns</CardTitle>
+                <CardDescription>Please upload the last 3 years of personal tax returns for each sponsor.</CardDescription>
             </CardHeader>
             <CardContent>
-                <Accordion type="multiple" defaultValue={["Soft Costs", "Site Work"]} className="w-full">
-                    {Object.keys(budgetStructure).map((section) => (
-                        <AccordionItem key={section} value={section}>
-                            <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                                <div className="flex justify-between w-full pr-4">
-                                    <span>{section}</span>
-                                    <span className="text-primary font-mono">{calculateSectionTotal(section).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>
-                                </div>
-                            </AccordionTrigger>
-                            <AccordionContent className="px-1">
-                                {Object.keys(budget[section]).map(item => <BudgetInputRow key={item} section={section} item={item} />)}
-                                <div className="pt-4">
-                                     <Button variant="outline" size="sm" onClick={() => handleAddBudgetItem(section)}>
-                                        <PlusCircle className="mr-2 h-4 w-4" /> Add Line Item to {section}
-                                    </Button>
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                    ))}
-                </Accordion>
-                <div className="mt-6 pt-4 border-t">
-                     <h3 className="text-lg font-semibold mb-2">Add New Budget Section</h3>
-                    <div className="flex gap-2">
-                        <Input
-                            placeholder="Enter new section name"
-                            value={newSectionName}
-                            onChange={(e) => setNewSectionName(e.target.value)}
-                        />
-                        <Button onClick={handleAddSection}>Add Section</Button>
-                    </div>
+                <div className="w-full sm:w-1/2 md:w-1/3">
+                    <Label htmlFor="num-sponsors">Number of Sponsors</Label>
+                    <Select value={String(numberOfSponsors)} onValueChange={(value) => setNumberOfSponsors(Number(value))}>
+                        <SelectTrigger id="num-sponsors">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                        {[1, 2, 3, 4, 5].map(num => (
+                            <SelectItem key={num} value={String(num)}>{num}</SelectItem>
+                        ))}
+                        </SelectContent>
+                    </Select>
                 </div>
-                <div className="mt-6 pt-4 border-t">
-                    <div className="flex justify-between items-center">
-                        <h3 className="text-xl font-bold">Grand Total</h3>
-                        <p className="text-2xl font-bold text-green-600 font-mono">
-                            {calculateGrandTotal().toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
-                        </p>
-                    </div>
-                </div>
+
+                {Array.from({ length: numberOfSponsors }).map((_, index) => (
+                    <SponsorTaxSection key={index} sponsorIndex={index} />
+                ))}
+
             </CardContent>
         </Card>
 
