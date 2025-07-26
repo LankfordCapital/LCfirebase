@@ -84,7 +84,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                     <Input id="loanAmount" type="number" placeholder="e.g., 300000" value={loanAmount} onChange={e => setLoanAmount(e.target.value)} />
                 </div>
                 
-                {loanProgram === 'Commercial - Ground Up Construction' && (
+                {loanProgram === 'Commercial - Ground Up Construction' ? (
                     <div className="space-y-4 pt-4 border-t">
                         <Label className="font-semibold">Transaction Type</Label>
                         <RadioGroup value={transactionType} onValueChange={setTransactionType} className="flex space-x-4">
@@ -145,7 +145,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                             </div>
                         )}
                     </div>
-                )}
+                ) : null}
                 
                 <div className="space-y-2">
                     <Label htmlFor="monthlyRentalAmount">Monthly Rental Amount</Label>
@@ -159,7 +159,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                     </div>
                 </div>
                 
-                {loanProgram === 'Commercial - Ground Up Construction' && (
+                {loanProgram === 'Commercial - Ground Up Construction' ? (
                      <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="afterConstructedValue">After Constructed Value</Label>
@@ -170,7 +170,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                             <Input id="stabilizedValue" type="number" placeholder="e.g., 1200000" value={stabilizedValue} onChange={e => setStabilizedValue(e.target.value)} />
                         </div>
                     </div>
-                )}
+                ) : null}
                 
                  <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
