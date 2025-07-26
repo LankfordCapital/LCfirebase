@@ -51,7 +51,6 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   };
 
   const isBridgeLoan = loanProgram.includes('Bridge');
-  const isCommercialGroundUp = loanProgram === 'Commercial - Ground Up Construction';
 
   return (
     <div className="space-y-6">
@@ -158,7 +157,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                     </div>
                 </div>
                 
-                {isCommercialGroundUp && (
+                {loanProgram === 'Commercial - Ground Up Construction' && (
                      <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="afterConstructedValue">After Constructed Value</Label>
@@ -247,3 +246,4 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
     </div>
   );
 }
+
