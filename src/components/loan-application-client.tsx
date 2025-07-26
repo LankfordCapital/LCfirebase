@@ -84,66 +84,68 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                     <Input id="loanAmount" type="number" placeholder="e.g., 300000" value={loanAmount} onChange={e => setLoanAmount(e.target.value)} />
                 </div>
                 
-                <div className="space-y-4 pt-4 border-t">
-                    <Label className="font-semibold">Transaction Type</Label>
-                    <RadioGroup value={transactionType} onValueChange={setTransactionType} className="flex space-x-4">
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="purchase" id="purchase" />
-                        <Label htmlFor="purchase">Purchase</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="refinance" id="refinance" />
-                        <Label htmlFor="refinance">Refinance</Label>
-                    </div>
-                    </RadioGroup>
-
-                    {transactionType === 'purchase' && (
-                        <div className="space-y-2">
-                            <Label htmlFor="purchasePrice">Purchase Price</Label>
-                            <Input id="purchasePrice" type="number" placeholder="e.g., 400000" value={purchasePrice} onChange={e => setPurchasePrice(e.target.value)} />
+                {loanProgram === 'Commercial - Ground Up Construction' && (
+                    <div className="space-y-4 pt-4 border-t">
+                        <Label className="font-semibold">Transaction Type</Label>
+                        <RadioGroup value={transactionType} onValueChange={setTransactionType} className="flex space-x-4">
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="purchase" id="purchase" />
+                            <Label htmlFor="purchase">Purchase</Label>
                         </div>
-                    )}
-
-                    {transactionType === 'refinance' && (
-                        <div className="space-y-4">
-                            <div className="grid md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="originalPurchasePrice">Original Purchase Price</Label>
-                                <Input id="originalPurchasePrice" type="number" placeholder="e.g., 350000" value={originalPurchasePrice} onChange={e => setOriginalPurchasePrice(e.target.value)} />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="purchaseDate">Date of Purchase</Label>
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                        variant={"outline"}
-                                        className={cn(
-                                            "w-full justify-start text-left font-normal",
-                                            !purchaseDate && "text-muted-foreground"
-                                        )}
-                                        >
-                                        <CalendarIcon className="mr-2 h-4 w-4" />
-                                        {purchaseDate ? format(purchaseDate, "PPP") : <span>Pick a date</span>}
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0">
-                                        <Calendar
-                                        mode="single"
-                                        selected={purchaseDate}
-                                        onSelect={setPurchaseDate}
-                                        initialFocus
-                                        />
-                                    </PopoverContent>
-                                </Popover>
-                            </div>
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="currentDebt">Current Debt on Property</Label>
-                                <Input id="currentDebt" type="number" placeholder="e.g., 150000" value={currentDebt} onChange={e => setCurrentDebt(e.target.value)} />
-                            </div>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="refinance" id="refinance" />
+                            <Label htmlFor="refinance">Refinance</Label>
                         </div>
-                    )}
-                </div>
+                        </RadioGroup>
+
+                        {transactionType === 'purchase' && (
+                            <div className="space-y-2">
+                                <Label htmlFor="purchasePrice">Purchase Price</Label>
+                                <Input id="purchasePrice" type="number" placeholder="e.g., 400000" value={purchasePrice} onChange={e => setPurchasePrice(e.target.value)} />
+                            </div>
+                        )}
+
+                        {transactionType === 'refinance' && (
+                            <div className="space-y-4">
+                                <div className="grid md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="originalPurchasePrice">Original Purchase Price</Label>
+                                    <Input id="originalPurchasePrice" type="number" placeholder="e.g., 350000" value={originalPurchasePrice} onChange={e => setOriginalPurchasePrice(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="purchaseDate">Date of Purchase</Label>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                            variant={"outline"}
+                                            className={cn(
+                                                "w-full justify-start text-left font-normal",
+                                                !purchaseDate && "text-muted-foreground"
+                                            )}
+                                            >
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            {purchaseDate ? format(purchaseDate, "PPP") : <span>Pick a date</span>}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0">
+                                            <Calendar
+                                            mode="single"
+                                            selected={purchaseDate}
+                                            onSelect={setPurchaseDate}
+                                            initialFocus
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="currentDebt">Current Debt on Property</Label>
+                                    <Input id="currentDebt" type="number" placeholder="e.g., 150000" value={currentDebt} onChange={e => setCurrentDebt(e.target.value)} />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
                 
                 <div className="space-y-2">
                     <Label htmlFor="monthlyRentalAmount">Monthly Rental Amount</Label>
@@ -246,4 +248,3 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
     </div>
   );
 }
-
