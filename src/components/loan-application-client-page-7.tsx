@@ -1,54 +1,47 @@
 
 'use client';
 
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, CreditCard, FileText, FileUp } from 'lucide-react';
+import { ArrowLeft, ArrowRight, DollarSign, PlusCircle, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { ComparableSales } from './comparable-sales';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Label } from './ui/label';
 import { Input } from './ui/input';
-import { useDocumentContext } from '@/contexts/document-context';
-import { useCallback } from 'react';
-import { ComparableRentals } from './comparable-rentals';
+import { Textarea } from './ui/textarea';
+
+type Draw = {
+  id: string;
+  workCompleted: string;
+  cost: number;
+  schedule: string;
+};
 
 export function LoanApplicationClientPage7({ loanProgram }: { loanProgram: string}) {
   const router = useRouter();
-  const { documents, addDocument } = useDocumentContext();
+  const [draws, setDraws] = useState<Draw[]>([
+    { id: `draw-${Date.now()}`, workCompleted: '', cost: 0, schedule: '' }
+  ]);
+  
+  const handleDrawChange = (id: string, field: keyof Omit<Draw, 'id'>, value: string | number) => {
+    setDraws(draws.map(draw => (draw.id === id ? { ...draw, [field]: value } : draw)));
+  };
+
+  const handleAddDraw = () => {
+    setDraws([...draws, { id: `draw-${Date.now()}`, workCompleted: '', cost: 0, schedule: '' }]);
+  };
+
+  const handleRemoveDraw = (id: string) => {
+    setDraws(draws.filter(draw => draw.id !== id));
+  };
+  
+  const calculateTotalDrawAmount = () => {
+    return draws.reduce((total, draw) => total + (Number(draw.cost) || 0), 0);
+  }
 
   const handleContinue = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
     router.push(`/dashboard/application/${programSlug}/page-8`);
-  }
-
-  const handleFileChange = useCallback(async (itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-        const file = event.target.files[0];
-        
-        await addDocument({
-            name: itemName,
-            file,
-            status: 'uploaded',
-        });
-    }
-  }, [addDocument]);
-
-  const DocumentUploadInput = ({ name }: { name: string }) => {
-    const doc = documents[name];
-    const fileInputId = `upload-${name.replace(/\s+/g, '-')}`;
-    
-    return (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-md border">
-            <div className="flex items-center gap-3">
-              {doc?.status === 'uploaded' && <FileUp className="h-5 w-5 text-blue-500" />}
-              {!doc && <FileText className="h-5 w-5 text-muted-foreground" />}
-              <Label htmlFor={fileInputId} className="font-medium">{name}</Label>
-            </div>
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <Input id={fileInputId} type="file" className="w-full sm:w-auto" onChange={(e) => handleFileChange(name, e)} disabled={!!doc} />
-            </div>
-        </div>
-    );
   };
 
   return (
@@ -58,20 +51,72 @@ export function LoanApplicationClientPage7({ loanProgram }: { loanProgram: strin
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
-        <ComparableSales />
-        <ComparableRentals />
-
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <CreditCard className="h-5 w-5 text-primary" />
-                    Payment Authorization
+                    <DollarSign className="h-5 w-5 text-primary" />
+                    Projected Draw Schedule
                 </CardTitle>
-                <CardDescription>Please upload images of the credit card to be used for the due diligence fees (credit report, background check, CDA, etc.).</CardDescription>
+                <CardDescription>Outline the projected draw schedule for your project. Detail the work planned, its cost, and the timeline for each draw.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-                <DocumentUploadInput name="Credit Card (Front)" />
-                <DocumentUploadInput name="Credit Card (Back)" />
+            <CardContent className="space-y-6">
+                {draws.map((draw, index) => (
+                    <div key={draw.id} className="p-4 border rounded-md space-y-4 relative">
+                        <div className="flex justify-between items-center">
+                            <h4 className="font-semibold">Draw #{index + 1}</h4>
+                            {draws.length > 1 && (
+                                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleRemoveDraw(draw.id)}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            )}
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor={`draw-cost-${draw.id}`}>Projected Draw Cost</Label>
+                                <Input 
+                                    id={`draw-cost-${draw.id}`} 
+                                    type="number" 
+                                    placeholder="0.00" 
+                                    value={draw.cost || ''}
+                                    onChange={(e) => handleDrawChange(draw.id, 'cost', Number(e.target.value))}
+                                />
+                            </div>
+                             <div className="space-y-2">
+                                <Label htmlFor={`draw-schedule-${draw.id}`}>Projected Schedule</Label>
+                                <Input 
+                                    id={`draw-schedule-${draw.id}`}
+                                    placeholder="e.g., Month 1" 
+                                    value={draw.schedule}
+                                    onChange={(e) => handleDrawChange(draw.id, 'schedule', e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor={`draw-work-${draw.id}`}>Work to be Completed</Label>
+                            <Textarea 
+                                id={`draw-work-${draw.id}`}
+                                placeholder="Describe the work to be completed for this draw..."
+                                value={draw.workCompleted}
+                                onChange={(e) => handleDrawChange(draw.id, 'workCompleted', e.target.value)}
+                            />
+                        </div>
+                    </div>
+                ))}
+
+                <div className="flex justify-start">
+                     <Button variant="outline" onClick={handleAddDraw}>
+                        <PlusCircle className="mr-2 h-4 w-4" /> Add Another Draw
+                    </Button>
+                </div>
+               
+                <div className="mt-6 pt-4 border-t">
+                    <div className="flex justify-between items-center">
+                        <h3 className="text-xl font-bold">Total Draw Amount</h3>
+                        <p className="text-2xl font-bold text-green-600 font-mono">
+                           {calculateTotalDrawAmount().toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                        </p>
+                    </div>
+                </div>
             </CardContent>
         </Card>
 
