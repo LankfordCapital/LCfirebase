@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useCallback } from 'react';
@@ -51,6 +52,15 @@ export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: strin
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
     router.push(`/dashboard/application/${programSlug}/page-9`);
   };
+
+  const handleGoBack = () => {
+    const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
+    if (loanProgram.includes('Conventional Long Term Debt')) {
+        router.push(`/dashboard/application/${programSlug}/page-5`);
+    } else {
+        router.push(`/dashboard/application/${programSlug}/page-7`);
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -107,8 +117,8 @@ export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: strin
         </Card>
 
         <div className="flex justify-between items-center">
-            <Button variant="outline" onClick={() => router.back()}>
-               <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 7
+            <Button variant="outline" onClick={handleGoBack}>
+               <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page {loanProgram.includes('Conventional Long Term Debt') ? '5' : '7'}
             </Button>
             <Button onClick={handleContinue}>
                 Continue to Page 9 <ArrowRight className="ml-2 h-4 w-4" />

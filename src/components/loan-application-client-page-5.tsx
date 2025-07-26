@@ -68,10 +68,14 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
   const handleNextPage = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
     if (loanProgram.includes('Conventional Long Term Debt')) {
-        router.push(`/dashboard/application/${programSlug}/page-7`);
+        router.push(`/dashboard/application/${programSlug}/page-8`);
     } else {
         router.push(`/dashboard/application/${programSlug}/page-6`);
     }
+  }
+
+  const handleGoBack = () => {
+    router.back();
   }
 
   return (
@@ -223,11 +227,11 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
         </Card>
 
         <div className="flex justify-between items-center">
-            <Button variant="outline" onClick={() => router.back()}>
+            <Button variant="outline" onClick={handleGoBack}>
                <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 4
             </Button>
             <Button onClick={handleNextPage}>
-                Continue to Page {loanProgram.includes('Conventional Long Term Debt') ? '7' : '6'} <ArrowRight className="ml-2 h-4 w-4" />
+                Continue to Page {loanProgram.includes('Conventional Long Term Debt') ? '8' : '6'} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
         </div>
     </div>
