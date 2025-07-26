@@ -316,7 +316,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Trailing 12-month Operating Statement for property",
             "Purchase Agreement",
             "Evidence of Earnest Money Deposit",
-            "Preliminary Title Report",
+            "Marked Up Title Commitment",
             "Property Tax Certificate",
             "Appraisal",
             "Collateral Desktop Analysis",

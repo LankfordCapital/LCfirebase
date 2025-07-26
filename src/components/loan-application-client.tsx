@@ -289,6 +289,9 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                     <DocumentUploadInput name="EIN Certificate (Company)" />
                     <DocumentUploadInput name="Formation Documentation (Company)" />
                     <DocumentUploadInput name="Operating Agreement/Bylaws (Company)" />
+                    <DocumentUploadInput name="Partnership/Officer List (Company)" />
+                    <DocumentUploadInput name="Business License (Company)" />
+                    <DocumentUploadInput name="Certificate of Good Standing (Company)" />
                 </div>
             </CardContent>
         </Card>
