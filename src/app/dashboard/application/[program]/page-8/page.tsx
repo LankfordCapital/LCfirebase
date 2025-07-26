@@ -1,7 +1,6 @@
 
-
 import { Suspense } from 'react';
-import { LoanApplicationClientPage6 } from '@/components/loan-application-client-page-6';
+import { LoanApplicationClientPage8 } from '@/components/loan-application-client-page-8';
 import { Skeleton } from '@/components/ui/skeleton';
 
 function ApplicationSkeleton() {
@@ -13,17 +12,18 @@ function ApplicationSkeleton() {
             </div>
             <div className="space-y-4">
                 <Skeleton className="h-64 w-full" />
+                <Skeleton className="h-48 w-full" />
             </div>
         </div>
     )
 }
 
-export default function LoanApplicationPage6({ params }: { params: { program: string } }) {
+export default function LoanApplicationPage8({ params }: { params: { program: string } }) {
     const loanProgram = decodeURIComponent(params.program.replace(/-/g, ' ').replace(/\band\b/g, '&')).replace(/(^\w|\s\w)/g, m => m.toUpperCase()).replace('NOO', 'NOO');
 
     return (
         <Suspense fallback={<ApplicationSkeleton />}>
-            <LoanApplicationClientPage6 loanProgram={loanProgram} />
+            <LoanApplicationClientPage8 loanProgram={loanProgram} />
         </Suspense>
     )
 }
