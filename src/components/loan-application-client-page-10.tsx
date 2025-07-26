@@ -1,13 +1,17 @@
 
 'use client';
 
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Label } from './ui/label';
+import { Textarea } from './ui/textarea';
 
 export function LoanApplicationClientPage10({ loanProgram }: { loanProgram: string}) {
   const router = useRouter();
+  const [otherDetails, setOtherDetails] = useState('');
   
   const handleContinue = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
@@ -23,11 +27,20 @@ export function LoanApplicationClientPage10({ loanProgram }: { loanProgram: stri
         
         <Card>
             <CardHeader>
-                <CardTitle>Page 10</CardTitle>
-                <CardDescription>This is a placeholder for page 10.</CardDescription>
+                <CardTitle className="flex items-center gap-2"><Info className="h-5 w-5 text-primary"/> Other Important Details</CardTitle>
+                <CardDescription>Use this space to provide any other important details about the subject property or the deal that we should know.</CardDescription>
             </CardHeader>
             <CardContent>
-                <p>Content for page 10 will go here.</p>
+                <div className="space-y-2">
+                    <Label htmlFor="otherDetails">Narrative</Label>
+                    <Textarea
+                        id="otherDetails"
+                        placeholder="Provide any additional information here..."
+                        value={otherDetails}
+                        onChange={(e) => setOtherDetails(e.target.value)}
+                        className="h-48 resize-none"
+                    />
+                </div>
             </CardContent>
         </Card>
         
