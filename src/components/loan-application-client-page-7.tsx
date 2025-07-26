@@ -47,6 +47,14 @@ export function LoanApplicationClientPage7({ loanProgram }: { loanProgram: strin
     router.push(`/dashboard/application/${programSlug}/page-8`);
   };
 
+  const handleGoBack = () => {
+    if (loanProgram.includes('Conventional Long Term Debt')) {
+        router.back(); // This will go back to page 5
+    } else {
+        router.back(); // This will go back to page 6
+    }
+  }
+
   return (
     <div className="space-y-6">
         <div>
@@ -124,8 +132,8 @@ export function LoanApplicationClientPage7({ loanProgram }: { loanProgram: strin
         </Card>
 
         <div className="flex justify-between items-center">
-            <Button variant="outline" onClick={() => router.back()}>
-               <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 6
+            <Button variant="outline" onClick={handleGoBack}>
+               <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page {loanProgram.includes('Conventional Long Term Debt') ? '5' : '6'}
             </Button>
             <Button onClick={handleContinue}>
                 Continue to Page 8 <ArrowRight className="ml-2 h-4 w-4" />
