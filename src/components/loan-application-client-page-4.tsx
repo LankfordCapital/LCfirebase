@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
@@ -224,7 +223,7 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
              <div className="space-y-4 rounded-md border p-4">
                  <h4 className="font-semibold">Personal Asset Statement - Month {month}</h4>
                  <div className="space-y-2">
-                    <Label htmlFor={`personal-asset-upload-${month}-${sponsorIndex}`}>Upload Asset Statement (Month {month})</Label>
+                    <Label htmlFor={`personal-asset-upload-${month}-${sponsorIndex}`}>Upload Asset Statement (Month ${month})</Label>
                     <div className="flex gap-2">
                         <Input id={`personal-asset-upload-${month}-${sponsorIndex}`} type="file" onChange={(e) => handleFileChange(docName, e)} />
                         <Button onClick={() => handleScanAssetStatement(monthKey, sponsorIndex)} disabled={scanState.isScanning || !documents[docName]}>

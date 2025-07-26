@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState } from 'react';
@@ -8,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
-import { ArrowLeft, ArrowRight, Briefcase, FileText, FileUp, Building, BookText, DollarSign } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Briefcase, FileText, FileUp, Building, BookText, DollarSign, Shield, BookUser } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
@@ -17,6 +16,22 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
   const [managementCompanyName, setManagementCompanyName] = useState('');
   const [managementCompanyPhone, setManagementCompanyPhone] = useState('');
   const [managementCompanyEmail, setManagementCompanyEmail] = useState('');
+  
+  const [insuranceAgentName, setInsuranceAgentName] = useState('');
+  const [insuranceAgentCompany, setInsuranceAgentCompany] = useState('');
+  const [insuranceAgentPhone, setInsuranceAgentPhone] = useState('');
+  const [insuranceAgentEmail, setInsuranceAgentEmail] = useState('');
+
+  const [titleAgentName, setTitleAgentName] = useState('');
+  const [titleAgentCompany, setTitleAgentCompany] = useState('');
+  const [titleAgentPhone, setTitleAgentPhone] = useState('');
+  const [titleAgentEmail, setTitleAgentEmail] = useState('');
+  
+  const [escrowAgentName, setEscrowAgentName] = useState('');
+  const [escrowAgentCompany, setEscrowAgentCompany] = useState('');
+  const [escrowAgentPhone, setEscrowAgentPhone] = useState('');
+  const [escrowAgentEmail, setEscrowAgentEmail] = useState('');
+
 
   const { documents, addDocument } = useDocumentContext();
   const router = useRouter();
@@ -110,6 +125,95 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
                 <DocumentUploadInput name="Sources and Uses Statement" />
                 <DocumentUploadInput name="Marketing Plan" />
                 <DocumentUploadInput name="5 Years of Financial Projections" />
+            </CardContent>
+        </Card>
+        
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Shield className="h-5 w-5 text-primary" /> Insurance Agent Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                 <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="insuranceAgentName">Agent Name</Label>
+                        <Input id="insuranceAgentName" value={insuranceAgentName} onChange={e => setInsuranceAgentName(e.target.value)} />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="insuranceAgentCompany">Agent Company</Label>
+                        <Input id="insuranceAgentCompany" value={insuranceAgentCompany} onChange={e => setInsuranceAgentCompany(e.target.value)} />
+                    </div>
+                </div>
+                 <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="insuranceAgentPhone">Agent Phone</Label>
+                        <Input id="insuranceAgentPhone" type="tel" value={insuranceAgentPhone} onChange={e => setInsuranceAgentPhone(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="insuranceAgentEmail">Agent Email</Label>
+                        <Input id="insuranceAgentEmail" type="email" value={insuranceAgentEmail} onChange={e => setInsuranceAgentEmail(e.target.value)} />
+                    </div>
+                </div>
+                 <DocumentUploadInput name="Builder's Risk Insurance Quote" />
+                 <DocumentUploadInput name="Commercial Liability Insurance Quote" />
+            </CardContent>
+        </Card>
+
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><BookUser className="h-5 w-5 text-primary" /> Title Agent Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                 <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="titleAgentName">Agent Name</Label>
+                        <Input id="titleAgentName" value={titleAgentName} onChange={e => setTitleAgentName(e.target.value)} />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="titleAgentCompany">Company Name</Label>
+                        <Input id="titleAgentCompany" value={titleAgentCompany} onChange={e => setTitleAgentCompany(e.target.value)} />
+                    </div>
+                </div>
+                 <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="titleAgentPhone">Agent Phone</Label>
+                        <Input id="titleAgentPhone" type="tel" value={titleAgentPhone} onChange={e => setTitleAgentPhone(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="titleAgentEmail">Agent Email</Label>
+                        <Input id="titleAgentEmail" type="email" value={titleAgentEmail} onChange={e => setTitleAgentEmail(e.target.value)} />
+                    </div>
+                </div>
+                <DocumentUploadInput name="Marked Up Title Commitment" />
+            </CardContent>
+        </Card>
+
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Building className="h-5 w-5 text-primary" /> Escrow Agent Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                 <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="escrowAgentName">Agent Name</Label>
+                        <Input id="escrowAgentName" value={escrowAgentName} onChange={e => setEscrowAgentName(e.target.value)} />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="escrowAgentCompany">Company Name</Label>
+                        <Input id="escrowAgentCompany" value={escrowAgentCompany} onChange={e => setEscrowAgentCompany(e.target.value)} />
+                    </div>
+                </div>
+                 <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="escrowAgentPhone">Agent Phone</Label>
+                        <Input id="escrowAgentPhone" type="tel" value={escrowAgentPhone} onChange={e => setEscrowAgentPhone(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="escrowAgentEmail">Agent Email</Label>
+                        <Input id="escrowAgentEmail" type="email" value={escrowAgentEmail} onChange={e => setEscrowAgentEmail(e.target.value)} />
+                    </div>
+                </div>
+                 <DocumentUploadInput name="Escrow Instructions" />
+                 <DocumentUploadInput name="Closing Protection Letter" />
             </CardContent>
         </Card>
 

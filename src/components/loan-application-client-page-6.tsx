@@ -2,135 +2,149 @@
 
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useId } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useDocumentContext } from '@/contexts/document-context';
-import { CheckCircle, ArrowLeft, ArrowRight, BookUser, Building, Shield, Briefcase, FileText, FileUp } from 'lucide-react';
+import { ArrowLeft, ArrowRight, DollarSign, PlusCircle, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { getDocumentChecklist } from '@/ai/flows/document-checklist-flow';
-import { useAuth } from '@/contexts/auth-context';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
+import { Label } from './ui/label';
+import { Input } from './ui/input';
+import { Textarea } from './ui/textarea';
 
-
-type UploadStatus = 'pending' | 'uploaded' | 'verified' | 'missing';
-
-type DocumentItem = {
-    name: string;
-    status: UploadStatus;
-    file?: File;
-    dataUri?: string;
+type BudgetItem = {
+  cost: number;
+  narrative: string;
+  timeToComplete: string;
 };
 
-type CategorizedDocuments = {
-    borrower: DocumentItem[];
-    company: DocumentItem[];
-    subjectProperty: DocumentItem[];
+type BudgetSection = {
+  [key: string]: BudgetItem;
 };
 
+const initialBudgetItem: BudgetItem = { cost: 0, narrative: '', timeToComplete: '' };
+
+const initialBudgetStructure: Record<string, string[]> = {
+    "Soft Costs": ["Permits & Fees", "Architectural & Engineering", "Legal & Accounting", "Developer Fees", "Contingency (Soft)"],
+    "Site Work": ["Demolition", "Excavation & Grading", "Utilities (Sewer, Water, Gas)", "Paving & Sidewalks", "Landscaping & Irrigation", "Fencing"],
+    "Foundation & Structure": ["Foundation Concrete", "Structural Steel / Rebar", "Framing Labor & Materials", "Sheathing"],
+    "Exterior": ["Roofing", "Siding/Stucco/Masonry", "Windows & Doors", "Exterior Paint", "Gutters & Downspouts"],
+    "Interior Systems": ["Plumbing (Rough-in & Finish)", "HVAC (Rough-in & Finish)", "Electrical (Rough-in & Finish)", "Low Voltage (Security, AV)", "Fire Sprinklers", "Insulation"],
+    "Interior Finishes": ["Drywall & Taping", "Interior Paint", "Flooring (Tile, Wood, Carpet)", "Cabinetry & Countertops", "Interior Doors & Trim", "Appliances", "Fixtures (Lighting & Plumbing)"],
+    "Amenities": ["Pool & Spa", "Outdoor Kitchen", "Decks & Patios", "Hardscaping", "Other Amenities"],
+    "Project Management": ["Supervision", "General Conditions", "Contingency (Hard)", "Final Cleanup"],
+};
 
 export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: string}) {
-  const [checklist, setChecklist] = useState<CategorizedDocuments | null>(null);
-  const [isLoadingChecklist, setIsLoadingChecklist] = useState(true);
-  const [insuranceAgentName, setInsuranceAgentName] = useState('');
-  const [insuranceAgentCompany, setInsuranceAgentCompany] = useState('');
-  const [insuranceAgentPhone, setInsuranceAgentPhone] = useState('');
-  const [insuranceAgentEmail, setInsuranceAgentEmail] = useState('');
-
-  const [titleAgentName, setTitleAgentName] = useState('');
-  const [titleAgentCompany, setTitleAgentCompany] = useState('');
-  const [titleAgentPhone, setTitleAgentPhone] = useState('');
-  const [titleAgentEmail, setTitleAgentEmail] = useState('');
-  
-  const [escrowAgentName, setEscrowAgentName] = useState('');
-  const [escrowAgentCompany, setEscrowAgentCompany] = useState('');
-  const [escrowAgentPhone, setEscrowAgentPhone] = useState('');
-  const [escrowAgentEmail, setEscrowAgentEmail] = useState('');
-
-  const { documents, addDocument, getDocument } = useDocumentContext();
-  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-
-  const syncChecklistWithContext = useCallback((checklistData: CategorizedDocuments) => {
-    const newChecklist = { ...checklistData };
-    (Object.keys(newChecklist) as Array<keyof CategorizedDocuments>).forEach(category => {
-        newChecklist[category] = newChecklist[category].map(item => {
-            const docFromContext = getDocument(item.name);
-            if (docFromContext) {
-                return {
-                    ...item,
-                    status: 'uploaded',
-                    file: docFromContext.file,
-                    dataUri: docFromContext.dataUri,
-                };
-            }
-            return item;
+  const [budgetStructure, setBudgetStructure] = useState(initialBudgetStructure);
+  const [budget, setBudget] = useState<Record<string, BudgetSection>>(() => {
+    const initialState: Record<string, BudgetSection> = {};
+    Object.keys(initialBudgetStructure).forEach(section => {
+        initialState[section] = {};
+        initialBudgetStructure[section].forEach(item => {
+            initialState[section][item] = { ...initialBudgetItem };
         });
     });
-    return newChecklist;
-  }, [getDocument]);
+    return initialState;
+  });
+  
+  const [newSectionName, setNewSectionName] = useState('');
 
-  useEffect(() => {
-    if (loanProgram && !authLoading) {
-      const fetchChecklist = async () => {
-        setIsLoadingChecklist(true);
-        try {
-          const { documentRequestList } = await getDocumentChecklist({ loanProgram });
-          let initialChecklist: CategorizedDocuments = {
-            borrower: documentRequestList.borrower.map(name => ({ name, status: 'missing' })),
-            company: documentRequestList.company.map(name => ({ name, status: 'missing' })),
-            subjectProperty: documentRequestList.subjectProperty.map(name => ({ name, status: 'missing' })),
-          };
-          
-          initialChecklist = syncChecklistWithContext(initialChecklist);
-          setChecklist(initialChecklist);
-
-        } catch (error) {
-          console.error("Failed to fetch document checklist", error);
-        } finally {
-          setIsLoadingChecklist(false);
+  const handleBudgetChange = (section: string, item: string, field: keyof BudgetItem, value: string | number) => {
+    setBudget(prev => ({
+        ...prev,
+        [section]: {
+            ...prev[section],
+            [item]: {
+                ...prev[section][item],
+                [field]: value
+            }
         }
-      };
-      fetchChecklist();
-    }
-  }, [loanProgram, authLoading, syncChecklistWithContext]);
-
+    }))
+  }
   
-  const handleFileChange = useCallback(async (itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-        const file = event.target.files[0];
-        
-        await addDocument({
-            name: itemName,
-            file,
-            status: 'uploaded',
-        });
-    }
-  }, [addDocument]);
-
-  const DocumentUploadInput = ({ name }: { name: string }) => {
-    const doc = documents[name];
-    const fileInputId = `upload-${name.replace(/\s+/g, '-')}`;
-    return (
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-md border">
-        <div className="flex items-center gap-3">
-          {doc?.status === 'verified' && <CheckCircle className="h-5 w-5 text-green-500" />}
-          {doc?.status === 'uploaded' && <FileUp className="h-5 w-5 text-blue-500" />}
-          {!doc && <FileText className="h-5 w-5 text-muted-foreground" />}
-          <Label htmlFor={fileInputId} className="font-medium">{name}</Label>
-        </div>
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Input id={fileInputId} type="file" className="w-full sm:w-auto" onChange={(e) => handleFileChange(name, e)} disabled={!!doc} />
-        </div>
-      </div>
-    );
-  };
+  const handleAddBudgetItem = (section: string) => {
+    const newItemName = `Custom Item ${Object.keys(budget[section]).length + 1}`;
+    setBudget(prev => ({
+        ...prev,
+        [section]: {
+            ...prev[section],
+            [newItemName]: { ...initialBudgetItem }
+        }
+    }))
+  }
   
-  const handleNextPage = () => {
+  const handleRemoveBudgetItem = (section: string, item: string) => {
+    const newSection = { ...budget[section] };
+    delete newSection[item];
+    setBudget(prev => ({ ...prev, [section]: newSection }));
+  }
+
+  const handleAddSection = () => {
+    if (newSectionName && !budgetStructure[newSectionName]) {
+        setBudgetStructure(prev => ({...prev, [newSectionName]: [] }));
+        setBudget(prev => ({...prev, [newSectionName]: {} }));
+        setNewSectionName('');
+    }
+  }
+
+
+  const calculateSectionTotal = (section: string) => {
+    return Object.values(budget[section] || {}).reduce((total, item) => total + (Number(item.cost) || 0), 0);
+  }
+
+  const calculateGrandTotal = () => {
+    return Object.keys(budget).reduce((total, section) => total + calculateSectionTotal(section), 0);
+  }
+
+  const handleContinue = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
     router.push(`/dashboard/application/${programSlug}/page-7`);
   }
+  
+  const BudgetInputRow = ({ section, item }: { section: string, item: string }) => (
+    <div className="py-4 border-b relative">
+        <div className="flex justify-between items-center">
+             <Label className="font-semibold">{item}</Label>
+            {!initialBudgetStructure[section]?.includes(item) && (
+                <Button variant="ghost" size="icon" onClick={() => handleRemoveBudgetItem(section, item)} className="h-7 w-7">
+                    <Trash2 className="h-4 w-4" />
+                </Button>
+            )}
+        </div>
+        <div className="grid md:grid-cols-3 gap-4 mt-2">
+            <div className="space-y-2">
+                <Label htmlFor={`${section}-${item}-cost`} className="text-xs">Cost</Label>
+                <Input 
+                    id={`${section}-${item}-cost`} 
+                    type="number"
+                    placeholder="0.00" 
+                    value={budget[section][item].cost || ''}
+                    onChange={(e) => handleBudgetChange(section, item, 'cost', Number(e.target.value))}
+                />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor={`${section}-${item}-time`} className="text-xs">Time to Complete</Label>
+                <Input 
+                    id={`${section}-${item}-time`}
+                    placeholder="e.g., 2 weeks" 
+                    value={budget[section][item].timeToComplete}
+                    onChange={(e) => handleBudgetChange(section, item, 'timeToComplete', e.target.value)}
+                />
+            </div>
+             <div className="space-y-2 md:col-span-3">
+                <Label htmlFor={`${section}-${item}-narrative`} className="text-xs">Narrative Description</Label>
+                <Textarea 
+                    id={`${section}-${item}-narrative`}
+                    placeholder="Describe the scope of work for this item..." 
+                    value={budget[section][item].narrative}
+                    onChange={(e) => handleBudgetChange(section, item, 'narrative', e.target.value)}
+                />
+            </div>
+        </div>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -138,101 +152,60 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
             <h1 className="font-headline text-3xl font-bold">Loan Application - Page 6 of 12</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
-
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Shield className="h-5 w-5 text-primary" /> Insurance Agent Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                 <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="insuranceAgentName">Agent Name</Label>
-                        <Input id="insuranceAgentName" value={insuranceAgentName} onChange={e => setInsuranceAgentName(e.target.value)} />
-                    </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="insuranceAgentCompany">Agent Company</Label>
-                        <Input id="insuranceAgentCompany" value={insuranceAgentCompany} onChange={e => setInsuranceAgentCompany(e.target.value)} />
-                    </div>
-                </div>
-                 <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="insuranceAgentPhone">Agent Phone</Label>
-                        <Input id="insuranceAgentPhone" type="tel" value={insuranceAgentPhone} onChange={e => setInsuranceAgentPhone(e.target.value)} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="insuranceAgentEmail">Agent Email</Label>
-                        <Input id="insuranceAgentEmail" type="email" value={insuranceAgentEmail} onChange={e => setInsuranceAgentEmail(e.target.value)} />
-                    </div>
-                </div>
-                 <DocumentUploadInput name="Builder's Risk Insurance Quote" />
-                 <DocumentUploadInput name="Commercial Liability Insurance Quote" />
-            </CardContent>
-        </Card>
-
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2"><BookUser className="h-5 w-5 text-primary" /> Title Agent Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                 <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="titleAgentName">Agent Name</Label>
-                        <Input id="titleAgentName" value={titleAgentName} onChange={e => setTitleAgentName(e.target.value)} />
-                    </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="titleAgentCompany">Company Name</Label>
-                        <Input id="titleAgentCompany" value={titleAgentCompany} onChange={e => setTitleAgentCompany(e.target.value)} />
-                    </div>
-                </div>
-                 <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="titleAgentPhone">Agent Phone</Label>
-                        <Input id="titleAgentPhone" type="tel" value={titleAgentPhone} onChange={e => setTitleAgentPhone(e.target.value)} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="titleAgentEmail">Agent Email</Label>
-                        <Input id="titleAgentEmail" type="email" value={titleAgentEmail} onChange={e => setTitleAgentEmail(e.target.value)} />
-                    </div>
-                </div>
-                <DocumentUploadInput name="Marked Up Title Commitment" />
-            </CardContent>
-        </Card>
-
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Building className="h-5 w-5 text-primary" /> Escrow Agent Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                 <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="escrowAgentName">Agent Name</Label>
-                        <Input id="escrowAgentName" value={escrowAgentName} onChange={e => setEscrowAgentName(e.target.value)} />
-                    </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="escrowAgentCompany">Company Name</Label>
-                        <Input id="escrowAgentCompany" value={escrowAgentCompany} onChange={e => setEscrowAgentCompany(e.target.value)} />
-                    </div>
-                </div>
-                 <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="escrowAgentPhone">Agent Phone</Label>
-                        <Input id="escrowAgentPhone" type="tel" value={escrowAgentPhone} onChange={e => setEscrowAgentPhone(e.target.value)} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="escrowAgentEmail">Agent Email</Label>
-                        <Input id="escrowAgentEmail" type="email" value={escrowAgentEmail} onChange={e => setEscrowAgentEmail(e.target.value)} />
-                    </div>
-                </div>
-                 <DocumentUploadInput name="Escrow Instructions" />
-                 <DocumentUploadInput name="Closing Protection Letter" />
-            </CardContent>
-        </Card>
         
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><DollarSign className="h-5 w-5 text-primary"/> Construction Budget</CardTitle>
+                <CardDescription>Provide a detailed breakdown of the construction costs. This information is critical for underwriting.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Accordion type="multiple" defaultValue={["Soft Costs", "Site Work"]} className="w-full">
+                    {Object.keys(budgetStructure).map((section) => (
+                        <AccordionItem key={section} value={section}>
+                            <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                                <div className="flex justify-between w-full pr-4">
+                                    <span>{section}</span>
+                                    <span className="text-primary font-mono">{calculateSectionTotal(section).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>
+                                </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="px-1">
+                                {Object.keys(budget[section]).map(item => <BudgetInputRow key={item} section={section} item={item} />)}
+                                <div className="pt-4">
+                                     <Button variant="outline" size="sm" onClick={() => handleAddBudgetItem(section)}>
+                                        <PlusCircle className="mr-2 h-4 w-4" /> Add Line Item to {section}
+                                    </Button>
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                    ))}
+                </Accordion>
+                <div className="mt-6 pt-4 border-t">
+                     <h3 className="text-lg font-semibold mb-2">Add New Budget Section</h3>
+                    <div className="flex gap-2">
+                        <Input
+                            placeholder="Enter new section name"
+                            value={newSectionName}
+                            onChange={(e) => setNewSectionName(e.target.value)}
+                        />
+                        <Button onClick={handleAddSection}>Add Section</Button>
+                    </div>
+                </div>
+                <div className="mt-6 pt-4 border-t">
+                    <div className="flex justify-between items-center">
+                        <h3 className="text-xl font-bold">Grand Total</h3>
+                        <p className="text-2xl font-bold text-green-600 font-mono">
+                            {calculateGrandTotal().toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                        </p>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+
         <div className="flex justify-between items-center">
             <Button variant="outline" onClick={() => router.back()}>
                <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 5
             </Button>
-            <Button onClick={handleNextPage}>
+            <Button onClick={handleContinue}>
                 Continue to Page 7 <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
         </div>
