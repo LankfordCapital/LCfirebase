@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, ArrowRight, DollarSign } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { ComparableSales } from './comparable-sales';
+import { ComparableRentals } from './comparable-rentals';
 
 export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: string}) {
   const router = useRouter();
@@ -116,6 +118,11 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
                 </div>
             </CardContent>
         </Card>
+
+        <div className="space-y-6">
+            <ComparableSales />
+            <ComparableRentals />
+        </div>
         
         <div className="flex justify-between items-center">
             <Button variant="outline" onClick={() => router.back()}>
