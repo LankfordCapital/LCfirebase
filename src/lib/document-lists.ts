@@ -161,6 +161,11 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Approved Permits",
             "Construction Plans",
             "Construction Budget",
+            "General Contractor's Contract to Build",
+            "General Contractor License",
+            "General Contractor Insurance",
+            "General Contractor Bond",
+            "Projected Draw Schedule"
         ]
     },
     "Commercial - Rehab Loans": {

@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
-import { ArrowLeft, ArrowRight, User, FileText, FileUp, Shield } from 'lucide-react';
+import { ArrowLeft, ArrowRight, User, FileText, FileUp, Shield, ClipboardCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
@@ -95,6 +95,17 @@ export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: strin
             </CardContent>
         </Card>
         
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><ClipboardCheck className="h-5 w-5 text-primary"/> Plans & Permits</CardTitle>
+                <CardDescription>Upload your project plans and any approved permits.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+                <DocumentUploadInput name="Approved or Pre-approved Plans" />
+                <DocumentUploadInput name="Approved Permits" />
+            </CardContent>
+        </Card>
+
         <div className="flex justify-between items-center">
             <Button variant="outline" onClick={() => router.back()}>
                <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 7
