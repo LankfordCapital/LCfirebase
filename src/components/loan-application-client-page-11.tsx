@@ -78,11 +78,15 @@ export function LoanApplicationClientPage11({ loanProgram }: { loanProgram: stri
             <CardContent className="prose prose-sm max-w-none">
                 <p>By signing below, you certify that all information provided in this application is true and correct. You authorize Lankford Capital to verify all information provided and to obtain credit reports. You understand that making false statements can result in denial of your application and may be punishable by law.</p>
                 
+                <h5 className="font-semibold">Data Room and Third-Party Reports</h5>
+                <p>You acknowledge and agree that Lankford Capital will create a data room for this transaction and that the sponsorship (all sponsors collectively) is responsible for the associated costs. Furthermore, you authorize Lankford Capital to order any necessary third-party reports (such as appraisals, environmental reports, etc.) required for the specific deal type. The sponsorship assumes full financial responsibility for the costs of these reports, regardless of whether the loan closes.</p>
+
                 <h5 className="font-semibold">Fair Credit Reporting Act (FCRA) Disclosure</h5>
                 <p>You have the right to know what is in your credit file. You may request and obtain all the information about you in the files of a consumer reporting agency (your "file disclosure").</p>
 
                 <h5 className="font-semibold">Equal Credit Opportunity Act (ECOA) Notice</h5>
                 <p>The Federal Equal Credit Opportunity Act prohibits creditors from discriminating against credit applicants on the basis of race, color, religion, national origin, sex, marital status, age (provided the applicant has the capacity to enter into a binding contract); because all or part of the applicant's income derives from any public assistance program; or because the applicant has in good faith exercised any right under the Consumer Credit Protection Act.</p>
+
             </CardContent>
         </Card>
 
