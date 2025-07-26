@@ -35,7 +35,6 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [constructionTime, setConstructionTime] = useState('');
   const [requestedClosingDate, setRequestedClosingDate] = useState<Date>();
   const [projectChange, setProjectChange] = useState('');
-  const [monthlyRentalAmount, setMonthlyRentalAmount] = useState('');
   const [transactionType, setTransactionType] = useState('purchase');
   const [originalPurchasePrice, setOriginalPurchasePrice] = useState('');
   const [purchaseDate, setPurchaseDate] = useState<Date>();
@@ -55,7 +54,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   return (
     <div className="space-y-6">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 1 of 7</h1>
+            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 1 of 11</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
@@ -84,72 +83,65 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                     <Input id="loanAmount" type="number" placeholder="e.g., 300000" value={loanAmount} onChange={e => setLoanAmount(e.target.value)} />
                 </div>
                 
-                {loanProgram === 'Commercial - Ground Up Construction' ? (
-                    <div className="space-y-4 pt-4 border-t">
-                        <Label className="font-semibold">Transaction Type</Label>
-                        <RadioGroup value={transactionType} onValueChange={setTransactionType} className="flex space-x-4">
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="purchase" id="purchase" />
-                            <Label htmlFor="purchase">Purchase</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="refinance" id="refinance" />
-                            <Label htmlFor="refinance">Refinance</Label>
-                        </div>
-                        </RadioGroup>
-
-                        {transactionType === 'purchase' && (
-                            <div className="space-y-2">
-                                <Label htmlFor="purchasePrice">Purchase Price</Label>
-                                <Input id="purchasePrice" type="number" placeholder="e.g., 400000" value={purchasePrice} onChange={e => setPurchasePrice(e.target.value)} />
-                            </div>
-                        )}
-
-                        {transactionType === 'refinance' && (
-                            <div className="space-y-4">
-                                <div className="grid md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="originalPurchasePrice">Original Purchase Price</Label>
-                                    <Input id="originalPurchasePrice" type="number" placeholder="e.g., 350000" value={originalPurchasePrice} onChange={e => setOriginalPurchasePrice(e.target.value)} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="purchaseDate">Date of Purchase</Label>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                            variant={"outline"}
-                                            className={cn(
-                                                "w-full justify-start text-left font-normal",
-                                                !purchaseDate && "text-muted-foreground"
-                                            )}
-                                            >
-                                            <CalendarIcon className="mr-2 h-4 w-4" />
-                                            {purchaseDate ? format(purchaseDate, "PPP") : <span>Pick a date</span>}
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
-                                            <Calendar
-                                            mode="single"
-                                            selected={purchaseDate}
-                                            onSelect={setPurchaseDate}
-                                            initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="currentDebt">Current Debt on Property</Label>
-                                    <Input id="currentDebt" type="number" placeholder="e.g., 150000" value={currentDebt} onChange={e => setCurrentDebt(e.target.value)} />
-                                </div>
-                            </div>
-                        )}
+                <div className="space-y-4 pt-4 border-t">
+                    <Label className="font-semibold">Transaction Type</Label>
+                    <RadioGroup value={transactionType} onValueChange={setTransactionType} className="flex space-x-4">
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="purchase" id="purchase" />
+                        <Label htmlFor="purchase">Purchase</Label>
                     </div>
-                ) : null}
-                
-                <div className="space-y-2">
-                    <Label htmlFor="monthlyRentalAmount">Monthly Rental Amount</Label>
-                    <Input id="monthlyRentalAmount" type="number" placeholder="e.g., 2500" value={monthlyRentalAmount} onChange={e => setMonthlyRentalAmount(e.target.value)} />
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="refinance" id="refinance" />
+                        <Label htmlFor="refinance">Refinance</Label>
+                    </div>
+                    </RadioGroup>
+
+                    {transactionType === 'purchase' && (
+                        <div className="space-y-2">
+                            <Label htmlFor="purchasePrice">Purchase Price</Label>
+                            <Input id="purchasePrice" type="number" placeholder="e.g., 400000" value={purchasePrice} onChange={e => setPurchasePrice(e.target.value)} />
+                        </div>
+                    )}
+
+                    {transactionType === 'refinance' && (
+                        <div className="space-y-4">
+                            <div className="grid md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="originalPurchasePrice">Original Purchase Price</Label>
+                                <Input id="originalPurchasePrice" type="number" placeholder="e.g., 350000" value={originalPurchasePrice} onChange={e => setOriginalPurchasePrice(e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="purchaseDate">Date of Purchase</Label>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                        variant={"outline"}
+                                        className={cn(
+                                            "w-full justify-start text-left font-normal",
+                                            !purchaseDate && "text-muted-foreground"
+                                        )}
+                                        >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {purchaseDate ? format(purchaseDate, "PPP") : <span>Pick a date</span>}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0">
+                                        <Calendar
+                                        mode="single"
+                                        selected={purchaseDate}
+                                        onSelect={setPurchaseDate}
+                                        initialFocus
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="currentDebt">Current Debt on Property</Label>
+                                <Input id="currentDebt" type="number" placeholder="e.g., 150000" value={currentDebt} onChange={e => setCurrentDebt(e.target.value)} />
+                            </div>
+                        </div>
+                    )}
                 </div>
                 
                 <div className="grid md:grid-cols-2 gap-4">
@@ -159,18 +151,16 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                     </div>
                 </div>
                 
-                {loanProgram === 'Commercial - Ground Up Construction' ? (
-                     <div className="grid md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="afterConstructedValue">After Constructed Value</Label>
-                            <Input id="afterConstructedValue" type="number" placeholder="e.g., 1000000" value={afterConstructedValue} onChange={e => setAfterConstructedValue(e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="stabilizedValue">Stabilized Value</Label>
-                            <Input id="stabilizedValue" type="number" placeholder="e.g., 1200000" value={stabilizedValue} onChange={e => setStabilizedValue(e.target.value)} />
-                        </div>
+                 <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="afterConstructedValue">After Constructed Value</Label>
+                        <Input id="afterConstructedValue" type="number" placeholder="e.g., 1000000" value={afterConstructedValue} onChange={e => setAfterConstructedValue(e.target.value)} />
                     </div>
-                ) : null}
+                    <div className="space-y-2">
+                        <Label htmlFor="stabilizedValue">Stabilized Value</Label>
+                        <Input id="stabilizedValue" type="number" placeholder="e.g., 1200000" value={stabilizedValue} onChange={e => setStabilizedValue(e.target.value)} />
+                    </div>
+                </div>
                 
                  <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -182,29 +172,6 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                         <Input id="lotSize" placeholder="e.g., 10,000 sq. ft. or 0.23 acres" value={lotSize} onChange={e => setLotSize(e.target.value)} />
                     </div>
                 </div>
-                
-                {!isBridgeLoan && (
-                    <div className="space-y-2">
-                        <Label htmlFor="project-change">Is any of the following happening?</Label>
-                        <Select onValueChange={setProjectChange} value={projectChange}>
-                            <SelectTrigger id="project-change">
-                                <SelectValue placeholder="Select an option..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="no">No</SelectItem>
-                                <SelectItem value="expand-horizontal">Expanding the square footage (Horizontally)</SelectItem>
-                                <SelectItem value="expand-vertical">Expanding the square footage (Vertically)</SelectItem>
-                                <SelectItem value="expand-both">Expanding the square footage (Horizontally and Vertically)</SelectItem>
-                                <SelectItem value="change-units">Changing the unit count</SelectItem>
-                                <SelectItem value="convert-condo">Converting to Condominiums</SelectItem>
-                                <SelectItem value="add-adu">Adding or Converting to an ADU (accessory dwelling unit)</SelectItem>
-                                <SelectItem value="repair-fire">Repairing fire damage</SelectItem>
-                                <SelectItem value="repair-water">Repairing water damage</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                )}
-
 
                 <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
