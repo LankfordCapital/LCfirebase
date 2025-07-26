@@ -85,7 +85,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   return (
     <div className="space-y-6">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 1 of 11</h1>
+            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 1 of 12</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
