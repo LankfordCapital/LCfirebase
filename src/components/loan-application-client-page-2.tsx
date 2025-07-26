@@ -22,11 +22,15 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
   const [maintenance, setMaintenance] = useState(0);
   const [updates, setUpdates] = useState(0);
   const [grounds, setGrounds] = useState(0);
+  const [adjustedGrossIncome, setAdjustedGrossIncome] = useState(0);
   const [netOperatingIncome, setNetOperatingIncome] = useState(0);
 
   useEffect(() => {
-    const totalExpenses = utilities + insurance + management + vacancy + nonPerformance + maintenance + updates + grounds;
-    const noi = grossIncome - totalExpenses;
+    const agi = grossIncome - vacancy - nonPerformance - management;
+    setAdjustedGrossIncome(agi);
+    
+    const otherExpenses = utilities + insurance + maintenance + updates + grounds;
+    const noi = agi - otherExpenses;
     setNetOperatingIncome(noi);
   }, [grossIncome, utilities, insurance, management, vacancy, nonPerformance, maintenance, updates, grounds]);
 
@@ -42,7 +46,7 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
   return (
     <div className="space-y-6">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 2 of 8</h1>
+            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 2 of 11</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
@@ -56,8 +60,29 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
                     <Label htmlFor="grossIncome">Gross Income</Label>
                     <Input id="grossIncome" type="number" placeholder="e.g., 10000" onChange={handleNumberChange(setGrossIncome)} />
                 </div>
+                 <div className="grid md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="vacancy">Vacancy</Label>
+                        <Input id="vacancy" type="number" placeholder="e.g., 500" onChange={handleNumberChange(setVacancy)} />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="nonPerformance">Non-Performance</Label>
+                        <Input id="nonPerformance" type="number" placeholder="e.g., 200" onChange={handleNumberChange(setNonPerformance)} />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="management">Management</Label>
+                        <Input id="management" type="number" placeholder="e.g., 800" onChange={handleNumberChange(setManagement)} />
+                    </div>
+                </div>
+
+                <div className="pt-4 border-t">
+                    <Label className="font-bold text-lg">Adjusted Gross Income</Label>
+                    <p className="text-2xl font-bold text-primary">
+                        {adjustedGrossIncome.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                    </p>
+                </div>
                 
-                <h3 className="font-semibold pt-4 border-t">Monthly Expenses</h3>
+                <h3 className="font-semibold pt-4 border-t">Other Monthly Expenses</h3>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="utilities">Utilities</Label>
@@ -66,18 +91,6 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
                     <div className="space-y-2">
                         <Label htmlFor="insurance">Insurance</Label>
                         <Input id="insurance" type="number" placeholder="e.g., 200" onChange={handleNumberChange(setInsurance)} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="management">Management</Label>
-                        <Input id="management" type="number" placeholder="e.g., 800" onChange={handleNumberChange(setManagement)} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="vacancy">Vacancy</Label>
-                        <Input id="vacancy" type="number" placeholder="e.g., 500" onChange={handleNumberChange(setVacancy)} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="nonPerformance">Non-Performance</Label>
-                        <Input id="nonPerformance" type="number" placeholder="e.g., 200" onChange={handleNumberChange(setNonPerformance)} />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="maintenance">Maintenance</Label>
@@ -113,3 +126,4 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
     </div>
   );
 }
+
