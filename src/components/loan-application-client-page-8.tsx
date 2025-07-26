@@ -8,15 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
-import { ArrowLeft, ArrowRight, User, FileText, FileUp, Shield, ClipboardCheck } from 'lucide-react';
+import { ArrowLeft, ArrowRight, FileText, FileUp, DollarSign } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
-  const [gcName, setGcName] = useState('');
-  const [gcCompanyName, setGcCompanyName] = useState('');
-  const [gcPhone, setGcPhone] = useState('');
-  const [gcEmail, setGcEmail] = useState('');
-  
   const { documents, addDocument } = useDocumentContext();
   const router = useRouter();
 
@@ -54,12 +49,7 @@ export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: strin
   };
 
   const handleGoBack = () => {
-    const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
-    if (loanProgram.includes('Conventional Long Term Debt')) {
-        router.push(`/dashboard/application/${programSlug}/page-5`);
-    } else {
-        router.push(`/dashboard/application/${programSlug}/page-7`);
-    }
+    router.back();
   }
 
   return (
@@ -71,54 +61,19 @@ export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: strin
         
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2"><User className="h-5 w-5 text-primary"/> General Contractor Details</CardTitle>
-                <CardDescription>Provide the contact information and required documents for your General Contractor.</CardDescription>
+                <CardTitle className="flex items-center gap-2"><DollarSign className="h-5 w-5 text-primary"/> Subject Property Financials</CardTitle>
+                <CardDescription>Please upload the profit and loss statements for the subject property.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="gcName">GC Name</Label>
-                        <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} placeholder="John Builder" />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="gcCompanyName">GC Company Name</Label>
-                        <Input id="gcCompanyName" value={gcCompanyName} onChange={e => setGcCompanyName(e.target.value)} placeholder="Builder Co." />
-                    </div>
-                </div>
-                 <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="gcPhone">GC Phone</Label>
-                        <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} placeholder="(555) 555-5555" />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="gcEmail">GC Email</Label>
-                        <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} placeholder="john@builderco.com" />
-                    </div>
-                </div>
-
-                <div className="space-y-3 pt-4 border-t">
-                    <DocumentUploadInput name="General Contractor's Contract to Build" />
-                    <DocumentUploadInput name="General Contractor License" />
-                    <DocumentUploadInput name="General Contractor Bond" />
-                    <DocumentUploadInput name="General Contractor Insurance" />
-                </div>
+            <CardContent className="space-y-3">
+                <DocumentUploadInput name="Trailing 12-Month Profit & Loss Statement" />
+                <DocumentUploadInput name="Previous Year 1 Profit & Loss Statement" />
+                <DocumentUploadInput name="Previous Year 2 Profit & Loss Statement" />
             </CardContent>
         </Card>
         
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2"><ClipboardCheck className="h-5 w-5 text-primary"/> Plans & Permits</CardTitle>
-                <CardDescription>Upload your project plans and any approved permits.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-                <DocumentUploadInput name="Approved or Pre-approved Plans" />
-                <DocumentUploadInput name="Approved Permits" />
-            </CardContent>
-        </Card>
-
         <div className="flex justify-between items-center">
             <Button variant="outline" onClick={handleGoBack}>
-               <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page {loanProgram.includes('Conventional Long Term Debt') ? '5' : '7'}
+               <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 7
             </Button>
             <Button onClick={handleContinue}>
                 Continue to Page 9 <ArrowRight className="ml-2 h-4 w-4" />
