@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
-import { ArrowLeft, ArrowRight, Briefcase, FileText, FileUp, Building, BookText } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Briefcase, FileText, FileUp, Building, BookText, DollarSign } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
@@ -102,10 +102,12 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
         
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2"><BookText className="h-5 w-5 text-primary" /> Marketing Plan</CardTitle>
-                <CardDescription>Please upload your marketing plan for the property.</CardDescription>
+                <CardTitle className="flex items-center gap-2"><BookText className="h-5 w-5 text-primary" /> Project Details</CardTitle>
+                <CardDescription>Please upload the following project documents.</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
+                <DocumentUploadInput name="Executive Summary" />
+                <DocumentUploadInput name="Sources and Uses Statement" />
                 <DocumentUploadInput name="Marketing Plan" />
             </CardContent>
         </Card>
