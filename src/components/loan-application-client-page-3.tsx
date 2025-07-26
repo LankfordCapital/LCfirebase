@@ -238,7 +238,7 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
-        {renderChecklistCategory('borrower', 'Borrower Documents', <User className="h-5 w-5 text-primary" />)}
+        {renderChecklistCategory('borrower', 'Sponsorship Documents', <User className="h-5 w-5 text-primary" />)}
 
         <Card>
             <CardHeader>
