@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Loader2, ArrowRight, Calendar as CalendarIcon, Building2 } from 'lucide-react';
+import { Loader2, ArrowRight, Calendar as CalendarIcon, Building2, Briefcase, FileUp, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 import { aiPreUnderwriter, type AiPreUnderwriterOutput } from '@/ai/flows/ai-pre-underwriter';
@@ -42,13 +42,45 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [stabilizedValue, setStabilizedValue] = useState('');
   const [propertyType, setPropertyType] = useState('');
   const [otherPropertyType, setOtherPropertyType] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [companyEin, setCompanyEin] = useState('');
 
+  const { documents, addDocument } = useDocumentContext();
   const router = useRouter();
   
   const handleContinue = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
     router.push(`/dashboard/application/${programSlug}/page-2`);
   };
+  
+  const handleFileChange = useCallback(async (itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+        const file = event.target.files[0];
+        await addDocument({
+            name: itemName,
+            file,
+            status: 'uploaded',
+        });
+    }
+  }, [addDocument]);
+
+  const DocumentUploadInput = ({ name }: { name: string }) => {
+    const doc = documents[name];
+    const fileInputId = `upload-${name.replace(/\s+/g, '-')}`;
+    return (
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-md border">
+        <div className="flex items-center gap-3">
+          {doc?.status === 'uploaded' && <FileUp className="h-5 w-5 text-blue-500" />}
+          {!doc && <FileText className="h-5 w-5 text-muted-foreground" />}
+          <Label htmlFor={fileInputId} className="font-medium">{name}</Label>
+        </div>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Input id={fileInputId} type="file" className="w-full sm:w-auto" onChange={(e) => handleFileChange(name, e)} disabled={!!doc} />
+        </div>
+      </div>
+    );
+  };
+
 
   return (
     <div className="space-y-6">
@@ -59,8 +91,8 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
         
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Building2 className="h-5 w-5 text-primary" /> Loan Details</CardTitle>
-                <CardDescription>Provide the key details about the loan you are requesting.</CardDescription>
+                <CardTitle className="flex items-center gap-2"><Building2 className="h-5 w-5 text-primary" /> Loan & Property Details</CardTitle>
+                <CardDescription>Provide the key details about the loan you are requesting and the subject property.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -105,7 +137,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                 )}
 
                 <div className="space-y-2">
-                    <Label htmlFor="loanAmount">Loan Amount</Label>
+                    <Label htmlFor="loanAmount">Loan Amount Requested</Label>
                     <Input id="loanAmount" type="number" placeholder="e.g., 300000" value={loanAmount} onChange={e => setLoanAmount(e.target.value)} />
                 </div>
                 
@@ -123,9 +155,13 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                     </RadioGroup>
 
                     {transactionType === 'purchase' && (
-                        <div className="space-y-2">
-                            <Label htmlFor="purchasePrice">Purchase Price</Label>
-                            <Input id="purchasePrice" type="number" placeholder="e.g., 400000" value={purchasePrice} onChange={e => setPurchasePrice(e.target.value)} />
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="purchasePrice">Purchase Price</Label>
+                                <Input id="purchasePrice" type="number" placeholder="e.g., 400000" value={purchasePrice} onChange={e => setPurchasePrice(e.target.value)} />
+                            </div>
+                            <DocumentUploadInput name="Executed Purchase Contract" />
+                            <DocumentUploadInput name="Evidence of Earnest Money Deposit" />
                         </div>
                     )}
 
@@ -232,6 +268,31 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                 </div>
             </CardContent>
         </Card>
+        
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary" /> Borrowing Entity</CardTitle>
+                <CardDescription>Provide details about the borrowing company.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="companyName">Company Name</Label>
+                        <Input id="companyName" placeholder="e.g., Real Estate Holdings LLC" value={companyName} onChange={e => setCompanyName(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="companyEin">Company EIN</Label>
+                        <Input id="companyEin" placeholder="e.g., 12-3456789" value={companyEin} onChange={e => setCompanyEin(e.target.value)} />
+                    </div>
+                </div>
+                <div className="space-y-3 pt-2">
+                    <DocumentUploadInput name="EIN Certificate (Company)" />
+                    <DocumentUploadInput name="Formation Documentation (Company)" />
+                    <DocumentUploadInput name="Operating Agreement/Bylaws (Company)" />
+                </div>
+            </CardContent>
+        </Card>
+
 
         <div className="flex justify-end items-center">
             <Button onClick={handleContinue}>
