@@ -15,6 +15,7 @@ import { getDocumentChecklist } from '@/ai/flows/document-checklist-flow';
 import { useAuth } from '@/contexts/auth-context';
 import { DealHistory } from '@/components/deal-history';
 import { scanAssetStatement, type ScanAssetStatementOutput } from '@/ai/flows/asset-statement-scanner';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type UploadStatus = 'pending' | 'uploaded' | 'verified' | 'missing';
 
@@ -39,6 +40,7 @@ type AssetScanState = {
 export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: string}) {
   const [checklist, setChecklist] = useState<CategorizedDocuments | null>(null);
   const [isLoadingChecklist, setIsLoadingChecklist] = useState(true);
+  const [numberOfSponsors, setNumberOfSponsors] = useState(1);
   
   const [assetScanStates, setAssetScanStates] = useState({
       month1: { balance: null, isScanning: false },
@@ -119,8 +121,8 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
     }
   }, [addDocument, checklist, syncChecklistWithContext]);
 
-   const handleScanAssetStatement = async (monthKey: keyof typeof assetScanStates) => {
-    const docName = `Personal Asset Statement (Month ${monthKey === 'month1' ? 1 : monthKey === 'month2' ? 2 : 3})`;
+   const handleScanAssetStatement = async (monthKey: keyof typeof assetScanStates, sponsorIndex: number) => {
+    const docName = `Personal Asset Statement (Month ${monthKey === 'month1' ? 1 : monthKey === 'month2' ? 2 : 3}) (Sponsor ${sponsorIndex + 1})`;
     const assetStatement = documents[docName];
 
     if (!assetStatement?.file) {
@@ -186,17 +188,17 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
     );
   };
   
-    const AssetStatementUploader = ({ month, monthKey }: { month: number, monthKey: keyof typeof assetScanStates }) => {
-        const docName = `Personal Asset Statement (Month ${month})`;
+    const AssetStatementUploader = ({ month, monthKey, sponsorIndex }: { month: number, monthKey: keyof typeof assetScanStates, sponsorIndex: number }) => {
+        const docName = `Personal Asset Statement (Month ${month}) (Sponsor ${sponsorIndex + 1})`;
         const scanState = assetScanStates[monthKey];
         return (
              <div className="space-y-4 rounded-md border p-4">
                  <h4 className="font-semibold">Personal Asset Statement - Month {month}</h4>
                  <div className="space-y-2">
-                    <Label htmlFor={`personal-asset-upload-${month}`}>Upload Asset Statement (Month {month})</Label>
+                    <Label htmlFor={`personal-asset-upload-${month}-${sponsorIndex}`}>Upload Asset Statement (Month {month})</Label>
                     <div className="flex gap-2">
-                        <Input id={`personal-asset-upload-${month}`} type="file" onChange={(e) => handleFileChange(docName, e)} />
-                        <Button onClick={() => handleScanAssetStatement(monthKey)} disabled={scanState.isScanning || !documents[docName]}>
+                        <Input id={`personal-asset-upload-${month}-${sponsorIndex}`} type="file" onChange={(e) => handleFileChange(docName, e)} />
+                        <Button onClick={() => handleScanAssetStatement(monthKey, sponsorIndex)} disabled={scanState.isScanning || !documents[docName]}>
                             {scanState.isScanning ? <Loader2 className="animate-spin" /> : <Landmark />}
                             <span className="ml-2 hidden sm:inline">Scan</span>
                         </Button>
@@ -220,13 +222,13 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
     return <div>Could not load checklist. Please go back and select a loan program.</div>
   }
   
-  const renderChecklistCategory = (category: keyof CategorizedDocuments, title: string, icon: React.ReactNode) => (
-      <Card>
+  const renderSponsorshipSection = (sponsorIndex: number) => (
+      <Card key={`sponsor-${sponsorIndex}`}>
           <CardHeader>
-              <CardTitle className="flex items-center gap-2">{icon} {title}</CardTitle>
+              <CardTitle className="flex items-center gap-2"><User className="h-5 w-5 text-primary" /> Sponsorship Documents (Sponsor #{sponsorIndex + 1})</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-              {checklist[category].map(item => <DocumentUploadInput key={item.name} name={item.name} />)}
+              {checklist.borrower.map(item => <DocumentUploadInput key={item.name} name={`${item.name} (Sponsor ${sponsorIndex + 1})`} />)}
           </CardContent>
       </Card>
   );
@@ -238,17 +240,44 @@ export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: strin
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
-        {renderChecklistCategory('borrower', 'Sponsorship Documents', <User className="h-5 w-5 text-primary" />)}
+        <Card>
+          <CardHeader>
+            <CardTitle>Sponsor Information</CardTitle>
+            <CardDescription>Select the number of sponsors for this loan.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="w-full sm:w-1/2 md:w-1/3">
+              <Label htmlFor="num-sponsors">Number of Sponsors</Label>
+              <Select value={String(numberOfSponsors)} onValueChange={(value) => setNumberOfSponsors(Number(value))}>
+                <SelectTrigger id="num-sponsors">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {[1, 2, 3, 4, 5].map(num => (
+                    <SelectItem key={num} value={String(num)}>{num}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+        {Array.from({ length: numberOfSponsors }).map((_, index) => renderSponsorshipSection(index))}
 
         <Card>
             <CardHeader>
                 <CardTitle>AI Asset Verification</CardTitle>
-                <CardDescription>Upload the last three months of personal asset statements to have our AI extract the most recent balances.</CardDescription>
+                <CardDescription>Upload the last three months of personal asset statements for each sponsor to have our AI extract the most recent balances.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-                <AssetStatementUploader month={1} monthKey="month1" />
-                <AssetStatementUploader month={2} monthKey="month2" />
-                <AssetStatementUploader month={3} monthKey="month3" />
+            <CardContent className="space-y-6">
+                {Array.from({ length: numberOfSponsors }).map((_, sponsorIndex) => (
+                    <div key={`asset-sponsor-${sponsorIndex}`} className="space-y-4 p-4 border rounded-lg">
+                         <h3 className="font-bold text-lg">Asset Statements for Sponsor #{sponsorIndex + 1}</h3>
+                        <AssetStatementUploader month={1} monthKey="month1" sponsorIndex={sponsorIndex} />
+                        <AssetStatementUploader month={2} monthKey="month2" sponsorIndex={sponsorIndex} />
+                        <AssetStatementUploader month={3} monthKey="month3" sponsorIndex={sponsorIndex} />
+                    </div>
+                ))}
             </CardContent>
         </Card>
         
