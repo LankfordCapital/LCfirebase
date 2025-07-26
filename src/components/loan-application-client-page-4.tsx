@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
-import { ArrowLeft, ArrowRight, Briefcase, FileText, FileUp, Building } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Briefcase, FileText, FileUp, Building, BookText } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
@@ -57,7 +57,7 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
   return (
     <div className="space-y-6">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 4 of 8</h1>
+            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 4 of 11</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
@@ -100,6 +100,16 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
             </CardContent>
         </Card>
         
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><BookText className="h-5 w-5 text-primary" /> Marketing Plan</CardTitle>
+                <CardDescription>Please upload your marketing plan for the property.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <DocumentUploadInput name="Marketing Plan" />
+            </CardContent>
+        </Card>
+
         <div className="flex justify-between items-center">
             <Button variant="outline" onClick={() => router.back()}>
                <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 3
