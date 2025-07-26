@@ -168,6 +168,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "ID/Driver's License",
             "Personal Financial Statement",
             "Credit Report",
+            "Experience",
+            "Real Estate Owned"
         ],
         company: [
             "EIN Certificate",
@@ -192,6 +194,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "ID/Driver's License",
             "Personal Financial Statement",
             "Credit Report",
+            "Experience",
+            "Real Estate Owned"
         ],
         company: [
             "EIN Certificate",
@@ -215,6 +219,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "ID/Driver's License",
             "Personal Financial Statement",
             "Credit Report",
+            "Experience",
+            "Real Estate Owned"
         ],
         company: [
             "EIN Certificate",
@@ -240,6 +246,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Personal Financial Statement",
             "Credit Report",
             "Proof of Equity Injection",
+            "Experience",
+            "Real Estate Owned"
         ],
         company: [
             "EIN Certificate",
@@ -267,6 +275,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "ID/Driver's License",
             "Personal Financial Statement",
             "Credit Report",
+            "Experience",
+            "Real Estate Owned"
         ],
         company: [
             "EIN Certificate",
@@ -291,6 +301,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "ID/Driver's License",
             "Personal Financial Statement",
             "Credit Report",
+            "Experience",
+            "Real Estate Owned"
         ],
         company: [
             "EIN Certificate",
@@ -315,6 +327,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "ID/Driver's License",
             "Personal Financial Statement",
             "Credit Report",
+            "Experience",
+            "Real Estate Owned"
         ],
         company: [
             "EIN Certificate",
@@ -338,6 +352,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         borrower: [
             "SBA Form 1919",
             "Personal Financial Statement (SBA Form 413)",
+            "Experience",
+            "Real Estate Owned"
         ],
         company: [
             "Business Financial Statements (3 years)",
@@ -352,6 +368,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
     "SBA 504": {
         borrower: [
             "Personal Financial Statement for all guarantors",
+            "Experience",
+            "Real Estate Owned"
         ],
         company: [
             "SBA Form 1244",
@@ -372,6 +390,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "ID/Driver's License",
             "Personal Financial Statement",
             "Credit Report",
+            "Experience",
+            "Real Estate Owned"
         ],
         company: [
             "EIN Certificate",
@@ -398,6 +418,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Personal Financial Statement",
             "Credit Report",
             "Sponsor Financials",
+            "Experience",
+            "Real Estate Owned"
         ],
         company: [
             "EIN Certificate",
@@ -418,6 +440,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "ID/Driver's License",
             "Personal Financial Statement",
             "Credit Report",
+            "Experience",
+            "Real Estate Owned"
         ],
         company: [
             "EIN Certificate",
@@ -439,6 +463,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "ID/Driver's License",
             "Personal Financial Statement",
             "Credit Report",
+            "Experience",
+            "Real Estate Owned"
         ],
         company: [
             "EIN Certificate",
@@ -454,7 +480,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         ]
     },
     "Default": {
-        borrower: ["ID/Driver's License", "Personal Financial Statement", "Credit Report"],
+        borrower: ["ID/Driver's License", "Personal Financial Statement", "Credit Report", "Experience", "Real Estate Owned"],
         company: ["EIN Certificate", "Formation Documentation", "Operating Agreement/Bylaws", "Partnership/Officer List", "Business License", "Certificate of Good Standing"],
         subjectProperty: ["Purchase and Sale Agreement", "Evidence of Earnest Money Deposit", "Appraisal Report", "Approved or Pre-approved Plans", "Approved Permits"]
     }
