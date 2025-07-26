@@ -4,13 +4,12 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, ArrowRight, DollarSign } from 'lucide-react';
+import { ArrowLeft, ArrowRight, DollarSign, PlusCircle, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { Label } from './ui/label';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
-import { Separator } from './ui/separator';
 
 type BudgetItem = {
   cost: number;
@@ -24,29 +23,33 @@ type BudgetSection = {
 
 const initialBudgetItem: BudgetItem = { cost: 0, narrative: '', timeToComplete: '' };
 
-const budgetStructure: Record<string, string[]> = {
-    "Soft Costs": ["Permits & Fees", "Architectural & Engineering", "Legal & Accounting", "Contingency (Soft)"],
-    "Foundation & Structure": ["Excavation & Grading", "Foundation Concrete", "Structural Steel", "Framing Labor & Materials"],
-    "Exterior": ["Roofing", "Siding/Stucco/Masonry", "Windows & Doors", "Exterior Paint"],
-    "Interior Systems": ["Plumbing (Rough-in & Finish)", "HVAC (Rough-in & Finish)", "Electrical (Rough-in & Finish)", "Insulation"],
-    "Interior Finishes": ["Drywall & Taping", "Interior Paint", "Flooring", "Cabinetry & Countertops", "Appliances", "Fixtures (Lighting & Plumbing)"],
-    "Site Work & Landscaping": ["Utilities (Sewer, Water, Gas)", "Paving & Sidewalks", "Landscaping & Irrigation", "Fencing"],
-    "Amenities": ["Pool & Spa", "Outdoor Kitchen", "Decks & Patios", "Other Amenities"],
+const initialBudgetStructure: Record<string, string[]> = {
+    "Soft Costs": ["Permits & Fees", "Architectural & Engineering", "Legal & Accounting", "Developer Fees", "Contingency (Soft)"],
+    "Site Work": ["Demolition", "Excavation & Grading", "Utilities (Sewer, Water, Gas)", "Paving & Sidewalks", "Landscaping & Irrigation", "Fencing"],
+    "Foundation & Structure": ["Foundation Concrete", "Structural Steel / Rebar", "Framing Labor & Materials", "Sheathing"],
+    "Exterior": ["Roofing", "Siding/Stucco/Masonry", "Windows & Doors", "Exterior Paint", "Gutters & Downspouts"],
+    "Interior Systems": ["Plumbing (Rough-in & Finish)", "HVAC (Rough-in & Finish)", "Electrical (Rough-in & Finish)", "Low Voltage (Security, AV)", "Fire Sprinklers", "Insulation"],
+    "Interior Finishes": ["Drywall & Taping", "Interior Paint", "Flooring (Tile, Wood, Carpet)", "Cabinetry & Countertops", "Interior Doors & Trim", "Appliances", "Fixtures (Lighting & Plumbing)"],
+    "Amenities": ["Pool & Spa", "Outdoor Kitchen", "Decks & Patios", "Hardscaping", "Other Amenities"],
+    "Project Management": ["Supervision", "General Conditions", "Contingency (Hard)", "Final Cleanup"],
 };
 
 export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: string}) {
   const router = useRouter();
 
+  const [budgetStructure, setBudgetStructure] = useState(initialBudgetStructure);
   const [budget, setBudget] = useState<Record<string, BudgetSection>>(() => {
     const initialState: Record<string, BudgetSection> = {};
-    Object.keys(budgetStructure).forEach(section => {
+    Object.keys(initialBudgetStructure).forEach(section => {
         initialState[section] = {};
-        budgetStructure[section].forEach(item => {
+        initialBudgetStructure[section].forEach(item => {
             initialState[section][item] = { ...initialBudgetItem };
         });
     });
     return initialState;
   });
+  
+  const [newSectionName, setNewSectionName] = useState('');
 
   const handleBudgetChange = (section: string, item: string, field: keyof BudgetItem, value: string | number) => {
     setBudget(prev => ({
@@ -60,6 +63,32 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
         }
     }))
   }
+  
+  const handleAddBudgetItem = (section: string) => {
+    const newItemName = `Custom Item ${Object.keys(budget[section]).length + 1}`;
+    setBudget(prev => ({
+        ...prev,
+        [section]: {
+            ...prev[section],
+            [newItemName]: { ...initialBudgetItem }
+        }
+    }))
+  }
+  
+  const handleRemoveBudgetItem = (section: string, item: string) => {
+    const newSection = { ...budget[section] };
+    delete newSection[item];
+    setBudget(prev => ({ ...prev, [section]: newSection }));
+  }
+
+  const handleAddSection = () => {
+    if (newSectionName && !budgetStructure[newSectionName]) {
+        setBudgetStructure(prev => ({...prev, [newSectionName]: [] }));
+        setBudget(prev => ({...prev, [newSectionName]: {} }));
+        setNewSectionName('');
+    }
+  }
+
 
   const calculateSectionTotal = (section: string) => {
     return Object.values(budget[section] || {}).reduce((total, item) => total + (Number(item.cost) || 0), 0);
@@ -75,8 +104,15 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
   }
   
   const BudgetInputRow = ({ section, item }: { section: string, item: string }) => (
-    <div className="py-4 border-b">
-        <Label className="font-semibold">{item}</Label>
+    <div className="py-4 border-b relative">
+        <div className="flex justify-between items-center">
+             <Label className="font-semibold">{item}</Label>
+            {!initialBudgetStructure[section]?.includes(item) && (
+                <Button variant="ghost" size="icon" onClick={() => handleRemoveBudgetItem(section, item)} className="h-7 w-7">
+                    <Trash2 className="h-4 w-4" />
+                </Button>
+            )}
+        </div>
         <div className="grid md:grid-cols-3 gap-4 mt-2">
             <div className="space-y-2">
                 <Label htmlFor={`${section}-${item}-cost`} className="text-xs">Cost</Label>
@@ -123,8 +159,8 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
                 <CardDescription>Provide a detailed breakdown of the construction costs. This information is critical for underwriting.</CardDescription>
             </CardHeader>
             <CardContent>
-                <Accordion type="multiple" defaultValue={["Soft Costs"]} className="w-full">
-                    {Object.entries(budgetStructure).map(([section, items]) => (
+                <Accordion type="multiple" defaultValue={["Soft Costs", "Site Work"]} className="w-full">
+                    {Object.keys(budgetStructure).map((section) => (
                         <AccordionItem key={section} value={section}>
                             <AccordionTrigger className="text-lg font-semibold hover:no-underline">
                                 <div className="flex justify-between w-full pr-4">
@@ -133,11 +169,27 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
                                 </div>
                             </AccordionTrigger>
                             <AccordionContent className="px-1">
-                                {items.map(item => <BudgetInputRow key={item} section={section} item={item} />)}
+                                {Object.keys(budget[section]).map(item => <BudgetInputRow key={item} section={section} item={item} />)}
+                                <div className="pt-4">
+                                     <Button variant="outline" size="sm" onClick={() => handleAddBudgetItem(section)}>
+                                        <PlusCircle className="mr-2 h-4 w-4" /> Add Line Item to {section}
+                                    </Button>
+                                </div>
                             </AccordionContent>
                         </AccordionItem>
                     ))}
                 </Accordion>
+                <div className="mt-6 pt-4 border-t">
+                     <h3 className="text-lg font-semibold mb-2">Add New Budget Section</h3>
+                    <div className="flex gap-2">
+                        <Input
+                            placeholder="Enter new section name"
+                            value={newSectionName}
+                            onChange={(e) => setNewSectionName(e.target.value)}
+                        />
+                        <Button onClick={handleAddSection}>Add Section</Button>
+                    </div>
+                </div>
                 <div className="mt-6 pt-4 border-t">
                     <div className="flex justify-between items-center">
                         <h3 className="text-xl font-bold">Grand Total</h3>
