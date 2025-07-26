@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -22,6 +21,12 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
   const [maintenance, setMaintenance] = useState(0);
   const [updates, setUpdates] = useState(0);
   const [grounds, setGrounds] = useState(0);
+  const [admin, setAdmin] = useState(0);
+  const [payroll, setPayroll] = useState(0);
+  const [propertyTaxes, setPropertyTaxes] = useState(0);
+  const [landscaping, setLandscaping] = useState(0);
+  const [licensing, setLicensing] = useState(0);
+  const [marketing, setMarketing] = useState(0);
   const [adjustedGrossIncome, setAdjustedGrossIncome] = useState(0);
   const [netOperatingIncome, setNetOperatingIncome] = useState(0);
 
@@ -29,10 +34,10 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
     const agi = grossIncome - vacancy - nonPerformance - management;
     setAdjustedGrossIncome(agi);
     
-    const otherExpenses = utilities + insurance + maintenance + updates + grounds;
+    const otherExpenses = utilities + insurance + maintenance + updates + grounds + admin + payroll + propertyTaxes + landscaping + licensing + marketing;
     const noi = agi - otherExpenses;
     setNetOperatingIncome(noi);
-  }, [grossIncome, utilities, insurance, management, vacancy, nonPerformance, maintenance, updates, grounds]);
+  }, [grossIncome, utilities, insurance, management, vacancy, nonPerformance, maintenance, updates, grounds, admin, payroll, propertyTaxes, landscaping, licensing, marketing]);
 
   const handleNextPage = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
@@ -42,6 +47,21 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
   const handleNumberChange = (setter: (value: number) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setter(Number(e.target.value) || 0);
   };
+  
+  const calculatePercentage = (expense: number) => {
+    if (grossIncome === 0) return '0.00%';
+    return ((expense / grossIncome) * 100).toFixed(2) + '%';
+  };
+
+  const ExpenseInput = ({ label, value, setter, placeholder }: { label: string, value: number, setter: (value: number) => void, placeholder?: string }) => (
+    <div className="space-y-2">
+      <Label htmlFor={label.toLowerCase()}>{label}</Label>
+      <div className="flex items-center gap-2">
+        <Input id={label.toLowerCase()} type="number" placeholder={placeholder} value={value || ''} onChange={handleNumberChange(setter)} />
+        <span className="text-sm text-muted-foreground w-20 text-right">{calculatePercentage(value)}</span>
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -61,18 +81,9 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
                     <Input id="grossIncome" type="number" placeholder="e.g., 10000" onChange={handleNumberChange(setGrossIncome)} />
                 </div>
                  <div className="grid md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="vacancy">Vacancy</Label>
-                        <Input id="vacancy" type="number" placeholder="e.g., 500" onChange={handleNumberChange(setVacancy)} />
-                    </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="nonPerformance">Non-Performance</Label>
-                        <Input id="nonPerformance" type="number" placeholder="e.g., 200" onChange={handleNumberChange(setNonPerformance)} />
-                    </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="management">Management</Label>
-                        <Input id="management" type="number" placeholder="e.g., 800" onChange={handleNumberChange(setManagement)} />
-                    </div>
+                    <ExpenseInput label="Vacancy" value={vacancy} setter={setVacancy} placeholder="e.g., 500" />
+                    <ExpenseInput label="Non-Performance" value={nonPerformance} setter={setNonPerformance} placeholder="e.g., 200" />
+                    <ExpenseInput label="Management" value={management} setter={setManagement} placeholder="e.g., 800" />
                 </div>
 
                 <div className="pt-4 border-t">
@@ -83,27 +94,18 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
                 </div>
                 
                 <h3 className="font-semibold pt-4 border-t">Other Monthly Expenses</h3>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="utilities">Utilities</Label>
-                        <Input id="utilities" type="number" placeholder="e.g., 500" onChange={handleNumberChange(setUtilities)} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="insurance">Insurance</Label>
-                        <Input id="insurance" type="number" placeholder="e.g., 200" onChange={handleNumberChange(setInsurance)} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="maintenance">Maintenance</Label>
-                        <Input id="maintenance" type="number" placeholder="e.g., 300" onChange={handleNumberChange(setMaintenance)} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="updates">Updates</Label>
-                        <Input id="updates" type="number" placeholder="e.g., 150" onChange={handleNumberChange(setUpdates)} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="grounds">Grounds</Label>
-                        <Input id="grounds" type="number" placeholder="e.g., 100" onChange={handleNumberChange(setGrounds)} />
-                    </div>
+                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <ExpenseInput label="Utilities" value={utilities} setter={setUtilities} placeholder="e.g., 500" />
+                    <ExpenseInput label="Insurance" value={insurance} setter={setInsurance} placeholder="e.g., 200" />
+                    <ExpenseInput label="Maintenance" value={maintenance} setter={setMaintenance} placeholder="e.g., 300" />
+                    <ExpenseInput label="Updates" value={updates} setter={setUpdates} placeholder="e.g., 150" />
+                    <ExpenseInput label="Grounds" value={grounds} setter={setGrounds} placeholder="e.g., 100" />
+                    <ExpenseInput label="Admin" value={admin} setter={setAdmin} placeholder="e.g., 100" />
+                    <ExpenseInput label="Payroll" value={payroll} setter={setPayroll} placeholder="e.g., 2000" />
+                    <ExpenseInput label="Property Taxes" value={propertyTaxes} setter={setPropertyTaxes} placeholder="e.g., 400" />
+                    <ExpenseInput label="Landscaping" value={landscaping} setter={setLandscaping} placeholder="e.g., 150" />
+                    <ExpenseInput label="Licensing" value={licensing} setter={setLicensing} placeholder="e.g., 50" />
+                    <ExpenseInput label="Marketing" value={marketing} setter={setMarketing} placeholder="e.g., 100" />
                 </div>
 
                 <div className="pt-4 border-t">
@@ -126,4 +128,3 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
     </div>
   );
 }
-
