@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useId } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, DollarSign, PlusCircle, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -19,8 +19,9 @@ type Draw = {
 
 export function LoanApplicationClientPage7({ loanProgram }: { loanProgram: string}) {
   const router = useRouter();
-  const [draws, setDraws] = useState<Draw[]>([
-    { id: `draw-${Date.now()}`, workCompleted: '', cost: 0, schedule: '' }
+  const initialId = useId();
+  const [draws, setDraws] = useState<Draw[]>(() => [
+    { id: initialId, workCompleted: '', cost: 0, schedule: '' }
   ]);
   
   const handleDrawChange = (id: string, field: keyof Omit<Draw, 'id'>, value: string | number) => {
@@ -28,7 +29,8 @@ export function LoanApplicationClientPage7({ loanProgram }: { loanProgram: strin
   };
 
   const handleAddDraw = () => {
-    setDraws([...draws, { id: `draw-${Date.now()}`, workCompleted: '', cost: 0, schedule: '' }]);
+    const newId = `draw-${Math.random().toString(36).substring(2, 9)}`;
+    setDraws([...draws, { id: newId, workCompleted: '', cost: 0, schedule: '' }]);
   };
 
   const handleRemoveDraw = (id: string) => {
