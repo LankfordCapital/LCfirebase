@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState } from 'react';
@@ -8,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
-import { ArrowLeft, ArrowRight, Briefcase, FileText, FileUp, Building, BookText, DollarSign, Shield, BookUser } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Briefcase, FileText, FileUp, Building, BookText, DollarSign, Shield, BookUser, Wrench } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
@@ -32,6 +31,12 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
   const [escrowAgentCompany, setEscrowAgentCompany] = useState('');
   const [escrowAgentPhone, setEscrowAgentPhone] = useState('');
   const [escrowAgentEmail, setEscrowAgentEmail] = useState('');
+  
+  const [gcName, setGcName] = useState('');
+  const [gcCompanyName, setGcCompanyName] = useState('');
+  const [gcPhone, setGcPhone] = useState('');
+  const [gcEmail, setGcEmail] = useState('');
+  const [gcLicense, setGcLicense] = useState('');
 
 
   const { documents, addDocument } = useDocumentContext();
@@ -122,17 +127,40 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
         
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2"><BookText className="h-5 w-5 text-primary" /> Project Details</CardTitle>
-                <CardDescription>Please upload the following project documents.</CardDescription>
+                <CardTitle className="flex items-center gap-2"><Wrench className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-                <DocumentUploadInput name="Executive Summary" />
-                <DocumentUploadInput name="Sources and Uses Statement" />
-                <DocumentUploadInput name="Marketing Plan" />
-                <DocumentUploadInput name="5 Years of Financial Projections" />
+                 <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="gcName">GC Name</Label>
+                        <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="gcCompanyName">GC Company Name</Label>
+                        <Input id="gcCompanyName" value={gcCompanyName} onChange={e => setGcCompanyName(e.target.value)} />
+                    </div>
+                </div>
+                 <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="gcPhone">GC Phone</Label>
+                        <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="gcEmail">GC Email</Label>
+                        <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} />
+                    </div>
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="gcLicense">GC License Number</Label>
+                    <Input id="gcLicense" value={gcLicense} onChange={e => setGcLicense(e.target.value)} />
+                 </div>
+                 <DocumentUploadInput name="General Contractor License" />
+                 <DocumentUploadInput name="General Contractor Insurance" />
+                 <DocumentUploadInput name="General Contractor Bond" />
+                 <DocumentUploadInput name="General Contractor's Contract to Build" />
             </CardContent>
         </Card>
-        
+
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2"><Shield className="h-5 w-5 text-primary" /> Insurance Agent Details</CardTitle>

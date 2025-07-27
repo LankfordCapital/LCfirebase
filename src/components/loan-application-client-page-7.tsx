@@ -1,57 +1,41 @@
 
-
 'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, ArrowRight, Briefcase, FileText } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar, DollarSign, List, PlusCircle, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Label } from './ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Input } from './ui/input';
-import { useDocumentContext } from '@/contexts/document-context';
+
+type Draw = {
+  id: string;
+  description: string;
+  amount: number;
+};
 
 export function LoanApplicationClientPage7({ loanProgram }: { loanProgram: string}) {
   const router = useRouter();
-  const [numberOfCompanies, setNumberOfCompanies] = useState(1);
-  const { documents, addDocument } = useDocumentContext();
+  const [draws, setDraws] = useState<Draw[]>([
+    { id: `draw-${Date.now()}`, description: '', amount: 0 },
+  ]);
 
-  const handleFileChange = async (itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-        const file = event.target.files[0];
-        await addDocument({
-            name: itemName,
-            file,
-            status: 'uploaded',
-        });
-    }
+  const handleDrawChange = (id: string, field: keyof Omit<Draw, 'id'>, value: string | number) => {
+    setDraws(draws.map(draw => (draw.id === id ? { ...draw, [field]: value } : draw)));
   };
 
-  const DocumentUploadInput = ({ name }: { name: string }) => {
-    const doc = documents[name];
-    const fileInputId = `upload-${name.replace(/\s+/g, '-')}`;
-    return (
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-md border">
-        <div className="flex items-center gap-3">
-          <FileText className="h-5 w-5 text-muted-foreground" />
-          <Label htmlFor={fileInputId} className="font-medium">{name}</Label>
-        </div>
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Input id={fileInputId} type="file" className="w-full sm:w-auto" onChange={(e) => handleFileChange(name, e)} disabled={!!doc} />
-        </div>
-      </div>
-    );
+  const handleAddDraw = () => {
+    setDraws([...draws, { id: `draw-${Date.now()}`, description: '', amount: 0 }]);
+  };
+
+  const handleRemoveDraw = (id: string) => {
+    setDraws(draws.filter(draw => draw.id !== id));
   };
   
-  const CompanyTaxSection = ({ companyIndex }: { companyIndex: number }) => (
-    <div key={companyIndex} className="space-y-4 pt-4 mt-4 border-t">
-      <h4 className="font-semibold text-lg">Company #{companyIndex + 1} Business Tax Returns</h4>
-      <DocumentUploadInput name={`Business Tax Returns - Year 1 (Company ${companyIndex + 1})`} />
-      <DocumentUploadInput name={`Business Tax Returns - Year 2 (Company ${companyIndex + 1})`} />
-      <DocumentUploadInput name={`Business Tax Returns - Year 3 (Company ${companyIndex + 1})`} />
-    </div>
-  );
+  const calculateTotalDraws = () => {
+    return draws.reduce((total, draw) => total + (Number(draw.amount) || 0), 0);
+  }
 
   const handleContinue = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
@@ -72,28 +56,54 @@ export function LoanApplicationClientPage7({ loanProgram }: { loanProgram: strin
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <Briefcase className="h-5 w-5 text-primary" />
-                    Business Tax Returns
+                    <Calendar className="h-5 w-5 text-primary" />
+                    Projected Draw Schedule
                 </CardTitle>
-                <CardDescription>Please upload the last 3 years of business tax returns for each relevant company.</CardDescription>
+                <CardDescription>Outline the projected draw schedule for the construction.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="w-full sm:w-1/2 md:w-1/3">
-                    <Label htmlFor="num-companies">Number of Companies</Label>
-                    <Select value={String(numberOfCompanies)} onValueChange={(value) => setNumberOfCompanies(Number(value))}>
-                        <SelectTrigger id="num-companies">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                        {[1, 2, 3, 4, 5].map(num => (
-                            <SelectItem key={num} value={String(num)}>{num}</SelectItem>
-                        ))}
-                        </SelectContent>
-                    </Select>
+                <div className="space-y-4">
+                    {draws.map((draw, index) => (
+                        <div key={draw.id} className="flex items-end gap-4 p-4 border rounded-md relative">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-grow">
+                                <div className="space-y-2">
+                                    <Label htmlFor={`draw-desc-${draw.id}`}>Draw #{index + 1} Description</Label>
+                                    <Input 
+                                        id={`draw-desc-${draw.id}`} 
+                                        value={draw.description} 
+                                        onChange={(e) => handleDrawChange(draw.id, 'description', e.target.value)}
+                                        placeholder="e.g., Foundation & Framing"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor={`draw-amount-${draw.id}`}>Amount</Label>
+                                    <Input 
+                                        id={`draw-amount-${draw.id}`} 
+                                        type="number" 
+                                        value={draw.amount || ''}
+                                        onChange={(e) => handleDrawChange(draw.id, 'amount', Number(e.target.value))}
+                                        placeholder="0.00"
+                                    />
+                                </div>
+                            </div>
+                            {draws.length > 1 && (
+                                <Button variant="ghost" size="icon" onClick={() => handleRemoveDraw(draw.id)}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            )}
+                        </div>
+                    ))}
                 </div>
-                {Array.from({ length: numberOfCompanies }).map((_, index) => (
-                    <CompanyTaxSection key={index} companyIndex={index} />
-                ))}
+                 <div className="flex justify-between items-center mt-6 pt-4 border-t">
+                    <Button type="button" variant="outline" onClick={handleAddDraw}>
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Add Draw
+                    </Button>
+                    <div className="text-right">
+                        <p className="text-lg font-semibold">Total Draw Amount</p>
+                        <p className="text-2xl font-bold text-primary">{calculateTotalDraws().toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</p>
+                    </div>
+                </div>
             </CardContent>
         </Card>
 
