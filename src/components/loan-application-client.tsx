@@ -81,6 +81,8 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
     );
   };
 
+  const isIndustrial = loanProgram.toLowerCase().includes('industrial');
+
 
   return (
     <div className="space-y-6">
@@ -117,14 +119,25 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                       <SelectValue placeholder="Select a property type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="multi-family">Multi Family</SelectItem>
-                      <SelectItem value="mixed-use">Mixed Use</SelectItem>
-                      <SelectItem value="retail">Retail</SelectItem>
-                      <SelectItem value="restaurant">Restaurant</SelectItem>
-                      <SelectItem value="hospitality">Hospitality</SelectItem>
-                      <SelectItem value="office">Office</SelectItem>
-                      <SelectItem value="medical">Medical</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      {isIndustrial ? (
+                        <>
+                          <SelectItem value="warehouses">Warehouses</SelectItem>
+                          <SelectItem value="light-industrial">Light Industrial</SelectItem>
+                          <SelectItem value="heavy-industrial">Heavy Industrial</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </>
+                      ) : (
+                        <>
+                          <SelectItem value="multi-family">Multi Family</SelectItem>
+                          <SelectItem value="mixed-use">Mixed Use</SelectItem>
+                          <SelectItem value="retail">Retail</SelectItem>
+                          <SelectItem value="restaurant">Restaurant</SelectItem>
+                          <SelectItem value="hospitality">Hospitality</SelectItem>
+                          <SelectItem value="office">Office</SelectItem>
+                          <SelectItem value="medical">Medical</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
