@@ -29,4 +29,3 @@ export default function LoanApplicationPage({ params }: { params: { program: str
         </Suspense>
     )
 }
-
