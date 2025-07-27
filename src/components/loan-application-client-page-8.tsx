@@ -8,12 +8,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
-import { ArrowLeft, ArrowRight, FileText, FileUp, DollarSign } from 'lucide-react';
+import { ArrowLeft, ArrowRight, FileText, FileUp, Wrench } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
   const { documents, addDocument } = useDocumentContext();
   const router = useRouter();
+
+  const [gcName, setGcName] = useState('');
+  const [gcCompanyName, setGcCompanyName] = useState('');
+  const [gcPhone, setGcPhone] = useState('');
+  const [gcEmail, setGcEmail] = useState('');
+  const [gcLicense, setGcLicense] = useState('');
 
   const handleFileChange = useCallback(async (itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -61,13 +67,38 @@ export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: strin
         
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2"><DollarSign className="h-5 w-5 text-primary"/> Subject Property Financials</CardTitle>
-                <CardDescription>Please upload the profit and loss statements for the subject property.</CardDescription>
+                <CardTitle className="flex items-center gap-2"><Wrench className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
+                <CardDescription>Provide information about the general contractor for this project.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
-                <DocumentUploadInput name="Trailing 12-Month Profit & Loss Statement" />
-                <DocumentUploadInput name="Previous Year 1 Profit & Loss Statement" />
-                <DocumentUploadInput name="Previous Year 2 Profit & Loss Statement" />
+            <CardContent className="space-y-4">
+                 <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="gcName">GC Name</Label>
+                        <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="gcCompanyName">GC Company Name</Label>
+                        <Input id="gcCompanyName" value={gcCompanyName} onChange={e => setGcCompanyName(e.target.value)} />
+                    </div>
+                </div>
+                 <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="gcPhone">GC Phone</Label>
+                        <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="gcEmail">GC Email</Label>
+                        <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} />
+                    </div>
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="gcLicense">GC License Number</Label>
+                    <Input id="gcLicense" value={gcLicense} onChange={e => setGcLicense(e.target.value)} />
+                 </div>
+                 <DocumentUploadInput name="General Contractor License" />
+                 <DocumentUploadInput name="General Contractor Insurance" />
+                 <DocumentUploadInput name="General Contractor Bond" />
+                 <DocumentUploadInput name="General Contractor's Contract to Build" />
             </CardContent>
         </Card>
         
