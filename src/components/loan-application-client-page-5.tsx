@@ -176,7 +176,7 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="titleAgentEmail">Agent Email</Label>
-                        <Input id="titleAgentEmail" type="email" value={titleAgentEmail} onChange={e => setTitleAgentEmail(e.target.value)} />
+                        <Input id="titleAgentEmail" type="email" value={titleAgentEmail} onChange={e => setEscrowAgentEmail(e.target.value)} />
                     </div>
                 </div>
                 <DocumentUploadInput name="Marked Up Title Commitment" />

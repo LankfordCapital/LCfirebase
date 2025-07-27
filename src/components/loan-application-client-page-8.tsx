@@ -8,18 +8,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
-import { ArrowLeft, ArrowRight, FileText, FileUp, Wrench } from 'lucide-react';
+import { ArrowLeft, ArrowRight, FileText, FileUp, Building, Wallet } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Separator } from './ui/separator';
 
 export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
   const { documents, addDocument } = useDocumentContext();
   const router = useRouter();
-
-  const [gcName, setGcName] = useState('');
-  const [gcCompanyName, setGcCompanyName] = useState('');
-  const [gcPhone, setGcPhone] = useState('');
-  const [gcEmail, setGcEmail] = useState('');
-  const [gcLicense, setGcLicense] = useState('');
 
   const handleFileChange = useCallback(async (itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -50,12 +45,20 @@ export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: strin
   };
   
   const handleContinue = () => {
-    const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
+    const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&g/, 'and');
     router.push(`/dashboard/application/${programSlug}/page-9`);
   };
 
   const handleGoBack = () => {
-    router.back();
+    // For non-construction, page 5 links here, so we go back to 5.
+    // For construction, page 7 links here, so we go back to 7.
+    const isConstructionOrRehab = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('rehab');
+     if (isConstructionOrRehab) {
+        router.back(); // Goes back to page 7
+     } else {
+        const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
+        router.push(`/dashboard/application/${programSlug}/page-5`);
+     }
   }
 
   return (
@@ -67,44 +70,34 @@ export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: strin
         
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Wrench className="h-5 w-5 text-primary" /> General Contractor Details</CardTitle>
-                <CardDescription>Provide information about the general contractor for this project.</CardDescription>
+                <CardTitle className="flex items-center gap-2"><Wallet className="h-5 w-5 text-primary" /> Property Financials & Tax Returns</CardTitle>
+                <CardDescription>Upload the property's financial statements and the required tax returns.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-                 <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="gcName">GC Name</Label>
-                        <Input id="gcName" value={gcName} onChange={e => setGcName(e.target.value)} />
-                    </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="gcCompanyName">GC Company Name</Label>
-                        <Input id="gcCompanyName" value={gcCompanyName} onChange={e => setGcCompanyName(e.target.value)} />
+            <CardContent className="space-y-6">
+                 <div>
+                    <h3 className="text-lg font-semibold mb-2">Property Financials</h3>
+                    <div className="space-y-3">
+                        <DocumentUploadInput name="Trailing 12-Month Profit & Loss Statement" />
+                        <DocumentUploadInput name="Previous Year 1 Profit & Loss Statement" />
+                        <DocumentUploadInput name="Previous Year 2 Profit & Loss Statement" />
                     </div>
                 </div>
-                 <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="gcPhone">GC Phone</Label>
-                        <Input id="gcPhone" type="tel" value={gcPhone} onChange={e => setGcPhone(e.target.value)} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="gcEmail">GC Email</Label>
-                        <Input id="gcEmail" type="email" value={gcEmail} onChange={e => setGcEmail(e.target.value)} />
+                
+                <Separator />
+                
+                <div>
+                     <h3 className="text-lg font-semibold mb-2">Tax Returns</h3>
+                    <div className="space-y-3">
+                        <DocumentUploadInput name="Sponsor Personal Tax Returns (Last 2 Years)" />
+                        <DocumentUploadInput name="Business Entity Tax Returns (Last 2 Years)" />
                     </div>
                 </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="gcLicense">GC License Number</Label>
-                    <Input id="gcLicense" value={gcLicense} onChange={e => setGcLicense(e.target.value)} />
-                 </div>
-                 <DocumentUploadInput name="General Contractor License" />
-                 <DocumentUploadInput name="General Contractor Insurance" />
-                 <DocumentUploadInput name="General Contractor Bond" />
-                 <DocumentUploadInput name="General Contractor's Contract to Build" />
             </CardContent>
         </Card>
         
         <div className="flex justify-between items-center">
             <Button variant="outline" onClick={handleGoBack}>
-               <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 7
+               <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
             </Button>
             <Button onClick={handleContinue}>
                 Continue to Page 9 <ArrowRight className="ml-2 h-4 w-4" />
