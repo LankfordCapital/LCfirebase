@@ -20,7 +20,7 @@ export default function MezzanineLoansPage() {
         <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
         <div className="container relative z-20 mx-auto px-4 text-center">
           <h1 className="font-headline text-4xl font-bold md:text-5xl">
-            <span className="text-primary">Mezzanine</span> <span className="text-white">Loans</span>
+            <span className="text-white">Mezzanine</span> <span className="text-primary">Loans</span>
           </h1>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Sophisticated capital solutions to bridge the funding gap.
