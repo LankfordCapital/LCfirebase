@@ -37,7 +37,12 @@ export async function generateMarketAnalysis(input: GenerateMarketAnalysisInput)
 
 const prompt = ai.definePrompt({
     name: 'generateMarketAnalysisPrompt',
-    input: { schema: GenerateMarketAnalysisInputSchema },
+    input: { schema: GenerateMarketAnalysisInputSchema.extend({
+        generateTrafficStudy: z.boolean(),
+        generateDemographics: z.boolean(),
+        generateEconomicDrivers: z.boolean(),
+        generateZoning: z.boolean(),
+    }) },
     output: { schema: GenerateMarketAnalysisOutputSchema },
     prompt: `You are an expert real estate and urban planning market analyst. Your task is to generate a series of detailed reports for a subject property based on the provided address, deal type, and a list of requested reports.
 
@@ -46,9 +51,9 @@ You must use your knowledge of public data sources, market trends, and analysis 
 **Subject Property Address:** {{{subjectPropertyAddress}}}
 **Deal Type / Property Focus:** {{{dealType}}}
 
-Please generate the following reports as requested. If a report is not requested in the 'reportTypes' array, do not generate it.
+Please generate the following reports as requested. If a report is not requested, do not generate it.
 
-{{#if (includes reportTypes "trafficStudy")}}
+{{#if generateTrafficStudy}}
 **Traffic Study:**
 Generate a detailed report on traffic conditions around the subject property. Include:
 - Estimated average daily traffic counts on nearby major roads.
@@ -57,7 +62,7 @@ Generate a detailed report on traffic conditions around the subject property. In
 - Any known future transportation projects that could impact the area.
 {{/if}}
 
-{{#if (includes reportTypes "demographics")}}
+{{#if generateDemographics}}
 **Demographics Report:**
 Generate a comprehensive demographic analysis for a 3-5 mile radius around the property. Include:
 - Population data: total population, density, and projected growth rate.
@@ -67,7 +72,7 @@ Generate a comprehensive demographic analysis for a 3-5 mile radius around the p
 - Educational attainment levels.
 {{/if}}
 
-{{#if (includes reportTypes "economicDrivers")}}
+{{#if generateEconomicDrivers}}
 **Economic Drivers Report:**
 Generate an analysis of the local economy. Include:
 - Major employers in the area and their industries.
@@ -77,7 +82,7 @@ Generate an analysis of the local economy. Include:
 - How these drivers specifically relate to the "{{dealType}}".
 {{/if}}
 
-{{#if (includes reportTypes "zoning")}}
+{{#if generateZoning}}
 **Zoning & Use Report:**
 Generate a report on the property's zoning and land use. Include:
 - The specific zoning designation for the address.
@@ -97,7 +102,15 @@ const marketAnalysisFlow = ai.defineFlow(
         outputSchema: GenerateMarketAnalysisOutputSchema,
     },
     async (input) => {
-        const { output } = await prompt(input);
+        const promptInput = {
+            ...input,
+            generateTrafficStudy: input.reportTypes.includes('trafficStudy'),
+            generateDemographics: input.reportTypes.includes('demographics'),
+            generateEconomicDrivers: input.reportTypes.includes('economicDrivers'),
+            generateZoning: input.reportTypes.includes('zoning'),
+        };
+
+        const { output } = await prompt(promptInput);
         return output!;
     }
 );
