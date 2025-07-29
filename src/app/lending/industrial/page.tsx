@@ -55,7 +55,7 @@ export default function IndustrialLendingPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="font-headline text-3xl font-bold text-foreground">Financing <span className="text-primary">Industrial</span> Growth</h2>
+            <h2 className="font-headline text-3xl font-bold text-foreground"><span className="text-primary">Financing</span> <span className="text-foreground">Industrial</span> <span className="text-primary">Growth</span></h2>
             <p className="mt-2 text-muted-foreground">Solutions for manufacturing, logistics, and warehousing.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
