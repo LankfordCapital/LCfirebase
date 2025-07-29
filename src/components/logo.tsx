@@ -1,32 +1,17 @@
 import React from 'react';
+import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 export function Logo({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 250 40"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-label="Lankford Capital Logo"
-    >
-      <g className="font-headline">
-        <text
-          x="0"
-          y="28"
-          fontSize="30"
-          fontWeight="bold"
-          className="fill-primary"
-        >
-          Lankford
-        </text>
-        <text
-          x="135"
-          y="28"
-          fontSize="30"
-          className="fill-accent"
-        >
-          Capital
-        </text>
-      </g>
-    </svg>
+    <div className={cn("relative h-10 w-40", className)}>
+        <Image
+            src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Secondary%20Logo%20V1.png?alt=media&token=beae4c39-c288-4f32-870e-9d716a6da952"
+            alt="Lankford Capital Logo"
+            layout="fill"
+            objectFit="contain"
+            priority
+        />
+    </div>
   );
 }

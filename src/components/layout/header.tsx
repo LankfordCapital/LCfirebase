@@ -38,7 +38,7 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
-          <Logo className="h-8 w-auto" />
+          <Logo className="h-10 w-40" />
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
@@ -145,7 +145,7 @@ export function Header() {
               </SheetHeader>
               <div className="flex flex-col gap-6 p-6">
                 <Link href="/" onClick={() => setIsOpen(false)}>
-                  <Logo className="h-8 w-auto" />
+                  <Logo className="h-10 w-40" />
                 </Link>
                 <div className="flex flex-col gap-4">
                   <h3 className="font-bold">Lending Products</h3>

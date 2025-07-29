@@ -24,7 +24,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           <div className="md:col-span-1">
             <Link href="/">
-              <Logo className="h-10 w-auto" />
+              <Logo className="h-10 w-40" />
             </Link>
             <p className="mt-4 text-sm text-muted-foreground">
               Your trusted partner in financial growth.
