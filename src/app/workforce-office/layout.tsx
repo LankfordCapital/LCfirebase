@@ -14,7 +14,6 @@ import {
 import { Logo } from '@/components/logo';
 import {
   LayoutDashboard,
-  FileText,
   LogOut,
   ChevronLeft,
   Bot,

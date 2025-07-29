@@ -21,6 +21,7 @@ function BrokerOfficeLayoutContent({ children }: { children: React.ReactNode }) 
         return <>{children}</>;
     }
     
+    // In a real app, this would be a full dashboard layout with a sidebar
     return (
          <div className="bg-primary/5 min-h-screen">{children}</div>
     )

@@ -30,6 +30,12 @@ function DashboardNav() {
   const pathname = usePathname();
   const { user, logOut } = useAuth();
 
+  const menuItems = [
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/dashboard/documents', label: 'New Application', icon: FileText },
+    { href: '/dashboard/profile', label: 'Profile', icon: UserCircle },
+  ];
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -88,12 +94,6 @@ function DashboardNav() {
     </Sidebar>
   )
 }
-
-const menuItems = [
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/dashboard/documents', label: 'New Application', icon: FileText },
-    { href: '/dashboard/profile', label: 'Profile', icon: UserCircle },
-];
 
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     const { user, loading } = useAuth();
