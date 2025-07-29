@@ -2,15 +2,27 @@
 'use client';
 
 import { ProtectedRoute } from "@/components/protected-route";
+import { useAuth } from "@/contexts/auth-context";
 import { Loader2 } from "lucide-react";
 
 function BrokerOfficeSkeleton() {
-  // A simple full-page loader since the broker office layout is simpler.
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-primary/5">
+    <div className="flex h-screen w-full items-center justify-center bg-background">
       <Loader2 className="h-8 w-8 animate-spin text-primary" />
     </div>
   )
+}
+
+function BrokerOfficeLayoutContent({ children }: { children: React.ReactNode }) {
+    const { user, loading } = useAuth();
+
+    if (loading || !user) {
+        return <>{children}</>;
+    }
+    
+    return (
+         <div className="bg-primary/5 min-h-screen">{children}</div>
+    )
 }
 
 export default function BrokerOfficeLayout({
@@ -20,7 +32,7 @@ export default function BrokerOfficeLayout({
 }) {
   return (
       <ProtectedRoute redirectTo="/auth/broker-signin" Skeleton={BrokerOfficeSkeleton}>
-        <div className="bg-primary/5 min-h-screen">{children}</div>
+        <BrokerOfficeLayoutContent>{children}</BrokerOfficeLayoutContent>
       </ProtectedRoute>
   );
 }

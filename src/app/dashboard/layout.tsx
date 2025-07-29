@@ -96,6 +96,13 @@ const menuItems = [
 ];
 
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
+    const { user, loading } = useAuth();
+    
+    // Conditionally render the sidebar only when the user is authenticated.
+    if (loading || !user) {
+        return <>{children}</>;
+    }
+
     return (
         <div className="flex h-screen">
             <DashboardNav />
@@ -110,26 +117,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
 function DashboardSkeleton() {
     return (
-        <div className="flex h-screen w-full">
-            <div className="hidden md:block md:w-64 bg-background border-r p-2">
-                <div className="flex flex-col h-full">
-                    <div className="p-2">
-                        <div className="h-10 w-40 bg-muted rounded-md animate-pulse"></div>
-                    </div>
-                    <div className="flex flex-col gap-1 p-2 flex-grow">
-                        <div className="h-8 w-full bg-muted rounded-md animate-pulse"></div>
-                        <div className="h-8 w-full bg-muted rounded-md animate-pulse"></div>
-                        <div className="h-8 w-full bg-muted rounded-md animate-pulse"></div>
-                    </div>
-                    <div className="p-2">
-                        <div className="h-12 w-full bg-muted rounded-md animate-pulse"></div>
-                        <div className="h-8 mt-2 w-full bg-muted rounded-md animate-pulse"></div>
-                    </div>
-                </div>
-            </div>
-            <div className="flex-1 flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
+        <div className="flex h-screen w-full items-center justify-center bg-background">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
     )
 }
