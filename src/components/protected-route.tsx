@@ -6,6 +6,34 @@ import {useRouter} from 'next/navigation';
 import {useEffect, useState, ReactNode} from 'react';
 import {useAuth} from '@/contexts/auth-context';
 import {Skeleton} from '@/components/ui/skeleton';
+import { Sidebar, SidebarContent, SidebarHeader } from './ui/sidebar';
+
+function ProtectedRouteSkeleton() {
+  return (
+    <div className="flex h-screen">
+      <div className="hidden md:flex flex-col w-64 border-r">
+          <div className="p-4">
+             <Skeleton className="h-8 w-40" />
+          </div>
+          <div className="p-4 space-y-2">
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-8 w-full" />
+          </div>
+      </div>
+      <div className="flex-1 p-8 space-y-4">
+        <Skeleton className="h-12 w-1/4" />
+        <div className="grid grid-cols-3 gap-4">
+          <Skeleton className="h-24" />
+          <Skeleton className="h-24" />
+          <Skeleton className="h-24" />
+        </div>
+        <Skeleton className="h-64" />
+      </div>
+    </div>
+  )
+}
+
 
 export const ProtectedRoute = ({
   children,
@@ -29,17 +57,7 @@ export const ProtectedRoute = ({
   }, [user, loading, router, isClient, redirectTo]);
 
   if (loading || !isClient) {
-    return (
-      <div className="space-y-4 p-4">
-        <Skeleton className="h-12 w-1/4" />
-        <div className="grid grid-cols-3 gap-4">
-          <Skeleton className="h-24" />
-          <Skeleton className="h-24" />
-          <Skeleton className="h-24" />
-        </div>
-        <Skeleton className="h-64" />
-      </div>
-    );
+    return <ProtectedRouteSkeleton />;
   }
   
   return user ? children : null;
