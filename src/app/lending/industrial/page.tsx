@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle } from "lucide-react";
@@ -30,10 +31,20 @@ const loanTypes = [
 export default function IndustrialLendingPage() {
   return (
     <div>
-      <section className="relative bg-primary/5 py-20 md:py-28 text-center">
-        <div className="container mx-auto px-4">
-          <h1 className="font-headline text-4xl font-bold text-primary md:text-5xl">Industrial Lending</h1>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
+      <section className="relative h-[50vh] flex items-center justify-center text-white py-20 md:py-28">
+         <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute top-0 left-0 w-full h-full object-cover z-0"
+        >
+          <source src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Adobe%20Express%20-%20shutterstock_3505661673.mp4?alt=media&token=0bf831ef-6f04-43d7-abcf-cfd0706a39d8" type="video/mp4" />
+        </video>
+        <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
+        <div className="container relative z-20 mx-auto px-4 text-center">
+          <h1 className="font-headline text-4xl font-bold text-white md:text-5xl">Industrial Lending</h1>
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Specialized financing for the backbone of commerce.
           </p>
         </div>
