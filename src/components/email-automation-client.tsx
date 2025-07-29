@@ -14,20 +14,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { useDocumentContext } from '@/contexts/document-context';
 import { Checkbox } from './ui/checkbox';
 
-const sampleBorrower: GenerateEmailInput['recipient'] = {
-    userId: 'user-123',
-    email: 'john.doe@example.com',
-    fullName: 'John Doe',
-    role: 'borrower',
-    timeZone: 'America/New_York',
-};
+const sampleUsers: GenerateEmailInput['recipient'][] = [
+    { userId: 'user-123', email: 'john.doe@example.com', fullName: 'John Doe', role: 'borrower', timeZone: 'America/New_York' },
+    { userId: 'user-456', email: 'jane.smith@example.com', fullName: 'Jane Smith', role: 'borrower', timeZone: 'America/Chicago' },
+    { userId: 'user-789', email: 'sam.wilson@example.com', fullName: 'Sam Wilson', role: 'borrower', timeZone: 'America/Los_Angeles' },
+];
 
-const sampleBroker = {
-    userId: 'broker-456',
-    email: 'alice.broker@example.com',
-    fullName: 'Alice Broker',
-    role: 'broker' as const,
-};
+const sampleBrokers = [
+    { userId: 'broker-111', email: 'alice.broker@example.com', fullName: 'Alice Broker', role: 'broker' as const },
+    { userId: 'broker-222', email: 'bob.agent@example.com', fullName: 'Bob Agent', role: 'broker' as const, },
+    { userId: 'broker-333', email: 'charlie.capital@example.com', fullName: 'Charlie Capital', role: 'broker' as const, },
+];
 
 
 export function EmailAutomationClient() {
@@ -36,7 +33,9 @@ export function EmailAutomationClient() {
     const [scenario, setScenario] = useState<GenerateEmailInput['scenario']>('missingDocuments');
     const { documents } = useDocumentContext();
 
-    const [recipientType, setRecipientType] = useState<'borrower' | 'broker'>('borrower');
+    const [selectedBorrowerId, setSelectedBorrowerId] = useState<string | null>(null);
+    const [selectedBrokerId, setSelectedBrokerId] = useState<string | null>(null);
+
     const [fromWorkforceName, setFromWorkforceName] = useState('Your Name');
     const [ccBroker, setCcBroker] = useState(false);
 
@@ -52,11 +51,31 @@ export function EmailAutomationClient() {
     const { toast } = useToast();
 
     const handleGenerateEmail = async () => {
+        if (!selectedBorrowerId) {
+            toast({
+                variant: 'destructive',
+                title: 'No Recipient',
+                description: 'Please select a borrower to send the email to.',
+            });
+            return;
+        }
+
         setIsLoading(true);
         setResult(null);
 
         const uploadedDocumentNames = Object.keys(documents);
-        const recipient = recipientType === 'borrower' ? sampleBorrower : sampleBroker;
+        const recipient = sampleUsers.find(u => u.userId === selectedBorrowerId);
+        const broker = ccBroker ? sampleBrokers.find(b => b.userId === selectedBrokerId) : undefined;
+        
+        if (!recipient) {
+             toast({
+                variant: 'destructive',
+                title: 'Invalid Recipient',
+                description: 'The selected borrower could not be found.',
+            });
+            setIsLoading(false);
+            return;
+        }
 
         try {
             const response = await generateEmail({ 
@@ -67,8 +86,8 @@ export function EmailAutomationClient() {
                     ...details,
                     uploadedDocumentNames
                 },
-                ccBroker: recipient.role === 'borrower' && ccBroker,
-                broker: recipient.role === 'borrower' && ccBroker ? sampleBroker : undefined,
+                ccBroker: ccBroker && !!broker,
+                broker: broker,
             });
             setResult(response);
             toast({
@@ -206,14 +225,15 @@ export function EmailAutomationClient() {
                         />
                     </div>
                     <div className="space-y-2">
-                        <Label>To</Label>
-                         <Select onValueChange={(value) => setRecipientType(value as any)} defaultValue={recipientType}>
+                        <Label>To (Borrower)</Label>
+                         <Select onValueChange={setSelectedBorrowerId} value={selectedBorrowerId ?? ''}>
                             <SelectTrigger>
-                                <SelectValue />
+                                <SelectValue placeholder="Select a borrower..." />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="borrower">Borrower: {sampleBorrower.fullName}</SelectItem>
-                                <SelectItem value="broker">Broker: {sampleBroker.fullName}</SelectItem>
+                                {sampleUsers.map(user => (
+                                    <SelectItem key={user.userId} value={user.userId}>{user.fullName} ({user.email})</SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                     </div>
@@ -240,17 +260,33 @@ export function EmailAutomationClient() {
                     {renderScenarioInputs()}
                 </div>
 
-                {recipientType === 'borrower' && (
-                    <div className="flex items-center space-x-2">
-                        <Checkbox id="cc-broker" checked={ccBroker} onCheckedChange={(checked) => setCcBroker(checked as boolean)} />
-                        <label
-                            htmlFor="cc-broker"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                            CC Broker on this email
-                        </label>
+                
+                <div className="flex items-center space-x-2">
+                    <Checkbox id="cc-broker" checked={ccBroker} onCheckedChange={(checked) => setCcBroker(checked as boolean)} />
+                    <label
+                        htmlFor="cc-broker"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                        CC Broker on this email
+                    </label>
+                </div>
+
+                {ccBroker && (
+                     <div className="space-y-2 pl-6">
+                        <Label>CC (Broker)</Label>
+                         <Select onValueChange={setSelectedBrokerId} value={selectedBrokerId ?? ''}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a broker to CC..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {sampleBrokers.map(broker => (
+                                    <SelectItem key={broker.userId} value={broker.userId}>{broker.fullName} ({broker.email})</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                 )}
+
 
                 <Button onClick={handleGenerateEmail} disabled={isLoading}>
                     {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
