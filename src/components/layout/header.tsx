@@ -26,9 +26,7 @@ const lendingProducts = [
   { href: '/lending/equipment-financing', label: 'Equipment Financing', icon: Truck },
 ];
 
-const mainNav = [
-  { href: '/about', label: 'About Us' },
-  { href: '/contact', label: 'Contact' },
+const mainNav: { href: string, label: string }[] = [
 ];
 
 export function Header() {
@@ -73,7 +71,7 @@ export function Header() {
               {item.label}
             </Link>
           ))}
-           <Button asChild variant="outline">
+           <Button asChild>
               <Link href="/broker">For Brokers</Link>
             </Button>
            <DropdownMenu>
