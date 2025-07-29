@@ -74,9 +74,6 @@ export function Header() {
            <Button asChild className="text-black hover:bg-primary/90">
               <Link href="/broker">For Brokers</Link>
             </Button>
-            <Button asChild>
-              <Link href="/auth/signin">Borrower Login</Link>
-            </Button>
            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="font-semibold">
