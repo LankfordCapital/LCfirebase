@@ -22,7 +22,8 @@ const UserProfileSchema = z.object({
 });
 
 const GenerateEmailInputSchema = z.object({
-    user: UserProfileSchema.describe('The user for whom the email is being generated.'),
+    recipient: UserProfileSchema.describe('The user (borrower or broker) for whom the email is being generated.'),
+    fromWorkforceName: z.string().describe('The name of the Lankford Capital workforce member sending the email.'),
     scenario: z.enum(['missingDocuments', 'appointmentConfirmation', 'loanApproval', 'adverseAction', 'custom'])
         .describe('The scenario for which the email is being generated.'),
     details: z.object({
@@ -58,23 +59,23 @@ const prompt = ai.definePrompt({
     output: { schema: GenerateEmailOutputSchema },
     prompt: `You are an AI assistant for Lankford Capital responsible for drafting professional emails.
 
-Your task is to generate a personalized and professional email draft based on the provided user profile and scenario.
+Your task is to generate a personalized and professional email draft based on the provided recipient profile and scenario.
 
-Address the user by their full name. The tone should be professional and helpful.
+Address the recipient by their full name. The tone should be professional and helpful. Sign the email from "{{fromWorkforceName}}".
 
-**User Data:**
-- User ID: {{{user.userId}}}
-  - Name: {{{user.fullName}}}
-  - Email: {{{user.email}}}
-  - Role: {{{user.role}}}
-  - Timezone: {{{user.timeZone}}}
+**Recipient Data:**
+- User ID: {{{recipient.userId}}}
+  - Name: {{{recipient.fullName}}}
+  - Email: {{{recipient.email}}}
+  - Role: {{{recipient.role}}}
+  - Timezone: {{{recipient.timeZone}}}
 
 **Email Scenario: {{{scenario}}}**
 
 {{#if (eq scenario "missingDocuments")}}
 **Subject: Action Required on Your Loan Application**
 **Body:**
-Draft an email reminding the user of the following missing documents for their {{details.loanProgram}} application:
+Draft an email reminding the recipient of the following missing documents for their {{details.loanProgram}} application:
 {{#each details.missingDocuments}}
 - {{{this}}}
 {{/each}}
@@ -90,7 +91,7 @@ Draft an email confirming an appointment scheduled for **{{{details.appointmentT
 {{#if (eq scenario "loanApproval")}}
 **Subject: Congratulations! Your Loan Has Been Approved**
 **Body:**
-Draft an email congratulating the user on their loan approval. Include the following details: {{{details.loanDetails}}}. Mention that a loan officer will be in touch with the next steps.
+Draft an email congratulating the recipient on their loan approval. Include the following details: {{{details.loanDetails}}}. Mention that a loan officer will be in touch with the next steps.
 {{/if}}
 
 {{#if (eq scenario "adverseAction")}}

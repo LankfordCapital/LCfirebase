@@ -13,12 +13,20 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useDocumentContext } from '@/contexts/document-context';
 
-const sampleUser: GenerateEmailInput['user'] = {
+const sampleBorrower: GenerateEmailInput['recipient'] = {
     userId: 'user-123',
     email: 'john.doe@example.com',
     fullName: 'John Doe',
     role: 'borrower',
     timeZone: 'America/New_York',
+};
+
+const sampleBroker: GenerateEmailInput['recipient'] = {
+    userId: 'broker-456',
+    email: 'alice.broker@example.com',
+    fullName: 'Alice Broker',
+    role: 'broker',
+    timeZone: 'America/Los_Angeles',
 };
 
 
@@ -27,6 +35,9 @@ export function EmailAutomationClient() {
     const [result, setResult] = useState<GenerateEmailOutput | null>(null);
     const [scenario, setScenario] = useState<GenerateEmailInput['scenario']>('missingDocuments');
     const { documents } = useDocumentContext();
+
+    const [recipientType, setRecipientType] = useState<'borrower' | 'broker'>('borrower');
+    const [fromWorkforceName, setFromWorkforceName] = useState('Your Name');
 
     const [details, setDetails] = useState<GenerateEmailInput['details']>({
         loanProgram: '',
@@ -44,10 +55,12 @@ export function EmailAutomationClient() {
         setResult(null);
 
         const uploadedDocumentNames = Object.keys(documents);
+        const recipient = recipientType === 'borrower' ? sampleBorrower : sampleBroker;
 
         try {
             const response = await generateEmail({ 
-                user: sampleUser, 
+                recipient,
+                fromWorkforceName,
                 scenario, 
                 details: {
                     ...details,
@@ -180,29 +193,45 @@ export function EmailAutomationClient() {
                 <CardDescription>Generate personalized email drafts for various communication scenarios.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                      <div className="space-y-2">
-                        <Label>User</Label>
-                        <div className="p-3 rounded-md border bg-muted text-sm">
-                            {sampleUser.fullName} ({sampleUser.email})
-                        </div>
+                        <Label htmlFor="fromWorkforceName">From (Workforce Member)</Label>
+                        <Input
+                            id="fromWorkforceName"
+                            value={fromWorkforceName}
+                            onChange={(e) => setFromWorkforceName(e.target.value)}
+                        />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="scenario">Email Scenario</Label>
-                         <Select onValueChange={(value) => setScenario(value as any)} defaultValue={scenario}>
-                            <SelectTrigger id="scenario">
-                                <SelectValue placeholder="Select a scenario" />
+                        <Label>To</Label>
+                         <Select onValueChange={(value) => setRecipientType(value as any)} defaultValue={recipientType}>
+                            <SelectTrigger>
+                                <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="missingDocuments">Missing Document Reminder</SelectItem>
-                                <SelectItem value="appointmentConfirmation">Appointment Confirmation</SelectItem>
-                                <SelectItem value="loanApproval">Loan Approval</SelectItem>
-                                <SelectItem value="adverseAction">Adverse Action Notice</SelectItem>
-                                <SelectItem value="custom">Custom Email</SelectItem>
+                                <SelectItem value="borrower">Borrower: {sampleBorrower.fullName}</SelectItem>
+                                <SelectItem value="broker">Broker: {sampleBroker.fullName}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
                 </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="scenario">Email Scenario</Label>
+                        <Select onValueChange={(value) => setScenario(value as any)} defaultValue={scenario}>
+                        <SelectTrigger id="scenario">
+                            <SelectValue placeholder="Select a scenario" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="missingDocuments">Missing Document Reminder</SelectItem>
+                            <SelectItem value="appointmentConfirmation">Appointment Confirmation</SelectItem>
+                            <SelectItem value="loanApproval">Loan Approval</SelectItem>
+                            <SelectItem value="adverseAction">Adverse Action Notice</SelectItem>
+                            <SelectItem value="custom">Custom Email</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
 
                 <div className="space-y-4">
                     {renderScenarioInputs()}
