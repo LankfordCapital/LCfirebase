@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useEffect, type FormEvent } from 'react';
@@ -120,6 +121,7 @@ export function AIAssistant() {
               >
                 {message.sender === 'ai' && (
                   <Avatar className="h-8 w-8">
+                    <AvatarImage src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" alt="Lankford Capital AI" />
                     <AvatarFallback className="bg-primary text-primary-foreground">LC</AvatarFallback>
                   </Avatar>
                 )}
@@ -143,6 +145,7 @@ export function AIAssistant() {
              {isLoading && (
                  <div className="flex items-start gap-3 justify-start">
                     <Avatar className="h-8 w-8">
+                        <AvatarImage src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" alt="Lankford Capital AI" />
                         <AvatarFallback className="bg-primary text-primary-foreground">LC</AvatarFallback>
                     </Avatar>
                     <div className="bg-muted rounded-lg px-4 py-2 flex items-center">

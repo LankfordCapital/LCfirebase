@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
 import { Twitter, Linkedin, Facebook } from 'lucide-react';
+import Image from 'next/image';
 
 const lendingProducts1 = [
     { href: '/lending/residential-NOO', label: 'Residential NOO' },
@@ -82,7 +83,8 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
+        <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground flex items-center justify-center gap-2">
+          <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" alt="Lankford Capital Icon" width={20} height={20} />
           <p>&copy; {new Date().getFullYear()} Lankford Capital. All rights reserved.</p>
         </div>
       </div>
