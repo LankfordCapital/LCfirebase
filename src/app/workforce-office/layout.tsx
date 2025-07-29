@@ -36,7 +36,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/auth-context';
-import { ProtectedRoute } from '@/components/protected-route';
 
 function WorkforceNav() {
   const pathname = usePathname();
@@ -128,7 +127,6 @@ export default function WorkforceOfficeLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ProtectedRoute redirectTo="/auth/workforce-signin">
       <div className="flex h-screen">
         <WorkforceNav />
         <div className="flex-1 overflow-y-auto">
@@ -137,6 +135,5 @@ export default function WorkforceOfficeLayout({
           </div>
         </div>
       </div>
-    </ProtectedRoute>
   );
 }

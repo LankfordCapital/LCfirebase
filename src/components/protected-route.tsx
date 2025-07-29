@@ -26,19 +26,14 @@ export const ProtectedRoute = ({
 }) => {
   const {user, loading} = useAuth();
   const router = useRouter();
-  const [isVerified, setIsVerified] = useState(false);
-
+  
   useEffect(() => {
-    if (!loading) {
-      if (!user) {
-        router.push(redirectTo);
-      } else {
-        setIsVerified(true);
-      }
+    if (!loading && !user) {
+      router.push(redirectTo);
     }
   }, [user, loading, router, redirectTo]);
 
-  if (!isVerified) {
+  if (loading || !user) {
     return <Skeleton />;
   }
   
