@@ -83,8 +83,10 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground flex items-center justify-center gap-2">
-          <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" alt="Lankford Capital Icon" width={20} height={20} />
+        <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
+          <div className="flex justify-center mb-4">
+            <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" alt="Lankford Capital Icon" width={40} height={40} />
+          </div>
           <p>&copy; {new Date().getFullYear()} Lankford Capital. All rights reserved.</p>
         </div>
       </div>
