@@ -23,7 +23,41 @@ export function Footer() {
     <footer className="bg-primary/5 border-t">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
-          <div className="md:col-span-2">
+           <div className="md:col-span-1">
+              <div>
+                <h3 className="font-headline font-semibold text-primary">Lending</h3>
+                  <ul className="mt-4 space-y-2">
+                      {lendingProducts1.map(item => (
+                           <li key={item.href}><Link href={item.href} className="text-sm text-muted-foreground hover:text-primary">{item.label}</Link></li>
+                      ))}
+                  </ul>
+              </div>
+          </div>
+           <div className="md:col-span-1">
+              <h3 className="font-headline font-semibold text-primary invisible">More</h3>
+               <ul className="mt-4 space-y-2">
+                  {lendingProducts2.map(item => (
+                       <li key={item.href}><Link href={item.href} className="text-sm text-muted-foreground hover:text-primary">{item.label}</Link></li>
+                  ))}
+              </ul>
+          </div>
+           <div>
+            <h3 className="font-headline font-semibold text-primary">Company</h3>
+            <ul className="mt-4 space-y-2">
+              <li><Link href="/about" className="text-sm text-muted-foreground hover:text-primary">About Us</Link></li>
+              <li><Link href="/broker" className="text-sm text-muted-foreground hover:text-primary">For Brokers</Link></li>
+              <li><Link href="/contact" className="text-sm text-muted-foreground hover:text-primary">Contact</Link></li>
+            </ul>
+          </div>
+           <div>
+            <h3 className="font-headline font-semibold text-primary">Legal</h3>
+            <ul className="mt-4 space-y-2">
+              <li><Link href="/privacy-policy" className="text-sm text-muted-foreground hover:text-primary">Privacy Policy</Link></li>
+              <li><Link href="/terms-of-service" className="text-sm text-muted-foreground hover:text-primary">Terms of Service</Link></li>
+            </ul>
+          </div>
+        </div>
+        <div className="md:col-span-2 mt-8">
             <Link href="/">
               <Logo className="h-auto w-48" />
             </Link>
@@ -48,40 +82,6 @@ export function Footer() {
               </Button>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-8 md:col-span-2">
-              <div>
-                <h3 className="font-headline font-semibold text-primary">Lending</h3>
-                  <ul className="mt-4 space-y-2">
-                      {lendingProducts1.map(item => (
-                           <li key={item.href}><Link href={item.href} className="text-sm text-muted-foreground hover:text-primary">{item.label}</Link></li>
-                      ))}
-                  </ul>
-              </div>
-              <div>
-                  <h3 className="font-headline font-semibold text-primary invisible">More</h3>
-                   <ul className="mt-4 space-y-2">
-                      {lendingProducts2.map(item => (
-                           <li key={item.href}><Link href={item.href} className="text-sm text-muted-foreground hover:text-primary">{item.label}</Link></li>
-                      ))}
-                  </ul>
-              </div>
-          </div>
-           <div>
-            <h3 className="font-headline font-semibold text-primary">Company</h3>
-            <ul className="mt-4 space-y-2">
-              <li><Link href="/about" className="text-sm text-muted-foreground hover:text-primary">About Us</Link></li>
-              <li><Link href="/broker" className="text-sm text-muted-foreground hover:text-primary">For Brokers</Link></li>
-              <li><Link href="/contact" className="text-sm text-muted-foreground hover:text-primary">Contact</Link></li>
-            </ul>
-          </div>
-           <div>
-            <h3 className="font-headline font-semibold text-primary">Legal</h3>
-            <ul className="mt-4 space-y-2">
-              <li><Link href="/privacy-policy" className="text-sm text-muted-foreground hover:text-primary">Privacy Policy</Link></li>
-              <li><Link href="/terms-of-service" className="text-sm text-muted-foreground hover:text-primary">Terms of Service</Link></li>
-            </ul>
-          </div>
-        </div>
         <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
           <div className="flex justify-center mb-4">
             <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" alt="Lankford Capital Icon" width={40} height={40} />
