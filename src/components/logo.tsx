@@ -5,13 +5,13 @@ import Image from 'next/image';
 
 export function Logo({ className }: { className?: string }) {
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn("flex items-center gap-1", className)}>
        <Image 
         src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" 
         alt="Lankford Capital Logo"
-        width={32}
-        height={32}
-        className="h-8 w-8"
+        width={40}
+        height={40}
+        className="h-10 w-10"
       />
       <div className="flex items-baseline gap-1 font-headline text-2xl tracking-tight">
         <span className="text-primary font-bold">
