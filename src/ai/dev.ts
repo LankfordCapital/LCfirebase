@@ -8,3 +8,4 @@ import '@/ai/flows/credit-score-scanner.ts';
 import '@/ai/flows/asset-statement-scanner.ts';
 import '@/ai/flows/email-automation.ts';
 import '@/ai/flows/document-checklist-flow.ts';
+import '@/ai/flows/document-generator.ts';

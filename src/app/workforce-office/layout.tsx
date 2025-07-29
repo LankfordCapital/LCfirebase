@@ -21,6 +21,7 @@ import {
   Mail,
   BarChartHorizontal,
   MessageSquare,
+  FileJson,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -34,6 +35,7 @@ function WorkforceNav() {
   const menuItems = [
     { href: '/workforce-office', label: 'Pipeline Dashboard', icon: LayoutDashboard },
     { href: '/workforce-office/document-optimizer', label: 'Document Optimizer', icon: Bot },
+    { href: '/workforce-office/document-generator', label: 'Document Generator', icon: FileJson },
     { href: '/workforce-office/email-automation', label: 'Email Automation', icon: Mail },
     { href: '/workforce-office/reports', label: 'Reporting', icon: BarChartHorizontal },
     { href: '/workforce-office/communications', label: 'Communications Hub', icon: MessageSquare },
