@@ -8,13 +8,16 @@ import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { PlusCircle, Users, BarChart, DollarSign, MoreHorizontal, FileWarning, Search, Briefcase } from "lucide-react";
+import { PlusCircle, Users, BarChart, DollarSign, MoreHorizontal, FileWarning, Search, Briefcase, UserPlus } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 
 const summaryCards = [
@@ -38,6 +41,65 @@ const brokerPipeline = [
     { id: "BRK-004", name: "Diana Prince", company: "Capital Partners", activeLoans: 12, totalVolume: "$7.2M", status: "Approved" },
 ];
 
+function InviteUserDialog() {
+    const { toast } = useToast();
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [role, setRole] = useState('borrower');
+
+    const handleSendInvite = () => {
+        // Here you would typically call a backend service to send an email
+        toast({
+            title: "Invite Sent!",
+            description: `An invitation has been sent to ${name} at ${email}.`,
+        });
+    }
+    
+    return (
+         <Dialog>
+            <DialogTrigger asChild>
+                <Button variant="outline"><UserPlus className="mr-2 h-4 w-4" /> Invite User</Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Invite New User</DialogTitle>
+                    <DialogDescription>Send an invitation link for a new user to join the platform.</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="name">Full Name</Label>
+                        <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="John Doe" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="email">Email Address</Label>
+                        <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="user@example.com" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="role">Role</Label>
+                        <Select value={role} onValueChange={setRole}>
+                            <SelectTrigger id="role">
+                                <SelectValue placeholder="Select a role" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="borrower">Borrower</SelectItem>
+                                <SelectItem value="broker">Broker</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+                <DialogFooter>
+                    <DialogClose asChild>
+                        <Button type="button" variant="secondary">Cancel</Button>
+                    </DialogClose>
+                     <DialogClose asChild>
+                        <Button onClick={handleSendInvite}>Send Invite</Button>
+                    </DialogClose>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
 export default function WorkforceOfficePage() {
     const [selectedLoan, setSelectedLoan] = useState<(typeof clientLoans)[0] | null>(null);
 
@@ -53,6 +115,7 @@ export default function WorkforceOfficePage() {
              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
              <Input placeholder="Search clients or loans..." className="pl-8 w-full md:w-64" />
            </div>
+           <InviteUserDialog />
             <Button asChild>
                 <Link href="/dashboard/documents"><PlusCircle className="mr-2 h-4 w-4"/> New Application</Link>
             </Button>
@@ -219,3 +282,4 @@ export default function WorkforceOfficePage() {
     </div>
   );
 }
+
