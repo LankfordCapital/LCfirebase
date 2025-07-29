@@ -23,6 +23,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/auth-context';
+import { ProtectedRoute } from '@/components/protected-route';
 
 function DashboardNav() {
   const pathname = usePathname();
@@ -101,13 +102,15 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen">
-        <DashboardNav />
-        <div className="flex-1 overflow-y-auto">
-            <div className="p-4 md:p-6 lg:p-8 bg-primary/5 min-h-full w-full">
-                {children}
-            </div>
-        </div>
-    </div>
+    <ProtectedRoute redirectTo="/auth/signin">
+      <div className="flex h-screen">
+          <DashboardNav />
+          <div className="flex-1 overflow-y-auto">
+              <div className="p-4 md:p-6 lg:p-8 bg-primary/5 min-h-full w-full">
+                  {children}
+              </div>
+          </div>
+      </div>
+    </ProtectedRoute>
   );
 }
