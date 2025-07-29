@@ -29,6 +29,13 @@ const borrowerLoans = [
     { id: "LL-00127", borrower: "Sam Wilson", property: "789 Pine Ln, Otherville", type: "Ground Up Construction", status: "Missing Documents", progress: 25, missingDocuments: ["General Contractor License", "Approved or Pre-approved Plans", "Builder's Risk Insurance Quote"] },
 ];
 
+// Mock data for workforce members. In a real app, this would come from a database.
+const workforceMembers = [
+    { uid: 'workforce-user-1', name: 'Alex Johnson', title: 'Senior Loan Officer' },
+    { uid: 'workforce-user-2', name: 'Maria Garcia', title: 'Underwriting Manager' },
+    { uid: 'workforce-user-3', name: 'Chris Lee', title: 'Closing Coordinator' },
+];
+
 export default function BrokerOfficePage() {
     const { addDocument, documents } = useDocumentContext();
     const [selectedLoan, setSelectedLoan] = useState<(typeof borrowerLoans)[0] | null>(null);
@@ -192,7 +199,7 @@ export default function BrokerOfficePage() {
                 </CardContent>
             </Card>
         </div>
-        <div>
+        <div className="space-y-6">
             <Card>
                 <CardHeader>
                     <CardTitle>Broker Documents</CardTitle>
@@ -205,9 +212,36 @@ export default function BrokerOfficePage() {
                     <UploadButton docName="Signed Broker Agreement" />
                 </CardContent>
             </Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Calendar className="h-5 w-5 text-primary" />
+                        Schedule an Appointment
+                    </CardTitle>
+                    <CardDescription>Book a time with a team member.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                   {workforceMembers.map(member => (
+                       <div key={member.uid} className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
+                           <div className="flex items-center gap-3">
+                               <Avatar className="h-10 w-10">
+                                   <AvatarImage src={`https://i.pravatar.cc/40?u=${member.uid}`} />
+                                   <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                               </Avatar>
+                               <div>
+                                   <p className="font-semibold">{member.name}</p>
+                                   <p className="text-xs text-muted-foreground">{member.title}</p>
+                               </div>
+                           </div>
+                           <Button asChild variant="outline" size="sm">
+                               <Link href={`/book-appointment/${member.uid}`} target="_blank">Book Now</Link>
+                           </Button>
+                       </div>
+                   ))}
+                </CardContent>
+            </Card>
         </div>
       </div>
     </div>
   );
 }
-

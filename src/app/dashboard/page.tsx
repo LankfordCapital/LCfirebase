@@ -7,10 +7,11 @@ import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { DollarSign, FileCheck, FileClock, PlusCircle, AlertCircle } from "lucide-react";
+import { DollarSign, FileCheck, FileClock, PlusCircle, AlertCircle, Calendar, Briefcase, UserCheck } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/auth-context";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 
 const summaryCards = [
@@ -36,6 +37,13 @@ const missingDocuments = [
     { id: "doc3", name: "Signed Purchase Agreement" },
     { id: "doc4", name: "Driver's License" },
 ]
+
+// Mock data for workforce members. In a real app, this would come from a database.
+const workforceMembers = [
+    { uid: 'workforce-user-1', name: 'Alex Johnson', title: 'Senior Loan Officer' },
+    { uid: 'workforce-user-2', name: 'Maria Garcia', title: 'Underwriting Manager' },
+    { uid: 'workforce-user-3', name: 'Chris Lee', title: 'Closing Coordinator' },
+];
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -129,22 +137,56 @@ export default function DashboardPage() {
             </Card>
         </div>
       </div>
-
-      <Card>
-        <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-        </CardHeader>
-        <CardContent>
-            <ul className="space-y-4">
-                {recentActivity.map((activity, index) => (
-                    <li key={index} className="flex items-start gap-4">
-                        <span className="text-xs text-muted-foreground w-24 flex-shrink-0">{activity.date}</span>
-                        <p className="text-sm">{activity.description}</p>
-                    </li>
-                ))}
-            </ul>
-        </CardContent>
-      </Card>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Recent Activity</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <ul className="space-y-4">
+                        {recentActivity.map((activity, index) => (
+                            <li key={index} className="flex items-start gap-4">
+                                <span className="text-xs text-muted-foreground w-24 flex-shrink-0">{activity.date}</span>
+                                <p className="text-sm">{activity.description}</p>
+                            </li>
+                        ))}
+                    </ul>
+                </CardContent>
+            </Card>
+        </div>
+        <div>
+           <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Calendar className="h-5 w-5 text-primary" />
+                        Schedule an Appointment
+                    </CardTitle>
+                    <CardDescription>Need to talk? Book a time with one of our team members.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                   {workforceMembers.map(member => (
+                       <div key={member.uid} className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
+                           <div className="flex items-center gap-3">
+                               <Avatar className="h-10 w-10">
+                                   <AvatarImage src={`https://i.pravatar.cc/40?u=${member.uid}`} />
+                                   <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                               </Avatar>
+                               <div>
+                                   <p className="font-semibold">{member.name}</p>
+                                   <p className="text-xs text-muted-foreground">{member.title}</p>
+                               </div>
+                           </div>
+                           <Button asChild variant="outline" size="sm">
+                               <Link href={`/book-appointment/${member.uid}`} target="_blank">Book Now</Link>
+                           </Button>
+                       </div>
+                   ))}
+                </CardContent>
+            </Card>
+        </div>
+      </div>
     </div>
   )
 }
