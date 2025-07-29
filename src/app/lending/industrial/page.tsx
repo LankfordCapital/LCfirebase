@@ -49,6 +49,11 @@ export default function IndustrialLendingPage() {
           <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Specialized financing for the backbone of commerce.
           </p>
+          <div className="mt-8 flex justify-center gap-4">
+                <Button asChild size="lg">
+                  <Link href="/auth/signup">Apply Now</Link>
+                </Button>
+            </div>
         </div>
       </section>
 
