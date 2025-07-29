@@ -28,6 +28,54 @@ type CustomTerm = {
     value: string;
 };
 
+const sampleTemplates = [
+    {
+        name: 'Loan Commitment Letter',
+        content: `
+[Date]
+
+[Borrower Name]
+[Borrower Address]
+
+Subject: Loan Commitment for Property at [Property Address]
+
+Dear [Borrower Name],
+
+Lankford Capital is pleased to inform you that your application for a loan has been approved, subject to the terms and conditions outlined below.
+
+Loan Amount: [Loan Amount]
+Interest Rate: [Interest Rate]
+Loan Term: [Loan Term]
+Points: [Points]
+
+This commitment is valid until [Commitment Expiry Date].
+
+We look forward to working with you.
+
+Sincerely,
+The Lankford Capital Team
+        `
+    },
+    {
+        name: 'Promissory Note',
+        content: `
+PROMISSORY NOTE
+
+Principal Amount: [Loan Amount]
+Date: [Date]
+
+FOR VALUE RECEIVED, the undersigned, [Borrower Name] (the "Borrower"), promises to pay to the order of Lankford Capital (the "Lender"), the principal sum of [Loan Amount], together with interest thereon at the rate of [Interest Rate] per annum.
+
+This note is secured by the property located at [Property Address].
+
+Borrower:
+_________________________
+[Borrower Name]
+        `
+    }
+];
+
+
 export function DocumentGeneratorClient() {
     const [isLoading, setIsLoading] = useState(false);
     const [result, setResult] = useState<GenerateDocumentOutput | null>(null);
@@ -52,6 +100,17 @@ export function DocumentGeneratorClient() {
         }
     };
     
+    const handleTemplateSelect = (templateName: string) => {
+        const template = sampleTemplates.find(t => t.name === templateName);
+        if (template) {
+            setTemplateContent(template.content);
+            setTemplateFileName(template.name);
+        } else {
+            setTemplateContent('');
+            setTemplateFileName('');
+        }
+    };
+    
     const handleAddTerm = () => {
         setCustomTerms([...customTerms, { id: `term-${customTerms.length}`, key: '', value: '' }]);
     };
@@ -67,7 +126,7 @@ export function DocumentGeneratorClient() {
 
     const handleGenerateDocument = async () => {
         if (!templateContent) {
-            toast({ variant: 'destructive', title: 'Missing Template', description: 'Please upload a document template.' });
+            toast({ variant: 'destructive', title: 'Missing Template', description: 'Please upload or select a document template.' });
             return;
         }
         if (!selectedBorrower) {
@@ -105,20 +164,29 @@ export function DocumentGeneratorClient() {
         <Card>
             <CardHeader>
                 <CardTitle>Document Generator</CardTitle>
-                <CardDescription>Upload a template, select the parties, add custom terms, and let the AI do the rest.</CardDescription>
+                <CardDescription>Select a template, choose the parties, add custom terms, and let the AI do the rest.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="space-y-2">
-                    <Label htmlFor="template-upload">Document Template</Label>
+                    <Label htmlFor="template-select">Document Template</Label>
                     <div className="flex items-center gap-2">
+                        <Select onValueChange={handleTemplateSelect}>
+                            <SelectTrigger id="template-select">
+                                <SelectValue placeholder="Select a pre-defined template..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {sampleTemplates.map(t => <SelectItem key={t.name} value={t.name}>{t.name}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                        <span className="text-sm text-muted-foreground">OR</span>
                         <Button asChild variant="outline">
                             <Label htmlFor="template-upload" className="cursor-pointer flex items-center">
-                                <FileUp className="mr-2" /> Upload File
+                                <FileUp className="mr-2" /> Upload Custom
                             </Label>
                         </Button>
                         <Input id="template-upload" type="file" className="hidden" accept=".txt,.md" onChange={handleFileChange} />
-                         {templateFileName && <span className="text-sm text-muted-foreground">{templateFileName}</span>}
                     </div>
+                     {templateFileName && <span className="text-sm text-muted-foreground">Selected: {templateFileName}</span>}
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
@@ -164,7 +232,7 @@ export function DocumentGeneratorClient() {
                 </div>
 
 
-                <Button onClick={handleGenerateDocument} disabled={isLoading}>
+                <Button onClick={handleGenerateDocument} disabled={isLoading || !templateContent}>
                     {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                     Generate Document
                 </Button>
