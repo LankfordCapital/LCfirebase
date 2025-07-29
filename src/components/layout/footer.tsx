@@ -57,7 +57,7 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <div className="md:col-span-2 mt-8">
+        <div className="mt-8 flex flex-col items-center text-center">
             <Link href="/">
               <Logo className="h-auto w-48" />
             </Link>
