@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle } from "lucide-react";
@@ -46,7 +47,7 @@ export default function ResidentialNOOPage() {
         </video>
         <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
         <div className="container relative z-20 mx-auto px-4 text-center">
-          <h1 className="font-headline text-4xl font-bold text-white md:text-5xl">Residential Non-Owner Occupied Lending</h1>
+          <h1 className="font-headline text-4xl font-bold text-white md:text-5xl">Residential <span className="text-primary">Non-Owner Occupied</span> Lending</h1>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Tailored financing solutions for real estate investors.
           </p>
