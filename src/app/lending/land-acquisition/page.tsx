@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
@@ -27,7 +28,7 @@ export default function LandAcquisitionPage() {
         </video>
         <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
         <div className="container relative z-20 mx-auto px-4 text-center">
-          <h1 className="font-headline text-4xl font-bold text-white md:text-5xl">Land Acquisition & Development</h1>
+          <h1 className="font-headline text-4xl font-bold text-white md:text-5xl">Land <span className="text-primary">Acquisition</span> & Development</h1>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Secure the foundation for your next great project.
           </p>
