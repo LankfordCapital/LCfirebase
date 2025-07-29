@@ -24,12 +24,12 @@ import {
   FileJson,
   AreaChart,
   Hammer,
+  BookCopy,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/auth-context';
-import { ProtectedRoute } from '@/components/protected-route';
 
 function WorkforceNav() {
   const pathname = usePathname();
@@ -39,6 +39,7 @@ function WorkforceNav() {
     { href: '/workforce-office', label: 'Pipeline Dashboard', icon: LayoutDashboard },
     { href: '/workforce-office/market-analysis', label: 'Market Analysis', icon: AreaChart },
     { href: '/workforce-office/construction-feasibility', label: 'Construction Feasibility', icon: Hammer },
+    { href: '/workforce-office/title-escrow-instructions', label: 'Title & Escrow', icon: BookCopy },
     { href: '/workforce-office/document-optimizer', label: 'Document Optimizer', icon: Bot },
     { href: '/workforce-office/document-generator', label: 'Document Generator', icon: FileJson },
     { href: '/workforce-office/email-automation', label: 'Email Automation', icon: Mail },
