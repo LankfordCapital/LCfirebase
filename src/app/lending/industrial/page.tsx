@@ -55,7 +55,7 @@ export default function IndustrialLendingPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="font-headline text-3xl font-bold text-foreground"><span className="text-primary">Financing</span> <span className="text-foreground">Industrial</span> <span className="text-primary">Growth</span></h2>
+            <h2 className="font-headline text-3xl font-bold"><span className="text-primary">Financing</span> <span className="text-foreground">Industrial</span> <span className="text-primary">Growth</span></h2>
             <p className="mt-2 text-muted-foreground">Solutions for manufacturing, logistics, and warehousing.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -82,7 +82,7 @@ export default function IndustrialLendingPage() {
              <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-homebase.firebasestorage.app/o/shutterstock_2605496977.jpg?alt=media&token=57a23a29-1c77-4a49-bca0-61b47cbfa66e" alt="Large modern warehouse interior" layout="fill" objectFit="cover" data-ai-hint="warehouse" />
           </div>
           <div>
-            <h2 className="font-headline text-3xl font-bold text-primary">Built for Industry</h2>
+            <h2 className="font-headline text-3xl font-bold text-primary">Built for <span className="text-foreground">Industry</span></h2>
             <p className="mt-4 text-lg text-foreground/70">
               We provide robust financing solutions that understand the demands of the industrial sector, from complex supply chains to large-scale manufacturing.
             </p>
