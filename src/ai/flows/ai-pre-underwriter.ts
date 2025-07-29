@@ -10,25 +10,21 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
+const DocumentChecklistSchema = z.object({
+    borrower: z.array(z.string()).describe('List of documents related to the borrower.'),
+    company: z.array(z.string()).describe('List of documents related to the company.'),
+    subjectProperty: z.array(z.string()).describe('List of documents related to the subject property.'),
+});
+
 const AiPreUnderwriterInputSchema = z.object({
   loanProgram: z.string().describe('The selected loan program (e.g., Ground Up Construction, Fix and Flip, DSCR).'),
   uploadedDocuments: z.array(z.object({
     filename: z.string().describe('The name of the uploaded document.'),
     dataUri: z.string().describe("The document data as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."),
   })).describe('An array of uploaded documents, including their filenames and data URIs.'),
-   documentRequestList: z.object({
-      borrower: z.array(z.string()),
-      company: z.array(z.string()),
-      subjectProperty: z.array(z.string()),
-    }).describe('A categorized list of all documents required to close the loan, specific to the selected loan program.'),
+   documentRequestList: DocumentChecklistSchema.describe('A categorized list of all documents required to close the loan, specific to the selected loan program.'),
 });
 export type AiPreUnderwriterInput = z.infer<typeof AiPreUnderwriterInputSchema>;
-
-const DocumentChecklistSchema = z.object({
-    borrower: z.array(z.string()).describe('List of documents related to the borrower.'),
-    company: z.array(z.string()).describe('List of documents related to the company.'),
-    subjectProperty: z.array(z.string()).describe('List of documents related to the subject property.'),
-});
 
 const AiPreUnderwriterOutputSchema = z.object({
   prequalificationStatus: z.string().describe('The prequalification status based on the provided information (e.g., Prequalified, Needs Review, Not Prequalified).'),
