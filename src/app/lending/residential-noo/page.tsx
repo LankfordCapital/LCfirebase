@@ -53,7 +53,7 @@ export default function ResidentialNOOPage() {
           </p>
            <div className="mt-8 flex justify-center gap-4">
                 <Button asChild size="lg">
-                  <Link href="/auth/signup">Borrowers</Link>
+                  <Link href="/auth/signup">Apply Now</Link>
                 </Button>
             </div>
         </div>
