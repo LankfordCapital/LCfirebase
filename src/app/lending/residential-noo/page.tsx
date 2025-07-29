@@ -56,7 +56,7 @@ export default function ResidentialNOOPage() {
                   <Link href="/auth/signin">Borrowers</Link>
                 </Button>
                 <Button asChild size="lg" variant="secondary">
-                  <Link href="/auth/broker-signin">For Brokers</Link>
+                  <Link href="/auth/broker-signin">Brokers</Link>
                 </Button>
             </div>
         </div>
