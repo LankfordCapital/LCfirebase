@@ -18,6 +18,7 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { InquiryForm } from '@/components/inquiry-form';
+import { Logo } from '@/components/logo';
 
 const loanProducts = [
   {

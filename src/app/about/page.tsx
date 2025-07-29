@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
 import { Target, Users, Handshake } from "lucide-react";
+import { Logo } from "@/components/logo";
 
 const values = [
     {
@@ -27,7 +28,7 @@ export default function AboutUsPage() {
     <div>
       <section className="relative bg-primary/5 py-20 md:py-28 text-center">
         <div className="container mx-auto px-4">
-          <h1 className="font-headline text-4xl font-bold text-primary md:text-5xl">About Lankford Capital</h1>
+          <h1 className="font-headline text-4xl font-bold text-primary md:text-5xl">About <Logo className="inline-block h-12 w-auto" /></h1>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
             Your dedicated partner in achieving financial growth and success.
           </p>
