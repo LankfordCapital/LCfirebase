@@ -2,12 +2,12 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useId } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Loader2, ArrowRight, Calendar as CalendarIcon, Building2, Briefcase, FileUp, FileText, Layers, DollarSign, Truck } from 'lucide-react';
+import { Loader2, ArrowRight, Calendar as CalendarIcon, Building2, Briefcase, FileUp, FileText, Layers, DollarSign, Truck, PlusCircle, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 import { aiPreUnderwriter, type AiPreUnderwriterOutput } from '@/ai/flows/ai-pre-underwriter';
@@ -21,6 +21,21 @@ import { useAuth } from '@/contexts/auth-context';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Textarea } from './ui/textarea';
+
+type Dealer = {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  address: string;
+};
+
+type Quote = {
+  id: string;
+  description: string;
+  cost: string;
+};
+
 
 export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [propertyAddress, setPropertyAddress] = useState('');
@@ -61,9 +76,10 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [clientName, setClientName] = useState('');
 
   // Equipment Financing specific fields
-  const [equipmentDescription, setEquipmentDescription] = useState('');
-  const [equipmentCost, setEquipmentCost] = useState('');
-  const [equipmentSeller, setEquipmentSeller] = useState('');
+  const dealerId = useId();
+  const quoteId = useId();
+  const [dealers, setDealers] = useState<Dealer[]>([{ id: dealerId, name: '', phone: '', email: '', address: '' }]);
+  const [quotes, setQuotes] = useState<Quote[]>([{ id: quoteId, description: '', cost: ''}]);
 
 
   const { documents, addDocument } = useDocumentContext();
@@ -84,6 +100,30 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
         });
     }
   }, [addDocument]);
+  
+  const handleAddDealer = () => {
+    setDealers([...dealers, { id: `dealer-${Date.now()}`, name: '', phone: '', email: '', address: '' }]);
+  };
+
+  const handleRemoveDealer = (id: string) => {
+      setDealers(dealers.filter(d => d.id !== id));
+  };
+
+  const handleDealerChange = (id: string, field: keyof Omit<Dealer, 'id'>, value: string) => {
+      setDealers(dealers.map(d => (d.id === id ? { ...d, [field]: value } : d)));
+  };
+
+  const handleAddQuote = () => {
+      setQuotes([...quotes, { id: `quote-${Date.now()}`, description: '', cost: '' }]);
+  };
+
+  const handleRemoveQuote = (id: string) => {
+      setQuotes(quotes.filter(q => q.id !== id));
+  };
+
+  const handleQuoteChange = (id: string, field: keyof Omit<Quote, 'id'>, value: string) => {
+      setQuotes(quotes.map(q => (q.id === id ? { ...q, [field]: value } : q)));
+  };
 
   const DocumentUploadInput = ({ name }: { name: string }) => {
     const doc = documents[name];
@@ -156,24 +196,76 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2 text-primary"><Truck className="h-5 w-5" /> Equipment Financing Details</CardTitle>
                         </CardHeader>
-                            <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="loanAmount">Loan Amount Requested</Label>
+                            <CardContent className="space-y-6">
+                             <div className="space-y-2">
+                                <Label htmlFor="loanAmount">Total Loan Amount Requested</Label>
                                 <Input id="loanAmount" type="number" placeholder="e.g., 75000" value={loanAmount} onChange={e => setLoanAmount(e.target.value)} />
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="equipmentCost">Total Equipment Cost</Label>
-                                <Input id="equipmentCost" type="number" placeholder="e.g., 100000" value={equipmentCost} onChange={e => setEquipmentCost(e.target.value)} />
+
+                            {/* Dealers Section */}
+                            <div className="space-y-4">
+                                <h3 className="font-semibold text-lg">Dealer Information</h3>
+                                {dealers.map((dealer, index) => (
+                                    <div key={dealer.id} className="p-4 border rounded-md space-y-4 relative">
+                                        <Label className="font-semibold">Dealer #{index + 1}</Label>
+                                        {dealers.length > 1 && (
+                                            <Button variant="ghost" size="icon" className="absolute top-2 right-2" onClick={() => handleRemoveDealer(dealer.id)}>
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        )}
+                                        <div className="space-y-2">
+                                            <Label htmlFor={`dealer-name-${dealer.id}`}>Dealer Name</Label>
+                                            <Input id={`dealer-name-${dealer.id}`} value={dealer.name} onChange={e => handleDealerChange(dealer.id, 'name', e.target.value)} placeholder="e.g., Heavy Machinery Inc." />
+                                        </div>
+                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <Label htmlFor={`dealer-phone-${dealer.id}`}>Phone Number</Label>
+                                                <Input id={`dealer-phone-${dealer.id}`} type="tel" value={dealer.phone} onChange={e => handleDealerChange(dealer.id, 'phone', e.target.value)} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor={`dealer-email-${dealer.id}`}>Email</Label>
+                                                <Input id={`dealer-email-${dealer.id}`} type="email" value={dealer.email} onChange={e => handleDealerChange(dealer.id, 'email', e.target.value)} />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor={`dealer-address-${dealer.id}`}>Address</Label>
+                                            <Input id={`dealer-address-${dealer.id}`} value={dealer.address} onChange={e => handleDealerChange(dealer.id, 'address', e.target.value)} />
+                                        </div>
+                                    </div>
+                                ))}
+                                 <Button type="button" variant="outline" onClick={handleAddDealer}>
+                                    <PlusCircle className="mr-2 h-4 w-4" />
+                                    Add Another Dealer
+                                </Button>
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="equipmentSeller">Dealer/Seller Name</Label>
-                                <Input id="equipmentSeller" placeholder="e.g., Heavy Machinery Inc." value={equipmentSeller} onChange={e => setEquipmentSeller(e.target.value)} />
+
+                            {/* Equipment Quotes Section */}
+                            <div className="space-y-4">
+                                <h3 className="font-semibold text-lg">Equipment Quotes</h3>
+                                {quotes.map((quote, index) => (
+                                     <div key={quote.id} className="p-4 border rounded-md space-y-4 relative">
+                                        <Label className="font-semibold">Quote #{index + 1}</Label>
+                                        {quotes.length > 1 && (
+                                            <Button variant="ghost" size="icon" className="absolute top-2 right-2" onClick={() => handleRemoveQuote(quote.id)}>
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        )}
+                                        <div className="space-y-2">
+                                            <Label htmlFor={`quote-desc-${quote.id}`}>Equipment Description</Label>
+                                            <Textarea id={`quote-desc-${quote.id}`} value={quote.description} onChange={e => handleQuoteChange(quote.id, 'description', e.target.value)} placeholder="Make, model, year, condition, etc." />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor={`quote-cost-${quote.id}`}>Equipment Cost</Label>
+                                            <Input id={`quote-cost-${quote.id}`} type="number" value={quote.cost} onChange={e => handleQuoteChange(quote.id, 'cost', e.target.value)} />
+                                        </div>
+                                        <DocumentUploadInput name={`Equipment Quote or Invoice #${index + 1}`} />
+                                    </div>
+                                ))}
+                                <Button type="button" variant="outline" onClick={handleAddQuote}>
+                                    <PlusCircle className="mr-2 h-4 w-4" />
+                                    Add Another Quote
+                                </Button>
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="equipmentDescription">Equipment Description</Label>
-                                <Textarea id="equipmentDescription" placeholder="Describe the equipment (make, model, year, condition, etc.)..." value={equipmentDescription} onChange={e => setEquipmentDescription(e.target.value)} />
-                            </div>
-                            <DocumentUploadInput name="Equipment Quote or Invoice" />
                         </CardContent>
                     </Card>
                 ) : (
