@@ -120,7 +120,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="font-headline text-3xl font-bold text-primary md:text-4xl">
-              Comprehensive Lending Solutions
+              <span className="text-foreground">Comprehensive</span> Lending Solutions
             </h2>
             <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/70">
               We offer a diverse range of loan products to meet the unique needs of every client.
@@ -151,7 +151,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="font-headline text-3xl font-bold text-primary md:text-4xl">Why Partner with Lankford Capital?</h2>
+              <h2 className="font-headline text-3xl font-bold text-primary md:text-4xl">Why <span className="text-foreground">Partner</span> with Lankford Capital?</h2>
               <p className="mt-4 text-lg text-foreground/70">
                 Choosing the right lender is crucial. We combine cutting-edge technology with personalized service to deliver unparalleled results.
               </p>
