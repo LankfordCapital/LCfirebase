@@ -108,21 +108,13 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   );
 }
 
-function DashboardSkeleton() {
-    return (
-        <div className="flex h-screen w-full items-center justify-center bg-background">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-    )
-}
-
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <ProtectedRoute redirectTo="/auth/signin" Skeleton={DashboardSkeleton}>
+    <ProtectedRoute redirectTo="/auth/signin">
       <DashboardLayoutContent>{children}</DashboardLayoutContent>
     </ProtectedRoute>
   );
