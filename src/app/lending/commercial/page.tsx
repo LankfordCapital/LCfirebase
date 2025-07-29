@@ -93,7 +93,7 @@ export default function CommercialLendingPage() {
       <section className="bg-primary/5 py-16 md:py-24">
         <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
            <div>
-            <h2 className="font-headline text-3xl font-bold text-primary">Your Vision, Our Capital</h2>
+            <h2 className="font-headline text-3xl font-bold text-primary">Your Vision, <span className="text-foreground">Our Capital</span></h2>
             <p className="mt-4 text-lg text-foreground/70">
               From small business storefronts to large-scale developments, our commercial lending experts provide the capital and guidance necessary to bring your vision to life.
             </p>
