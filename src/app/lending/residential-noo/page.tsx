@@ -52,7 +52,7 @@ export default function ResidentialNOOPage() {
             Tailored financing solutions for real estate investors.
           </p>
            <Button asChild size="lg" className="mt-8">
-              <Link href="/auth/signin">Borrower Login</Link>
+              <Link href="/auth/signin">Borrowers</Link>
             </Button>
         </div>
       </section>
