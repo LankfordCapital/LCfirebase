@@ -16,13 +16,14 @@ import { cn } from '@/lib/utils';
 import React from 'react';
 
 const lendingProducts = [
-  { href: '/lending/residential-NOO', label: 'Residential NOO', icon: Building },
+  { href: '/lending/residential-noo', label: 'Residential NOO', icon: Building },
   { href: '/lending/commercial', label: 'Commercial', icon: Wrench },
   { href: '/lending/industrial', label: 'Industrial', icon: Factory },
   { href: '/lending/land-acquisition', label: 'Land Acquisition', icon: LandPlot },
   { href: '/lending/mezzanine-loans', label: 'Mezzanine Loans', icon: Layers },
   { href: '/lending/mobilization-funding', label: 'Mobilization Funding', icon: Truck },
   { href: '/lending/equipment-financing', label: 'Equipment Financing', icon: Truck },
+  { href: '/lending/sba-loans', label: 'SBA Loans', icon: Handshake },
 ];
 
 const mainNav = [

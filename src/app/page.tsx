@@ -24,7 +24,7 @@ const loanProducts = [
     icon: <Building className="h-8 w-8 text-primary" />,
     title: 'Residential NOO',
     description: 'Financing for non-owner occupied residential properties.',
-    href: '/lending/residential-NOO',
+    href: '/lending/residential-noo',
   },
   {
     icon: <Wrench className="h-8 w-8 text-primary" />,
@@ -55,6 +55,12 @@ const loanProducts = [
     title: 'Equipment Financing',
     description: 'Secure funding for essential business equipment and machinery.',
     href: '/lending/equipment-financing',
+  },
+  {
+    icon: <Handshake className="h-8 w-8 text-primary" />,
+    title: 'SBA Loans',
+    description: 'Government-backed loans to help your small business grow.',
+    href: '/lending/sba-loans',
   },
   {
     icon: <Handshake className="h-8 w-8 text-primary" />,
