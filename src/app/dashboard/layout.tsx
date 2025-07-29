@@ -40,7 +40,7 @@ function DashboardNav() {
       <SidebarHeader>
         <div className="flex items-center justify-between">
           <Link href="/">
-            <Logo className="h-10 w-40" />
+            <Logo className="h-auto w-40" />
           </Link>
           <SidebarTrigger variant="ghost" size="icon" className="md:hidden">
             <ChevronLeft />
