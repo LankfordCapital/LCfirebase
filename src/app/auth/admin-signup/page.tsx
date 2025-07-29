@@ -74,7 +74,8 @@ export default function AdminSignUpPage() {
   };
 
   return (
-    <div className="flex flex-1 items-center justify-end bg-primary/5 p-4 pr-4 md:pr-16 lg:pr-32">
+    <div className="flex flex-col flex-1 items-center justify-between bg-primary/5 p-4">
+      <div/>
       <Card className="w-full max-w-sm shadow-2xl">
         <form onSubmit={handleSignIn}>
           <CardHeader className="text-center">
@@ -101,6 +102,11 @@ export default function AdminSignUpPage() {
           </CardFooter>
         </form>
       </Card>
+      <div className="text-center text-sm">
+        <Link href="/auth/signin" className="underline">
+            Back to Borrower Sign In
+        </Link>
+      </div>
     </div>
   )
 }
