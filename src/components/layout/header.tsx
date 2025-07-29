@@ -71,7 +71,7 @@ export function Header() {
               {item.label}
             </Link>
           ))}
-           <Button asChild>
+           <Button asChild className="text-black">
               <Link href="/broker">For Brokers</Link>
             </Button>
            <DropdownMenu>
