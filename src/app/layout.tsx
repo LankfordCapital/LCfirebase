@@ -31,7 +31,7 @@ function LayoutWrapper({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">
       {!isAuthPage && !isDashboardPage && <Header />}
-      <main className={cn(!isAuthPage && 'flex-1')}>{children}</main>
+      <main className="flex-1">{children}</main>
       {!isAuthPage && !isDashboardPage && <Footer />}
       {!isAuthPage && !isDashboardPage && <AIAssistant />}
     </div>

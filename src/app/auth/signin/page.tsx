@@ -44,7 +44,7 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-primary/5 p-4">
+    <div className="flex flex-1 items-center justify-center bg-primary/5 p-4">
       <Card className="w-full max-w-sm shadow-2xl">
         <form onSubmit={handleSubmit}>
           <CardHeader className="text-center">

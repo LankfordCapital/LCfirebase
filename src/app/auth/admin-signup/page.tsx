@@ -74,7 +74,7 @@ export default function AdminSignUpPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-primary/5 p-4">
+    <div className="flex flex-1 items-center justify-center bg-primary/5 p-4">
       <Card className="w-full max-w-sm shadow-2xl">
         <form onSubmit={handleSignIn}>
           <CardHeader className="text-center">
