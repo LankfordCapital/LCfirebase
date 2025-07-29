@@ -221,28 +221,15 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
     },
     "Commercial - Conventional Long Term Debt": {
         borrower: [
-            "ID/Driver's License",
-            "Personal Financial Statement",
-            "Credit Report",
-            "Experience",
-            "Real Estate Owned"
+            "Personal Tax Returns (Last 2 Years)",
         ],
         company: [
-            "EIN Certificate",
-            "Formation Documentation",
-            "Operating Agreement/Bylaws",
-            "Partnership/Officer List",
-            "Business License",
-            "Certificate of Good Standing",
+            "Business Entity Tax Returns (Last 2 Years)",
         ],
         subjectProperty: [
-            "Current Rent Roll",
-            "Lease Agreements",
-            "Purchase Agreement (if applicable)",
-            "Evidence of Earnest Money Deposit",
-            "Property Tax Certificate",
-            "Appraisal",
-            "Collateral Desktop Analysis",
+            "Trailing 12-Month Profit & Loss Statement",
+            "Previous Year 1 Profit & Loss Statement",
+            "Previous Year 2 Profit & Loss Statement",
         ]
     },
     "Industrial - Ground Up Construction": {
@@ -273,6 +260,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Approved or Pre-approved Plans",
             "Approved Permits",
             "Construction Plans, Budget, and Timeline",
+            "Construction Budget",
+            "Projected Draw Schedule"
         ]
     },
     "Industrial - Rehab & Expansion": {
@@ -333,7 +322,8 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Personal Financial Statement",
             "Credit Report",
             "Experience",
-            "Real Estate Owned"
+            "Real Estate Owned",
+            "Personal Tax Returns (Last 2 Years)",
         ],
         company: [
             "EIN Certificate",
@@ -342,15 +332,12 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Partnership/Officer List",
             "Business License",
             "Certificate of Good Standing",
+            "Business Entity Tax Returns (Last 2 Years)",
         ],
         subjectProperty: [
-            "Property Operating Statements (3 years)",
-            "Lease Agreements",
-            "Purchase Agreement (if applicable)",
-            "Evidence of Earnest Money Deposit",
-            "Property Tax Certificate",
-            "Appraisal",
-            "Collateral Desktop Analysis",
+            "Trailing 12-Month Profit & Loss Statement",
+            "Previous Year 1 Profit & Loss Statement",
+            "Previous Year 2 Profit & Loss Statement",
         ]
     },
     "Land Acquisition": {
@@ -370,7 +357,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Certificate of Good Standing",
         ],
         subjectProperty: [
-            "Purchase Agreement",
+            "Executed Purchase Contract",
             "Evidence of Earnest Money Deposit",
             "Feasibility Study",
             "Zoning and Entitlement Documents",

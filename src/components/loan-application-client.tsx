@@ -45,6 +45,12 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [companyName, setCompanyName] = useState('');
   const [companyEin, setCompanyEin] = useState('');
 
+  // Land Acquisition specific fields
+  const [entitlementStatus, setEntitlementStatus] = useState('');
+  const [developmentCosts, setDevelopmentCosts] = useState('');
+  const [afterDevelopmentValue, setAfterDevelopmentValue] = useState('');
+
+
   const { documents, addDocument } = useDocumentContext();
   const router = useRouter();
   
@@ -82,6 +88,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   };
 
   const isIndustrial = loanProgram.toLowerCase().includes('industrial');
+  const isLandAcquisition = loanProgram.toLowerCase().includes('land acquisition');
 
 
   return (
@@ -112,7 +119,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                     </div>
                 </div>
 
-                <div className="space-y-2">
+                {!isLandAcquisition && <div className="space-y-2">
                   <Label htmlFor="propertyType">Property Type</Label>
                   <Select onValueChange={setPropertyType} value={propertyType}>
                     <SelectTrigger id="propertyType">
@@ -140,9 +147,9 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                       )}
                     </SelectContent>
                   </Select>
-                </div>
+                </div>}
 
-                {propertyType === 'other' && (
+                {propertyType === 'other' && !isLandAcquisition && (
                   <div className="space-y-2">
                     <Label htmlFor="otherPropertyType">Please specify property type</Label>
                     <Input id="otherPropertyType" value={otherPropertyType} onChange={e => setOtherPropertyType(e.target.value)} />
@@ -225,23 +232,47 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                         <Input id="asIsValue" type="number" placeholder="e.g., 350000" value={asIsValue} onChange={e => setAsIsValue(e.target.value)} />
                     </div>
                 </div>
+
+                {isLandAcquisition ? (
+                    <>
+                         <div className="grid md:grid-cols-2 gap-4">
+                             <div className="space-y-2">
+                                <Label htmlFor="entitlementStatus">Entitlement Status</Label>
+                                <Input id="entitlementStatus" placeholder="e.g., Fully Entitled, In Progress" value={entitlementStatus} onChange={e => setEntitlementStatus(e.target.value)} />
+                            </div>
+                             <div className="space-y-2">
+                                <Label htmlFor="developmentCosts">Total Development Costs</Label>
+                                <Input id="developmentCosts" type="number" placeholder="e.g., 500000" value={developmentCosts} onChange={e => setDevelopmentCosts(e.target.value)} />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="afterDevelopmentValue">After Development Value</Label>
+                            <Input id="afterDevelopmentValue" type="number" placeholder="e.g., 1500000" value={afterDevelopmentValue} onChange={e => setAfterDevelopmentValue(e.target.value)} />
+                        </div>
+                        <DocumentUploadInput name="Feasibility Study" />
+                        <DocumentUploadInput name="Zoning and Entitlement Documents" />
+                        <DocumentUploadInput name="Environmental Report" />
+                    </>
+                ) : (
+                    <>
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="afterConstructedValue">After Constructed Value</Label>
+                                <Input id="afterConstructedValue" type="number" placeholder="e.g., 1000000" value={afterConstructedValue} onChange={e => setAfterConstructedValue(e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="stabilizedValue">Stabilized Value</Label>
+                                <Input id="stabilizedValue" type="number" placeholder="e.g., 1200000" value={stabilizedValue} onChange={e => setStabilizedValue(e.target.value)} />
+                            </div>
+                        </div>
+                    </>
+                )}
                 
                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="afterConstructedValue">After Constructed Value</Label>
-                        <Input id="afterConstructedValue" type="number" placeholder="e.g., 1000000" value={afterConstructedValue} onChange={e => setAfterConstructedValue(e.target.value)} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="stabilizedValue">Stabilized Value</Label>
-                        <Input id="stabilizedValue" type="number" placeholder="e.g., 1200000" value={stabilizedValue} onChange={e => setStabilizedValue(e.target.value)} />
-                    </div>
-                </div>
-                
-                 <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
+                    {!isLandAcquisition && <div className="space-y-2">
                         <Label htmlFor="propertySqFt">Subject Property Square Footage</Label>
                         <Input id="propertySqFt" type="number" placeholder="e.g., 2000" value={propertySqFt} onChange={e => setPropertySqFt(e.target.value)} />
-                    </div>
+                    </div>}
                     <div className="space-y-2">
                         <Label htmlFor="lotSize">Lot Size (in sq. ft. or acres)</Label>
                         <Input id="lotSize" placeholder="e.g., 10,000 sq. ft. or 0.23 acres" value={lotSize} onChange={e => setLotSize(e.target.value)} />
@@ -249,10 +280,10 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
+                    {!isLandAcquisition && <div className="space-y-2">
                         <Label htmlFor="constructionTime">Estimated Time to Construct (in months)</Label>
                         <Input id="constructionTime" type="number" placeholder="e.g., 6" value={constructionTime} onChange={e => setConstructionTime(e.target.value)} />
-                    </div>
+                    </div>}
                      <div className="space-y-2">
                         <Label htmlFor="closingDate">Requested Closing Date</Label>
                          <Popover>

@@ -66,6 +66,7 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
   const handleNextPage = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
     const isConstructionOrRehab = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('rehab');
+    const isLandAcquisition = loanProgram.toLowerCase().includes('land acquisition');
 
     if (isConstructionOrRehab) {
       router.push(`/dashboard/application/${programSlug}/page-6`);
