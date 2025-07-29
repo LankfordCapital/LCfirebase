@@ -29,6 +29,7 @@ import {
   FileBarChart,
   Database,
   Users,
+  ClipboardUser,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -48,6 +49,7 @@ function WorkforceNav() {
     { href: '/workforce-office/insurance-instructions', label: 'Insurance Instructions', icon: Shield },
     { href: '/workforce-office/lender-database', label: 'Lender Database', icon: Database },
     { href: '/workforce-office/lender-matcher', label: 'AI Lender Matcher', icon: Users },
+    { href: '/workforce-office/amc-database', label: 'AMC Database', icon: ClipboardUser },
     { href: '/workforce-office/document-optimizer', label: 'Document Optimizer', icon: Bot },
     { href: '/workforce-office/document-generator', label: 'Document Generator', icon: FileJson },
     { href: '/workforce-office/email-automation', label: 'Email Automation', icon: Mail },
