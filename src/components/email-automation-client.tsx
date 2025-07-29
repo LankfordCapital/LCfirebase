@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useDocumentContext } from '@/contexts/document-context';
+import { Checkbox } from './ui/checkbox';
 
 const sampleBorrower: GenerateEmailInput['recipient'] = {
     userId: 'user-123',
@@ -21,12 +22,11 @@ const sampleBorrower: GenerateEmailInput['recipient'] = {
     timeZone: 'America/New_York',
 };
 
-const sampleBroker: GenerateEmailInput['recipient'] = {
+const sampleBroker = {
     userId: 'broker-456',
     email: 'alice.broker@example.com',
     fullName: 'Alice Broker',
-    role: 'broker',
-    timeZone: 'America/Los_Angeles',
+    role: 'broker' as const,
 };
 
 
@@ -38,6 +38,7 @@ export function EmailAutomationClient() {
 
     const [recipientType, setRecipientType] = useState<'borrower' | 'broker'>('borrower');
     const [fromWorkforceName, setFromWorkforceName] = useState('Your Name');
+    const [ccBroker, setCcBroker] = useState(false);
 
     const [details, setDetails] = useState<GenerateEmailInput['details']>({
         loanProgram: '',
@@ -65,7 +66,9 @@ export function EmailAutomationClient() {
                 details: {
                     ...details,
                     uploadedDocumentNames
-                } 
+                },
+                ccBroker: recipient.role === 'borrower' && ccBroker,
+                broker: recipient.role === 'borrower' && ccBroker ? sampleBroker : undefined,
             });
             setResult(response);
             toast({
@@ -237,6 +240,18 @@ export function EmailAutomationClient() {
                     {renderScenarioInputs()}
                 </div>
 
+                {recipientType === 'borrower' && (
+                    <div className="flex items-center space-x-2">
+                        <Checkbox id="cc-broker" checked={ccBroker} onCheckedChange={(checked) => setCcBroker(checked as boolean)} />
+                        <label
+                            htmlFor="cc-broker"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                            CC Broker on this email
+                        </label>
+                    </div>
+                )}
+
                 <Button onClick={handleGenerateEmail} disabled={isLoading}>
                     {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                     Generate Email Draft
@@ -248,6 +263,7 @@ export function EmailAutomationClient() {
                         <Card className="bg-muted/50">
                              <CardHeader>
                                 <CardTitle className="text-base">To: {result.draftedEmail.to}</CardTitle>
+                                {result.draftedEmail.cc && <CardDescription>CC: {result.draftedEmail.cc}</CardDescription>}
                                 <CardDescription>Subject: {result.draftedEmail.subject}</CardDescription>
                             </CardHeader>
                             <CardContent>

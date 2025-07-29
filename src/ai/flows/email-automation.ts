@@ -21,6 +21,14 @@ const UserProfileSchema = z.object({
   timeZone: z.string().describe('The timezone of the user (e.g., "America/New_York").'),
 });
 
+const BrokerProfileSchema = z.object({
+    userId: z.string().describe('Unique identifier for the broker.'),
+    email: z.string().email().describe('The email address of the broker.'),
+    fullName: z.string().describe('The full name of the broker.'),
+    role: z.literal('broker').describe('The role of the user.'),
+});
+
+
 const GenerateEmailInputSchema = z.object({
     recipient: UserProfileSchema.describe('The user (borrower or broker) for whom the email is being generated.'),
     fromWorkforceName: z.string().describe('The name of the Lankford Capital workforce member sending the email.'),
@@ -34,11 +42,14 @@ const GenerateEmailInputSchema = z.object({
         adverseActionReason: z.string().optional().describe('The reason for the adverse action. Required for "adverseAction" scenario.'),
         customInstructions: z.string().optional().describe('Specific instructions for a custom email. Required for "custom" scenario.'),
     }).describe('Details specific to the chosen scenario.'),
+    ccBroker: z.boolean().optional().describe('Whether to CC the associated broker on the email.'),
+    broker: BrokerProfileSchema.optional().describe('The associated broker\'s profile, required if ccBroker is true.'),
 });
 export type GenerateEmailInput = z.infer<typeof GenerateEmailInputSchema>;
 
 const EmailDraftSchema = z.object({
     to: z.string().email().describe('The recipient\'s email address.'),
+    cc: z.string().email().optional().describe('The CC recipient\'s email address.'),
     subject: z.string().describe('The subject line of the email.'),
     body: z.string().describe('The HTML body content of the email.'),
 });
@@ -109,7 +120,7 @@ Draft a custom email based on the following instructions:
 {{{details.customInstructions}}}
 {{/if}}
 
-Generate the final email and return it in the 'draftedEmail' field.
+Generate the final email and return it in the 'draftedEmail' field. Do not populate the CC field in your response, it will be handled by the system.
 `,
 });
 
@@ -132,6 +143,11 @@ const emailAutomationFlow = ai.defineFlow(
         }
 
         const { output } = await prompt(input);
+
+        if (output && input.ccBroker && input.broker) {
+            output.draftedEmail.cc = input.broker.email;
+        }
+        
         return output!;
     }
 );
