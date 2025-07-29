@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
@@ -29,7 +30,7 @@ export default function AboutUsPage() {
     <div>
       <section className="relative bg-primary/5 py-20 md:py-28 text-center">
         <div className="container mx-auto px-4">
-          <h1 className="font-headline text-4xl font-bold text-primary md:text-5xl flex items-center justify-center gap-2">About <Logo className="h-12 w-48 font-headline text-4xl" /></h1>
+          <h1 className="font-headline text-4xl font-bold text-primary md:text-5xl flex items-center justify-center gap-2">About <Logo className="h-12 w-48" /></h1>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
             Your dedicated partner in achieving financial growth and success.
           </p>
