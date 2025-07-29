@@ -24,7 +24,6 @@ import { usePathname } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/auth-context';
 import { ProtectedRoute } from '@/components/protected-route';
-import { Loader2 } from 'lucide-react';
 
 function DashboardNav() {
   const pathname = usePathname();
@@ -41,7 +40,9 @@ function DashboardNav() {
       <SidebarHeader>
         <div className="flex items-center justify-between">
           <Link href="/">
-            <Logo className="h-auto w-40" />
+            <div className="font-headline text-2xl tracking-tight flex items-baseline gap-1">
+              <Logo />
+            </div>
           </Link>
           <SidebarTrigger variant="ghost" size="icon" className="md:hidden">
             <ChevronLeft />
@@ -95,19 +96,6 @@ function DashboardNav() {
   )
 }
 
-function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex h-screen">
-        <DashboardNav />
-        <div className="flex-1 overflow-y-auto">
-            <div className="p-4 md:p-6 lg:p-8 bg-primary/5 min-h-full w-full">
-                {children}
-            </div>
-        </div>
-    </div>
-  );
-}
-
 export default function DashboardLayout({
   children,
 }: {
@@ -115,7 +103,14 @@ export default function DashboardLayout({
 }) {
   return (
     <ProtectedRoute redirectTo="/auth/signin">
-      <DashboardLayoutContent>{children}</DashboardLayoutContent>
+        <div className="flex h-screen">
+            <DashboardNav />
+            <div className="flex-1 overflow-y-auto">
+                <div className="p-4 md:p-6 lg:p-8 bg-primary/5 min-h-full w-full">
+                    {children}
+                </div>
+            </div>
+        </div>
     </ProtectedRoute>
   );
 }

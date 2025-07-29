@@ -31,7 +31,6 @@ import {
   ClipboardList,
   Calendar,
   Notebook,
-  Loader2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -67,7 +66,9 @@ function WorkforceNav() {
       <SidebarHeader>
         <div className="flex items-center justify-between">
           <Link href="/">
-            <Logo className="h-auto w-40" />
+             <div className="font-headline text-2xl tracking-tight flex items-baseline gap-1">
+                <Logo />
+              </div>
           </Link>
           <SidebarTrigger variant="ghost" size="icon" className="md:hidden">
             <ChevronLeft />
@@ -121,19 +122,6 @@ function WorkforceNav() {
   )
 }
 
-function WorkforceOfficeLayoutContent({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex h-screen">
-      <WorkforceNav />
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-4 md:p-6 lg:p-8 bg-primary/5 min-h-full w-full">
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function WorkforceOfficeLayout({
   children,
 }: {
@@ -141,7 +129,14 @@ export default function WorkforceOfficeLayout({
 }) {
   return (
     <ProtectedRoute redirectTo="/auth/workforce-signin">
-      <WorkforceOfficeLayoutContent>{children}</WorkforceOfficeLayoutContent>
+      <div className="flex h-screen">
+        <WorkforceNav />
+        <div className="flex-1 overflow-y-auto">
+          <div className="p-4 md:p-6 lg:p-8 bg-primary/5 min-h-full w-full">
+            {children}
+          </div>
+        </div>
+      </div>
     </ProtectedRoute>
   );
 }
