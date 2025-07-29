@@ -32,7 +32,7 @@ export default function MobilizationFundingPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
           <div>
-            <h2 className="font-headline text-3xl font-bold text-primary">Kickstart Your Operations</h2>
+            <h2 className="font-headline text-3xl font-bold text-primary"><span className="text-foreground">Kickstart</span> Your Operations</h2>
             <p className="mt-4 text-lg text-foreground/70">
               Mobilization funding provides essential upfront capital for contractors and service providers to cover initial project costs like equipment, materials, and labor before the first payment from the client is received. This funding ensures your project starts on time and runs smoothly from day one.
             </p>
