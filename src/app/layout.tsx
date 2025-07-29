@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import './globals.css';
@@ -22,8 +23,29 @@ export const metadata: Metadata = {
   title: 'Lankford Capital - Your Partner in Financial Growth',
   description:
     'Lankford Capital offers a wide range of loan products including residential, commercial, industrial, and SBA loans. We provide tailored financing solutions for construction, acquisition, and development projects. Your trusted partner for real estate and business financing.',
-  keywords:
-    'lending, loan, residential lending, commercial lending, industrial loans, sba loans, construction financing, fix and flip, dscr loans, land acquisition, equipment financing, broker services, capital',
+  keywords: [
+    'real estate financing',
+    'investment property loans',
+    'private lending',
+    'hard money lender',
+    'commercial real estate loans',
+    'residential investment loans',
+    'non-owner occupied loans',
+    'fix and flip loans',
+    'DSCR loans',
+    'ground up construction loans',
+    'bridge loans',
+    'commercial bridge loans',
+    'industrial property financing',
+    'land development loans',
+    'mezzanine financing',
+    'equipment financing',
+    'mobilization funding',
+    'capital for real estate investors',
+    'broker loan programs',
+    'Lankford Capital',
+    'Lankford Lending'
+  ],
 };
 
 export default function RootLayout({
