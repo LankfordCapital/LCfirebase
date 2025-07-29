@@ -6,30 +6,12 @@ import {useRouter} from 'next/navigation';
 import {useEffect, useState, ReactNode} from 'react';
 import {useAuth} from '@/contexts/auth-context';
 import {Skeleton} from '@/components/ui/skeleton';
-import { Sidebar, SidebarContent, SidebarHeader } from './ui/sidebar';
+import { Loader2 } from 'lucide-react';
 
 function ProtectedRouteSkeleton() {
   return (
-    <div className="flex h-screen">
-      <div className="hidden md:flex flex-col w-64 border-r">
-          <div className="p-4">
-             <Skeleton className="h-8 w-40" />
-          </div>
-          <div className="p-4 space-y-2">
-            <Skeleton className="h-8 w-full" />
-            <Skeleton className="h-8 w-full" />
-            <Skeleton className="h-8 w-full" />
-          </div>
-      </div>
-      <div className="flex-1 p-8 space-y-4">
-        <Skeleton className="h-12 w-1/4" />
-        <div className="grid grid-cols-3 gap-4">
-          <Skeleton className="h-24" />
-          <Skeleton className="h-24" />
-          <Skeleton className="h-24" />
-        </div>
-        <Skeleton className="h-64" />
-      </div>
+    <div className="flex h-screen w-full items-center justify-center">
+      <Loader2 className="h-8 w-8 animate-spin" />
     </div>
   )
 }
@@ -56,7 +38,7 @@ export const ProtectedRoute = ({
     }
   }, [user, loading, router, isClient, redirectTo]);
 
-  if (loading || !isClient) {
+  if (loading || !isClient || !user) {
     return <ProtectedRouteSkeleton />;
   }
   
