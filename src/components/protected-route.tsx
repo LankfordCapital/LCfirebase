@@ -25,13 +25,7 @@ export const ProtectedRoute = ({
   useEffect(() => {
     if (isClient && !loading && !user) {
       router.push(redirectTo);
-    } else if (isClient && !loading && user && user.email !== 'admin@lankfordcapital.com' && window.location.pathname !== '/dashboard' && redirectTo !== '/auth/signin' && window.location.pathname.startsWith(redirectTo.replace('/auth/signin', ''))) {
-        // This is a simplistic role check. A real app would have more robust role management.
-        // It prevents non-admin users from accessing dashboards they shouldn't.
-        // For example, a broker trying to access /workforce-office.
-        // This logic is imperfect and should be replaced with a proper role-based access control system.
     }
-
   }, [user, loading, router, isClient, redirectTo]);
 
   if (loading || !isClient) {
@@ -48,11 +42,5 @@ export const ProtectedRoute = ({
     );
   }
   
-  // Allow admin user to access everything
-  if(user?.email === 'admin@lankfordcapital.com') {
-    return children;
-  }
-
-  // If user is not admin, perform the check
   return user ? children : null;
 };
