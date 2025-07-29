@@ -353,43 +353,6 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Collateral Desktop Analysis",
         ]
     },
-    "SBA 7(a)": {
-        borrower: [
-            "SBA Form 1919",
-            "Personal Financial Statement (SBA Form 413)",
-            "Experience",
-            "Real Estate Owned"
-        ],
-        company: [
-            "Business Financial Statements (3 years)",
-            "Business Tax Returns (3 years)",
-            "Business Plan and Projections",
-            "Partnership/Officer List",
-            "Business License",
-            "Certificate of Good Standing",
-        ],
-        subjectProperty: ["Appraisal", "Collateral Desktop Analysis"]
-    },
-    "SBA 504": {
-        borrower: [
-            "Personal Financial Statement for all guarantors",
-            "Experience",
-            "Real Estate Owned"
-        ],
-        company: [
-            "SBA Form 1244",
-            "Business Financial Statements (3 years)",
-            "Partnership/Officer List",
-            "Business License",
-            "Certificate of Good Standing",
-        ],
-        subjectProperty: [
-            "Project Cost Details",
-            "Property Tax Certificate",
-            "Appraisal",
-            "Collateral Desktop Analysis",
-        ]
-    },
     "Land Acquisition": {
         borrower: [
             "ID/Driver's License",

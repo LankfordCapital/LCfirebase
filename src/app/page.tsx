@@ -57,12 +57,6 @@ const loanProducts = [
     href: '/lending/equipment-financing',
   },
   {
-    icon: <Warehouse className="h-8 w-8 text-primary" />,
-    title: 'SBA Loans',
-    description: 'Government-backed loans for small businesses.',
-    href: '/lending/sba-loans',
-  },
-  {
     icon: <Handshake className="h-8 w-8 text-primary" />,
     title: 'For Brokers',
     description: 'Partner with us to provide your clients with top-tier financing.',

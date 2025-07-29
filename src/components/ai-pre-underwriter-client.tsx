@@ -66,8 +66,6 @@ export function AIPReUnderwriterClient() {
                     </SelectGroup>
                       <SelectGroup>
                           <SelectLabel>Other</SelectLabel>
-                        <SelectItem value="SBA 7(a)">SBA 7(a)</SelectItem>
-                        <SelectItem value="SBA 504">SBA 504</SelectItem>
                         <SelectItem value="Land Acquisition">Land Acquisition</SelectItem>
                           <SelectItem value="Mezzanine Loans">Mezzanine Loans</SelectItem>
                           <SelectItem value="Mobilization Funding">Mobilization Funding</SelectItem>

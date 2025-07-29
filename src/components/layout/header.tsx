@@ -22,7 +22,6 @@ const lendingProducts = [
   { href: '/lending/land-acquisition', label: 'Land Acquisition', icon: LandPlot },
   { href: '/lending/mezzanine-loans', label: 'Mezzanine Loans', icon: Layers },
   { href: '/lending/mobilization-funding', label: 'Mobilization Funding', icon: Truck },
-  { href: '/lending/sba-loans', label: 'SBA Loans', icon: Warehouse },
   { href: '/lending/equipment-financing', label: 'Equipment Financing', icon: Truck },
 ];
 

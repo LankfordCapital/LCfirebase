@@ -14,7 +14,6 @@ const lendingProducts1 = [
 const lendingProducts2 = [
     { href: '/lending/mezzanine-loans', label: 'Mezzanine Loans' },
     { href: '/lending/mobilization-funding', label: 'Mobilization Funding' },
-    { href: '/lending/sba-loans', label: 'SBA Loans' },
     { href: '/lending/equipment-financing', label: 'Equipment Financing' },
 ]
 
