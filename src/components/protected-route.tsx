@@ -26,21 +26,16 @@ export const ProtectedRoute = ({
 }) => {
   const {user, loading} = useAuth();
   const router = useRouter();
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   useEffect(() => {
     // Wait until loading is false and we're on the client.
-    if (!loading && isClient) {
+    if (!loading) {
       // If there's no user, redirect.
       if (!user) {
         router.push(redirectTo);
       }
     }
-  }, [user, loading, router, isClient, redirectTo]);
+  }, [user, loading, router, redirectTo]);
 
   // While loading, or if there's no user (and redirection is imminent),
   // show the skeleton.
