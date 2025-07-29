@@ -45,7 +45,7 @@ export default function EquipmentFinancingPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
           <div>
-            <h2 className="font-headline text-3xl font-bold text-primary">Power Your Operations</h2>
+            <h2 className="font-headline text-3xl font-bold text-primary"><span className="text-foreground">Power</span> Your Operations</h2>
             <p className="mt-4 text-lg text-foreground/70">
                 Don't let a lack of equipment hold your business back. Our equipment financing and leasing options make it easy to acquire the machinery, vehicles, or technology you need with manageable payments, helping you scale operations and increase efficiency.
             </p>
