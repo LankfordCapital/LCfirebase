@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Loader2, ArrowRight, Calendar as CalendarIcon, Building2, Briefcase, FileUp, FileText, Layers, DollarSign } from 'lucide-react';
+import { Loader2, ArrowRight, Calendar as CalendarIcon, Building2, Briefcase, FileUp, FileText, Layers, DollarSign, Truck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 import { aiPreUnderwriter, type AiPreUnderwriterOutput } from '@/ai/flows/ai-pre-underwriter';
@@ -60,6 +60,11 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [projectDescription, setProjectDescription] = useState('');
   const [clientName, setClientName] = useState('');
 
+  // Equipment Financing specific fields
+  const [equipmentDescription, setEquipmentDescription] = useState('');
+  const [equipmentCost, setEquipmentCost] = useState('');
+  const [equipmentSeller, setEquipmentSeller] = useState('');
+
 
   const { documents, addDocument } = useDocumentContext();
   const router = useRouter();
@@ -101,6 +106,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const isLandAcquisition = loanProgram.toLowerCase().includes('land acquisition');
   const isMezzanine = loanProgram.toLowerCase().includes('mezzanine');
   const isMobilization = loanProgram.toLowerCase().includes('mobilization funding');
+  const isEquipmentFinancing = loanProgram.toLowerCase().includes('equipment financing');
 
 
   return (
@@ -112,8 +118,8 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
         
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Building2 className="h-5 w-5 text-primary" /> Loan & {isMobilization ? 'Project' : 'Property'} Details</CardTitle>
-                <CardDescription>Provide the key details about the loan you are requesting and the subject {isMobilization ? 'project' : 'property'}.</CardDescription>
+                <CardTitle className="flex items-center gap-2"><Building2 className="h-5 w-5 text-primary" /> Loan & {isMobilization ? 'Project' : isEquipmentFinancing ? 'Equipment' : 'Property'} Details</CardTitle>
+                <CardDescription>Provide the key details about the loan you are requesting and the subject {isMobilization ? 'project' : isEquipmentFinancing ? 'equipment' : 'property'}.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 
@@ -145,6 +151,31 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                             </CardContent>
                         </Card>
                     </>
+                ) : isEquipmentFinancing ? (
+                     <Card className="bg-primary/5">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-primary"><Truck className="h-5 w-5" /> Equipment Financing Details</CardTitle>
+                        </CardHeader>
+                            <CardContent className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="loanAmount">Loan Amount Requested</Label>
+                                <Input id="loanAmount" type="number" placeholder="e.g., 75000" value={loanAmount} onChange={e => setLoanAmount(e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="equipmentCost">Total Equipment Cost</Label>
+                                <Input id="equipmentCost" type="number" placeholder="e.g., 100000" value={equipmentCost} onChange={e => setEquipmentCost(e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="equipmentSeller">Dealer/Seller Name</Label>
+                                <Input id="equipmentSeller" placeholder="e.g., Heavy Machinery Inc." value={equipmentSeller} onChange={e => setEquipmentSeller(e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="equipmentDescription">Equipment Description</Label>
+                                <Textarea id="equipmentDescription" placeholder="Describe the equipment (make, model, year, condition, etc.)..." value={equipmentDescription} onChange={e => setEquipmentDescription(e.target.value)} />
+                            </div>
+                            <DocumentUploadInput name="Equipment Quote or Invoice" />
+                        </CardContent>
+                    </Card>
                 ) : (
                 <>
                 <div className="space-y-2">

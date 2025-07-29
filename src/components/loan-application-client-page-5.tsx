@@ -70,10 +70,12 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
     const isLandAcquisition = loanProgram.toLowerCase().includes('land acquisition');
     const isMezzanine = loanProgram.toLowerCase().includes('mezzanine');
     const isMobilization = loanProgram.toLowerCase().includes('mobilization funding');
+    const isEquipmentFinancing = loanProgram.toLowerCase().includes('equipment financing');
+
 
     if (isConstructionOrRehab) {
       router.push(`/dashboard/application/${programSlug}/page-6`);
-    } else if (isLandAcquisition || isMezzanine || isMobilization) {
+    } else if (isLandAcquisition || isMezzanine || isMobilization || isEquipmentFinancing) {
       router.push(`/dashboard/application/${programSlug}/page-8`);
     }
      else {

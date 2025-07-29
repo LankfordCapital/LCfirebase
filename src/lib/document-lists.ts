@@ -237,7 +237,6 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "ID/Driver's License",
             "Personal Financial Statement",
             "Credit Report",
-            "Proof of Equity Injection",
             "Experience",
             "Real Estate Owned"
         ],
@@ -248,9 +247,11 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Partnership/Officer List",
             "Business License",
             "Certificate of Good Standing",
-            "Business Plan with projections",
         ],
         subjectProperty: [
+            "General Contractor License",
+            "General Contractor Insurance",
+            "General Contractor Bond",
             "Purchase and Sale Agreement",
             "Evidence of Earnest Money Deposit",
             "Environmental Reports",
@@ -281,6 +282,9 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "Certificate of Good Standing",
         ],
         subjectProperty: [
+            "General Contractor License",
+            "General Contractor Insurance",
+            "General Contractor Bond",
             "Current Property Operating Statements",
             "Rehab/Expansion Plans and Budget",
             "Purchase Agreement (if applicable)",
@@ -416,8 +420,6 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
             "ID/Driver's License",
             "Personal Financial Statement",
             "Credit Report",
-            "Experience",
-            "Real Estate Owned"
         ],
         company: [
             "EIN Certificate",
