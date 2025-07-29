@@ -20,7 +20,9 @@ export default function MobilizationFundingPage() {
         </video>
         <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
         <div className="container relative z-20 mx-auto px-4 text-center">
-          <h1 className="font-headline text-4xl font-bold text-white md:text-5xl">Mobilization Funding</h1>
+          <h1 className="font-headline text-4xl font-bold md:text-5xl">
+            <span className="text-primary">Mobilization</span> <span className="text-white">Funding</span>
+            </h1>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Get the upfront capital you need to start your projects.
           </p>
