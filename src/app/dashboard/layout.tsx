@@ -96,22 +96,16 @@ function DashboardNav() {
 }
 
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
-    const { user, loading } = useAuth();
-
-    if (loading || !user) {
-      return <>{children}</>;
-    }
-    
-    return (
-      <div className="flex h-screen">
-          <DashboardNav />
-          <div className="flex-1 overflow-y-auto">
-              <div className="p-4 md:p-6 lg:p-8 bg-primary/5 min-h-full w-full">
-                  {children}
-              </div>
-          </div>
-      </div>
-    );
+  return (
+    <div className="flex h-screen">
+        <DashboardNav />
+        <div className="flex-1 overflow-y-auto">
+            <div className="p-4 md:p-6 lg:p-8 bg-primary/5 min-h-full w-full">
+                {children}
+            </div>
+        </div>
+    </div>
+  );
 }
 
 function DashboardSkeleton() {
