@@ -9,7 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Sparkles } from 'lucide-react';
-import { generateMarketAnalysis, type GenerateMarketAnalysisOutput } from '@/ai/flows/market-analysis-flow';
+import { generateMarketAnalysis } from '@/ai/flows/market-analysis-flow';
+import { type GenerateMarketAnalysisOutput } from '@/ai/flows/market-analysis-types';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 type ReportType = 'trafficStudy' | 'demographics' | 'economicDrivers' | 'zoning';
