@@ -394,9 +394,7 @@ export const loanProgramDocumentLists: Record<string, DocumentList> = {
         borrower: [
             "ID/Driver's License",
             "Personal Financial Statement",
-            "Credit Report",
-            "Experience",
-            "Real Estate Owned"
+            "Credit Report"
         ],
         company: [
             "EIN Certificate",

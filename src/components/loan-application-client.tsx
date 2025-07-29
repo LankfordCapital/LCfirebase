@@ -54,6 +54,11 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   // Mezzanine Loan specific fields
   const [seniorLoanAmount, setSeniorLoanAmount] = useState('');
   const [capitalStack, setCapitalStack] = useState('');
+  
+  // Mobilization Funding specific fields
+  const [contractValue, setContractValue] = useState('');
+  const [projectDescription, setProjectDescription] = useState('');
+  const [clientName, setClientName] = useState('');
 
 
   const { documents, addDocument } = useDocumentContext();
@@ -95,6 +100,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const isIndustrial = loanProgram.toLowerCase().includes('industrial');
   const isLandAcquisition = loanProgram.toLowerCase().includes('land acquisition');
   const isMezzanine = loanProgram.toLowerCase().includes('mezzanine');
+  const isMobilization = loanProgram.toLowerCase().includes('mobilization funding');
 
 
   return (
@@ -106,10 +112,41 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
         
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Building2 className="h-5 w-5 text-primary" /> Loan & Property Details</CardTitle>
-                <CardDescription>Provide the key details about the loan you are requesting and the subject property.</CardDescription>
+                <CardTitle className="flex items-center gap-2"><Building2 className="h-5 w-5 text-primary" /> Loan & {isMobilization ? 'Project' : 'Property'} Details</CardTitle>
+                <CardDescription>Provide the key details about the loan you are requesting and the subject {isMobilization ? 'project' : 'property'}.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+                
+                {isMobilization ? (
+                    <>
+                        <Card className="bg-primary/5">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2 text-primary"><DollarSign className="h-5 w-5" /> Mobilization Funding Details</CardTitle>
+                            </CardHeader>
+                             <CardContent className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="fundingAmount">Funding Amount Requested</Label>
+                                    <Input id="fundingAmount" type="number" placeholder="e.g., 50000" value={loanAmount} onChange={e => setLoanAmount(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="contractValue">Total Contract Value</Label>
+                                    <Input id="contractValue" type="number" placeholder="e.g., 250000" value={contractValue} onChange={e => setContractValue(e.target.value)} />
+                                </div>
+                                 <div className="space-y-2">
+                                    <Label htmlFor="clientName">Client/Payor Name</Label>
+                                    <Input id="clientName" placeholder="e.g., General Construction Co." value={clientName} onChange={e => setClientName(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="projectDescription">Brief Project Description</Label>
+                                    <Textarea id="projectDescription" placeholder="Briefly describe the project, its scope, and timeline..." value={projectDescription} onChange={e => setProjectDescription(e.target.value)} />
+                                </div>
+                                <DocumentUploadInput name="Executed Contract for the project" />
+                                <DocumentUploadInput name="Detailed Use of Funds" />
+                            </CardContent>
+                        </Card>
+                    </>
+                ) : (
+                <>
                 <div className="space-y-2">
                     <Label htmlFor="propertyAddress">Subject Property Address</Label>
                     <Input id="propertyAddress" placeholder="123 Main St, Anytown, USA" value={propertyAddress} onChange={e => setPropertyAddress(e.target.value)} />
@@ -336,6 +373,8 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                         </Popover>
                     </div>
                 </div>
+                </>
+                )}
             </CardContent>
         </Card>
         

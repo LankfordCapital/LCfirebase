@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState } from 'react';
@@ -68,10 +69,11 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
     const isConstructionOrRehab = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('rehab');
     const isLandAcquisition = loanProgram.toLowerCase().includes('land acquisition');
     const isMezzanine = loanProgram.toLowerCase().includes('mezzanine');
+    const isMobilization = loanProgram.toLowerCase().includes('mobilization funding');
 
     if (isConstructionOrRehab) {
       router.push(`/dashboard/application/${programSlug}/page-6`);
-    } else if (isLandAcquisition || isMezzanine) {
+    } else if (isLandAcquisition || isMezzanine || isMobilization) {
       router.push(`/dashboard/application/${programSlug}/page-8`);
     }
      else {
@@ -181,7 +183,7 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="titleAgentEmail">Agent Email</Label>
-                        <Input id="titleAgentEmail" type="email" value={setEscrowAgentEmail(e.target.value)} />
+                        <Input id="titleAgentEmail" type="email" value={titleAgentEmail} onChange={e => setTitleAgentEmail(e.target.value)} />
                     </div>
                 </div>
                 <DocumentUploadInput name="Marked Up Title Commitment" />
