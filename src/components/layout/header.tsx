@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -23,7 +24,6 @@ const lendingProducts = [
   { href: '/lending/mezzanine-loans', label: 'Mezzanine Loans', icon: Layers },
   { href: '/lending/mobilization-funding', label: 'Mobilization Funding', icon: Truck },
   { href: '/lending/equipment-financing', label: 'Equipment Financing', icon: Truck },
-  { href: '/lending/sba-loans', label: 'SBA Loans', icon: Handshake },
 ];
 
 const mainNav = [

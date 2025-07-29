@@ -22,7 +22,7 @@ const fontHeadline = Space_Grotesk({
 export const metadata: Metadata = {
   title: 'Lankford Capital - Your Partner in Financial Growth',
   description:
-    'Lankford Capital offers a wide range of loan products including residential, commercial, industrial, and SBA loans. We provide tailored financing solutions for construction, acquisition, and development projects. Your trusted partner for real estate and business financing.',
+    'Lankford Capital offers a wide range of loan products including residential, commercial, and industrial loans. We provide tailored financing solutions for construction, acquisition, and development projects. Your trusted partner for real estate and business financing.',
   keywords: [
     'real estate financing',
     'investment property loans',
