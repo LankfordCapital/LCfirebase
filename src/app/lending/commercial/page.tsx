@@ -59,7 +59,7 @@ export default function CommercialLendingPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="font-headline text-3xl font-bold text-primary">Our Commercial Loan Products</h2>
+            <h2 className="font-headline text-3xl font-bold text-primary">Our <span className="text-foreground">Commercial</span> Loan Products</h2>
             <p className="mt-2 text-muted-foreground">Versatile solutions for every stage of your investment.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
