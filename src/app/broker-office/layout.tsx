@@ -4,6 +4,7 @@
 import { ProtectedRoute } from "@/components/protected-route";
 import { useAuth } from "@/contexts/auth-context";
 import { Loader2 } from "lucide-react";
+import BrokerOfficePageClient from "@/components/broker-office-page-client";
 
 function BrokerOfficeSkeleton() {
   return (
