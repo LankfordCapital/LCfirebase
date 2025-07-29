@@ -1,8 +1,20 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageSquare } from "lucide-react";
+'use client';
+
+import { ChatClient } from "@/components/chat-client";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MessageSquare, Users, Briefcase } from "lucide-react";
+
 
 export default function CommunicationsPage() {
+    // In a real application, these room IDs would be dynamic,
+    // e.g., based on loan IDs or user IDs.
+    const rooms = {
+        internal: 'workforce-internal-chat',
+        broker: 'broker-alice-chat',
+        borrower: 'borrower-johndoe-chat',
+    }
+
     return (
         <div className="space-y-6">
             <div>
@@ -11,18 +23,22 @@ export default function CommunicationsPage() {
                     Chat with workforce members, brokers, and borrowers in real-time.
                 </p>
             </div>
-            <Card className="flex flex-col items-center justify-center text-center p-12 min-h-[400px]">
-                <CardHeader>
-                    <div className="mx-auto bg-muted p-4 rounded-full">
-                        <MessageSquare className="h-12 w-12 text-muted-foreground" />
-                    </div>
-                    <CardTitle className="mt-4">Coming Soon</CardTitle>
-                    <CardDescription>
-                        Our internal and external chat features are currently under development. <br />
-                        Soon you will be able to communicate seamlessly with all parties involved in a loan.
-                    </CardDescription>
-                </CardHeader>
-            </Card>
+            <Tabs defaultValue="internal" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="internal"><Users className="mr-2 h-4 w-4" /> Internal Workforce</TabsTrigger>
+                    <TabsTrigger value="broker"><Briefcase className="mr-2 h-4 w-4" /> Broker: Alice</TabsTrigger>
+                    <TabsTrigger value="borrower"><MessageSquare className="mr-2 h-4 w-4" /> Borrower: John Doe</TabsTrigger>
+                </TabsList>
+                <TabsContent value="internal">
+                   <ChatClient roomId={rooms.internal} />
+                </TabsContent>
+                <TabsContent value="broker">
+                    <ChatClient roomId={rooms.broker} />
+                </TabsContent>
+                <TabsContent value="borrower">
+                    <ChatClient roomId={rooms.borrower} />
+                </TabsContent>
+            </Tabs>
         </div>
     )
 }
