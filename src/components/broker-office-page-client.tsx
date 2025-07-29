@@ -10,10 +10,7 @@ import Link from "next/link";
 import { PlusCircle, Users, DollarSign, BarChart, MoreHorizontal, Calendar, Mail, Upload, FileWarning } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useDocumentContext } from "@/contexts/document-context";
 import { useState } from "react";
 
 
@@ -37,40 +34,7 @@ const workforceMembers = [
 ];
 
 export default function BrokerOfficePage() {
-    const { addDocument, documents } = useDocumentContext();
     const [selectedLoan, setSelectedLoan] = useState<(typeof borrowerLoans)[0] | null>(null);
-
-    const handleDocumentUpload = async (docName: string, event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files && event.target.files[0]) {
-            const file = event.target.files[0];
-            addDocument({
-                name: docName,
-                file,
-            });
-        }
-    };
-
-    const UploadButton = ({ docName }: { docName: string }) => {
-        const fileInputId = `upload-${docName.replace(/\s+/g, '-')}`;
-        const doc = documents[docName];
-        return (
-            <div className="space-y-2">
-                <Label htmlFor={fileInputId}>{docName}</Label>
-                <div className="flex items-center gap-2">
-                    <Input 
-                        id={fileInputId} 
-                        type="file" 
-                        onChange={(e) => handleDocumentUpload(docName, e)} 
-                    />
-                    <Button size="icon" variant="ghost">
-                        <Upload className="h-4 w-4"/>
-                        {doc && <span className="text-green-500 ml-2">(Uploaded)</span>}
-                    </Button>
-                </div>
-            </div>
-        );
-    };
-
 
   return (
     <div className="container mx-auto p-4 md:p-8 space-y-6">
@@ -206,10 +170,10 @@ export default function BrokerOfficePage() {
                     <CardDescription>Upload your compliance documents here.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <UploadButton docName="W-9 (Broker)" />
-                    <UploadButton docName="Wiring Instructions (Broker)" />
-                    <UploadButton docName="ID/Driver's License (Broker)" />
-                    <UploadButton docName="Signed Broker Agreement" />
+                     <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 h-4 w-4" /> W-9 (Broker)</Button>
+                     <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 h-4 w-4" /> Wiring Instructions (Broker)</Button>
+                     <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 h-4 w-4" /> ID/Driver's License (Broker)</Button>
+                     <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 h-4 w-4" /> Signed Broker Agreement</Button>
                 </CardContent>
             </Card>
             <Card>
