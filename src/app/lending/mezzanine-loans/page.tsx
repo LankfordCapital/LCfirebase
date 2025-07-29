@@ -7,7 +7,7 @@ import { Layers, ArrowRight } from "lucide-react";
 export default function MezzanineLoansPage() {
   return (
     <div>
-      <section className="relative h-[50vh] flex items-center justify-center text-white py-20 md:py-28">
+      <section className="relative h-[50vh] flex items-center justify-center py-20 md:py-28">
         <video
           autoPlay
           muted
@@ -34,7 +34,7 @@ export default function MezzanineLoansPage() {
              <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-homebase.firebasestorage.app/o/shutterstock_2605496977.jpg?alt=media&token=57a23a29-1c77-4a49-bca0-61b47cbfa66e" alt="Large modern warehouse interior" layout="fill" objectFit="cover" data-ai-hint="warehouse" />
           </div>
           <div>
-            <h2 className="font-headline text-3xl font-bold text-primary">What is Mezzanine Financing?</h2>
+            <h2 className="font-headline text-3xl font-bold text-primary">What is <span className="text-foreground">Mezzanine</span> Financing?</h2>
             <p className="mt-4 text-lg text-foreground/70">
               Mezzanine debt is a form of hybrid capital that sits between senior debt and equity in a company's capital structure. It's an ideal solution for developers and business owners looking to maximize leverage and minimize equity dilution for acquisitions, expansions, or recapitalizations.
             </p>
