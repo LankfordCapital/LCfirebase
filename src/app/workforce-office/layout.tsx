@@ -30,6 +30,8 @@ import {
   Database,
   Users,
   ClipboardList,
+  Calendar,
+  Notebook,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -53,6 +55,8 @@ function WorkforceNav() {
     { href: '/workforce-office/document-optimizer', label: 'Document Optimizer', icon: Bot },
     { href: '/workforce-office/document-generator', label: 'Document Generator', icon: FileJson },
     { href: '/workforce-office/email-automation', label: 'Email Automation', icon: Mail },
+    { href: '/workforce-office/scheduler', label: 'Scheduler', icon: Calendar },
+    { href: '/workforce-office/docs', label: 'Documents & Notes', icon: Notebook },
     { href: '/workforce-office/reports', label: 'Reporting', icon: BarChartHorizontal },
     { href: '/workforce-office/communications', label: 'Communications Hub', icon: MessageSquare },
   ];
