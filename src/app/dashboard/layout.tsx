@@ -10,7 +10,6 @@ import {
   SidebarMenuButton,
   SidebarFooter,
   SidebarTrigger,
-  SidebarInset,
 } from '@/components/ui/sidebar';
 import { Logo } from '@/components/logo';
 import {
@@ -25,16 +24,11 @@ import { usePathname } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/auth-context';
 import { ProtectedRoute } from '@/components/protected-route';
+import { Loader2 } from 'lucide-react';
 
 function DashboardNav() {
   const pathname = usePathname();
   const { user, logOut } = useAuth();
-
-  const menuItems = [
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/dashboard/documents', label: 'New Application', icon: FileText },
-    { href: '/dashboard/profile', label: 'Profile', icon: UserCircle },
-  ];
 
   return (
     <Sidebar>
@@ -95,6 +89,51 @@ function DashboardNav() {
   )
 }
 
+const menuItems = [
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/dashboard/documents', label: 'New Application', icon: FileText },
+    { href: '/dashboard/profile', label: 'Profile', icon: UserCircle },
+];
+
+function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
+    return (
+        <div className="flex h-screen">
+            <DashboardNav />
+            <div className="flex-1 overflow-y-auto">
+                <div className="p-4 md:p-6 lg:p-8 bg-primary/5 min-h-full w-full">
+                    {children}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function DashboardSkeleton() {
+    return (
+        <div className="flex h-screen w-full">
+            <div className="hidden md:block md:w-64 bg-background border-r p-2">
+                <div className="flex flex-col h-full">
+                    <div className="p-2">
+                        <div className="h-10 w-40 bg-muted rounded-md animate-pulse"></div>
+                    </div>
+                    <div className="flex flex-col gap-1 p-2 flex-grow">
+                        <div className="h-8 w-full bg-muted rounded-md animate-pulse"></div>
+                        <div className="h-8 w-full bg-muted rounded-md animate-pulse"></div>
+                        <div className="h-8 w-full bg-muted rounded-md animate-pulse"></div>
+                    </div>
+                    <div className="p-2">
+                        <div className="h-12 w-full bg-muted rounded-md animate-pulse"></div>
+                        <div className="h-8 mt-2 w-full bg-muted rounded-md animate-pulse"></div>
+                    </div>
+                </div>
+            </div>
+            <div className="flex-1 flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        </div>
+    )
+}
+
 export default function DashboardLayout({
   children,
 }: {
@@ -102,15 +141,8 @@ export default function DashboardLayout({
 }) {
 
   return (
-    <ProtectedRoute redirectTo="/auth/signin">
-      <div className="flex h-screen">
-        <DashboardNav />
-        <div className="flex-1 overflow-y-auto">
-          <div className="p-4 md:p-6 lg:p-8 bg-primary/5 min-h-full w-full">
-            {children}
-          </div>
-        </div>
-      </div>
+    <ProtectedRoute redirectTo="/auth/signin" Skeleton={DashboardSkeleton}>
+      <DashboardLayoutContent>{children}</DashboardLayoutContent>
     </ProtectedRoute>
   );
 }
