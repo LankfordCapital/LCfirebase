@@ -72,7 +72,7 @@ export default function ResidentialNOOPage() {
                   <ul className="space-y-2">
                     {loan.features.map((feature) => (
                       <li key={feature} className="flex items-center gap-2">
-                        <CheckCircle className="h-5 w-5 text-accent" />
+                        <CheckCircle className="h-5 w-5 text-accent flex-shrink-0" />
                         <span className="text-muted-foreground">{feature}</span>
                       </li>
                     ))}
