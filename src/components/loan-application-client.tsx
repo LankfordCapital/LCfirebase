@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Loader2, ArrowRight, Calendar as CalendarIcon, Building2, Briefcase, FileUp, FileText } from 'lucide-react';
+import { Loader2, ArrowRight, Calendar as CalendarIcon, Building2, Briefcase, FileUp, FileText, Layers, DollarSign } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 import { aiPreUnderwriter, type AiPreUnderwriterOutput } from '@/ai/flows/ai-pre-underwriter';
@@ -20,6 +20,7 @@ import { format } from 'date-fns';
 import { useAuth } from '@/contexts/auth-context';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
+import { Textarea } from './ui/textarea';
 
 export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [propertyAddress, setPropertyAddress] = useState('');
@@ -49,6 +50,10 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const [entitlementStatus, setEntitlementStatus] = useState('');
   const [developmentCosts, setDevelopmentCosts] = useState('');
   const [afterDevelopmentValue, setAfterDevelopmentValue] = useState('');
+
+  // Mezzanine Loan specific fields
+  const [seniorLoanAmount, setSeniorLoanAmount] = useState('');
+  const [capitalStack, setCapitalStack] = useState('');
 
 
   const { documents, addDocument } = useDocumentContext();
@@ -89,6 +94,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
 
   const isIndustrial = loanProgram.toLowerCase().includes('industrial');
   const isLandAcquisition = loanProgram.toLowerCase().includes('land acquisition');
+  const isMezzanine = loanProgram.toLowerCase().includes('mezzanine');
 
 
   return (
@@ -157,7 +163,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                 )}
 
                 <div className="space-y-2">
-                    <Label htmlFor="loanAmount">Loan Amount Requested</Label>
+                    <Label htmlFor="loanAmount">{isMezzanine ? "Mezzanine Loan Amount Requested" : "Loan Amount Requested"}</Label>
                     <Input id="loanAmount" type="number" placeholder="e.g., 300000" value={loanAmount} onChange={e => setLoanAmount(e.target.value)} />
                 </div>
                 
@@ -252,6 +258,26 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                         <DocumentUploadInput name="Feasibility Study" />
                         <DocumentUploadInput name="Zoning and Entitlement Documents" />
                         <DocumentUploadInput name="Environmental Report" />
+                    </>
+                ) : isMezzanine ? (
+                    <>
+                        <Card className="bg-primary/5">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2 text-primary"><Layers className="h-5 w-5" /> Mezzanine Details</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="seniorLoanAmount">Senior Loan Amount</Label>
+                                    <Input id="seniorLoanAmount" type="number" placeholder="e.g., 2000000" value={seniorLoanAmount} onChange={e => setSeniorLoanAmount(e.target.value)} />
+                                </div>
+                                 <div className="space-y-2">
+                                    <Label htmlFor="capitalStack">Capital Stack (Describe sources and amounts)</Label>
+                                    <Textarea id="capitalStack" placeholder="e.g., Senior Debt: $2M, Mezzanine: $500k, Equity: $500k" value={capitalStack} onChange={e => setCapitalStack(e.target.value)} />
+                                </div>
+                                <DocumentUploadInput name="Senior Debt Term Sheet" />
+                                <DocumentUploadInput name="Capital Stack overview" />
+                            </CardContent>
+                        </Card>
                     </>
                 ) : (
                     <>

@@ -67,10 +67,14 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
     const isConstructionOrRehab = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('rehab');
     const isLandAcquisition = loanProgram.toLowerCase().includes('land acquisition');
+    const isMezzanine = loanProgram.toLowerCase().includes('mezzanine');
 
     if (isConstructionOrRehab) {
       router.push(`/dashboard/application/${programSlug}/page-6`);
-    } else {
+    } else if (isLandAcquisition || isMezzanine) {
+      router.push(`/dashboard/application/${programSlug}/page-8`);
+    }
+     else {
       router.push(`/dashboard/application/${programSlug}/page-8`);
     }
   }
@@ -177,7 +181,7 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="titleAgentEmail">Agent Email</Label>
-                        <Input id="titleAgentEmail" type="email" value={titleAgentEmail} onChange={e => setEscrowAgentEmail(e.target.value)} />
+                        <Input id="titleAgentEmail" type="email" value={setEscrowAgentEmail(e.target.value)} />
                     </div>
                 </div>
                 <DocumentUploadInput name="Marked Up Title Commitment" />
