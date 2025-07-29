@@ -98,6 +98,7 @@ export default function Home() {
         </video>
         <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
         <div className="container relative z-20 mx-auto px-4 text-center">
+          <Logo className="w-72 mx-auto mb-4" />
           <h1 className="font-headline text-4xl font-bold tracking-tight text-white md:text-6xl lg:text-7xl">
             Building Futures, <span className="text-primary">Funding Dreams</span>
           </h1>
