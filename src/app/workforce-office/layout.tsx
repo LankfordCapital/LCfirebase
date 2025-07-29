@@ -23,6 +23,7 @@ import {
   MessageSquare,
   FileJson,
   AreaChart,
+  Hammer,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -37,6 +38,7 @@ function WorkforceNav() {
   const menuItems = [
     { href: '/workforce-office', label: 'Pipeline Dashboard', icon: LayoutDashboard },
     { href: '/workforce-office/market-analysis', label: 'Market Analysis', icon: AreaChart },
+    { href: '/workforce-office/construction-feasibility', label: 'Construction Feasibility', icon: Hammer },
     { href: '/workforce-office/document-optimizer', label: 'Document Optimizer', icon: Bot },
     { href: '/workforce-office/document-generator', label: 'Document Generator', icon: FileJson },
     { href: '/workforce-office/email-automation', label: 'Email Automation', icon: Mail },
