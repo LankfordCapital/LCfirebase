@@ -27,7 +27,8 @@ const lendingProducts = [
 ];
 
 const mainNav = [
-  { href: '/broker', label: 'For Brokers' },
+  { href: '/about', label: 'About Us' },
+  { href: '/contact', label: 'Contact' },
 ];
 
 export function Header() {
@@ -41,7 +42,7 @@ export function Header() {
           <Logo className="h-10 w-40" />
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="font-semibold">
@@ -72,6 +73,9 @@ export function Header() {
               {item.label}
             </Link>
           ))}
+           <Button asChild variant="outline">
+              <Link href="/broker">For Brokers</Link>
+            </Button>
            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="font-semibold">
@@ -170,6 +174,7 @@ export function Header() {
                         {item.label}
                     </Link>
                     ))}
+                    <Link href="/broker" className="font-bold" onClick={() => setIsOpen(false)}>For Brokers</Link>
                 </div>
                 <hr />
                 <div className="flex flex-col gap-2">
