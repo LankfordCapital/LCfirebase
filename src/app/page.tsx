@@ -99,7 +99,7 @@ export default function Home() {
         <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
         <div className="container relative z-20 mx-auto px-4 text-center">
           <h1 className="font-headline text-4xl font-bold tracking-tight text-white md:text-6xl lg:text-7xl">
-            Building Futures, Funding Dreams
+            Building Futures, <span className="text-primary">Funding Dreams</span>
           </h1>
           <p className="mt-6 max-w-3xl mx-auto text-lg text-white/90 md:text-xl">
             Lankford Capital provides tailored, innovative financing solutions to power your real estate and business ambitions.
