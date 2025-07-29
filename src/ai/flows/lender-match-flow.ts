@@ -37,7 +37,7 @@ export type DealInfo = z.infer<typeof DealInfoSchema>;
 
 // Input Schema for the Flow
 export const LenderMatchInputSchema = z.object({
-    deal: DealInfo,
+    deal: DealInfoSchema,
     lenders: z.array(LenderProfileSchema).describe('A list of all available lenders and their profiles.'),
 });
 export type LenderMatchInput = z.infer<typeof LenderMatchInputSchema>;
