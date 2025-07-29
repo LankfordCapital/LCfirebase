@@ -7,10 +7,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { generateEmail, type GenerateEmailOutput, type GenerateEmailInput } from '@/ai/flows/email-automation';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Mail, Send, Sparkles } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { useDocumentContext } from '@/contexts/document-context';
 
 const sampleUser: GenerateEmailInput['user'] = {
     userId: 'user-123',
@@ -25,9 +26,12 @@ export function EmailAutomationClient() {
     const [isLoading, setIsLoading] = useState(false);
     const [result, setResult] = useState<GenerateEmailOutput | null>(null);
     const [scenario, setScenario] = useState<GenerateEmailInput['scenario']>('missingDocuments');
+    const { documents } = useDocumentContext();
+
     const [details, setDetails] = useState<GenerateEmailInput['details']>({
-        missingDocuments: ['2023 Personal Tax Returns', 'Proof of Insurance'],
-        appointmentTime: new Date().toLocaleString(),
+        loanProgram: '',
+        uploadedDocumentNames: [],
+        appointmentTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleString(),
         loanDetails: 'Loan for 123 Main St has been approved for $300,000.',
         adverseActionReason: 'Insufficient credit history.',
         customInstructions: ''
@@ -39,8 +43,17 @@ export function EmailAutomationClient() {
         setIsLoading(true);
         setResult(null);
 
+        const uploadedDocumentNames = Object.keys(documents);
+
         try {
-            const response = await generateEmail({ user: sampleUser, scenario, details });
+            const response = await generateEmail({ 
+                user: sampleUser, 
+                scenario, 
+                details: {
+                    ...details,
+                    uploadedDocumentNames
+                } 
+            });
             setResult(response);
             toast({
                 title: 'Email Drafted',
@@ -67,12 +80,43 @@ export function EmailAutomationClient() {
             case 'missingDocuments':
                 return (
                      <div className="space-y-2">
-                        <Label htmlFor="missingDocuments">Missing Documents (comma-separated)</Label>
-                        <Input
-                            id="missingDocuments"
-                            value={details.missingDocuments?.join(', ')}
-                            onChange={(e) => handleDetailChange('missingDocuments', e.target.value.split(',').map(s => s.trim()))}
-                        />
+                        <Label htmlFor="loanProgram">Loan Program</Label>
+                        <Select onValueChange={(value) => handleDetailChange('loanProgram', value)} value={details.loanProgram}>
+                            <SelectTrigger id="loanProgram">
+                                <SelectValue placeholder="Select a program to find missing docs..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectLabel>Residential NOO</SelectLabel>
+                                    <SelectItem value="Residential NOO - Ground Up Construction">Ground Up Construction</SelectItem>
+                                    <SelectItem value="Residential NOO - Fix and Flip">Fix and Flip</SelectItem>
+                                    <SelectItem value="Residential NOO - DSCR">DSCR Loan</SelectItem>
+                                    <SelectItem value="Residential NOO - Bridge">Bridge Loan</SelectItem>
+                                </SelectGroup>
+                                <SelectGroup>
+                                    <SelectLabel>Commercial</SelectLabel>
+                                    <SelectItem value="Commercial - Ground Up Construction">Ground Up Construction</SelectItem>
+                                    <SelectItem value="Commercial - Rehab Loans">Rehab Loans</SelectItem>
+                                    <SelectItem value="Commercial - Acquisition & Bridge">Acquisition & Bridge</SelectItem>
+                                    <SelectItem value="Commercial - Conventional Long Term Debt">Conventional Long Term Debt</SelectItem>
+                                </SelectGroup>
+                                <SelectGroup>
+                                    <SelectLabel>Industrial</SelectLabel>
+                                    <SelectItem value="Industrial - Ground Up Construction">Ground Up Construction</SelectItem>
+                                    <SelectItem value="Industrial - Rehab & Expansion">Rehab & Expansion</SelectItem>
+                                    <SelectItem value="Industrial - Acquisition & Bridge">Acquisition & Bridge</SelectItem>
+                                    <SelectItem value="Industrial - Long Term Debt">Long Term Debt</SelectItem>
+                                </SelectGroup>
+                                <SelectGroup>
+                                    <SelectLabel>Other</SelectLabel>
+                                    <SelectItem value="Land Acquisition">Land Acquisition</SelectItem>
+                                    <SelectItem value="Mezzanine Loans">Mezzanine Loans</SelectItem>
+                                    <SelectItem value="Mobilization Funding">Mobilization Funding</SelectItem>
+                                    <SelectItem value="Equipment Financing">Equipment Financing</SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground">The AI will automatically find which documents are missing for the selected program.</p>
                     </div>
                 );
             case 'appointmentConfirmation':

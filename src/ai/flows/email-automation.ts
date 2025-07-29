@@ -11,6 +11,7 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
+import { loanProgramDocumentLists } from '@/lib/document-lists';
 
 const UserProfileSchema = z.object({
   userId: z.string().describe('Unique identifier for the user.'),
@@ -25,7 +26,8 @@ const GenerateEmailInputSchema = z.object({
     scenario: z.enum(['missingDocuments', 'appointmentConfirmation', 'loanApproval', 'adverseAction', 'custom'])
         .describe('The scenario for which the email is being generated.'),
     details: z.object({
-        missingDocuments: z.array(z.string()).optional().describe('A list of documents that are still missing. Required for "missingDocuments" scenario.'),
+        loanProgram: z.string().optional().describe('The loan program, required for "missingDocuments" scenario to determine the checklist.'),
+        uploadedDocumentNames: z.array(z.string()).optional().describe('A list of filenames for documents already uploaded by the user.'),
         appointmentTime: z.string().optional().describe('The date and time of the appointment. Required for "appointmentConfirmation" scenario.'),
         loanDetails: z.string().optional().describe('Details about the approved loan (e.g., amount, property). Required for "loanApproval" scenario.'),
         adverseActionReason: z.string().optional().describe('The reason for the adverse action. Required for "adverseAction" scenario.'),
@@ -72,7 +74,7 @@ Address the user by their full name. The tone should be professional and helpful
 {{#if (eq scenario "missingDocuments")}}
 **Subject: Action Required on Your Loan Application**
 **Body:**
-Draft an email reminding the user of the following missing documents:
+Draft an email reminding the user of the following missing documents for their {{details.loanProgram}} application:
 {{#each details.missingDocuments}}
 - {{{this}}}
 {{/each}}
@@ -82,7 +84,7 @@ Please ask them to upload these documents to the portal as soon as possible to c
 {{#if (eq scenario "appointmentConfirmation")}}
 **Subject: Appointment Confirmed with Lankford Capital**
 **Body:**
-Draft an email confirming an appointment scheduled for **{{details.appointmentTime}}**. Include details on how to join or what to prepare.
+Draft an email confirming an appointment scheduled for **{{{details.appointmentTime}}}**. Include details on how to join or what to prepare.
 {{/if}}
 
 {{#if (eq scenario "loanApproval")}}
@@ -117,6 +119,17 @@ const emailAutomationFlow = ai.defineFlow(
         outputSchema: GenerateEmailOutputSchema,
     },
     async (input) => {
+
+        if (input.scenario === 'missingDocuments' && input.details.loanProgram) {
+            const fullChecklist = loanProgramDocumentLists[input.details.loanProgram as keyof typeof loanProgramDocumentLists] || loanProgramDocumentLists['Default'];
+            const allRequiredDocs = [...fullChecklist.borrower, ...fullChecklist.company, ...fullChecklist.subjectProperty];
+            const uploadedDocs = new Set(input.details.uploadedDocumentNames || []);
+            const missingDocs = allRequiredDocs.filter(doc => !uploadedDocs.has(doc));
+            
+            // @ts-ignore - Dynamically adding missingDocuments to the prompt details
+            input.details.missingDocuments = missingDocs;
+        }
+
         const { output } = await prompt(input);
         return output!;
     }
