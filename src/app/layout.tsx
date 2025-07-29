@@ -28,12 +28,16 @@ function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const isAuthPage = pathname.startsWith('/auth');
   const isDashboardPage = pathname.startsWith('/dashboard') || pathname.startsWith('/broker-office') || pathname.startsWith('/workforce-office');
 
+  if (isAuthPage || isDashboardPage) {
+    return <main>{children}</main>
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
-      {!isAuthPage && !isDashboardPage && <Header />}
+      <Header />
       <main className="flex-1">{children}</main>
-      {!isAuthPage && !isDashboardPage && <Footer />}
-      {!isAuthPage && !isDashboardPage && <AIAssistant />}
+      <Footer />
+      <AIAssistant />
     </div>
   );
 }

@@ -49,8 +49,7 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="flex flex-col flex-1 items-center justify-between bg-primary/5 p-4">
-      <div/>
+    <div className="flex flex-col flex-1 items-center justify-center bg-primary/5 p-4 min-h-screen">
       <Card className="w-full max-w-sm shadow-2xl">
         <form onSubmit={handleSubmit}>
           <CardHeader className="text-center">
@@ -78,23 +77,23 @@ export default function SignUpPage() {
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Create account
             </Button>
+            <div className="flex flex-col gap-2 text-center text-sm">
+              <div className="text-center text-sm">
+                  By signing up, you agree to our{" "}
+                  <Link href="/terms-of-service" className="underline">
+                  Terms of Service
+                  </Link>
+              </div>
+              <div className="text-center text-sm">
+                  Already have an account?{" "}
+                  <Link href="/auth/signin" className="underline">
+                  Sign in
+                  </Link>
+              </div>
+            </div>
           </CardFooter>
         </form>
       </Card>
-      <div className="flex flex-col gap-2 text-center text-sm">
-        <div className="text-center text-sm">
-            By signing up, you agree to our{" "}
-            <Link href="/terms-of-service" className="underline">
-            Terms of Service
-            </Link>
-        </div>
-        <div className="text-center text-sm">
-            Already have an account?{" "}
-            <Link href="/auth/signin" className="underline">
-            Sign in
-            </Link>
-        </div>
-      </div>
     </div>
   )
 }

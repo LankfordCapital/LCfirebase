@@ -45,8 +45,7 @@ export default function WorkforceSignInPage() {
 
 
   return (
-    <div className="flex flex-col flex-1 items-center justify-between bg-primary/5 p-4">
-      <div/>
+    <div className="flex flex-col flex-1 items-center justify-center bg-primary/5 p-4 min-h-screen">
       <Card className="w-full max-w-sm shadow-2xl">
         <form onSubmit={handleSubmit}>
           <CardHeader className="text-center">
@@ -70,14 +69,14 @@ export default function WorkforceSignInPage() {
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Sign in
             </Button>
+             <div className="text-center text-sm">
+                <Link href="/auth/signin" className="underline">
+                  Borrower Sign In
+                </Link>
+            </div>
           </CardFooter>
         </form>
       </Card>
-      <div className="text-center text-sm">
-          <Link href="/auth/signin" className="underline">
-            Borrower Sign In
-          </Link>
-      </div>
     </div>
   )
 }
