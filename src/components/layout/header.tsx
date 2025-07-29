@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, ChevronDown, Building, Wrench, Warehouse, LandPlot, Layers, Truck, Handshake, Factory, LayoutDashboard } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { usePathname } from 'next/navigation';
@@ -140,6 +140,9 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
+              <SheetHeader className="sr-only">
+                <SheetTitle>Main Menu</SheetTitle>
+              </SheetHeader>
               <div className="flex flex-col gap-6 p-6">
                 <Link href="/" onClick={() => setIsOpen(false)}>
                   <Logo className="h-8 w-auto" />
