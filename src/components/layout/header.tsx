@@ -74,35 +74,6 @@ export function Header() {
            <Button asChild className="text-black hover:bg-primary/90">
               <Link href="/broker">For Brokers</Link>
             </Button>
-           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="font-semibold">
-                Sign In <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-64">
-                <DropdownMenuItem asChild>
-                  <Link href="/auth/signin">
-                    Borrower Sign In
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/auth/workforce-signin">
-                    Workforce Sign In
-                  </Link>
-                </DropdownMenuItem>
-                 <DropdownMenuItem asChild>
-                  <Link href="/auth/broker-signin">
-                    Broker Sign In
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/auth/admin-signup">
-                    Admin Sign In
-                  </Link>
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </nav>
 
         <div className="hidden md:flex items-center gap-2">
