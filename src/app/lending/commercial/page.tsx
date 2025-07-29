@@ -43,7 +43,7 @@ export default function CommercialLendingPage() {
           playsInline
           className="absolute top-0 left-0 w-full h-full object-cover z-0"
         >
-          <source src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.appspot.com/o/shutterstock_3468943095.mp4?alt=media&token=41530e46-27d9-45d4-8314-b4131548e690" type="video/mp4" />
+          <source src="https://firebasestorage.googleapis.com/v0/b/lankford-homebase.firebasestorage.app/o/Adobe%20Express%20-%20shutterstock_3601135427.mp4?alt=media&token=854b7060-a241-4543-91b4-245f7823f66c" type="video/mp4" />
         </video>
         <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
         <div className="container relative z-20 mx-auto px-4 text-center">
