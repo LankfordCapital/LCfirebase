@@ -8,7 +8,7 @@ import {getStorage} from 'firebase/storage';
 const firebaseConfig = {
   projectId: 'lankford-lending',
   appId: '1:940157326397:web:02fbefc8cd0a13c2160654',
-  storageBucket: 'lankford-lending.firebasestorage.app',
+  storageBucket: 'lankford-lending.appspot.com',
   apiKey: 'AIzaSyCY0-w7ICux8n0PrnmsGY5GP3Uqg478J34',
   authDomain: 'lankford-lending.firebaseapp.com',
   messagingSenderId: '940157326397',

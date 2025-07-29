@@ -2,27 +2,32 @@
 'use client';
 
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import { scanFile, FileScanResult } from '@/app/actions/scan-file';
+import { scanFile } from '@/app/actions/scan-file';
 import { useToast } from '@/hooks/use-toast';
+import { storage } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { useAuth } from './auth-context';
 
 export type UploadStatus = 'pending' | 'uploaded' | 'verified' | 'missing';
 
 export type Document = {
   name: string;
   file: File;
-  dataUri: string;
+  dataUri: string; // Keep for local use like AI scanning before upload
+  storagePath: string;
+  downloadURL: string;
   status: UploadStatus;
 };
 
 type DocumentStore = {
-  [key: string]: Document;
+  [key: string]: Omit<Document, 'file' | 'dataUri'> & { file?: File, dataUri?: string };
 };
 
 interface DocumentContextType {
   documents: DocumentStore;
-  addDocument: (doc: Omit<Document, 'dataUri'> & { dataUri?: string }) => Promise<boolean>;
+  addDocument: (doc: Pick<Document, 'name' | 'file'>) => Promise<boolean>;
   updateDocumentStatus: (docName: string, status: UploadStatus) => void;
-  getDocument: (docName: string) => Document | undefined;
+  getDocument: (docName: string) => DocumentStore[string] | undefined;
 }
 
 const DocumentContext = createContext<DocumentContextType | undefined>(undefined);
@@ -38,10 +43,19 @@ const fileToDataUri = (file: File): Promise<string> => {
 
 export const DocumentProvider = ({ children }: { children: ReactNode }) => {
   const [documents, setDocuments] = useState<DocumentStore>({});
+  const { user } = useAuth();
   const { toast } = useToast();
 
-  const addDocument = useCallback(async (doc: Omit<Document, 'dataUri'> & { dataUri?: string }): Promise<boolean> => {
-    
+  const addDocument = useCallback(async (doc: Pick<Document, 'name' | 'file'>): Promise<boolean> => {
+    if (!user) {
+        toast({
+            variant: 'destructive',
+            title: 'Authentication Error',
+            description: 'You must be logged in to upload documents.',
+        });
+        return false;
+    }
+
     // Step 1: Scan the file for malware
     const formData = new FormData();
     formData.append('upload', doc.file);
@@ -56,7 +70,6 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
             });
             return false;
         }
-
     } catch (error) {
          toast({
             variant: 'destructive',
@@ -66,26 +79,44 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
         return false;
     }
 
+    // Step 2: If clean, upload to Firebase Storage
+    const storagePath = `documents/${user.uid}/${doc.name}`;
+    const storageRef = ref(storage, storagePath);
 
-    // Step 2: If clean, proceed with adding the document
-    let dataUri = doc.dataUri;
-    if (!dataUri) {
-      dataUri = await fileToDataUri(doc.file);
+    try {
+        await uploadBytes(storageRef, doc.file);
+        const downloadURL = await getDownloadURL(storageRef);
+        const dataUri = await fileToDataUri(doc.file);
+
+        setDocuments(prev => ({
+          ...prev,
+          [doc.name]: {
+            name: doc.name,
+            status: 'uploaded',
+            storagePath,
+            downloadURL,
+            file: doc.file, // Keep file object for potential local use
+            dataUri, // Keep dataUri for local AI scanning
+          },
+        }));
+
+        toast({
+            title: 'File Scanned & Uploaded',
+            description: `"${doc.file.name}" is clean and has been securely uploaded.`,
+        });
+
+        return true;
+
+    } catch (error) {
+        console.error("Firebase Storage upload error:", error);
+        toast({
+            variant: 'destructive',
+            title: 'Upload Failed',
+            description: `Could not upload "${doc.file.name}" to storage.`,
+        });
+        return false;
     }
-    
-    setDocuments(prev => ({
-      ...prev,
-      [doc.name]: { ...doc, dataUri: dataUri!, status: 'uploaded' },
-    }));
-
-    toast({
-        title: 'File Scanned & Uploaded',
-        description: `"${doc.file.name}" is clean and has been uploaded.`,
-    });
-
-    return true;
-
-  }, [toast]);
+  }, [toast, user]);
 
   const updateDocumentStatus = useCallback((docName: string, status: UploadStatus) => {
     setDocuments(prev => {
@@ -117,5 +148,3 @@ export const useDocumentContext = () => {
   }
   return context;
 };
-
-    

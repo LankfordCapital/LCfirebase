@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
@@ -21,8 +22,6 @@ type UploadStatus = 'pending' | 'uploaded' | 'verified' | 'missing';
 type DocumentItem = {
     name: string;
     status: UploadStatus;
-    file?: File;
-    dataUri?: string;
 };
 
 type CategorizedDocuments = {
@@ -60,8 +59,6 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
                 return {
                     ...item,
                     status: 'uploaded',
-                    file: docFromContext.file,
-                    dataUri: docFromContext.dataUri,
                 };
             }
             return item;
@@ -119,7 +116,6 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
         const success = await addDocument({
             name: itemName,
             file,
-            status: 'uploaded',
         });
 
         if (success && checklist) {
@@ -132,7 +128,7 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
     const docName = `Personal Asset Statement (Month ${monthKey === 'month1' ? 1 : monthKey === 'month2' ? 2 : 3}) (Sponsor ${sponsorIndex + 1})`;
     const assetStatement = documents[docName];
 
-    if (!assetStatement?.file) {
+    if (!assetStatement?.dataUri) {
       toast({
         variant: 'destructive',
         title: 'No file selected',
