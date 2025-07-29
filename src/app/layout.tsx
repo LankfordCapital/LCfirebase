@@ -26,13 +26,14 @@ const fontHeadline = Space_Grotesk({
 function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAuthPage = pathname.startsWith('/auth');
+  const isDashboardPage = pathname.startsWith('/dashboard') || pathname.startsWith('/broker-office') || pathname.startsWith('/workforce-office');
 
   return (
     <div className="flex min-h-screen flex-col">
-      {!isAuthPage && <Header />}
-      <main>{children}</main>
-      {!isAuthPage && <Footer />}
-      {!isAuthPage && <AIAssistant />}
+      {!isAuthPage && !isDashboardPage && <Header />}
+      <main className={cn(!isAuthPage && 'flex-1')}>{children}</main>
+      {!isAuthPage && !isDashboardPage && <Footer />}
+      {!isAuthPage && !isDashboardPage && <AIAssistant />}
     </div>
   );
 }
