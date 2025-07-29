@@ -1,3 +1,6 @@
+
+'use client';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -7,6 +10,8 @@ import Link from "next/link";
 import { DollarSign, FileCheck, FileClock, PlusCircle, AlertCircle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/contexts/auth-context";
+
 
 const summaryCards = [
     { title: "Active Loans", value: "1", icon: <DollarSign className="h-4 w-4 text-muted-foreground" /> },
@@ -33,11 +38,13 @@ const missingDocuments = [
 ]
 
 export default function DashboardPage() {
+  const { user } = useAuth();
+  
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="font-headline text-3xl font-bold">Welcome Back, John Doe!</h1>
+          <h1 className="font-headline text-3xl font-bold">Welcome Back, {user?.displayName || 'Borrower'}!</h1>
           <p className="text-muted-foreground">Lankford Lending Solutions</p>
         </div>
         <Button asChild>
@@ -116,7 +123,7 @@ export default function DashboardPage() {
                         </div>
                     ))}
                      <Button className="w-full mt-2" asChild>
-                        <Link href="/dashboard/documents">Upload Documents</Link>
+                        <Link href="/dashboard/profile">Upload Documents</Link>
                     </Button>
                 </CardContent>
             </Card>

@@ -129,6 +129,9 @@ export default function ProfilePage() {
 
     try {
       const dataUri = creditReport.dataUri;
+      if (!dataUri) {
+        throw new Error('File data not available for scanning.');
+      }
       const result = await scanCreditReport({ creditReportDataUri: dataUri });
       setCreditScores(result);
       toast({
@@ -170,6 +173,9 @@ export default function ProfilePage() {
     
     try {
         const dataUri = assetStatement.dataUri;
+        if (!dataUri) {
+          throw new Error('File data not available for scanning.');
+        }
         const result = await scanAssetStatement({ statementDataUri: dataUri });
         if(type === 'personal') {
             setPersonalAssetBalance(result);
@@ -220,10 +226,10 @@ export default function ProfilePage() {
     return (
         <div className="relative">
             <Button variant="outline" className="w-full justify-start" asChild>
-                <Label htmlFor={fileInputId} className="cursor-pointer">
-                    <Upload className="mr-2" /> 
-                    {docName}
-                    {doc && <span className="text-green-500 ml-2">(Uploaded)</span>}
+                <Label htmlFor={fileInputId} className="cursor-pointer flex items-center">
+                    <Upload className="mr-2 h-4 w-4" /> 
+                    <span className="truncate">{docName}</span>
+                    {doc && <span className="text-green-500 ml-2 whitespace-nowrap">(Uploaded)</span>}
                 </Label>
             </Button>
             <Input 
@@ -445,7 +451,7 @@ export default function ProfilePage() {
 
         <div className="lg:col-span-1 space-y-6">
           {companies.map((company, index) => (
-             <Card key={company.id} ref={el => companyRefs.current[index] = el}>
+             <Card key={company.id} ref={el => { if (el) companyRefs.current[index] = el; }}>
                 <CardHeader>
                 <div className="flex justify-between items-center">
                   <CardTitle>Company Information</CardTitle>

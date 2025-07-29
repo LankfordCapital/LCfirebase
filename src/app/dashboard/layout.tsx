@@ -31,7 +31,7 @@ function DashboardNav() {
 
   const menuItems = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/dashboard/documents', label: 'Documents', icon: FileText },
+    { href: '/dashboard/documents', label: 'New Application', icon: FileText },
     { href: '/dashboard/profile', label: 'Profile', icon: UserCircle },
   ];
 
@@ -70,8 +70,8 @@ function DashboardNav() {
             <SidebarMenuButton>
               <div className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="https://placehold.co/40x40.png" alt="@borrower" />
-                  <AvatarFallback>BD</AvatarFallback>
+                  <AvatarImage src={user?.photoURL || "https://placehold.co/40x40.png"} alt="@borrower" />
+                  <AvatarFallback>{user?.displayName?.charAt(0) || 'B'}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col text-left">
                   <span className="text-sm font-semibold">{user?.displayName || 'Borrower'}</span>
