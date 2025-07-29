@@ -90,15 +90,6 @@ Please provide each requested report in its corresponding field in the output.
 `,
 });
 
-// Register a helper for the prompt
-ai.handlebars.registerHelper('includes', function (array, value, options) {
-    if (array?.includes(value)) {
-        return options.fn(this);
-    }
-    return options.inverse(this);
-});
-
-
 const marketAnalysisFlow = ai.defineFlow(
     {
         name: 'marketAnalysisFlow',
