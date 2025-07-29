@@ -11,7 +11,7 @@ export function Logo({ className }: { className?: string }) {
         alt="Lankford Capital Logo"
         width={48}
         height={48}
-        className="h-12 w-12"
+        className="h-14 w-14"
       />
       <div className="flex items-baseline gap-1 font-headline text-2xl tracking-tight">
         <span className="text-primary font-bold">
