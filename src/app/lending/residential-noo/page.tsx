@@ -90,7 +90,7 @@ export default function ResidentialNOOPage() {
              <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-homebase.firebasestorage.app/o/shutterstock_2494829643.jpg?alt=media&token=99af025c-48a0-4921-bb37-c28aeaffef5c" alt="Modern residential house" layout="fill" objectFit="cover" data-ai-hint="family home" />
           </div>
           <div>
-            <h2 className="font-headline text-3xl font-bold text-primary">Partner with the Experts</h2>
+            <h2 className="font-headline text-3xl font-bold text-primary"><span className="text-foreground">Partner</span> with the Experts</h2>
             <p className="mt-4 text-lg text-foreground/70">
               Our team understands the nuances of investment property financing. We work with you to structure loans that align with your project timelines and profitability goals.
             </p>
