@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { updateProfile } from "firebase/auth";
+import { Logo } from "@/components/logo";
 
 export default function AdminSignUpPage() {
   const [fullName, setFullName] = useState('Admin User');
@@ -74,38 +75,57 @@ export default function AdminSignUpPage() {
   };
 
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-primary/5 p-4 min-h-screen">
-      <Card className="w-full max-w-sm shadow-2xl">
-        <form onSubmit={handleSignIn}>
-          <CardHeader className="text-center">
-            <CardTitle className="font-headline text-2xl">Admin Sign In</CardTitle>
-            <CardDescription>
-              Use the admin credentials to access all dashboards. The account will be created if it doesn't exist.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter admin password" />
-            </div>
-          </CardContent>
-          <CardFooter className="flex flex-col gap-4">
-            <Button className="w-full" type="submit" disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Sign In or Create Admin
-            </Button>
-            <div className="text-center text-sm">
-                <Link href="/auth/signin" className="underline">
-                    Back to Borrower Sign In
-                </Link>
-            </div>
-          </CardFooter>
-        </form>
-      </Card>
+    <div className="grid md:grid-cols-2 h-screen">
+      <div className="flex flex-col items-center justify-center p-8 bg-primary/5">
+         <div className="w-full max-w-sm mb-8">
+            <Link href="/" className="flex items-center gap-2 text-3xl">
+                <Logo />
+            </Link>
+         </div>
+        <Card className="w-full max-w-sm shadow-2xl">
+          <form onSubmit={handleSignIn}>
+            <CardHeader className="text-center">
+              <CardTitle className="font-headline text-2xl">Admin Sign In</CardTitle>
+              <CardDescription>
+                Use the admin credentials to access all dashboards. The account will be created if it doesn't exist.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter admin password" />
+              </div>
+            </CardContent>
+            <CardFooter className="flex flex-col gap-4">
+              <Button className="w-full" type="submit" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Sign In or Create Admin
+              </Button>
+              <div className="text-center text-sm">
+                  <Link href="/auth/signin" className="underline">
+                      Back to Borrower Sign In
+                  </Link>
+              </div>
+            </CardFooter>
+          </form>
+        </Card>
+      </div>
+       <div className="hidden md:block relative">
+        <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute top-0 left-0 w-full h-full object-cover"
+        >
+          <source src="https://firebasestorage.googleapis.com/v0/b/lankford-homebase.firebasestorage.app/o/Adobe%20Express%20-%20shutterstock_3599048629.mp4?alt=media&token=a42649e7-9a18-4028-b277-b60390039ee2" type="video/mp4" />
+        </video>
+        <div className="absolute top-0 left-0 w-full h-full bg-black/50" />
+      </div>
     </div>
   )
 }

@@ -18,6 +18,7 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { Logo } from "@/components/logo";
 
 export default function BrokerSignInPage() {
   const [email, setEmail] = useState('');
@@ -45,39 +46,58 @@ export default function BrokerSignInPage() {
 
 
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-primary/5 p-4 min-h-screen">
-      <Card className="w-full max-w-sm shadow-2xl">
-        <form onSubmit={handleSubmit}>
-          <CardHeader className="text-center">
-            <CardTitle className="font-headline text-2xl">Broker Sign In</CardTitle>
-            <CardDescription>Access the broker back office.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="broker@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
-            </div>
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
+    <div className="grid md:grid-cols-2 h-screen">
+      <div className="flex flex-col items-center justify-center p-8 bg-primary/5">
+        <div className="w-full max-w-sm mb-8">
+            <Link href="/" className="flex items-center gap-2 text-3xl">
+                <Logo />
+            </Link>
+         </div>
+        <Card className="w-full max-w-sm shadow-2xl">
+          <form onSubmit={handleSubmit}>
+            <CardHeader className="text-center">
+              <CardTitle className="font-headline text-2xl">Broker Sign In</CardTitle>
+              <CardDescription>Access the broker back office.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" placeholder="broker@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
-              <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
-            </div>
-          </CardContent>
-          <CardFooter className="flex flex-col gap-4">
-            <Button className="w-full" type="submit" disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Sign in
-            </Button>
-            <div className="text-center text-sm">
-              Don't have an account?{" "}
-              <Link href="/auth/signup?role=broker" className="underline">
-                Register as a Broker
-              </Link>
-            </div>
-          </CardFooter>
-        </form>
-      </Card>
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label htmlFor="password">Password</Label>
+                </div>
+                <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+              </div>
+            </CardContent>
+            <CardFooter className="flex flex-col gap-4">
+              <Button className="w-full" type="submit" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Sign in
+              </Button>
+              <div className="text-center text-sm">
+                Don't have an account?{" "}
+                <Link href="/auth/signup?role=broker" className="underline">
+                  Register as a Broker
+                </Link>
+              </div>
+            </CardFooter>
+          </form>
+        </Card>
+      </div>
+      <div className="hidden md:block relative">
+        <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute top-0 left-0 w-full h-full object-cover"
+        >
+          <source src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Adobe%20Express%20-%20shutterstock_1098239155.mp4?alt=media&token=40066233-852b-4fb5-bad0-dcdef71de9a8" type="video/mp4" />
+        </video>
+        <div className="absolute top-0 left-0 w-full h-full bg-black/50" />
+      </div>
     </div>
   )
 }
