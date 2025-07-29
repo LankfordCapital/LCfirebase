@@ -38,7 +38,7 @@ export default function LandAcquisitionPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
           <div>
-            <h2 className="font-headline text-3xl font-bold text-primary">From Raw Land to Ready Site</h2>
+            <h2 className="font-headline text-3xl font-bold text-primary">From <span className="text-foreground">Raw Land</span> to Ready Site</h2>
             <p className="mt-4 text-lg text-foreground/70">
                 We provide specialized financing for the acquisition and development of land, empowering builders and developers to create value from the ground up. Our flexible loan structures are designed to support your project from initial purchase through to site readiness.
             </p>
