@@ -28,21 +28,14 @@ export const ProtectedRoute = ({
   const router = useRouter();
 
   useEffect(() => {
-    // Wait until loading is false and we're on the client.
-    if (!loading) {
-      // If there's no user, redirect.
-      if (!user) {
-        router.push(redirectTo);
-      }
+    if (!loading && !user) {
+      router.push(redirectTo);
     }
   }, [user, loading, router, redirectTo]);
 
-  // While loading, or if there's no user (and redirection is imminent),
-  // show the skeleton.
   if (loading || !user) {
     return <Skeleton />;
   }
   
-  // If we have a user, render the children.
   return children;
 };
