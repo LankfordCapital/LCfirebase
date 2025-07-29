@@ -26,6 +26,7 @@ import {
   Hammer,
   BookCopy,
   Shield,
+  FileBarChart,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -39,6 +40,7 @@ function WorkforceNav() {
   const menuItems = [
     { href: '/workforce-office', label: 'Pipeline Dashboard', icon: LayoutDashboard },
     { href: '/workforce-office/market-analysis', label: 'Market Analysis', icon: AreaChart },
+    { href: '/workforce-office/comparable-property-report', label: 'Comparable Property Report', icon: FileBarChart },
     { href: '/workforce-office/construction-feasibility', label: 'Construction Feasibility', icon: Hammer },
     { href: '/workforce-office/title-escrow-instructions', label: 'Title & Escrow', icon: BookCopy },
     { href: '/workforce-office/insurance-instructions', label: 'Insurance Instructions', icon: Shield },
