@@ -109,15 +109,13 @@ export default function WorkforceOfficeLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ProtectedRoute redirectTo="/auth/workforce-signin">
-        <div className="flex h-screen">
-        <WorkforceNav />
-        <div className="flex-1 overflow-y-auto">
-            <div className="p-4 md:p-6 lg:p-8 bg-primary/5 min-h-full w-full">
-            {children}
-            </div>
+    <div className="flex h-screen">
+      <WorkforceNav />
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-4 md:p-6 lg:p-8 bg-primary/5 min-h-full w-full">
+          {children}
         </div>
-        </div>
-    </ProtectedRoute>
+      </div>
+    </div>
   );
 }
