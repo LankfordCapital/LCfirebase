@@ -47,6 +47,7 @@ const prompt = ai.definePrompt({
 {{#each lenders}}
 -   **Lender ID:** {{id}}
 -   **Name:** {{name}}
+-   **Website:** {{website}}
 -   **Criteria:** {{lendingCriteria}}
 -   **Notes:** {{notes}}
 ---

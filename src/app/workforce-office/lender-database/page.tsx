@@ -8,10 +8,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PlusCircle, Trash2, Edit, Save, X } from 'lucide-react';
+import { Loader2, PlusCircle, Trash2, Edit, Save, X, ExternalLink } from 'lucide-react';
 import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { LenderProfile, LenderProfileSchema } from '@/ai/flows/lender-match-flow';
+import { type LenderProfile } from '@/ai/flows/lender-match-types';
 import {
   Table,
   TableBody,
@@ -20,6 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Link from 'next/link';
 
 export default function LenderDatabasePage() {
     const [lenders, setLenders] = useState<LenderProfile[]>([]);
@@ -31,6 +32,7 @@ export default function LenderDatabasePage() {
     const [contactPerson, setContactPerson] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
+    const [website, setWebsite] = useState('');
     const [lendingCriteria, setLendingCriteria] = useState('');
     const [notes, setNotes] = useState('');
 
@@ -55,6 +57,7 @@ export default function LenderDatabasePage() {
         setContactPerson('');
         setEmail('');
         setPhone('');
+        setWebsite('');
         setLendingCriteria('');
         setNotes('');
         setEditingId(null);
@@ -66,6 +69,7 @@ export default function LenderDatabasePage() {
         setContactPerson(lender.contactPerson);
         setEmail(lender.email);
         setPhone(lender.phone);
+        setWebsite(lender.website || '');
         setLendingCriteria(lender.lendingCriteria);
         setNotes(lender.notes || '');
     }
@@ -74,7 +78,7 @@ export default function LenderDatabasePage() {
         e.preventDefault();
         setIsSubmitting(true);
 
-        const newLenderData = { name, contactPerson, email, phone, lendingCriteria, notes };
+        const newLenderData = { name, contactPerson, email, phone, website, lendingCriteria, notes };
         
         try {
             if (editingId) {
@@ -147,6 +151,10 @@ export default function LenderDatabasePage() {
                                 <Input id="phone" type="tel" placeholder="e.g., 555-123-4567" value={phone} onChange={(e) => setPhone(e.target.value)} required />
                             </div>
                         </div>
+                         <div className="space-y-2">
+                            <Label htmlFor="website">Website</Label>
+                            <Input id="website" type="url" placeholder="e.g., https://capital.com" value={website} onChange={(e) => setWebsite(e.target.value)} />
+                        </div>
                         <div className="space-y-2">
                             <Label htmlFor="lendingCriteria">Lending Criteria</Label>
                             <Textarea id="lendingCriteria" placeholder="Describe preferred property types, loan sizes, LTV/LTC, geographic focus, etc." value={lendingCriteria} onChange={(e) => setLendingCriteria(e.target.value)} required className="h-32" />
@@ -171,37 +179,45 @@ export default function LenderDatabasePage() {
                     <CardTitle>Current Lenders</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Contact</TableHead>
-                                <TableHead>Email</TableHead>
-                                <TableHead>Phone</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {isLoading ? (
-                                <TableRow><TableCell colSpan={5} className="text-center">Loading lenders...</TableCell></TableRow>
-                            ) : lenders.map(lender => (
-                                <TableRow key={lender.id}>
-                                    <TableCell className="font-medium">{lender.name}</TableCell>
-                                    <TableCell>{lender.contactPerson}</TableCell>
-                                    <TableCell>{lender.email}</TableCell>
-                                    <TableCell>{lender.phone}</TableCell>
-                                    <TableCell className="text-right">
-                                        <Button variant="ghost" size="icon" onClick={() => handleEditClick(lender)}>
-                                            <Edit className="h-4 w-4" />
-                                        </Button>
-                                        <Button variant="ghost" size="icon" onClick={() => handleDelete(lender.id)}>
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                    </TableCell>
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Contact</TableHead>
+                                    <TableHead>Email</TableHead>
+                                    <TableHead>Website</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {isLoading ? (
+                                    <TableRow><TableCell colSpan={5} className="text-center">Loading lenders...</TableCell></TableRow>
+                                ) : lenders.map(lender => (
+                                    <TableRow key={lender.id}>
+                                        <TableCell className="font-medium">{lender.name}</TableCell>
+                                        <TableCell>{lender.contactPerson}</TableCell>
+                                        <TableCell>{lender.email}</TableCell>
+                                        <TableCell>
+                                            {lender.website ? (
+                                                <a href={lender.website} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline flex items-center gap-1">
+                                                    Visit <ExternalLink className="h-4 w-4" />
+                                                </a>
+                                            ) : 'N/A'}
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <Button variant="ghost" size="icon" onClick={() => handleEditClick(lender)}>
+                                                <Edit className="h-4 w-4" />
+                                            </Button>
+                                            <Button variant="ghost" size="icon" onClick={() => handleDelete(lender.id)}>
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </CardContent>
             </Card>
         </div>

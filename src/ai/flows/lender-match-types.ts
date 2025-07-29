@@ -7,6 +7,7 @@ export const LenderProfileSchema = z.object({
     contactPerson: z.string().describe("The primary contact person's name."),
     email: z.string().email().describe("The contact person's email."),
     phone: z.string().describe("The contact person's phone number."),
+    website: z.string().url().optional().describe("The lender's website URL."),
     lendingCriteria: z.string().describe('A detailed description of their lending criteria, including preferred deal types, loan sizes, geographic focus, LTV/LTC requirements, credit score minimums, etc.'),
     notes: z.string().optional().describe('Any additional notes or information about the lender.'),
 });
