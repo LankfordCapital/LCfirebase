@@ -42,17 +42,11 @@ export default function WorkforceOfficePage() {
     const [selectedLoan, setSelectedLoan] = useState<(typeof clientLoans)[0] | null>(null);
 
   return (
-    <div className="container mx-auto p-4 md:p-8 space-y-6 bg-primary/5 min-h-screen">
+    <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="flex items-center gap-4">
-            <Avatar className="h-16 w-16">
-              <AvatarImage src="https://placehold.co/80x80.png" />
-              <AvatarFallback>WM</AvatarFallback>
-            </Avatar>
-            <div>
-              <h1 className="font-headline text-3xl font-bold">Workforce Back Office</h1>
-              <p className="text-muted-foreground">Welcome, Workforce Member</p>
-            </div>
+        <div>
+            <h1 className="font-headline text-3xl font-bold">Workforce Dashboard</h1>
+            <p className="text-muted-foreground">Manage clients, brokers, and loans.</p>
         </div>
         <div className="flex items-center gap-2">
            <div className="relative">
@@ -60,7 +54,7 @@ export default function WorkforceOfficePage() {
              <Input placeholder="Search clients or loans..." className="pl-8 w-full md:w-64" />
            </div>
             <Button asChild>
-                <Link href="/workforce-office/new-client"><PlusCircle className="mr-2 h-4 w-4"/> Add New Client</Link>
+                <Link href="/dashboard/documents"><PlusCircle className="mr-2 h-4 w-4"/> New Application</Link>
             </Button>
         </div>
       </div>
