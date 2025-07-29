@@ -42,7 +42,7 @@ export default function BrokerPage() {
           <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Expand your offerings and close more deals by partnering with a trusted, efficient, and reliable lender.
           </p>
-           <Button asChild size="lg" className="mt-8" variant="secondary">
+           <Button asChild size="lg" className="mt-8">
               <Link href="/auth/broker-signin">Broker Login</Link>
             </Button>
         </div>
