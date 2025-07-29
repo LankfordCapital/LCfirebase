@@ -12,3 +12,4 @@ import '@/ai/flows/document-generator.ts';
 import '@/ai/flows/market-analysis-flow.ts';
 import '@/ai/flows/construction-feasibility-flow.ts';
 import '@/ai/flows/generate-title-escrow-instructions-flow.ts';
+import '@/ai/flows/generate-insurance-instructions-flow.ts';
