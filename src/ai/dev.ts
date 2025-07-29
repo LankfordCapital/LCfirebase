@@ -9,3 +9,4 @@ import '@/ai/flows/asset-statement-scanner.ts';
 import '@/ai/flows/email-automation.ts';
 import '@/ai/flows/document-checklist-flow.ts';
 import '@/ai/flows/document-generator.ts';
+import '@/ai/flows/market-analysis-flow.ts';
