@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -9,7 +10,7 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
 
 const UserProfileSchema = z.object({
   userId: z.string().describe('Unique identifier for the user.'),
@@ -20,7 +21,7 @@ const UserProfileSchema = z.object({
   missingDocuments: z.array(z.string()).describe('A list of documents that are still missing from their checklist.'),
 });
 
-export const GenerateMissingDocumentRemindersInputSchema = z.object({
+const GenerateMissingDocumentRemindersInputSchema = z.object({
   users: z.array(UserProfileSchema).describe('A list of users who need to be checked for missing documents.'),
 });
 export type GenerateMissingDocumentRemindersInput = z.infer<typeof GenerateMissingDocumentRemindersInputSchema>;
@@ -31,7 +32,7 @@ const EmailDraftSchema = z.object({
     body: z.string().describe('The HTML body content of the email.'),
 });
 
-export const GenerateMissingDocumentRemindersOutputSchema = z.object({
+const GenerateMissingDocumentRemindersOutputSchema = z.object({
     draftedEmails: z.array(EmailDraftSchema).describe('A list of drafted email reminders.'),
 });
 export type GenerateMissingDocumentRemindersOutput = z.infer<typeof GenerateMissingDocumentRemindersOutputSchema>;
