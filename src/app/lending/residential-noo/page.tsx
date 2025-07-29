@@ -51,9 +51,14 @@ export default function ResidentialNOOPage() {
           <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Tailored financing solutions for real estate investors.
           </p>
-           <Button asChild size="lg" className="mt-8">
-              <Link href="/auth/signin">Borrowers</Link>
-            </Button>
+           <div className="mt-8 flex justify-center gap-4">
+                <Button asChild size="lg">
+                  <Link href="/auth/signin">Borrowers</Link>
+                </Button>
+                <Button asChild size="lg" variant="secondary">
+                  <Link href="/auth/broker-signin">For Brokers</Link>
+                </Button>
+            </div>
         </div>
       </section>
 
