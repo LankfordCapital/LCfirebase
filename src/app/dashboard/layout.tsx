@@ -24,7 +24,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/auth-context';
-import { ProtectedRoute } from '@/components/protected-route';
 
 function DashboardNav() {
   const pathname = usePathname();
@@ -102,7 +101,6 @@ export default function DashboardLayout({
 }) {
 
   return (
-    <ProtectedRoute>
       <div className="flex h-screen">
         <DashboardNav />
         <div className="flex-1 overflow-y-auto">
@@ -111,6 +109,5 @@ export default function DashboardLayout({
           </div>
         </div>
       </div>
-    </ProtectedRoute>
   );
 }
