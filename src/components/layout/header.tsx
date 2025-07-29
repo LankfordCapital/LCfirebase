@@ -71,7 +71,7 @@ export function Header() {
               {item.label}
             </Link>
           ))}
-           <Button asChild className="text-black">
+           <Button asChild className="text-black hover:bg-primary/90">
               <Link href="/broker">For Brokers</Link>
             </Button>
            <DropdownMenu>
