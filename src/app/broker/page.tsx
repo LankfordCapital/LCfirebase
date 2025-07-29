@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
@@ -25,14 +26,24 @@ const benefits = [
 export default function BrokerPage() {
   return (
     <div>
-      <section className="relative bg-primary/5 py-20 md:py-28 text-center">
-        <div className="container mx-auto px-4">
-          <h1 className="font-headline text-4xl font-bold text-primary md:text-5xl">Partner with Lankford Capital</h1>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
+      <section className="relative h-[50vh] flex items-center justify-center text-white py-20 md:py-28">
+         <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute top-0 left-0 w-full h-full object-cover z-0"
+        >
+          <source src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Adobe%20Express%20-%20shutterstock_1098239155.mp4?alt=media&token=40066233-852b-4fb5-bad0-dcdef71de9a8" type="video/mp4" />
+        </video>
+        <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
+        <div className="container relative z-20 mx-auto px-4 text-center">
+          <h1 className="font-headline text-4xl font-bold text-white md:text-5xl">Partner with Lankford Capital</h1>
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Expand your offerings and close more deals by partnering with a trusted, efficient, and reliable lender.
           </p>
-           <Button asChild size="lg" className="mt-8">
-              <Link href="/broker-office">Broker Login</Link>
+           <Button asChild size="lg" className="mt-8" variant="secondary">
+              <Link href="/auth/broker-signin">Broker Login</Link>
             </Button>
         </div>
       </section>
