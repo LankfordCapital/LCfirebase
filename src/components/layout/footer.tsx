@@ -21,8 +21,8 @@ const lendingProducts2 = [
 export function Footer() {
   return (
     <footer className="bg-primary/5 border-t">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left">
+      <div className="container mx-auto px-4 py-12 text-center">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-1">
               <div>
                 <h3 className="font-headline font-semibold text-primary">Lending</h3>
@@ -57,7 +57,7 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <div className="mt-8 pt-8 border-t flex flex-col items-center text-center">
+        <div className="mt-8 pt-8 border-t flex flex-col items-center">
             <Link href="/">
               <Logo className="h-auto w-48" />
             </Link>
