@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState } from 'react';
@@ -15,14 +14,14 @@ export function LoanApplicationClientPage10({ loanProgram }: { loanProgram: stri
   const [otherDetails, setOtherDetails] = useState('');
   
   const handleContinue = () => {
-    const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
-    router.push(`/dashboard/application/${programSlug}/page-11`);
+    const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&g/, 'and');
+    router.push(`/dashboard/application/${programSlug}/page-12`);
   };
 
   return (
     <div className="space-y-6">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 10 of 12</h1>
+            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 10 of 11</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
@@ -50,7 +49,7 @@ export function LoanApplicationClientPage10({ loanProgram }: { loanProgram: stri
                <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 9
             </Button>
             <Button onClick={handleContinue}>
-                Continue to Page 11 <ArrowRight className="ml-2 h-4 w-4" />
+                Continue to Final Submission <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
         </div>
     </div>

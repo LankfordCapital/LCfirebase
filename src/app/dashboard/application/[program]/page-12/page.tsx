@@ -1,7 +1,8 @@
 
 'use client';
 
-import { useState, Suspense } from 'react';
+import { Suspense } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -127,7 +128,7 @@ function LoanApplicationClientPage12({ loanProgram }: { loanProgram: string}) {
         
         <div className="flex justify-between items-center">
             <Button variant="outline" onClick={() => router.back()}>
-               <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 9
+               <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 10
             </Button>
             <Button onClick={handleSubmitApplication}>
                 Submit Final Application
