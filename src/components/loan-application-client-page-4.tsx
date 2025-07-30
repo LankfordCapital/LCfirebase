@@ -9,13 +9,14 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
-import { CheckCircle, ArrowLeft, ArrowRight, User, Briefcase, FileText, FileUp, Check, AlertTriangle, Loader2, Landmark } from 'lucide-react';
+import { CheckCircle, ArrowLeft, ArrowRight, User, Briefcase, FileText, FileUp, Check, AlertTriangle, Landmark } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { getDocumentChecklist } from '@/ai/flows/document-checklist-flow';
 import { useAuth } from '@/contexts/auth-context';
 import { DealHistory } from '@/components/deal-history';
 import { scanAssetStatement, type ScanAssetStatementOutput } from '@/ai/flows/asset-statement-scanner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { CustomLoader } from './ui/custom-loader';
 
 type UploadStatus = 'pending' | 'uploaded' | 'verified' | 'missing';
 
@@ -223,7 +224,7 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
                     <div className="flex gap-2">
                         <Input id={`personal-asset-upload-${month}-${sponsorIndex}`} type="file" onChange={(e) => handleFileChange(docName, e)} />
                         <Button onClick={() => handleScanAssetStatement(monthKey, sponsorIndex)} disabled={scanState.isScanning || !documents[docName]}>
-                            {scanState.isScanning ? <Loader2 className="animate-spin" /> : <Landmark />}
+                            {scanState.isScanning ? <CustomLoader /> : <Landmark />}
                             <span className="ml-2 hidden sm:inline">Scan</span>
                         </Button>
                     </div>

@@ -7,10 +7,11 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/com
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Send, MessageSquare, Loader2, Sparkles } from 'lucide-react';
+import { Send, MessageSquare, Sparkles } from 'lucide-react';
 import { answerVisitorQuestion, type AnswerVisitorQuestionOutput } from '@/ai/flows/ai-assistant';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { CustomLoader } from './ui/custom-loader';
 
 interface Message {
   id: string;
@@ -149,7 +150,7 @@ export function AIAssistant() {
                         <AvatarFallback className="bg-primary text-primary-foreground">LC</AvatarFallback>
                     </Avatar>
                     <div className="bg-muted rounded-lg px-4 py-2 flex items-center">
-                        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground"/>
+                        <CustomLoader className="h-5 w-5 text-muted-foreground"/>
                     </div>
                 </div>
              )}
@@ -166,7 +167,7 @@ export function AIAssistant() {
                 className="flex-1"
               />
               <Button type="submit" size="icon" disabled={isLoading || !inputValue.trim()}>
-                {isLoading ? <Loader2 className="animate-spin" /> : <Send />}
+                {isLoading ? <CustomLoader /> : <Send />}
                 <span className="sr-only">Send message</span>
               </Button>
             </form>

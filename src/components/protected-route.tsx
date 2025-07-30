@@ -4,12 +4,12 @@
 import {useRouter} from 'next/navigation';
 import {useEffect, ReactNode} from 'react';
 import {useAuth} from '@/contexts/auth-context';
-import { Loader2 } from 'lucide-react';
+import { CustomLoader } from './ui/custom-loader';
 
 function FullPageLoader() {
   return (
     <div className="flex h-screen w-full items-center justify-center bg-background">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <CustomLoader className="h-8 w-8" />
     </div>
   )
 }

@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { addAppointment, getAppointments, type Appointment } from '@/ai/flows/appointment-scheduler-flow';
-import { Loader2, Plus, Calendar as CalendarIcon, ClipboardCheck, Trash2, Edit } from 'lucide-react';
+import { Plus, Calendar as CalendarIcon, ClipboardCheck, Trash2, Edit } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -21,6 +21,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAuth } from '@/contexts/auth-context';
+import { CustomLoader } from './ui/custom-loader';
 
 export function SchedulerClient() {
   const { user } = useAuth();
@@ -117,7 +118,7 @@ export function SchedulerClient() {
             </Button>
           </CardHeader>
           <CardContent>
-            {isLoading ? <Loader2 className="animate-spin" /> : (
+            {isLoading ? <CustomLoader /> : (
                  <div className="space-y-4">
                     {dailyEvents.length > 0 ? dailyEvents.map(event => (
                         <div key={event.id} className={`p-4 rounded-md border-l-4 ${event.type === 'task' ? 'border-blue-500 bg-blue-50' : 'border-purple-500 bg-purple-50'}`}>
@@ -193,7 +194,7 @@ export function SchedulerClient() {
                 </div>
                 <DialogFooter>
                     <Button onClick={handleSaveEvent} disabled={isSubmitting}>
-                        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+                        {isSubmitting && <CustomLoader className="mr-2 h-4 w-4"/>}
                         Save Event
                     </Button>
                 </DialogFooter>

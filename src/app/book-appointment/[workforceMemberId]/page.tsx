@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, CalendarCheck } from "lucide-react";
+import { CalendarCheck } from "lucide-react";
 import { addAppointment } from '@/ai/flows/appointment-scheduler-flow';
+import { CustomLoader } from '@/components/ui/custom-loader';
 
 // Mock available times
 const availableTimes = [
@@ -126,7 +127,7 @@ export default function BookAppointmentPage({ params }: { params: { workforceMem
                     <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
                 </div>
                 <Button onClick={handleBooking} disabled={isLoading} className="w-full">
-                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CalendarCheck className="mr-2 h-4 w-4" />}
+                    {isLoading ? <CustomLoader className="mr-2 h-4 w-4" /> : <CalendarCheck className="mr-2 h-4 w-4" />}
                     Confirm Appointment for {selectedTime}
                 </Button>
             </div>

@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Upload, PlusCircle, Trash2, ScanLine, Loader2, Landmark, FileText, Calendar as CalendarIcon, Download } from "lucide-react";
+import { Upload, PlusCircle, Trash2, ScanLine, Landmark, FileText, Calendar as CalendarIcon, Download } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { scanCreditReport, type ScanCreditReportOutput } from '@/ai/flows/credit-score-scanner';
@@ -25,6 +25,7 @@ import { useDocumentContext } from '@/contexts/document-context';
 import { useAuth } from '@/contexts/auth-context';
 import { updateProfile } from 'firebase/auth';
 import { DealHistory } from '@/components/deal-history';
+import { CustomLoader } from './ui/custom-loader';
 
 type Company = {
   id: string;
@@ -343,7 +344,7 @@ export default function ProfilePage() {
                     <div className="flex gap-2">
                         <Input id="credit-report-upload" type="file" onChange={(e) => handleDocumentUpload('Credit Report (Borrower)', e)} />
                         <Button onClick={handleScanCreditReport} disabled={isScanningCredit || !documents['Credit Report (Borrower)']}>
-                            {isScanningCredit ? <Loader2 className="animate-spin" /> : <ScanLine />}
+                            {isScanningCredit ? <CustomLoader /> : <ScanLine />}
                             <span className="ml-2 hidden sm:inline">Scan Report</span>
                         </Button>
                     </div>
@@ -386,7 +387,7 @@ export default function ProfilePage() {
                         <div className="flex gap-2">
                             <Input id="personal-asset-upload" type="file" onChange={(e) => handleDocumentUpload('Personal Asset Statement (Borrower)', e)} />
                             <Button onClick={() => handleScanAssetStatement('personal')} disabled={isScanningPersonalAsset || !documents['Personal Asset Statement (Borrower)']}>
-                                {isScanningPersonalAsset ? <Loader2 className="animate-spin" /> : <Landmark />}
+                                {isScanningPersonalAsset ? <CustomLoader /> : <Landmark />}
                                 <span className="ml-2 hidden sm:inline">Scan</span>
                             </Button>
                         </div>
@@ -406,7 +407,7 @@ export default function ProfilePage() {
                         <div className="flex gap-2">
                             <Input id="company-asset-upload" type="file" onChange={(e) => handleDocumentUpload('Company Asset Statement (Company)', e)} />
                             <Button onClick={() => handleScanAssetStatement('company')} disabled={isScanningCompanyAsset || !documents['Company Asset Statement (Company)']}>
-                                {isScanningCompanyAsset ? <Loader2 className="animate-spin" /> : <Landmark />}
+                                {isScanningCompanyAsset ? <CustomLoader /> : <Landmark />}
                                 <span className="ml-2 hidden sm:inline">Scan</span>
                             </Button>
                         </div>

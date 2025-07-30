@@ -6,11 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { generateDocument, type GenerateDocumentOutput, type GenerateDocumentInput } from '@/ai/flows/document-generator';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Sparkles, FileUp, PlusCircle, Trash2 } from 'lucide-react';
+import { Sparkles, FileUp, PlusCircle, Trash2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { CustomLoader } from './ui/custom-loader';
 
 const sampleBorrowers: GenerateDocumentInput['borrower'][] = [
     { fullName: 'John Doe', email: 'john.doe@example.com' },
@@ -233,7 +234,7 @@ export function DocumentGeneratorClient() {
 
 
                 <Button onClick={handleGenerateDocument} disabled={isLoading || !templateContent}>
-                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                    {isLoading ? <CustomLoader className="mr-2 h-4 w-4" /> : <Sparkles className="mr-2 h-4 w-4" />}
                     Generate Document
                 </Button>
 

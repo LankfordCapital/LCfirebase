@@ -6,13 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { generateEmail, type GenerateEmailOutput, type GenerateEmailInput } from '@/ai/flows/email-automation';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Mail, Send, Sparkles } from 'lucide-react';
+import { Mail, Send, Sparkles } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useDocumentContext } from '@/contexts/document-context';
 import { Checkbox } from './ui/checkbox';
+import { CustomLoader } from './ui/custom-loader';
 
 const sampleUsers: GenerateEmailInput['recipient'][] = [
     { userId: 'user-123', email: 'john.doe@example.com', fullName: 'John Doe', role: 'borrower', timeZone: 'America/New_York' },
@@ -289,7 +290,7 @@ export function EmailAutomationClient() {
 
 
                 <Button onClick={handleGenerateEmail} disabled={isLoading}>
-                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                    {isLoading ? <CustomLoader className="mr-2 h-4 w-4" /> : <Sparkles className="mr-2 h-4 w-4" />}
                     Generate Email Draft
                 </Button>
 
@@ -303,7 +304,7 @@ export function EmailAutomationClient() {
                                 <CardDescription>Subject: {result.draftedEmail.subject}</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <div className="prose prose-sm max-w-none p-4 border rounded-md bg-background" dangerouslySetInnerHTML={{ __html: result.draftedEmail.body.replace(/\n/g, '<br />') }} />
+                                <div className="prose prose-sm max-w-none p-4 border rounded-md bg-background" dangerouslySetInnerHTML={{ __html: result.draftedEmail.body.replace(/\\n/g, '<br />') }} />
                                     <div className="mt-4 flex justify-end">
                                     <Button size="sm">
                                         <Send className="mr-2 h-4 w-4" /> Send Email

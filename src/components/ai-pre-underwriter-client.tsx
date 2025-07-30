@@ -8,8 +8,9 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { useToast } from '@/hooks/use-toast';
 import { Label } from './ui/label';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, Loader2, CheckCircle, FileText } from 'lucide-react';
+import { ArrowRight, CheckCircle, FileText } from 'lucide-react';
 import { getDocumentChecklist, type GetDocumentChecklistOutput } from '@/ai/flows/document-checklist-flow';
+import { CustomLoader } from './ui/custom-loader';
 
 type Checklist = GetDocumentChecklistOutput['documentRequestList'];
 
@@ -109,7 +110,7 @@ export function AIPReUnderwriterClient() {
                     </SelectContent>
                 </Select>
                  <Button onClick={handleGenerateChecklist} disabled={!loanProgram || isLoading}>
-                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
+                    {isLoading ? <CustomLoader className="mr-2 h-4 w-4" /> : <CheckCircle className="mr-2 h-4 w-4" />}
                     Generate Checklist
                 </Button>
             </div>

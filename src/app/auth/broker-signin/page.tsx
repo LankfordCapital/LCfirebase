@@ -17,7 +17,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { CustomLoader } from "@/components/ui/custom-loader";
 import Image from "next/image";
 
 export default function BrokerSignInPage() {
@@ -46,9 +46,8 @@ export default function BrokerSignInPage() {
 
 
   return (
-    <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2">
-      <div className="flex items-center justify-center py-12">
-        <Card className="w-full max-w-md shadow-2xl mx-auto">
+    <div className="flex min-h-screen items-center justify-center bg-primary/5 p-4">
+        <Card className="w-full max-w-md shadow-2xl">
             <form onSubmit={handleSubmit}>
             <CardHeader className="text-center">
                 <CardTitle className="font-headline text-2xl">Broker Sign In</CardTitle>
@@ -68,7 +67,7 @@ export default function BrokerSignInPage() {
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
                 <Button className="w-full" type="submit" disabled={isLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isLoading && <CustomLoader className="mr-2 h-4 w-4" />}
                 Sign in
                 </Button>
                 <div className="text-center text-sm">
@@ -80,18 +79,6 @@ export default function BrokerSignInPage() {
             </CardFooter>
             </form>
         </Card>
-      </div>
-      <div className="hidden lg:flex items-center justify-center p-10">
-        <Link href="/">
-          <Image
-            src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5"
-            alt="Lankford Capital Logo"
-            width={256}
-            height={256}
-            className="h-auto w-64 animate-spin-y"
-          />
-        </Link>
-      </div>
     </div>
   )
 }

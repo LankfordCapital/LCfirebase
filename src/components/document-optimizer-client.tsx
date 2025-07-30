@@ -8,8 +8,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getDocumentOptimizationSuggestions, type GetDocumentOptimizationSuggestionsOutput } from '@/ai/flows/document-optimization';
-import { Loader2, Sparkles, Lightbulb } from 'lucide-react';
+import { Sparkles, Lightbulb } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { CustomLoader } from './ui/custom-loader';
 
 export function DocumentOptimizerClient() {
   const [documentText, setDocumentText] = useState('');
@@ -80,7 +81,7 @@ export function DocumentOptimizerClient() {
         </div>
         
         <Button onClick={handleSubmit} disabled={isLoading}>
-          {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+          {isLoading ? <CustomLoader className="mr-2 h-4 w-4" /> : <Sparkles className="mr-2 h-4 w-4" />}
           Get Optimization Suggestions
         </Button>
 
