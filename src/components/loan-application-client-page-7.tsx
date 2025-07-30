@@ -1,5 +1,5 @@
 
-'use-client';
+'use client';
 
 import { useState, useId } from 'react';
 import { Button } from '@/components/ui/button';
