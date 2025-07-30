@@ -17,8 +17,15 @@ import { useAuth } from "@/contexts/auth-context";
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, CheckCircle } from "lucide-react";
 import { Logo } from "@/components/logo";
+
+const benefits = [
+    { text: "Centralized Organization" },
+    { text: "Quicker Loan Processing" },
+    { text: "Ease of Access" },
+    { text: "Real-time Updates" }
+]
 
 export default function BrokerSignInPage() {
   const [email, setEmail] = useState('');
@@ -46,42 +53,58 @@ export default function BrokerSignInPage() {
 
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-primary/5 p-8 md:p-16">
-        <Card className="w-full max-w-md shadow-2xl">
-          <form onSubmit={handleSubmit}>
-            <CardHeader className="text-center">
-                <div className="flex justify-center mb-4">
-                    <Logo />
-                </div>
-              <CardTitle className="font-headline text-2xl">Broker Sign In</CardTitle>
-              <CardDescription>Access the broker back office.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="broker@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                </div>
-                <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
-              </div>
-            </CardContent>
-            <CardFooter className="flex flex-col gap-4">
-              <Button className="w-full" type="submit" disabled={isLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Sign in
-              </Button>
-              <div className="text-center text-sm">
-                Don't have an account?{" "}
-                <Link href="/auth/signup?role=broker" className="underline">
-                  Register as a Broker
-                </Link>
-              </div>
-            </CardFooter>
-          </form>
-        </Card>
+    <div className="w-full min-h-screen grid grid-cols-1 lg:grid-cols-2">
+        <div className="hidden lg:flex flex-col items-start justify-center p-12 bg-primary/5 relative">
+            <div className="absolute top-8 left-8">
+                <Logo />
+            </div>
+            <div className="space-y-6">
+                <h1 className="font-headline text-4xl font-bold text-primary">Unlock Your Dashboard</h1>
+                <p className="text-lg text-foreground/80">Experience the future of lending management.</p>
+                <ul className="space-y-4">
+                    {benefits.map((benefit, i) => (
+                        <li key={i} className="flex items-center gap-3">
+                            <CheckCircle className="h-6 w-6 text-accent"/>
+                            <span className="text-lg">{benefit.text}</span>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </div>
+        <div className="flex items-center justify-center p-8">
+            <Card className="w-full max-w-md shadow-2xl">
+              <form onSubmit={handleSubmit}>
+                <CardHeader className="text-center">
+                  <CardTitle className="font-headline text-2xl">Broker Sign In</CardTitle>
+                  <CardDescription>Access the broker back office.</CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" placeholder="broker@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                  </div>
+                  <div className="grid gap-2">
+                    <div className="flex items-center">
+                      <Label htmlFor="password">Password</Label>
+                    </div>
+                    <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                  </div>
+                </CardContent>
+                <CardFooter className="flex flex-col gap-4">
+                  <Button className="w-full" type="submit" disabled={isLoading}>
+                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Sign in
+                  </Button>
+                  <div className="text-center text-sm">
+                    Don't have an account?{" "}
+                    <Link href="/auth/signup?role=broker" className="underline">
+                      Register as a Broker
+                    </Link>
+                  </div>
+                </CardFooter>
+              </form>
+            </Card>
+        </div>
     </div>
   )
 }
