@@ -98,7 +98,7 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
   }
 
   const handleContinue = () => {
-    const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
+    const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&g/, 'and');
     router.push(`/dashboard/application/${programSlug}/page-7`);
   };
 
@@ -109,7 +109,7 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
         <div className="space-y-2 md:col-span-1">
             <Input 
                 id={`${section}-${item}-cost`} 
-                type="number"
+                type="text"
                 placeholder="Cost" 
                 value={budget[section][item].cost || ''}
                 onChange={(e) => handleBudgetChange(section, item, 'cost', Number(e.target.value))}
