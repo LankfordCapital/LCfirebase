@@ -12,7 +12,7 @@ import { ArrowLeft, ArrowRight, FileText, FileUp, Building, Wallet } from 'lucid
 import { useRouter } from 'next/navigation';
 import { Separator } from '@/components/ui/separator';
 
-export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
+export default function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
   const { documents, addDocument } = useDocumentContext();
   const router = useRouter();
 
