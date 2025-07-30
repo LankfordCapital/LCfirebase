@@ -46,18 +46,16 @@ export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: strin
   };
   
   const handleContinue = () => {
-    const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&g/, 'and');
+    const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
     router.push(`/dashboard/application/${programSlug}/page-9`);
   };
 
   const handleGoBack = () => {
-    // For non-construction, page 5 links here, so we go back to 5.
-    // For construction, page 7 links here, so we go back to 7.
     const isConstructionOrRehab = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('rehab');
      if (isConstructionOrRehab) {
-        router.back(); // Goes back to page 7
+        router.back(); 
      } else {
-        const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&g/, 'and');
+        const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
         router.push(`/dashboard/application/${programSlug}/page-5`);
      }
   }
@@ -106,4 +104,30 @@ export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: strin
         </div>
     </div>
   );
+}
+
+
+function ApplicationSkeleton() {
+    return (
+        <div className="space-y-6">
+            <div className="space-y-2">
+                <Skeleton className="h-8 w-1/3" />
+                <Skeleton className="h-4 w-1/2" />
+            </div>
+            <div className="space-y-4">
+                <Skeleton className="h-64 w-full" />
+                <Skeleton className="h-48 w-full" />
+            </div>
+        </div>
+    )
+}
+
+export default function LoanApplicationPage8({ params }: { params: { program: string } }) {
+    const loanProgram = decodeURIComponent(params.program.replace(/-/g, ' ').replace(/\band\b/g, '&')).replace(/(^\w|\s\w)/g, m => m.toUpperCase());
+
+    return (
+        <Suspense fallback={<ApplicationSkeleton />}>
+            <LoanApplicationClientPage8 loanProgram={loanProgram} />
+        </Suspense>
+    )
 }
