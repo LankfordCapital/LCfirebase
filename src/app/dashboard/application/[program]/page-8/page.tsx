@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useCallback } from 'react';
@@ -12,7 +11,7 @@ import { ArrowLeft, ArrowRight, FileText, FileUp, Building, Wallet } from 'lucid
 import { useRouter } from 'next/navigation';
 import { Separator } from '@/components/ui/separator';
 
-export default function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
+function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
   const { documents, addDocument } = useDocumentContext();
   const router = useRouter();
 
@@ -105,4 +104,10 @@ export default function LoanApplicationClientPage8({ loanProgram }: { loanProgra
         </div>
     </div>
   );
+}
+
+export default function LoanApplicationPage8({ params }: { params: { program: string } }) {
+    const loanProgram = decodeURIComponent(params.program.replace(/-/g, ' ').replace(/\band\b/g, '&')).replace(/(^\w|\s\w)/g, m => m.toUpperCase());
+
+    return <LoanApplicationClientPage8 loanProgram={loanProgram} />;
 }
