@@ -1,7 +1,8 @@
 
+
 'use client';
 
-import { useState, useCallback, useId } from 'react';
+import { useState, useCallback, useId, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, ArrowRight, DollarSign, FileUp, FileText, ScanLine, PlusCircle, Trash2, Calculator } from 'lucide-react';
@@ -98,10 +99,11 @@ export function LoanApplicationClientPage9({ loanProgram }: { loanProgram: strin
         setWorkSunkItems(items => items.filter(item => item.id !== id));
     };
 
-    const handleCalculateTotals = () => {
-        const total = workSunkItems.reduce((acc, item) => acc + (parseFloat(item.cost) || 0), 0);
+    useEffect(() => {
+        const total = workSunkItems.reduce((acc, item) => acc + (parseFloat(item.cost.replace(/,/g, '')) || 0), 0);
         setTotalManualCost(total);
-    };
+    }, [workSunkItems]);
+
 
   const handleContinue = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&g/, 'and');
@@ -200,10 +202,6 @@ export function LoanApplicationClientPage9({ loanProgram }: { loanProgram: strin
                         <div className="p-4 bg-primary/5 rounded-lg">
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-xl font-bold">Manual Total Work Sunk</h3>
-                                <Button onClick={handleCalculateTotals}>
-                                    <Calculator className="mr-2 h-4 w-4"/>
-                                    Calculate Total
-                                </Button>
                             </div>
                             <p className="text-2xl font-bold text-green-600 font-mono">
                                 {totalManualCost.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
