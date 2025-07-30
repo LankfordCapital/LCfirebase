@@ -36,7 +36,7 @@ export default function AdminSignUpPage() {
     try {
       await signIn(email, password);
       router.push('/dashboard');
-    } catch (error: any) => {
+    } catch (error: any) {
       if (error.code === 'auth/user-not-found') {
         try {
             const userCredential = await signUp(email, password);
