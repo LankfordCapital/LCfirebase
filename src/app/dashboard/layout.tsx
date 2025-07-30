@@ -18,9 +18,7 @@ export default function DashboardLayout({
       <div className="flex flex-col min-h-screen">
           <BorrowerDashboardHeader />
           <main className="flex-1">
-              <div className="p-4 md:p-6 lg:p-8">
-                  {children}
-              </div>
+            {children}
           </main>
       </div>
     // </ProtectedRoute>
