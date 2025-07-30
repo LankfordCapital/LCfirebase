@@ -18,6 +18,7 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
 
 export default function WorkforceSignInPage() {
   const [email, setEmail] = useState('');
@@ -79,17 +80,14 @@ export default function WorkforceSignInPage() {
             </form>
         </Card>
       </div>
-      <div className="hidden lg:block relative">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute top-0 left-0 w-full h-full object-cover"
-        >
-          <source src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Adobe%20Express%20-%20shutterstock_1098239155.mp4?alt=media&token=40066233-852b-4fb5-bad0-dcdef71de9a8" type="video/mp4" />
-        </video>
-        <div className="absolute top-0 left-0 w-full h-full bg-primary/20" />
+      <div className="hidden bg-primary/5 lg:flex items-center justify-center p-10">
+        <Image
+          src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5"
+          alt="Lankford Capital Logo"
+          width={256}
+          height={256}
+          className="h-auto w-64"
+        />
       </div>
     </div>
   )
