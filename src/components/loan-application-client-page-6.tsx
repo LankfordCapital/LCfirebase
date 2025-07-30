@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, ArrowRight, DollarSign, PlusCircle, Trash2 } from 'lucide-react';
@@ -32,6 +32,42 @@ const initialBudgetStructure: Record<string, string[]> = {
     "Amenities": ["Pool & Spa", "Outdoor Kitchen", "Decks & Patios", "Hardscaping", "Other Amenities"],
     "Project Management": ["Supervision", "General Conditions", "Contingency (Hard)", "Final Cleanup"],
 };
+
+// Isolated sub-component to manage its own state and prevent re-render issues.
+const BudgetInputRow = ({ item, section, handleBudgetChange, handleRemoveBudgetItem }: { item: string, section: string, handleBudgetChange: Function, handleRemoveBudgetItem: Function }) => {
+    const [cost, setCost] = useState('');
+    const [narrative, setNarrative] = useState('');
+
+    return (
+        <div className="py-2 border-b grid md:grid-cols-3 gap-4 items-start relative">
+            <Label className="font-semibold md:col-span-1 pt-2">{item}</Label>
+            <div className="space-y-2 md:col-span-1">
+                <Input 
+                    type="text"
+                    placeholder="Cost" 
+                    value={cost}
+                    onChange={(e) => setCost(e.target.value)}
+                    onBlur={() => handleBudgetChange(section, item, 'cost', cost)}
+                />
+            </div>
+            <div className="space-y-2 md:col-span-1">
+                <Textarea 
+                    placeholder="Narrative..." 
+                    value={narrative}
+                    onChange={(e) => setNarrative(e.target.value)}
+                    onBlur={() => handleBudgetChange(section, item, 'narrative', narrative)}
+                    rows={1}
+                />
+            </div>
+            {!initialBudgetStructure[section]?.includes(item) && (
+                <Button variant="ghost" size="icon" onClick={() => handleRemoveBudgetItem(section, item)} className="absolute top-0 right-0 h-8 w-8">
+                    <Trash2 className="h-4 w-4" />
+                </Button>
+            )}
+        </div>
+    );
+};
+
 
 export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: string}) {
   const router = useRouter();
@@ -90,7 +126,7 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
 
 
   const calculateSectionTotal = (section: string) => {
-    return Object.values(budget[section] || {}).reduce((total, item) => total + (Number(item.cost) || 0), 0);
+    return Object.values(budget[section] || {}).reduce((total, item) => total + (Number(item.cost.replace(/[^0-9.-]+/g,"")) || 0), 0);
   }
 
   const calculateGrandTotal = () => {
@@ -101,31 +137,6 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&g/, 'and');
     router.push(`/dashboard/application/${programSlug}/page-7`);
   };
-
-  
-  const BudgetInputRow = ({ section, item }: { section: string, item: string }) => (
-    <div className="py-2 border-b grid md:grid-cols-3 gap-4 items-start">
-        <Label className="font-semibold md:col-span-1 pt-2">{item}</Label>
-        <div className="space-y-2 md:col-span-1">
-            <Input 
-                id={`${section}-${item}-cost`} 
-                type="text"
-                placeholder="Cost" 
-                defaultValue={budget[section][item].cost}
-                onBlur={(e) => handleBudgetChange(section, item, 'cost', e.target.value)}
-            />
-        </div>
-        <div className="space-y-2 md:col-span-1">
-            <Textarea 
-                id={`${section}-${item}-narrative`}
-                placeholder="Narrative..." 
-                defaultValue={budget[section][item].narrative}
-                onChange={(e) => handleBudgetChange(section, item, 'narrative', e.target.value)}
-                rows={1}
-            />
-        </div>
-    </div>
-  );
 
   return (
     <div className="space-y-6">
@@ -150,7 +161,7 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
                                 </div>
                             </AccordionTrigger>
                             <AccordionContent className="px-1">
-                                {Object.keys(budget[section]).map(item => <BudgetInputRow key={item} section={section} item={item} />)}
+                                {Object.keys(budget[section]).map(item => <BudgetInputRow key={item} item={item} section={section} handleBudgetChange={handleBudgetChange} handleRemoveBudgetItem={handleRemoveBudgetItem} />)}
                             </AccordionContent>
                         </AccordionItem>
                     ))}
