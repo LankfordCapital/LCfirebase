@@ -28,8 +28,12 @@ function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const isAuthPage = pathname.startsWith('/auth') || pathname.startsWith('/book-appointment');
   const isDashboardPage = pathname.startsWith('/dashboard') || pathname.startsWith('/broker-office') || pathname.startsWith('/workforce-office');
 
-  if (isAuthPage || isDashboardPage) {
-    return <main>{children}</main>
+  if (isAuthPage) {
+    return <main>{children}</main>;
+  }
+
+  if (isDashboardPage) {
+     return <main>{children}</main>
   }
 
   return (
