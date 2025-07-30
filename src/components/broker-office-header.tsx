@@ -28,7 +28,7 @@ export function BrokerOfficeHeader() {
         </Link>
 
         <nav className="flex items-center gap-6">
-            <Link href="/dashboard/documents" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+            <Link href="/broker-office/documents" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
                 New Application
             </Link>
              <Link href="/broker-office" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
