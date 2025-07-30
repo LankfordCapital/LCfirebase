@@ -10,13 +10,13 @@ export default function BrokerOfficeLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ProtectedRoute redirectTo="/auth/broker-signin">
+    // <ProtectedRoute redirectTo="/auth/broker-signin">
         <div className="bg-primary/5 min-h-screen">
           <BrokerOfficeHeader />
           <main>
             {children}
           </main>
         </div>
-    </ProtectedRoute>
+    // </ProtectedRoute>
   );
 }

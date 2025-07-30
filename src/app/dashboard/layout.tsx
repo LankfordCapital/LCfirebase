@@ -10,7 +10,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ProtectedRoute>
+    // <ProtectedRoute>
       <div className="flex flex-col min-h-screen">
           <BorrowerDashboardHeader />
           <main className="flex-1">
@@ -19,6 +19,6 @@ export default function DashboardLayout({
               </div>
           </main>
       </div>
-    </ProtectedRoute>
+    // </ProtectedRoute>
   );
 }
