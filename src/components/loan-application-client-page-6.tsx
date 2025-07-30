@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -38,25 +37,21 @@ const initialBudgetStructure: Record<string, string[]> = {
 const BudgetInputRow = ({ 
     item, 
     section, 
-    initialData,
+    initialCost,
+    initialNarrative,
     onBudgetChange, 
     onRemove 
 }: { 
     item: string, 
     section: string, 
-    initialData: BudgetItem,
+    initialCost: string,
+    initialNarrative: string,
     onBudgetChange: (section: string, item: string, field: keyof BudgetItem, value: string) => void, 
     onRemove: (section: string, item: string) => void 
 }) => {
-    const [cost, setCost] = useState(initialData.cost);
-    const [narrative, setNarrative] = useState(initialData.narrative);
+    const [cost, setCost] = useState(initialCost);
+    const [narrative, setNarrative] = useState(initialNarrative);
     
-    // Sync with external changes if needed, but this might not be necessary depending on the UX
-    useEffect(() => {
-        setCost(initialData.cost);
-        setNarrative(initialData.narrative);
-    }, [initialData]);
-
     return (
         <div className="py-2 border-b grid md:grid-cols-3 gap-4 items-start relative">
             <Label className="font-semibold md:col-span-1 pt-2">{item}</Label>
@@ -121,20 +116,20 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
   const handleAddBudgetItem = (section: string) => {
     const newItemName = `Custom Item ${Object.keys(budget[section] || {}).length + 1}`;
     setBudget(prev => {
-        const newSection = prev[section] ? {...prev[section]} : {};
-        newSection[newItemName] = { ...initialBudgetItem };
+        const newSectionItems = prev[section] ? {...prev[section]} : {};
+        newSectionItems[newItemName] = { ...initialBudgetItem };
         return {
             ...prev,
-            [section]: newSection,
+            [section]: newSectionItems,
         };
     });
   }
   
   const handleRemoveBudgetItem = (section: string, item: string) => {
     setBudget(prev => {
-        const newSection = { ...prev[section] };
-        delete newSection[item];
-        return { ...prev, [section]: newSection };
+        const newSectionItems = { ...prev[section] };
+        delete newSectionItems[item];
+        return { ...prev, [section]: newSectionItems };
     });
   }
 
@@ -188,7 +183,8 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
                                         key={item} 
                                         item={item} 
                                         section={section} 
-                                        initialData={budget[section][item]}
+                                        initialCost={budget[section][item].cost}
+                                        initialNarrative={budget[section][item].narrative}
                                         onBudgetChange={handleBudgetChange} 
                                         onRemove={handleRemoveBudgetItem} 
                                     />
