@@ -36,7 +36,7 @@ export default function AdminSignUpPage() {
     try {
       await signIn(email, password);
       router.push('/dashboard');
-    } catch (error: any) {
+    } catch (error: any) => {
       if (error.code === 'auth/user-not-found') {
         try {
             const userCredential = await signUp(email, password);
@@ -76,7 +76,7 @@ export default function AdminSignUpPage() {
 
   return (
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2">
-      <div className="hidden bg-primary/5 lg:flex items-center justify-center">
+      <div className="flex items-center justify-center p-4">
         <Link href="/">
             <Image
             src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5"
