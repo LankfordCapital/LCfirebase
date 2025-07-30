@@ -37,7 +37,8 @@ export default function AdminSignUpPage() {
       await signIn(email, password);
       router.push('/dashboard');
     } catch (error: any) {
-      if (error.code === 'auth/user-not-found') {
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+        // If user doesn't exist or credential is bad (which happens on first try), attempt to sign up.
         try {
             const userCredential = await signUp(email, password);
             await updateProfile(userCredential.user, {
@@ -52,21 +53,15 @@ export default function AdminSignUpPage() {
             toast({
                 variant: 'destructive',
                 title: 'Sign Up Failed',
-                description: signUpError.message,
+                description: `Could not create admin account. ${signUpError.message}`,
             });
         }
-      } else if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
-           toast({
-            variant: 'destructive',
-            title: 'Sign In Failed',
-            description: "The password is incorrect. If you have forgotten the password, you may need to manage users in the Firebase console.",
-        });
       }
       else {
          toast({
             variant: 'destructive',
             title: 'Sign In Failed',
-            description: error.message,
+            description: `An unexpected error occurred: ${error.message}`,
         });
       }
     } finally {
