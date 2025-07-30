@@ -46,47 +46,53 @@ export default function WorkforceSignInPage() {
 
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-primary/5 p-4 space-y-8">
-      <Link href="/">
-        <Image
-          src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5"
-          alt="Lankford Capital Logo"
-          width={100}
-          height={100}
-          className="animate-spin-y"
-        />
-      </Link>
-      <Card className="w-full max-w-md shadow-2xl">
-          <form onSubmit={handleSubmit}>
-          <CardHeader className="text-center">
-              <CardTitle className="font-headline text-2xl">Workforce Sign In</CardTitle>
-              <CardDescription>Access the workforce back office.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4">
-              <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="employee@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
-              </div>
-              <div className="grid gap-2">
-              <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-              </div>
-              <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
-              </div>
-          </CardContent>
-          <CardFooter className="flex flex-col gap-4">
-              <Button className="w-full" type="submit" disabled={isLoading}>
-              {isLoading && <CustomLoader className="mr-2 h-4 w-4" />}
-              Sign in
-              </Button>
-          <div className="text-center text-sm">
-              <Link href="/auth/signin" className="underline">
-                  Borrower Sign In
-              </Link>
-          </div>
-          </CardFooter>
-          </form>
-      </Card>
+    <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2">
+      <div className="hidden bg-primary/5 lg:flex items-center justify-center">
+        <Link href="/">
+            <Image
+            src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5"
+            alt="Lankford Capital Logo"
+            width={200}
+            height={200}
+            className="animate-spin-y"
+            />
+        </Link>
+      </div>
+      <div className="flex items-center justify-center py-12">
+        <div className="mx-auto grid w-[350px] gap-6">
+            <Card className="shadow-2xl">
+                <form onSubmit={handleSubmit}>
+                <CardHeader className="text-center">
+                    <CardTitle className="font-headline text-2xl">Workforce Sign In</CardTitle>
+                    <CardDescription>Access the workforce back office.</CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-4">
+                    <div className="grid gap-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" placeholder="employee@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                    </div>
+                    <div className="grid gap-2">
+                    <div className="flex items-center">
+                        <Label htmlFor="password">Password</Label>
+                    </div>
+                    <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                    </div>
+                </CardContent>
+                <CardFooter className="flex flex-col gap-4">
+                    <Button className="w-full" type="submit" disabled={isLoading}>
+                    {isLoading && <CustomLoader className="mr-2 h-4 w-4" />}
+                    Sign in
+                    </Button>
+                <div className="text-center text-sm">
+                    <Link href="/auth/signin" className="underline">
+                        Borrower Sign In
+                    </Link>
+                </div>
+                </CardFooter>
+                </form>
+            </Card>
+        </div>
+      </div>
     </div>
   )
 }
