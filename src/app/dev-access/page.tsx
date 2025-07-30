@@ -6,13 +6,13 @@ import Link from "next/link";
 
 export default function DevAccessPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-primary/5 p-4">
-      <Card className="w-full max-w-md shadow-2xl">
+    <div className="flex min-h-screen items-stretch justify-center bg-primary/5 p-0">
+      <Card className="w-full shadow-2xl rounded-none flex flex-col justify-center">
         <CardHeader className="text-center">
           <CardTitle className="font-headline text-2xl">Developer Access Panel</CardTitle>
           <CardDescription>Direct dashboard links for development purposes.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 max-w-md mx-auto w-full">
             <div className="flex flex-col gap-4">
                 <Button asChild size="lg">
                     <Link href="/workforce-office">Workforce Dashboard</Link>
