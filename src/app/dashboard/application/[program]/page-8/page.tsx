@@ -43,7 +43,7 @@ function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
   };
   
   const handleContinue = () => {
-    const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
+    const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&g/, 'and');
     router.push(`/dashboard/application/${programSlug}/page-9`);
   };
 
@@ -54,7 +54,7 @@ function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
      if (isConstructionOrRehab) {
         router.back(); // Goes back to page 7
      } else {
-        const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
+        const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&g/, 'and');
         router.push(`/dashboard/application/${programSlug}/page-5`);
      }
   }
