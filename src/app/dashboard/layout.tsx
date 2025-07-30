@@ -2,6 +2,7 @@
 'use client';
 
 import { BorrowerDashboardHeader } from '@/components/borrower-dashboard-header';
+import { ProtectedRoute } from '@/components/protected-route';
 
 export default function DashboardLayout({
   children,
@@ -9,6 +10,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
+    <ProtectedRoute>
       <div className="flex flex-col min-h-screen">
           <BorrowerDashboardHeader />
           <main className="flex-1">
@@ -17,5 +19,6 @@ export default function DashboardLayout({
               </div>
           </main>
       </div>
+    </ProtectedRoute>
   );
 }
