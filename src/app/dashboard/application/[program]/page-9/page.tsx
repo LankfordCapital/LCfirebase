@@ -106,13 +106,13 @@ function LoanApplicationClientPage9({ loanProgram }: { loanProgram: string}) {
 
   const handleContinue = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&g/, 'and');
-    router.push(`/dashboard/application/${programSlug}/page-12`);
+    router.push(`/dashboard/application/${programSlug}/page-10`);
   };
 
   return (
     <div className="space-y-6">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 9 of 10</h1>
+            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 9 of 12</h1>
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
@@ -220,7 +220,7 @@ function LoanApplicationClientPage9({ loanProgram }: { loanProgram: string}) {
                <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 8
             </Button>
             <Button onClick={handleContinue}>
-                Continue to Final Submission <ArrowRight className="ml-2 h-4 w-4" />
+                Continue to Page 10 <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
         </div>
     </div>
