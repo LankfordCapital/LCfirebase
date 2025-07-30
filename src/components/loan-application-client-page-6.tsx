@@ -51,13 +51,17 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
   const [newSectionName, setNewSectionName] = useState('');
 
   const handleBudgetChange = (section: string, item: string, field: keyof BudgetItem, value: string | number) => {
+    let processedValue = value;
+    if (field === 'cost') {
+        processedValue = value === '' ? 0 : Number(value);
+    }
     setBudget(prev => ({
         ...prev,
         [section]: {
             ...prev[section],
             [item]: {
                 ...prev[section][item],
-                [field]: value
+                [field]: processedValue
             }
         }
     }))
@@ -109,10 +113,10 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
         <div className="space-y-2 md:col-span-1">
             <Input 
                 id={`${section}-${item}-cost`} 
-                type="text"
+                type="number"
                 placeholder="Cost" 
                 value={budget[section][item].cost || ''}
-                onChange={(e) => handleBudgetChange(section, item, 'cost', Number(e.target.value))}
+                onChange={(e) => handleBudgetChange(section, item, 'cost', e.target.value)}
             />
         </div>
         <div className="space-y-2 md:col-span-1">
