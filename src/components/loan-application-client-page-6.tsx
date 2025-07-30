@@ -12,7 +12,7 @@ import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 
 type BudgetItem = {
-  cost: string;
+  cost: string; // Changed to string to allow free typing
   narrative: string;
 };
 
