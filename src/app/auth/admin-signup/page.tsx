@@ -17,16 +17,8 @@ import { useAuth } from "@/contexts/auth-context";
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, CheckCircle } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { updateProfile } from "firebase/auth";
-import { Logo } from "@/components/logo";
-
-const benefits = [
-    { text: "Centralized Organization" },
-    { text: "Quicker Loan Processing" },
-    { text: "Ease of Access" },
-    { text: "Real-time Updates" }
-]
 
 export default function AdminSignUpPage() {
   const [fullName, setFullName] = useState('Admin User');
@@ -82,57 +74,38 @@ export default function AdminSignUpPage() {
   };
 
   return (
-    <div className="w-full min-h-screen grid grid-cols-1 lg:grid-cols-2">
-        <div className="hidden lg:flex flex-col items-start justify-center p-12 bg-primary/5 relative">
-            <div className="absolute top-8 left-8">
-                <Logo />
+    <div className="flex min-h-screen items-center justify-center bg-primary/5 p-4">
+      <Card className="w-full max-w-md shadow-2xl">
+        <form onSubmit={handleSignIn}>
+          <CardHeader className="text-center">
+              <CardTitle className="font-headline text-2xl">Admin Sign In</CardTitle>
+            <CardDescription>
+              Use the admin credentials to access all dashboards. The account will be created if it doesn't exist.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
-            <div className="space-y-6">
-                <h1 className="font-headline text-4xl font-bold text-primary">Unlock Your Dashboard</h1>
-                <p className="text-lg text-foreground/80">Experience the future of lending management.</p>
-                <ul className="space-y-4">
-                    {benefits.map((benefit, i) => (
-                        <li key={i} className="flex items-center gap-3">
-                            <CheckCircle className="h-6 w-6 text-accent"/>
-                            <span className="text-lg">{benefit.text}</span>
-                        </li>
-                    ))}
-                </ul>
+            <div className="grid gap-2">
+              <Label htmlFor="password">Password</Label>
+              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter admin password" />
             </div>
-        </div>
-        <div className="flex items-center justify-center p-8">
-            <Card className="w-full max-w-md shadow-2xl">
-              <form onSubmit={handleSignIn}>
-                <CardHeader className="text-center">
-                    <CardTitle className="font-headline text-2xl">Admin Sign In</CardTitle>
-                  <CardDescription>
-                    Use the admin credentials to access all dashboards. The account will be created if it doesn't exist.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="grid gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="password">Password</Label>
-                    <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter admin password" />
-                  </div>
-                </CardContent>
-                <CardFooter className="flex flex-col gap-4">
-                  <Button className="w-full" type="submit" disabled={isLoading}>
-                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Sign In or Create Admin
-                  </Button>
-                  <div className="text-center text-sm">
-                      <Link href="/auth/signin" className="underline">
-                          Back to Borrower Sign In
-                      </Link>
-                  </div>
-                </CardFooter>
-              </form>
-            </Card>
-        </div>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-4">
+            <Button className="w-full" type="submit" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Sign In or Create Admin
+            </Button>
+            <div className="text-center text-sm">
+                <Link href="/auth/signin" className="underline">
+                    Back to Borrower Sign In
+                </Link>
+            </div>
+          </CardFooter>
+        </form>
+      </Card>
     </div>
   )
 }

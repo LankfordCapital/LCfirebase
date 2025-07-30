@@ -17,15 +17,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, CheckCircle } from "lucide-react";
-import { Logo } from "@/components/logo";
-
-const benefits = [
-    { text: "Centralized Organization" },
-    { text: "Quicker Loan Processing" },
-    { text: "Ease of Access" },
-    { text: "Real-time Updates" }
-]
+import { Loader2 } from "lucide-react";
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
@@ -52,68 +44,49 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="w-full min-h-screen grid grid-cols-1 lg:grid-cols-2">
-        <div className="hidden lg:flex flex-col items-start justify-center p-12 bg-primary/5 relative">
-            <div className="absolute top-8 left-8">
-                <Logo />
+    <div className="flex min-h-screen items-center justify-center bg-primary/5 p-4">
+      <Card className="w-full max-w-md shadow-2xl">
+        <form onSubmit={handleSubmit}>
+          <CardHeader className="text-center">
+            <CardTitle className="font-headline text-2xl">Borrower Sign In</CardTitle>
+            <CardDescription>Sign in to access your borrower dashboard.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" type="email" placeholder="m@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
-            <div className="space-y-6">
-                <h1 className="font-headline text-4xl font-bold text-primary">Unlock Your Dashboard</h1>
-                <p className="text-lg text-foreground/80">Experience the future of lending management.</p>
-                <ul className="space-y-4">
-                    {benefits.map((benefit, i) => (
-                        <li key={i} className="flex items-center gap-3">
-                            <CheckCircle className="h-6 w-6 text-accent"/>
-                            <span className="text-lg">{benefit.text}</span>
-                        </li>
-                    ))}
-                </ul>
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label htmlFor="password">Password</Label>
+                <Link href="#" className="ml-auto inline-block text-sm underline">
+                  Forgot your password?
+                </Link>
+              </div>
+              <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
-        </div>
-        <div className="flex items-center justify-center p-8">
-            <Card className="w-full max-w-md shadow-2xl">
-              <form onSubmit={handleSubmit}>
-                <CardHeader className="text-center">
-                  <CardTitle className="font-headline text-2xl">Borrower Sign In</CardTitle>
-                  <CardDescription>Sign in to access your borrower dashboard.</CardDescription>
-                </CardHeader>
-                <CardContent className="grid gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" placeholder="m@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
-                  </div>
-                  <div className="grid gap-2">
-                    <div className="flex items-center">
-                      <Label htmlFor="password">Password</Label>
-                      <Link href="#" className="ml-auto inline-block text-sm underline">
-                        Forgot your password?
-                      </Link>
-                    </div>
-                    <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
-                  </div>
-                </CardContent>
-                <CardFooter className="flex flex-col gap-4">
-                  <Button className="w-full" type="submit" disabled={isLoading}>
-                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Sign in
-                  </Button>
-                  <div className="flex flex-col gap-2 text-center text-sm">
-                    <div>
-                      Don&apos;t have an account?{" "}
-                      <Link href="/auth/signup" className="underline">
-                        Sign up
-                      </Link>
-                    </div>
-                    <div className="mt-2">
-                      <Link href="/auth/workforce-signin" className="underline">
-                        Workforce Sign In
-                      </Link>
-                    </div>
-                  </div>
-                </CardFooter>
-              </form>
-            </Card>
-        </div>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-4">
+            <Button className="w-full" type="submit" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Sign in
+            </Button>
+            <div className="flex flex-col gap-2 text-center text-sm">
+              <div>
+                Don&apos;t have an account?{" "}
+                <Link href="/auth/signup" className="underline">
+                  Sign up
+                </Link>
+              </div>
+              <div className="mt-2">
+                <Link href="/auth/workforce-signin" className="underline">
+                  Workforce Sign In
+                </Link>
+              </div>
+            </div>
+          </CardFooter>
+        </form>
+      </Card>
     </div>
   )
 }
