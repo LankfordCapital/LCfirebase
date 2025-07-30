@@ -66,8 +66,6 @@ function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
   const { toast } = useToast();
   const initialId = useId();
 
-  // State from original page 8
-  
   // State from page 9
   const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState<ScanWorkSunkReportOutput | null>(null);
@@ -114,7 +112,8 @@ function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
   };
   
   const handleScanReport = async () => {
-    if (!doc?.dataUri) {
+    const workSunkDoc = documents[docName];
+    if (!workSunkDoc?.dataUri) {
       toast({
         variant: 'destructive',
         title: 'No file selected',
@@ -127,7 +126,7 @@ function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
     setScanResult(null);
 
     try {
-      const result = await scanWorkSunkReport({ reportDataUri: doc.dataUri });
+      const result = await scanWorkSunkReport({ reportDataUri: workSunkDoc.dataUri });
       setScanResult(result);
       toast({
         title: 'Scan Complete',
@@ -171,13 +170,11 @@ function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
     };
 
   const handleGoBack = () => {
-    // For non-construction, page 5 links here, so we go back to 5.
-    // For construction, page 7 links here, so we go back to 7.
-    const isConstructionOrRehab = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('rehab');
+    const isConstructionOrRehab = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('rehab') || loanProgram.toLowerCase().includes('land acquisition');
      if (isConstructionOrRehab) {
-        router.push(`/dashboard/application/${loanProgram.toLowerCase().replace(/ /g, '-').replace(/&g/, 'and')}/page-7`);
+        router.push(`/dashboard/application/${loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and')}/page-7`);
      } else {
-        router.push(`/dashboard/application/${loanProgram.toLowerCase().replace(/ /g, '-').replace(/&g/, 'and')}/page-5`);
+        router.push(`/dashboard/application/${loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and')}/page-5`);
      }
   }
 
@@ -244,7 +241,7 @@ function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
                            </Button>
                         </div>
                     )}
-                     <Input id="work-sunk-upload" type="file" className="sr-only" onChange={handleFileChange} accept=".pdf,.xls,.xlsx,.doc,.docx,.csv" />
+                     <Input id="work-sunk-upload" type="file" className="sr-only" onChange={(e) => handleFileChange(docName, e)} accept=".pdf,.xls,.xlsx,.doc,.docx,.csv" />
                 </div>
                 
                 <div className="flex justify-center">
@@ -396,5 +393,3 @@ export default function LoanApplicationPage8({ params }: { params: { program: st
 
     return <LoanApplicationClientPage8 loanProgram={loanProgram} />;
 }
-
-    
