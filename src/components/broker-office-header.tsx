@@ -49,7 +49,7 @@ export function BrokerOfficeHeader() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem asChild>
-                     <Link href="#">
+                     <Link href="/profile">
                         <UserCircle className="mr-2 h-4 w-4" />
                         <span>My Profile</span>
                     </Link>
