@@ -93,7 +93,7 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
     <div className="space-y-6">
         <div>
             <h1 className="font-headline text-3xl font-bold">Loan Application - Page 5 of 12</h1>
-            <p className="text-muted-foreground">{loanProgram}</p>
+            <p className="text-muted-foreground">{loanProgram.replace(/Noo/g, 'NOO')}</p>
         </div>
         
         {!isEquipmentFinancing && (
@@ -233,7 +233,7 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
                <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 4
             </Button>
             <Button onClick={handleNextPage}>
-                Continue <ArrowRight className="ml-2 h-4 w-4" />
+                Continue to Page 6 <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
         </div>
     </div>
