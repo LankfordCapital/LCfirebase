@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState } from 'react';
@@ -22,7 +23,7 @@ export function LoanApplicationClientPage10({ loanProgram }: { loanProgram: stri
     <div className="space-y-6">
         <div>
             <h1 className="font-headline text-3xl font-bold">Loan Application - Page 10 of 11</h1>
-            <p className="text-muted-foreground">{loanProgram}</p>
+            <p className="text-muted-foreground">{loanProgram.replace(/Dscr/g, 'DSCR')}</p>
         </div>
         
         <Card>

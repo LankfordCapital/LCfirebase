@@ -149,7 +149,7 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
     <div className="space-y-6">
         <div>
             <h1 className="font-headline text-3xl font-bold">Loan Application - Page 1 of 12</h1>
-            <p className="text-muted-foreground">{loanProgram}</p>
+            <p className="text-muted-foreground">{loanProgram.replace(/Dscr/g, 'DSCR')}</p>
         </div>
         
         <Card>
@@ -533,4 +533,3 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
     </div>
   );
 }
-

@@ -68,7 +68,8 @@ function LoanApplicationClientPage12({ loanProgram }: { loanProgram: string}) {
   const formattedLoanProgram = loanProgram
     .replace(/noo/i, 'NOO')
     .replace(/-/g, ' ')
-    .replace(/\b\w/g, l => l.toUpperCase());
+    .replace(/\b\w/g, l => l.toUpperCase())
+    .replace(/Dscr/g, 'DSCR');
 
 
   return (
@@ -154,7 +155,10 @@ function ApplicationSkeleton() {
 }
 
 export default function LoanApplicationPage12Page({ params }: { params: { program: string } }) {
-    const loanProgram = decodeURIComponent(params.program.replace(/-/g, ' ').replace(/\band\b/g, '&')).replace(/(^\w|\s\w)/g, m => m.toUpperCase()).replace(/Noo/g, 'NOO');
+    const loanProgram = decodeURIComponent(params.program.replace(/-/g, ' ').replace(/\band\b/g, '&'))
+        .replace(/(^\w|\s\w)/g, m => m.toUpperCase())
+        .replace(/Noo/g, 'NOO')
+        .replace(/Dscr/g, 'DSCR');
 
     return (
         <Suspense fallback={<ApplicationSkeleton />}>

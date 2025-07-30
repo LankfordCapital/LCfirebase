@@ -270,7 +270,7 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
     <div className="space-y-6">
         <div>
             <h1 className="font-headline text-3xl font-bold">Loan Application - Page 4 of 12</h1>
-            <p className="text-muted-foreground">{loanProgram}</p>
+            <p className="text-muted-foreground">{loanProgram.replace(/Dscr/g, 'DSCR')}</p>
         </div>
         
         <Card>

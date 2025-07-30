@@ -67,7 +67,8 @@ export function LoanApplicationClientPage12({ loanProgram }: { loanProgram: stri
   const formattedLoanProgram = loanProgram
     .replace(/noo/i, 'NOO')
     .replace(/-/g, ' ')
-    .replace(/\b\w/g, l => l.toUpperCase());
+    .replace(/\b\w/g, l => l.toUpperCase())
+    .replace(/Dscr/g, 'DSCR');
 
 
   return (
@@ -127,7 +128,7 @@ export function LoanApplicationClientPage12({ loanProgram }: { loanProgram: stri
         
         <div className="flex justify-between items-center">
             <Button variant="outline" onClick={() => router.back()}>
-               <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 11
+               <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 10
             </Button>
             <Button onClick={handleSubmitApplication}>
                 Submit Final Application
