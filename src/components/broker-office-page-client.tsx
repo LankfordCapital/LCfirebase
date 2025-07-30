@@ -37,7 +37,7 @@ export default function BrokerOfficePage() {
     const [selectedLoan, setSelectedLoan] = useState<(typeof borrowerLoans)[0] | null>(null);
 
   return (
-    <div className="container mx-auto p-4 md:p-8 space-y-6">
+    <div className="p-4 md:p-8 space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="flex items-center gap-4">
             <Avatar className="h-20 w-20">
