@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useId } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, ArrowRight, DollarSign, FileUp, FileText, ScanLine, PlusCircle, Trash2, Calculator } from 'lucide-react';
@@ -24,6 +25,7 @@ export function LoanApplicationClientPage9({ loanProgram }: { loanProgram: strin
   const router = useRouter();
   const { documents, addDocument } = useDocumentContext();
   const { toast } = useToast();
+  const initialId = useId();
 
   // State for AI scanner
   const [isScanning, setIsScanning] = useState(false);
@@ -31,7 +33,7 @@ export function LoanApplicationClientPage9({ loanProgram }: { loanProgram: strin
 
   // State for manual entry form
   const [workSunkItems, setWorkSunkItems] = useState<WorkSunkItem[]>([
-    { id: `item-${Date.now()}`, description: '', cost: '', dateCompleted: '' },
+    { id: initialId, description: '', cost: '', dateCompleted: '' },
   ]);
   const [totalManualCost, setTotalManualCost] = useState(0);
 
@@ -87,6 +89,8 @@ export function LoanApplicationClientPage9({ loanProgram }: { loanProgram: strin
     };
 
     const handleAddItem = () => {
+        // Note: The use of Date.now() here is safe because it only runs on the client-side
+        // in response to a user action (clicking the button), not during the server render.
         setWorkSunkItems(items => [...items, { id: `item-${Date.now()}`, description: '', cost: '', dateCompleted: '' }]);
     };
 
