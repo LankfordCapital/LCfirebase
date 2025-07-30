@@ -24,7 +24,7 @@ import Image from "next/image";
 export default function AdminSignUpPage() {
   const [fullName, setFullName] = useState('Admin User');
   const [email, setEmail] = useState('admin@lankfordcapital.com');
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState('Admin123');
   const [isLoading, setIsLoading] = useState(false);
   const { signUp, signIn } = useAuth();
   const router = useRouter();
@@ -95,11 +95,11 @@ export default function AdminSignUpPage() {
                 <CardContent className="grid gap-4">
                     <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <Input id="email" type="email" value={email} readOnly />
                     </div>
                     <div className="grid gap-2">
                     <Label htmlFor="password">Password</Label>
-                    <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter admin password" />
+                    <Input id="password" type="password" value={password} readOnly />
                     </div>
                 </CardContent>
                 <CardFooter className="flex flex-col gap-4">
