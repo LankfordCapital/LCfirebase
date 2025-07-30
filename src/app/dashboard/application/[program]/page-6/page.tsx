@@ -1,5 +1,4 @@
 
-
 import { Suspense } from 'react';
 import { LoanApplicationClientPage6 } from '@/components/loan-application-client-page-6';
 import { Skeleton } from '@/components/ui/skeleton';
