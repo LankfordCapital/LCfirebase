@@ -37,33 +37,34 @@ export default function AdminSignUpPage() {
       await signIn(email, password);
       router.push('/dashboard');
     } catch (error: any) {
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-        // If user doesn't exist or credential is bad (which happens on first try), attempt to sign up.
-        try {
-            const userCredential = await signUp(email, password);
-            await updateProfile(userCredential.user, {
-                displayName: fullName
-            });
-            toast({
-                title: 'Admin User Created',
-                description: `Successfully created and signed in as ${email}`,
-            });
-            router.push('/dashboard');
-        } catch (signUpError: any) {
-            toast({
-                variant: 'destructive',
-                title: 'Sign Up Failed',
-                description: `Could not create admin account. ${signUpError.message}`,
-            });
-        }
-      }
-      else {
-         toast({
+        toast({
             variant: 'destructive',
             title: 'Sign In Failed',
-            description: `An unexpected error occurred: ${error.message}`,
+            description: `Could not sign in. If this is the first time, please use the 'Create Admin' button. Error: ${error.message}`,
         });
-      }
+    } finally {
+        setIsLoading(false);
+    }
+  };
+
+  const handleCreateAdmin = async () => {
+    setIsLoading(true);
+    try {
+        const userCredential = await signUp(email, password);
+        await updateProfile(userCredential.user, {
+            displayName: fullName
+        });
+        toast({
+            title: 'Admin User Created',
+            description: `Successfully created and signed in as ${email}`,
+        });
+        router.push('/dashboard');
+    } catch (signUpError: any) {
+        toast({
+            variant: 'destructive',
+            title: 'Sign Up Failed',
+            description: `Could not create admin account. It may already exist. ${signUpError.message}`,
+        });
     } finally {
         setIsLoading(false);
     }
@@ -87,9 +88,9 @@ export default function AdminSignUpPage() {
             <Card className="shadow-2xl">
                 <form onSubmit={handleSignIn}>
                 <CardHeader className="text-center">
-                    <CardTitle className="font-headline text-2xl">Admin Sign In</CardTitle>
+                    <CardTitle className="font-headline text-2xl">Admin Access</CardTitle>
                     <CardDescription>
-                    Use the admin credentials to access all dashboards. The account will be created if it doesn't exist.
+                    Use these credentials to access all dashboards. If this is your first time, use the 'Create Admin' button.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-4">
@@ -105,7 +106,11 @@ export default function AdminSignUpPage() {
                 <CardFooter className="flex flex-col gap-4">
                     <Button className="w-full" type="submit" disabled={isLoading}>
                     {isLoading && <CustomLoader className="mr-2 h-4 w-4" />}
-                    Sign In or Create Admin
+                    Sign In
+                    </Button>
+                     <Button className="w-full" type="button" variant="secondary" onClick={handleCreateAdmin} disabled={isLoading}>
+                        {isLoading ? <CustomLoader className="mr-2 h-4 w-4" /> : null}
+                        Create Admin Account (First time only)
                     </Button>
                     <div className="text-center text-sm">
                         <Link href="/auth/signin" className="underline">
