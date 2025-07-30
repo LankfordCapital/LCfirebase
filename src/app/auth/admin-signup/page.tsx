@@ -75,16 +75,13 @@ export default function AdminSignUpPage() {
   };
 
   return (
-    <div className="flex items-center justify-end min-h-screen bg-primary/5 pr-8 md:pr-16 lg:pr-32">
-      <div className="p-8 w-full max-w-md">
-        <div className="flex justify-center mb-8">
-            <Link href="/" className="flex items-center gap-2 text-3xl">
-                <Logo />
-            </Link>
-        </div>
-        <Card className="shadow-2xl">
+    <div className="flex items-center justify-center min-h-screen bg-primary/5">
+        <Card className="w-full max-w-md shadow-2xl">
           <form onSubmit={handleSignIn}>
             <CardHeader className="text-center">
+                <div className="flex justify-center mb-4">
+                    <Logo />
+                </div>
               <CardTitle className="font-headline text-2xl">Admin Sign In</CardTitle>
               <CardDescription>
                 Use the admin credentials to access all dashboards. The account will be created if it doesn't exist.
@@ -113,7 +110,6 @@ export default function AdminSignUpPage() {
             </CardFooter>
           </form>
         </Card>
-      </div>
     </div>
   )
 }

@@ -25,9 +25,14 @@ const fontHeadline = Space_Grotesk({
 // Using a wrapper component to access pathname, as RootLayout cannot be a 'use client' component with metadata.
 function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAuthPage = pathname.startsWith('/auth');
+  const isAuthPage = pathname.startsWith('/auth') || pathname.startsWith('/book-appointment');
+  const isDashboardPage = pathname.startsWith('/dashboard') || pathname.startsWith('/broker-office') || pathname.startsWith('/workforce-office');
 
   if (isAuthPage) {
+    return <main>{children}</main>
+  }
+  
+  if (isDashboardPage) {
     return <main>{children}</main>
   }
 

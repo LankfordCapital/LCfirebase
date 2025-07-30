@@ -46,16 +46,13 @@ export default function WorkforceSignInPage() {
 
 
   return (
-    <div className="flex items-center justify-end min-h-screen bg-primary/5 pr-8 md:pr-16 lg:pr-32">
-       <div className="p-8 w-full max-w-md">
-        <div className="flex justify-center mb-8">
-            <Link href="/" className="flex items-center gap-2 text-3xl">
-                <Logo />
-            </Link>
-         </div>
-        <Card className="shadow-2xl">
+    <div className="flex items-center justify-center min-h-screen bg-primary/5">
+        <Card className="w-full max-w-md shadow-2xl">
           <form onSubmit={handleSubmit}>
             <CardHeader className="text-center">
+                <div className="flex justify-center mb-4">
+                    <Logo />
+                </div>
               <CardTitle className="font-headline text-2xl">Workforce Sign In</CardTitle>
               <CardDescription>Access the workforce back office.</CardDescription>
             </CardHeader>
@@ -84,7 +81,6 @@ export default function WorkforceSignInPage() {
             </CardFooter>
           </form>
         </Card>
-      </div>
     </div>
   )
 }
