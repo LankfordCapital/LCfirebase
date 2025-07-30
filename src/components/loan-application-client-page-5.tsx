@@ -87,6 +87,8 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
     router.back();
   }
 
+  const isEquipmentFinancing = loanProgram.toLowerCase().includes('equipment financing');
+
   return (
     <div className="space-y-6">
         <div>
@@ -94,44 +96,107 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
             <p className="text-muted-foreground">{loanProgram}</p>
         </div>
         
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Building className="h-5 w-5 text-primary" /> Management Details</CardTitle>
-                <CardDescription>Specify how the property will be managed.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <RadioGroup value={managementType} onValueChange={setManagementType} className="flex space-x-4">
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="self" id="self" />
-                        <Label htmlFor="self">Self Managed</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="professional" id="professional" />
-                        <Label htmlFor="professional">Professionally Managed</Label>
-                    </div>
-                </RadioGroup>
+        {!isEquipmentFinancing && (
+            <>
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2"><Building className="h-5 w-5 text-primary" /> Management Details</CardTitle>
+                        <CardDescription>Specify how the property will be managed.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <RadioGroup value={managementType} onValueChange={setManagementType} className="flex space-x-4">
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="self" id="self" />
+                                <Label htmlFor="self">Self Managed</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="professional" id="professional" />
+                                <Label htmlFor="professional">Professionally Managed</Label>
+                            </div>
+                        </RadioGroup>
 
-                {managementType === 'professional' && (
-                    <div className="space-y-4 pt-4 border-t mt-4">
-                         <div className="grid md:grid-cols-2 gap-4">
+                        {managementType === 'professional' && (
+                            <div className="space-y-4 pt-4 border-t mt-4">
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="managementCompanyName">Management Company Name</Label>
+                                        <Input id="managementCompanyName" value={managementCompanyName} onChange={e => setManagementCompanyName(e.target.value)} placeholder="Management Co." />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="managementCompanyPhone">Management Company Phone</Label>
+                                        <Input id="managementCompanyPhone" type="tel" value={managementCompanyPhone} onChange={e => setManagementCompanyPhone(e.target.value)} placeholder="(555) 123-4567" />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="managementCompanyEmail">Management Company Email</Label>
+                                    <Input id="managementCompanyEmail" type="email" value={managementCompanyEmail} onChange={e => setManagementCompanyEmail(e.target.value)} placeholder="contact@managementco.com"/>
+                                </div>
+                                <DocumentUploadInput name="Management Contract" />
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2"><BookUser className="h-5 w-5 text-primary" /> Title Agent Details</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="managementCompanyName">Management Company Name</Label>
-                                <Input id="managementCompanyName" value={managementCompanyName} onChange={e => setManagementCompanyName(e.target.value)} placeholder="Management Co." />
+                                <Label htmlFor="titleAgentName">Agent Name</Label>
+                                <Input id="titleAgentName" value={titleAgentName} onChange={e => setTitleAgentName(e.target.value)} />
                             </div>
-                             <div className="space-y-2">
-                                <Label htmlFor="managementCompanyPhone">Management Company Phone</Label>
-                                <Input id="managementCompanyPhone" type="tel" value={managementCompanyPhone} onChange={e => setManagementCompanyPhone(e.target.value)} placeholder="(555) 123-4567" />
+                            <div className="space-y-2">
+                                <Label htmlFor="titleAgentCompany">Company Name</Label>
+                                <Input id="titleAgentCompany" value={titleAgentCompany} onChange={e => setTitleAgentCompany(e.target.value)} />
                             </div>
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="managementCompanyEmail">Management Company Email</Label>
-                            <Input id="managementCompanyEmail" type="email" value={managementCompanyEmail} onChange={e => setManagementCompanyEmail(e.target.value)} placeholder="contact@managementco.com"/>
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="titleAgentPhone">Agent Phone</Label>
+                                <Input id="titleAgentPhone" type="tel" value={titleAgentPhone} onChange={e => setTitleAgentPhone(e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="titleAgentEmail">Agent Email</Label>
+                                <Input id="titleAgentEmail" type="email" value={titleAgentEmail} onChange={e => setTitleAgentEmail(e.target.value)} />
+                            </div>
                         </div>
-                        <DocumentUploadInput name="Management Contract" />
-                    </div>
-                )}
-            </CardContent>
-        </Card>
+                        <DocumentUploadInput name="Marked Up Title Commitment" />
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2"><Building className="h-5 w-5 text-primary" /> Escrow Agent Details</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="escrowAgentName">Agent Name</Label>
+                                <Input id="escrowAgentName" value={escrowAgentName} onChange={e => setEscrowAgentName(e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="escrowAgentCompany">Company Name</Label>
+                                <Input id="escrowAgentCompany" value={escrowAgentCompany} onChange={e => setEscrowAgentCompany(e.target.value)} />
+                            </div>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="escrowAgentPhone">Agent Phone</Label>
+                                <Input id="escrowAgentPhone" type="tel" value={escrowAgentPhone} onChange={e => setEscrowAgentPhone(e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="escrowAgentEmail">Agent Email</Label>
+                                <Input id="escrowAgentEmail" type="email" value={escrowAgentEmail} onChange={e => setEscrowAgentEmail(e.target.value)} />
+                            </div>
+                        </div>
+                        <DocumentUploadInput name="Escrow Instructions" />
+                        <DocumentUploadInput name="Closing Protection Letter" />
+                    </CardContent>
+                </Card>
+            </>
+        )}
         
         <Card>
             <CardHeader>
@@ -160,65 +225,6 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
                 </div>
                  <DocumentUploadInput name="Builder's Risk Insurance Quote" />
                  <DocumentUploadInput name="Commercial Liability Insurance Quote" />
-            </CardContent>
-        </Card>
-
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2"><BookUser className="h-5 w-5 text-primary" /> Title Agent Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                 <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="titleAgentName">Agent Name</Label>
-                        <Input id="titleAgentName" value={titleAgentName} onChange={e => setTitleAgentName(e.target.value)} />
-                    </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="titleAgentCompany">Company Name</Label>
-                        <Input id="titleAgentCompany" value={titleAgentCompany} onChange={e => setTitleAgentCompany(e.target.value)} />
-                    </div>
-                </div>
-                 <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="titleAgentPhone">Agent Phone</Label>
-                        <Input id="titleAgentPhone" type="tel" value={titleAgentPhone} onChange={e => setTitleAgentPhone(e.target.value)} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="titleAgentEmail">Agent Email</Label>
-                        <Input id="titleAgentEmail" type="email" value={titleAgentEmail} onChange={e => setTitleAgentEmail(e.target.value)} />
-                    </div>
-                </div>
-                <DocumentUploadInput name="Marked Up Title Commitment" />
-            </CardContent>
-        </Card>
-
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Building className="h-5 w-5 text-primary" /> Escrow Agent Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                 <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="escrowAgentName">Agent Name</Label>
-                        <Input id="escrowAgentName" value={escrowAgentName} onChange={e => setEscrowAgentName(e.target.value)} />
-                    </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="escrowAgentCompany">Company Name</Label>
-                        <Input id="escrowAgentCompany" value={escrowAgentCompany} onChange={e => setEscrowAgentCompany(e.target.value)} />
-                    </div>
-                </div>
-                 <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="escrowAgentPhone">Agent Phone</Label>
-                        <Input id="escrowAgentPhone" type="tel" value={escrowAgentPhone} onChange={e => setEscrowAgentPhone(e.target.value)} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="escrowAgentEmail">Agent Email</Label>
-                        <Input id="escrowAgentEmail" type="email" value={escrowAgentEmail} onChange={e => setEscrowAgentEmail(e.target.value)} />
-                    </div>
-                </div>
-                 <DocumentUploadInput name="Escrow Instructions" />
-                 <DocumentUploadInput name="Closing Protection Letter" />
             </CardContent>
         </Card>
 
