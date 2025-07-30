@@ -13,7 +13,7 @@ export default function BrokerOfficeLayout({
     // <ProtectedRoute redirectTo="/auth/broker-signin">
         <div className="bg-primary/5 min-h-screen">
           <BrokerOfficeHeader />
-          <main className="p-4 md:p-6 lg:p-8">
+          <main>
             {children}
           </main>
         </div>
