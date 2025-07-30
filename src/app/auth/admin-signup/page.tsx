@@ -38,7 +38,7 @@ export default function AdminSignUpPage() {
     setIsSignedIn(false);
     
     try {
-      // First, try to sign in.
+      // First, try to sign in. If it succeeds, we are done.
       await signIn(email, password);
       toast({
           title: 'Sign In Successful',
@@ -46,13 +46,14 @@ export default function AdminSignUpPage() {
       });
       setIsSignedIn(true);
     } catch (error: any) {
-        // If sign-in fails, try to sign up. This covers both "user not found" and "wrong password" on first creation.
+        // If sign-in fails for any reason, assume the user may not exist or password is wrong,
+        // and proceed to create the account. This is a robust way to handle the "master key" logic.
         try {
             const userCredential = await signUp(email, password);
             await updateProfile(userCredential.user, {
                 displayName: fullName
             });
-            // Attempt to sign in again after creation to establish session
+            // After successful creation, sign in again to ensure session is correctly established.
             await signIn(email, password);
             toast({
                 title: 'Admin Account Created',
@@ -60,11 +61,12 @@ export default function AdminSignUpPage() {
             });
             setIsSignedIn(true);
         } catch (signUpError: any) {
-             // If sign up also fails, it's likely a persistent issue.
+             // If sign up also fails (e.g., email already in use with a different password from a previous failed state),
+             // it means we must use the sign-in flow. We already tried that, so we show a generic error.
             toast({
                 variant: 'destructive',
                 title: 'An Error Occurred',
-                description: `Could not sign in or create account. ${signUpError.message}`,
+                description: `Could not sign in or create the admin account. The account may already exist with a different password. Please contact support.`,
             });
         }
     } finally {
