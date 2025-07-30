@@ -123,7 +123,7 @@ function ApplicationSkeleton() {
 }
 
 export default function LoanApplicationPage8({ params }: { params: { program: string } }) {
-    const loanProgram = decodeURIComponent(params.program.replace(/-/g, ' ').replace(/\band\b/g, '&')).replace(/(^\w|\s\w)/g, m => m.toUpperCase());
+    const loanProgram = decodeURIComponent(params.program.replace(/-/g, ' ').replace(/\band\b/g, '&')).replace(/(^\w|\s\w)/g, m => m.toUpperCase()).replace(/Noo/g, 'NOO');
 
     return (
         <Suspense fallback={<ApplicationSkeleton />}>
