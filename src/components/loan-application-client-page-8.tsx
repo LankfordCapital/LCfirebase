@@ -10,9 +10,9 @@ import { Label } from '@/components/ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
 import { ArrowLeft, ArrowRight, FileText, FileUp, Building, Wallet } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Separator } from './ui/separator';
+import { Separator } from '@/components/ui/separator';
 
-export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
+export default function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
   const { documents, addDocument } = useDocumentContext();
   const router = useRouter();
 
@@ -96,7 +96,7 @@ export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: strin
         </Card>
         
         <div className="flex justify-between items-center">
-            <Button onClick={handleGoBack} className="bg-[#3d3d3d] text-white hover:bg-[#3d3d3d]/90">
+            <Button variant="outline" onClick={handleGoBack}>
                <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
             </Button>
             <Button onClick={handleContinue}>
@@ -106,5 +106,3 @@ export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: strin
     </div>
   );
 }
-
-
