@@ -96,7 +96,7 @@ export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: strin
         </Card>
         
         <div className="flex justify-between items-center">
-            <Button variant="outline" onClick={handleGoBack}>
+            <Button variant="secondary" onClick={handleGoBack}>
                <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
             </Button>
             <Button onClick={handleContinue}>
