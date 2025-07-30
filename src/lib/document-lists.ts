@@ -1,5 +1,4 @@
 
-
 type DocumentList = {
     borrower: string[];
     company: string[];
