@@ -12,7 +12,7 @@ import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 
 type BudgetItem = {
-  cost: number;
+  cost: string;
   narrative: string;
 };
 
@@ -20,7 +20,7 @@ type BudgetSection = {
   [key: string]: BudgetItem;
 };
 
-const initialBudgetItem: BudgetItem = { cost: 0, narrative: '' };
+const initialBudgetItem: BudgetItem = { cost: '', narrative: '' };
 
 const initialBudgetStructure: Record<string, string[]> = {
     "Soft Costs": ["Permits & Fees", "Architectural & Engineering", "Legal & Accounting", "Developer Fees", "Contingency (Soft)"],
@@ -50,18 +50,14 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
   
   const [newSectionName, setNewSectionName] = useState('');
 
-  const handleBudgetChange = (section: string, item: string, field: keyof BudgetItem, value: string | number) => {
-    let processedValue = value;
-    if (field === 'cost') {
-        processedValue = value === '' ? 0 : Number(value);
-    }
+  const handleBudgetChange = (section: string, item: string, field: keyof BudgetItem, value: string) => {
     setBudget(prev => ({
         ...prev,
         [section]: {
             ...prev[section],
             [item]: {
                 ...prev[section][item],
-                [field]: processedValue
+                [field]: value
             }
         }
     }))
@@ -113,9 +109,9 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
         <div className="space-y-2 md:col-span-1">
             <Input 
                 id={`${section}-${item}-cost`} 
-                type="number"
+                type="text"
                 placeholder="Cost" 
-                value={budget[section][item].cost || ''}
+                value={budget[section][item].cost}
                 onChange={(e) => handleBudgetChange(section, item, 'cost', e.target.value)}
             />
         </div>
