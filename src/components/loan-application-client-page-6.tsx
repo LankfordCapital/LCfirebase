@@ -34,9 +34,32 @@ const initialBudgetStructure: Record<string, string[]> = {
 };
 
 // Isolated sub-component to manage its own state and prevent re-render issues.
-const BudgetInputRow = ({ item, section, handleBudgetChange, handleRemoveBudgetItem }: { item: string, section: string, handleBudgetChange: Function, handleRemoveBudgetItem: Function }) => {
-    const [cost, setCost] = useState('');
-    const [narrative, setNarrative] = useState('');
+const BudgetInputRow = ({ 
+    item, 
+    section, 
+    initialCost,
+    initialNarrative,
+    handleBudgetChange, 
+    handleRemoveBudgetItem 
+}: { 
+    item: string, 
+    section: string, 
+    initialCost: string,
+    initialNarrative: string,
+    handleBudgetChange: (section: string, item: string, field: keyof BudgetItem, value: string) => void, 
+    handleRemoveBudgetItem: (section: string, item: string) => void 
+}) => {
+    const [cost, setCost] = useState(initialCost);
+    const [narrative, setNarrative] = useState(initialNarrative);
+
+    // Sync state if initial props change
+    useEffect(() => {
+        setCost(initialCost);
+    }, [initialCost]);
+
+    useEffect(() => {
+        setNarrative(initialNarrative);
+    }, [initialNarrative]);
 
     return (
         <div className="py-2 border-b grid md:grid-cols-3 gap-4 items-start relative">
@@ -100,20 +123,23 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
   }
   
   const handleAddBudgetItem = (section: string) => {
-    const newItemName = `Custom Item ${Object.keys(budget[section]).length + 1}`;
-    setBudget(prev => ({
-        ...prev,
-        [section]: {
-            ...prev[section],
-            [newItemName]: { ...initialBudgetItem }
-        }
-    }))
+    const newItemName = `Custom Item ${Object.keys(budget[section] || {}).length + 1}`;
+    setBudget(prev => {
+        const newSection = prev[section] ? {...prev[section]} : {};
+        newSection[newItemName] = { ...initialBudgetItem };
+        return {
+            ...prev,
+            [section]: newSection,
+        };
+    });
   }
   
   const handleRemoveBudgetItem = (section: string, item: string) => {
-    const newSection = { ...budget[section] };
-    delete newSection[item];
-    setBudget(prev => ({ ...prev, [section]: newSection }));
+    setBudget(prev => {
+        const newSection = { ...prev[section] };
+        delete newSection[item];
+        return { ...prev, [section]: newSection };
+    });
   }
 
   const handleAddSection = () => {
@@ -161,12 +187,39 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
                                 </div>
                             </AccordionTrigger>
                             <AccordionContent className="px-1">
-                                {Object.keys(budget[section]).map(item => <BudgetInputRow key={item} item={item} section={section} handleBudgetChange={handleBudgetChange} handleRemoveBudgetItem={handleRemoveBudgetItem} />)}
+                                {Object.keys(budget[section] || {}).map(item => (
+                                    <BudgetInputRow 
+                                        key={item} 
+                                        item={item} 
+                                        section={section} 
+                                        initialCost={budget[section][item].cost}
+                                        initialNarrative={budget[section][item].narrative}
+                                        handleBudgetChange={handleBudgetChange} 
+                                        handleRemoveBudgetItem={handleRemoveBudgetItem} 
+                                    />
+                                ))}
+                                 <div className="pt-4">
+                                     <Button variant="outline" size="sm" onClick={() => handleAddBudgetItem(section)}>
+                                        <PlusCircle className="mr-2 h-4 w-4" /> Add Line Item to {section}
+                                    </Button>
+                                </div>
                             </AccordionContent>
                         </AccordionItem>
                     ))}
                 </Accordion>
                 
+                 <div className="mt-6 pt-4 border-t">
+                     <h3 className="text-lg font-semibold mb-2">Add New Section</h3>
+                    <div className="flex gap-2">
+                        <Input
+                            placeholder="Enter new section name"
+                            value={newSectionName}
+                            onChange={(e) => setNewSectionName(e.target.value)}
+                        />
+                        <Button onClick={handleAddSection}>Add Section</Button>
+                    </div>
+                </div>
+
                 <div className="mt-6 pt-4 border-t">
                     <div className="flex justify-between items-center">
                         <h3 className="text-xl font-bold">Total Budget</h3>
