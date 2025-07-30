@@ -26,13 +26,16 @@ const fontHeadline = Space_Grotesk({
 function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAuthPage = pathname.startsWith('/auth') || pathname.startsWith('/book-appointment');
-  const isDashboardPage = pathname.startsWith('/dashboard') || pathname.startsWith('/broker-office') || pathname.startsWith('/workforce-office');
+  const isSpecialtyPortal = pathname.startsWith('/broker-office') || pathname.startsWith('/workforce-office');
+  
+  // The main dashboard layout applies to /dashboard and its children, but not the specialty portals
+  const isBorrowerDashboard = pathname.startsWith('/dashboard');
 
-  if (isAuthPage) {
+  if (isAuthPage || isSpecialtyPortal) {
     return <main>{children}</main>;
   }
 
-  if (isDashboardPage) {
+  if (isBorrowerDashboard) {
      return <main>{children}</main>
   }
 
