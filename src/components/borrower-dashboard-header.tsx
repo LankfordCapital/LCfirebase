@@ -59,10 +59,10 @@ export function BorrowerDashboardHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2 px-2">
                  <Avatar className="h-8 w-8">
-                  <AvatarImage src={user?.photoURL || "https://placehold.co/40x40.png"} alt="@broker" />
+                  <AvatarImage src={user?.photoURL || "https://placehold.co/40x40.png"} alt="@borrower" />
                   <AvatarFallback>{user?.displayName?.charAt(0) || 'B'}</AvatarFallback>
                 </Avatar>
-                <span className="hidden md:inline font-semibold">{user?.displayName || 'Broker'}</span>
+                <span className="hidden md:inline font-semibold">{user?.displayName || 'Borrower'}</span>
                 <ChevronDown className="h-4 w-4 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
