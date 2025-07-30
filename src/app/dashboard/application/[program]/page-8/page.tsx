@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
-import { ArrowLeft, ArrowRight, FileText, FileUp, Building, Wallet } from 'lucide-react';
+import { ArrowLeft, ArrowRight, FileText, FileUp, Wallet } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Separator } from '@/components/ui/separator';
 
@@ -21,6 +21,7 @@ function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
         await addDocument({
             name: itemName,
             file,
+            status: 'uploaded',
         });
     }
   }, [addDocument]);
