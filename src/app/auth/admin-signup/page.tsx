@@ -28,7 +28,7 @@ export default function AdminSignUpPage() {
   const [password, setPassword] = useState('Admin123');
   const [isLoading, setIsLoading] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const { signUp, signIn } = useAuth();
+  const { signUp, signIn, user } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -46,35 +46,26 @@ export default function AdminSignUpPage() {
       });
       setIsSignedIn(true);
     } catch (error: any) {
-        // If sign-in fails (e.g., user not found or invalid credential first time)
-        // try to sign up.
+        // If sign-in fails, try to sign up. This covers both "user not found" and "wrong password" on first creation.
         try {
             const userCredential = await signUp(email, password);
             await updateProfile(userCredential.user, {
                 displayName: fullName
             });
+            // Attempt to sign in again after creation to establish session
+            await signIn(email, password);
             toast({
                 title: 'Admin Account Created',
                 description: `Successfully created and signed in as ${email}.`,
             });
-            // Attempt to sign in again after creation to establish session
-            await signIn(email, password);
             setIsSignedIn(true);
         } catch (signUpError: any) {
-             // If sign up also fails, it might be because of a wrong password for an existing user.
-             if (signUpError.code === 'auth/email-already-in-use') {
-                 toast({
-                    variant: 'destructive',
-                    title: 'Sign In Failed',
-                    description: 'The admin account already exists. The password provided may be incorrect.',
-                });
-             } else {
-                toast({
-                    variant: 'destructive',
-                    title: 'An Error Occurred',
-                    description: `Could not sign in or create account. ${signUpError.message}`,
-                });
-             }
+             // If sign up also fails, it's likely a persistent issue.
+            toast({
+                variant: 'destructive',
+                title: 'An Error Occurred',
+                description: `Could not sign in or create account. ${signUpError.message}`,
+            });
         }
     } finally {
         setIsLoading(false);
@@ -96,13 +87,13 @@ export default function AdminSignUpPage() {
         </Link>
       </div>
       <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[350px] gap-6">
+        <div className="mx-auto grid w-[380px] gap-6">
             <Card className="shadow-2xl">
                 <form onSubmit={handleSignInOrCreate}>
                 <CardHeader className="text-center">
-                    <CardTitle className="font-headline text-2xl">Admin Access</CardTitle>
+                    <CardTitle className="font-headline text-2xl">Admin Master Access</CardTitle>
                     <CardDescription>
-                    Use these credentials to access all dashboards.
+                    Use these fixed credentials to access all dashboards.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-4">
@@ -122,19 +113,27 @@ export default function AdminSignUpPage() {
                     )}
                 </CardContent>
                 <CardFooter className="flex flex-col gap-4">
-                    {isSignedIn ? (
-                        <Button className="w-full" asChild>
-                           <Link href="/workforce-office">Proceed to Workforce Dashboard</Link>
-                        </Button>
-                    ) : (
+                    {!isSignedIn ? (
                         <Button className="w-full" type="submit" disabled={isLoading}>
                             {isLoading && <CustomLoader className="mr-2 h-4 w-4" />}
-                            Sign In or Create Admin
+                            Sign In to Admin
                         </Button>
+                    ) : (
+                        <div className="w-full space-y-2">
+                             <Button className="w-full" asChild>
+                                <Link href="/workforce-office">Go to Workforce Dashboard</Link>
+                            </Button>
+                             <Button className="w-full" asChild variant="outline">
+                                <Link href="/broker-office">Go to Broker Dashboard</Link>
+                            </Button>
+                             <Button className="w-full" asChild variant="outline">
+                                <Link href="/dashboard">Go to Borrower Dashboard</Link>
+                            </Button>
+                        </div>
                     )}
                     <div className="text-center text-sm">
                         <Link href="/auth/signin" className="underline">
-                            Back to Borrower Sign In
+                            Back to Regular Sign In
                         </Link>
                     </div>
                 </CardFooter>
