@@ -17,4 +17,5 @@ import '@/ai/flows/generate-insurance-instructions-flow.ts';
 import '@/ai/flows/generate-comparable-property-report-flow.ts';
 import '@/ai/flows/lender-match-flow.ts';
 import '@/ai/flows/appointment-scheduler-flow.ts';
+import '@/ai/flows/work-sunk-scanner.ts';
 
