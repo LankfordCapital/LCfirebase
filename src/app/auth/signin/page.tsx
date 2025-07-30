@@ -45,14 +45,14 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="grid md:grid-cols-2 h-screen">
-       <div className="flex flex-col items-center justify-center p-8 bg-primary/5">
-        <div className="w-full max-w-sm mb-8">
+    <div className="flex items-center justify-center min-h-screen bg-primary/5">
+       <div className="p-8 w-full max-w-md">
+        <div className="flex justify-center mb-8">
             <Link href="/" className="flex items-center gap-2 text-3xl">
                 <Logo />
             </Link>
          </div>
-        <Card className="w-full max-w-sm shadow-2xl">
+        <Card className="shadow-2xl">
           <form onSubmit={handleSubmit}>
             <CardHeader className="text-center">
               <CardTitle className="font-headline text-2xl">Borrower Sign In</CardTitle>
@@ -94,18 +94,6 @@ export default function SignInPage() {
             </CardFooter>
           </form>
         </Card>
-      </div>
-       <div className="hidden md:block relative">
-        <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="absolute top-0 left-0 w-full h-full object-cover"
-        >
-          <source src="https://firebasestorage.googleapis.com/v0/b/lankford-homebase.firebasestorage.app/o/Adobe%20Express%20-%20shutterstock_3599048629.mp4?alt=media&token=a42649e7-9a18-4028-b277-b60390039ee2" type="video/mp4" />
-        </video>
-        <div className="absolute top-0 left-0 w-full h-full bg-black/50" />
       </div>
     </div>
   )

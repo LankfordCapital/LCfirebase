@@ -46,14 +46,14 @@ export default function WorkforceSignInPage() {
 
 
   return (
-    <div className="grid md:grid-cols-2 h-screen">
-       <div className="flex flex-col items-center justify-center p-8 bg-primary/5">
-        <div className="w-full max-w-sm mb-8">
+    <div className="flex items-center justify-center min-h-screen bg-primary/5">
+       <div className="p-8 w-full max-w-md">
+        <div className="flex justify-center mb-8">
             <Link href="/" className="flex items-center gap-2 text-3xl">
                 <Logo />
             </Link>
          </div>
-        <Card className="w-full max-w-sm shadow-2xl">
+        <Card className="shadow-2xl">
           <form onSubmit={handleSubmit}>
             <CardHeader className="text-center">
               <CardTitle className="font-headline text-2xl">Workforce Sign In</CardTitle>
@@ -84,18 +84,6 @@ export default function WorkforceSignInPage() {
             </CardFooter>
           </form>
         </Card>
-      </div>
-      <div className="hidden md:block relative">
-        <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="absolute top-0 left-0 w-full h-full object-cover"
-        >
-          <source src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Adobe%20Express%20-%20shutterstock_1056483272.mp4?alt=media&token=fa398116-1dce-44a1-a705-fcef667bcca1" type="video/mp4" />
-        </video>
-        <div className="absolute top-0 left-0 w-full h-full bg-black/50" />
       </div>
     </div>
   )
