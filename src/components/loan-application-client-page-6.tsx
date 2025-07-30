@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -158,7 +159,7 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
     }
   }
 
-  const handleCalculateTotals = () => {
+  useEffect(() => {
     let grandTotal = 0;
     const sectionTotals: Record<string, number> = {};
 
@@ -173,7 +174,7 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
     }
     
     setTotals({ grandTotal, sectionTotals });
-  };
+  }, [budget]);
 
 
   const handleContinue = () => {
@@ -191,7 +192,7 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
          <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2"><DollarSign className="h-5 w-5 text-primary"/> Construction Budget</CardTitle>
-                <CardDescription>Provide a detailed breakdown of the construction budget. Click "Calculate Total Budget" to update the totals.</CardDescription>
+                <CardDescription>Provide a detailed breakdown of the construction budget. Totals are calculated automatically.</CardDescription>
             </CardHeader>
             <CardContent>
                 <Accordion type="multiple" defaultValue={["Soft Costs"]} className="w-full">
@@ -240,10 +241,6 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
                     <div className="p-4 bg-primary/5 rounded-lg">
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="text-xl font-bold">Total Budget</h3>
-                             <Button onClick={handleCalculateTotals}>
-                                <Calculator className="mr-2 h-4 w-4"/>
-                                Calculate Total Budget
-                            </Button>
                         </div>
                         <p className="text-2xl font-bold text-green-600 font-mono">
                             {(totals.grandTotal || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
