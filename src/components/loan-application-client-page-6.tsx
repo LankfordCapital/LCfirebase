@@ -219,15 +219,17 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
                 </div>
 
                 <div className="mt-6 pt-4 border-t space-y-4">
-                     <Button onClick={handleCalculateTotals}>
-                        <Calculator className="mr-2 h-4 w-4"/>
-                        Calculate Total Budget
-                    </Button>
                     <div className="flex justify-between items-center p-4 bg-primary/5 rounded-lg">
-                        <h3 className="text-xl font-bold">Total Budget</h3>
-                        <p className="text-2xl font-bold text-green-600 font-mono">
-                            {(totals.grandTotal || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
-                        </p>
+                        <div>
+                            <h3 className="text-xl font-bold">Total Budget</h3>
+                            <p className="text-2xl font-bold text-green-600 font-mono">
+                                {(totals.grandTotal || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                            </p>
+                        </div>
+                        <Button onClick={handleCalculateTotals}>
+                           <Calculator className="mr-2 h-4 w-4"/>
+                           Calculate Total Budget
+                       </Button>
                     </div>
                 </div>
             </CardContent>
@@ -244,4 +246,3 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
     </div>
   );
 }
-
