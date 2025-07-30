@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useCallback } from 'react';
@@ -10,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
 import { ArrowLeft, ArrowRight, FileText, FileUp, Building, Wallet } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Separator } from './ui/separator';
+import { Separator } from '@/components/ui/separator';
 
 export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
   const { documents, addDocument } = useDocumentContext();
@@ -106,6 +105,3 @@ export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: strin
     </div>
   );
 }
-
-
-
