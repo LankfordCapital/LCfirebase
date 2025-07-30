@@ -26,9 +26,8 @@ const fontHeadline = Space_Grotesk({
 function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAuthPage = pathname.startsWith('/auth');
-  const isDashboardPage = pathname.startsWith('/dashboard') || pathname.startsWith('/broker-office') || pathname.startsWith('/workforce-office');
 
-  if (isAuthPage || isDashboardPage) {
+  if (isAuthPage) {
     return <main>{children}</main>
   }
 
