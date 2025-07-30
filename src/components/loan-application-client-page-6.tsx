@@ -38,29 +38,24 @@ const initialBudgetStructure: Record<string, string[]> = {
 const BudgetInputRow = ({ 
     item, 
     section, 
-    initialCost,
-    initialNarrative,
-    handleBudgetChange, 
-    handleRemoveBudgetItem 
+    initialData,
+    onBudgetChange, 
+    onRemove 
 }: { 
     item: string, 
     section: string, 
-    initialCost: string,
-    initialNarrative: string,
-    handleBudgetChange: (section: string, item: string, field: keyof BudgetItem, value: string) => void, 
-    handleRemoveBudgetItem: (section: string, item: string) => void 
+    initialData: BudgetItem,
+    onBudgetChange: (section: string, item: string, field: keyof BudgetItem, value: string) => void, 
+    onRemove: (section: string, item: string) => void 
 }) => {
-    const [cost, setCost] = useState(initialCost);
-    const [narrative, setNarrative] = useState(initialNarrative);
-
-    // Sync state if initial props change
+    const [cost, setCost] = useState(initialData.cost);
+    const [narrative, setNarrative] = useState(initialData.narrative);
+    
+    // Sync with external changes if needed, but this might not be necessary depending on the UX
     useEffect(() => {
-        setCost(initialCost);
-    }, [initialCost]);
-
-    useEffect(() => {
-        setNarrative(initialNarrative);
-    }, [initialNarrative]);
+        setCost(initialData.cost);
+        setNarrative(initialData.narrative);
+    }, [initialData]);
 
     return (
         <div className="py-2 border-b grid md:grid-cols-3 gap-4 items-start relative">
@@ -71,7 +66,7 @@ const BudgetInputRow = ({
                     placeholder="Cost" 
                     value={cost}
                     onChange={(e) => setCost(e.target.value)}
-                    onBlur={() => handleBudgetChange(section, item, 'cost', cost)}
+                    onBlur={() => onBudgetChange(section, item, 'cost', cost)}
                 />
             </div>
             <div className="space-y-2 md:col-span-1">
@@ -79,12 +74,12 @@ const BudgetInputRow = ({
                     placeholder="Narrative..." 
                     value={narrative}
                     onChange={(e) => setNarrative(e.target.value)}
-                    onBlur={() => handleBudgetChange(section, item, 'narrative', narrative)}
+                    onBlur={() => onBudgetChange(section, item, 'narrative', narrative)}
                     rows={1}
                 />
             </div>
             {!initialBudgetStructure[section]?.includes(item) && (
-                <Button variant="ghost" size="icon" onClick={() => handleRemoveBudgetItem(section, item)} className="absolute top-0 right-0 h-8 w-8">
+                <Button variant="ghost" size="icon" onClick={() => onRemove(section, item)} className="absolute top-0 right-0 h-8 w-8">
                     <Trash2 className="h-4 w-4" />
                 </Button>
             )}
@@ -193,10 +188,9 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
                                         key={item} 
                                         item={item} 
                                         section={section} 
-                                        initialCost={budget[section][item].cost}
-                                        initialNarrative={budget[section][item].narrative}
-                                        handleBudgetChange={handleBudgetChange} 
-                                        handleRemoveBudgetItem={handleRemoveBudgetItem} 
+                                        initialData={budget[section][item]}
+                                        onBudgetChange={handleBudgetChange} 
+                                        onRemove={handleRemoveBudgetItem} 
                                     />
                                 ))}
                                  <div className="pt-4">
