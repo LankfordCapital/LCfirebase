@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, ArrowRight, DollarSign, PlusCircle, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, DollarSign, PlusCircle, Trash2, Calculator } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { Label } from './ui/label';
@@ -33,21 +33,18 @@ const initialBudgetStructure: Record<string, string[]> = {
     "Project Management": ["Supervision", "General Conditions", "Contingency (Hard)", "Final Cleanup"],
 };
 
-// Isolated sub-component to manage its own state and prevent re-render issues.
 const BudgetInputRow = ({ 
-    item, 
-    section, 
     initialCost,
     initialNarrative,
-    onBudgetChange, 
-    onRemove 
+    onBlur,
+    onRemove,
+    item,
 }: { 
-    item: string, 
-    section: string, 
     initialCost: string,
     initialNarrative: string,
-    onBudgetChange: (section: string, item: string, field: keyof BudgetItem, value: string) => void, 
-    onRemove: (section: string, item: string) => void 
+    onBlur: (field: keyof BudgetItem, value: string) => void, 
+    onRemove?: () => void,
+    item: string
 }) => {
     const [cost, setCost] = useState(initialCost);
     const [narrative, setNarrative] = useState(initialNarrative);
@@ -61,7 +58,7 @@ const BudgetInputRow = ({
                     placeholder="Cost" 
                     value={cost}
                     onChange={(e) => setCost(e.target.value)}
-                    onBlur={() => onBudgetChange(section, item, 'cost', cost)}
+                    onBlur={() => onBlur('cost', cost)}
                 />
             </div>
             <div className="space-y-2 md:col-span-1">
@@ -69,12 +66,12 @@ const BudgetInputRow = ({
                     placeholder="Narrative..." 
                     value={narrative}
                     onChange={(e) => setNarrative(e.target.value)}
-                    onBlur={() => onBudgetChange(section, item, 'narrative', narrative)}
+                    onBlur={() => onBlur('narrative', narrative)}
                     rows={1}
                 />
             </div>
-            {!initialBudgetStructure[section]?.includes(item) && (
-                <Button variant="ghost" size="icon" onClick={() => onRemove(section, item)} className="absolute top-0 right-0 h-8 w-8">
+             {onRemove && (
+                <Button variant="ghost" size="icon" onClick={onRemove} className="absolute top-0 right-0 h-8 w-8">
                     <Trash2 className="h-4 w-4" />
                 </Button>
             )}
@@ -98,24 +95,26 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
     return initialState;
   });
   
+  const [totals, setTotals] = useState<{ grandTotal: number; sectionTotals: Record<string, number> }>({
+    grandTotal: 0,
+    sectionTotals: {},
+  });
+  
   const [newSectionName, setNewSectionName] = useState('');
 
   const handleBudgetChange = (section: string, item: string, field: keyof BudgetItem, value: string) => {
-    setBudget(prev => ({
-        ...prev,
-        [section]: {
-            ...prev[section],
-            [item]: {
-                ...prev[section][item],
-                [field]: value
-            }
-        }
-    }))
+    setBudget(prev => {
+        const newBudget = { ...prev };
+        if (!newBudget[section]) newBudget[section] = {};
+        if (!newBudget[section][item]) newBudget[section][item] = { cost: '', narrative: '' };
+        newBudget[section][item][field] = value;
+        return newBudget;
+    });
   }
   
   const handleAddBudgetItem = (section: string) => {
     const newItemName = `Custom Item ${Object.keys(budget[section] || {}).length + 1}`;
-    setBudget(prev => {
+     setBudget(prev => {
         const newSectionItems = prev[section] ? {...prev[section]} : {};
         newSectionItems[newItemName] = { ...initialBudgetItem };
         return {
@@ -141,14 +140,23 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
     }
   }
 
+  const handleCalculateTotals = () => {
+    let grandTotal = 0;
+    const sectionTotals: Record<string, number> = {};
 
-  const calculateSectionTotal = (section: string) => {
-    return Object.values(budget[section] || {}).reduce((total, item) => total + (Number(item.cost.replace(/[^0-9.-]+/g,"")) || 0), 0);
-  }
+    for (const section in budget) {
+      let sectionTotal = 0;
+      for (const item in budget[section]) {
+        const cost = parseFloat(budget[section][item].cost.replace(/[^0-9.-]+/g,"")) || 0;
+        sectionTotal += cost;
+      }
+      sectionTotals[section] = sectionTotal;
+      grandTotal += sectionTotal;
+    }
+    
+    setTotals({ grandTotal, sectionTotals });
+  };
 
-  const calculateGrandTotal = () => {
-    return Object.keys(budget).reduce((total, section) => total + calculateSectionTotal(section), 0);
-  }
 
   const handleContinue = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&g/, 'and');
@@ -165,7 +173,7 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
          <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2"><DollarSign className="h-5 w-5 text-primary"/> Construction Budget</CardTitle>
-                <CardDescription>Provide a detailed breakdown of the construction budget.</CardDescription>
+                <CardDescription>Provide a detailed breakdown of the construction budget. Click "Calculate Total Budget" to update the totals.</CardDescription>
             </CardHeader>
             <CardContent>
                 <Accordion type="multiple" defaultValue={["Soft Costs"]} className="w-full">
@@ -174,19 +182,18 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
                             <AccordionTrigger className="text-lg font-semibold hover:no-underline">
                                 <div className="flex justify-between w-full pr-4">
                                     <span>{section}</span>
-                                    <span className="text-primary font-mono">{calculateSectionTotal(section).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>
+                                    <span className="text-primary font-mono">{(totals.sectionTotals[section] || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>
                                 </div>
                             </AccordionTrigger>
                             <AccordionContent className="px-1">
                                 {Object.keys(budget[section] || {}).map(item => (
                                     <BudgetInputRow 
                                         key={item} 
-                                        item={item} 
-                                        section={section} 
-                                        initialCost={budget[section][item].cost}
-                                        initialNarrative={budget[section][item].narrative}
-                                        onBudgetChange={handleBudgetChange} 
-                                        onRemove={handleRemoveBudgetItem} 
+                                        item={item}
+                                        initialCost={budget[section][item]?.cost || ''}
+                                        initialNarrative={budget[section][item]?.narrative || ''}
+                                        onBlur={(field, value) => handleBudgetChange(section, item, field, value)}
+                                        onRemove={!initialBudgetStructure[section]?.includes(item) ? () => handleRemoveBudgetItem(section, item) : undefined}
                                     />
                                 ))}
                                  <div className="pt-4">
@@ -211,11 +218,15 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
                     </div>
                 </div>
 
-                <div className="mt-6 pt-4 border-t">
-                    <div className="flex justify-between items-center">
+                <div className="mt-6 pt-4 border-t space-y-4">
+                     <Button onClick={handleCalculateTotals}>
+                        <Calculator className="mr-2 h-4 w-4"/>
+                        Calculate Total Budget
+                    </Button>
+                    <div className="flex justify-between items-center p-4 bg-primary/5 rounded-lg">
                         <h3 className="text-xl font-bold">Total Budget</h3>
                         <p className="text-2xl font-bold text-green-600 font-mono">
-                            {calculateGrandTotal().toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                            {(totals.grandTotal || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
                         </p>
                     </div>
                 </div>
@@ -233,3 +244,4 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
     </div>
   );
 }
+
