@@ -56,7 +56,7 @@ export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: strin
      if (isConstructionOrRehab) {
         router.back(); // Goes back to page 7
      } else {
-        const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
+        const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&g/, 'and');
         router.push(`/dashboard/application/${programSlug}/page-5`);
      }
   }
@@ -96,7 +96,7 @@ export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: strin
         </Card>
         
         <div className="flex justify-between items-center">
-            <Button variant="secondary" onClick={handleGoBack}>
+            <Button onClick={handleGoBack} className="bg-secondary text-secondary-foreground hover:bg-secondary/80">
                <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
             </Button>
             <Button onClick={handleContinue}>
@@ -106,3 +106,4 @@ export function LoanApplicationClientPage8({ loanProgram }: { loanProgram: strin
     </div>
   );
 }
+
