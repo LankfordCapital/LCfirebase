@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState } from 'react';
@@ -12,8 +13,8 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useDocumentContext } from '@/contexts/document-context';
-import { Checkbox } from './ui/checkbox';
-import { CustomLoader } from './ui/custom-loader';
+import { Checkbox } from '../ui/checkbox';
+import { CustomLoader } from '../ui/custom-loader';
 
 const sampleUsers: GenerateEmailInput['recipient'][] = [
     { userId: 'user-123', email: 'john.doe@example.com', fullName: 'John Doe', role: 'borrower', timeZone: 'America/New_York' },

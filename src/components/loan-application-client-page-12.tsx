@@ -63,12 +63,18 @@ export function LoanApplicationClientPage12({ loanProgram }: { loanProgram: stri
     });
     router.push('/dashboard');
   };
+  
+  const formattedLoanProgram = loanProgram
+    .replace(/noo/i, 'NOO')
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, l => l.toUpperCase());
+
 
   return (
     <div className="space-y-6">
         <div>
             <h1 className="font-headline text-3xl font-bold">Loan Application - Final Submission</h1>
-            <p className="text-muted-foreground">{loanProgram}</p>
+            <p className="text-muted-foreground">{formattedLoanProgram}</p>
         </div>
         
         <Card>
