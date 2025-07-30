@@ -86,7 +86,7 @@ export default function WorkforceSignInPage() {
           alt="Lankford Capital Logo"
           width={256}
           height={256}
-          className="h-auto w-64"
+          className="h-auto w-64 animate-spin-y"
         />
       </div>
     </div>
