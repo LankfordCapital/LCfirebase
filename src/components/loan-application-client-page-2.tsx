@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -71,7 +72,13 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
 
   const handleNextPage = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
-    router.push(`/dashboard/application/${programSlug}/page-3`);
+    const isEquipmentFinancing = loanProgram.toLowerCase().includes('equipment financing');
+
+    if (isEquipmentFinancing) {
+        router.push(`/dashboard/application/${programSlug}/page-4`);
+    } else {
+        router.push(`/dashboard/application/${programSlug}/page-3`);
+    }
   }
   
   return (
@@ -133,7 +140,7 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
                <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 1
             </Button>
             <Button onClick={handleNextPage}>
-                Continue to Page 3 <ArrowRight className="ml-2 h-4 w-4" />
+                Continue <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
         </div>
     </div>
