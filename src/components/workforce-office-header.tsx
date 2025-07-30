@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -16,13 +17,15 @@ import {
 import {
   LayoutDashboard, LogOut, ChevronDown, Bot, Mail, BarChartHorizontal,
   MessageSquare, FileJson, AreaChart, Hammer, BookCopy, Shield, FileBarChart,
-  Database, Users, ClipboardList, Calendar, Notebook
+  Database, Users, ClipboardList, Calendar, Notebook, Menu
 } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { useAuth } from '@/contexts/auth-context';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
+import React from 'react';
 
 const navLinks = [
     { href: '/workforce-office', label: 'Pipeline' },
@@ -49,6 +52,7 @@ const toolsLinks = [
 export function WorkforceOfficeHeader() {
   const { user, logOut } = useAuth();
   const pathname = usePathname();
+  const [isOpen, setIsOpen] = React.useState(false);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -111,6 +115,35 @@ export function WorkforceOfficeHeader() {
                 </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+           <div className="md:hidden">
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+                <SheetTrigger asChild>
+                <Button variant="outline" size="icon">
+                    <Menu className="h-6 w-6" />
+                    <span className="sr-only">Open menu</span>
+                </Button>
+                </SheetTrigger>
+                <SheetContent side="right">
+                    <div className="flex flex-col gap-6 p-6">
+                        <Link href="/" onClick={() => setIsOpen(false)}>
+                            <Logo />
+                        </Link>
+                        <nav className="flex flex-col gap-4">
+                        {[...navLinks, ...toolsLinks].map((item) => (
+                            <Link
+                            key={item.href}
+                            href={item.href}
+                            className="text-muted-foreground hover:text-primary"
+                             onClick={() => setIsOpen(false)}
+                            >
+                            {item.label}
+                            </Link>
+                        ))}
+                        </nav>
+                    </div>
+                </SheetContent>
+            </Sheet>
+           </div>
         </div>
       </div>
     </header>
