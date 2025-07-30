@@ -51,17 +51,17 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
   const [netOperatingIncome, setNetOperatingIncome] = useState(0);
 
   useEffect(() => {
-    const numRevenue = parseFloat(revenue) || 0;
-    const numCogs = parseFloat(cogs) || 0;
+    const numRevenue = parseFloat(revenue.replace(/,/g, '')) || 0;
+    const numCogs = parseFloat(cogs.replace(/,/g, '')) || 0;
     const gp = numRevenue - numCogs;
     setGrossProfit(gp);
     
-    const numSalaries = parseFloat(salaries) || 0;
-    const numRent = parseFloat(rent) || 0;
-    const numUtilities = parseFloat(utilities) || 0;
-    const numMarketing = parseFloat(marketing) || 0;
-    const numRepairs = parseFloat(repairs) || 0;
-    const numOther = parseFloat(otherExpenses) || 0;
+    const numSalaries = parseFloat(salaries.replace(/,/g, '')) || 0;
+    const numRent = parseFloat(rent.replace(/,/g, '')) || 0;
+    const numUtilities = parseFloat(utilities.replace(/,/g, '')) || 0;
+    const numMarketing = parseFloat(marketing.replace(/,/g, '')) || 0;
+    const numRepairs = parseFloat(repairs.replace(/,/g, '')) || 0;
+    const numOther = parseFloat(otherExpenses.replace(/,/g, '')) || 0;
 
     const totalOpEx = numSalaries + numRent + numUtilities + numMarketing + numRepairs + numOther;
     setTotalOperatingExpenses(totalOpEx);
