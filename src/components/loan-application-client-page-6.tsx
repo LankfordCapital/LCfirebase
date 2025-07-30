@@ -12,7 +12,7 @@ import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 
 type BudgetItem = {
-  cost: string; // Changed to string to allow free typing
+  cost: string; 
   narrative: string;
 };
 
@@ -111,15 +111,15 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
                 id={`${section}-${item}-cost`} 
                 type="text"
                 placeholder="Cost" 
-                value={budget[section][item].cost}
-                onChange={(e) => handleBudgetChange(section, item, 'cost', e.target.value)}
+                defaultValue={budget[section][item].cost}
+                onBlur={(e) => handleBudgetChange(section, item, 'cost', e.target.value)}
             />
         </div>
         <div className="space-y-2 md:col-span-1">
             <Textarea 
                 id={`${section}-${item}-narrative`}
                 placeholder="Narrative..." 
-                value={budget[section][item].narrative}
+                defaultValue={budget[section][item].narrative}
                 onChange={(e) => handleBudgetChange(section, item, 'narrative', e.target.value)}
                 rows={1}
             />
