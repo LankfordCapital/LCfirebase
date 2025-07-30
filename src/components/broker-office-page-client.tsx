@@ -51,7 +51,7 @@ export default function BrokerOfficePage() {
             </div>
         </div>
         <Button asChild>
-            <Link href="/dashboard/documents"><PlusCircle className="mr-2 h-4 w-4"/> Start New Application</Link>
+            <Link href="/broker-office/documents"><PlusCircle className="mr-2 h-4 w-4"/> Start New Application</Link>
         </Button>
       </div>
 
