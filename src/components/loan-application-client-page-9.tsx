@@ -1,11 +1,10 @@
 
-
 'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, ArrowRight, DollarSign, PlusCircle, Trash2, Calendar as CalendarIcon } from 'lucide-react';
+import { ArrowLeft, ArrowRight, DollarSign, PlusCircle, Trash2, Calendar as CalendarIcon, Calculator } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { Label } from './ui/label';
@@ -17,7 +16,7 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 
 type BudgetItem = {
-  cost: number;
+  cost: string;
   narrative: string;
   dateCompleted?: Date;
 };
@@ -26,7 +25,7 @@ type BudgetSection = {
   [key: string]: BudgetItem;
 };
 
-const initialBudgetItem: BudgetItem = { cost: 0, narrative: '', dateCompleted: undefined };
+const initialBudgetItem: BudgetItem = { cost: '', narrative: '', dateCompleted: undefined };
 
 const initialBudgetStructure: Record<string, string[]> = {
     "Soft Costs": ["Permits & Fees", "Architectural & Engineering", "Legal & Accounting", "Developer Fees", "Contingency (Soft)"],
@@ -54,36 +53,41 @@ export function LoanApplicationClientPage9({ loanProgram }: { loanProgram: strin
     return initialState;
   });
   
+  const [totals, setTotals] = useState<{ grandTotal: number; sectionTotals: Record<string, number> }>({
+    grandTotal: 0,
+    sectionTotals: {},
+  });
+  
   const [newSectionName, setNewSectionName] = useState('');
 
-  const handleBudgetChange = (section: string, item: string, field: keyof BudgetItem, value: string | number | Date | undefined) => {
-    setBudget(prev => ({
-        ...prev,
-        [section]: {
-            ...prev[section],
-            [item]: {
-                ...prev[section][item],
-                [field]: value
-            }
-        }
-    }))
+  const handleBudgetChange = (section: string, item: string, field: keyof BudgetItem, value: string | Date | undefined) => {
+    setBudget(prev => {
+        const newBudget = { ...prev };
+        if (!newBudget[section]) newBudget[section] = {};
+        if (!newBudget[section][item]) newBudget[section][item] = { cost: '', narrative: '' };
+        (newBudget[section][item] as any)[field] = value;
+        return newBudget;
+    });
   }
   
   const handleAddBudgetItem = (section: string) => {
-    const newItemName = `Custom Item ${Object.keys(budget[section]).length + 1}`;
-    setBudget(prev => ({
-        ...prev,
-        [section]: {
-            ...prev[section],
-            [newItemName]: { ...initialBudgetItem }
-        }
-    }))
+    const newItemName = `Custom Item ${Object.keys(budget[section] || {}).length + 1}`;
+     setBudget(prev => {
+        const newSectionItems = prev[section] ? {...prev[section]} : {};
+        newSectionItems[newItemName] = { ...initialBudgetItem };
+        return {
+            ...prev,
+            [section]: newSectionItems,
+        };
+    });
   }
   
   const handleRemoveBudgetItem = (section: string, item: string) => {
-    const newSection = { ...budget[section] };
-    delete newSection[item];
-    setBudget(prev => ({ ...prev, [section]: newSection }));
+    setBudget(prev => {
+        const newSectionItems = { ...prev[section] };
+        delete newSectionItems[item];
+        return { ...prev, [section]: newSectionItems };
+    });
   }
 
   const handleAddSection = () => {
@@ -94,14 +98,23 @@ export function LoanApplicationClientPage9({ loanProgram }: { loanProgram: strin
     }
   }
 
+  const handleCalculateTotals = () => {
+    let grandTotal = 0;
+    const sectionTotals: Record<string, number> = {};
 
-  const calculateSectionTotal = (section: string) => {
-    return Object.values(budget[section] || {}).reduce((total, item) => total + (Number(item.cost) || 0), 0);
-  }
+    for (const section in budget) {
+      let sectionTotal = 0;
+      for (const item in budget[section]) {
+        const cost = parseFloat(budget[section][item].cost.replace(/[^0-9.-]+/g,"")) || 0;
+        sectionTotal += cost;
+      }
+      sectionTotals[section] = sectionTotal;
+      grandTotal += sectionTotal;
+    }
+    
+    setTotals({ grandTotal, sectionTotals });
+  };
 
-  const calculateGrandTotal = () => {
-    return Object.keys(budget).reduce((total, section) => total + calculateSectionTotal(section), 0);
-  }
 
   const handleContinue = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
@@ -124,10 +137,10 @@ export function LoanApplicationClientPage9({ loanProgram }: { loanProgram: strin
                 <Label htmlFor={`${section}-${item}-cost`} className="text-xs">Cost</Label>
                 <Input 
                     id={`${section}-${item}-cost`} 
-                    type="number"
+                    type="text"
                     placeholder="0.00" 
                     value={budget[section][item].cost || ''}
-                    onChange={(e) => handleBudgetChange(section, item, 'cost', Number(e.target.value))}
+                    onChange={(e) => handleBudgetChange(section, item, 'cost', e.target.value)}
                 />
             </div>
             <div className="space-y-2">
@@ -187,11 +200,11 @@ export function LoanApplicationClientPage9({ loanProgram }: { loanProgram: strin
                             <AccordionTrigger className="text-lg font-semibold hover:no-underline">
                                 <div className="flex justify-between w-full pr-4">
                                     <span>{section}</span>
-                                    <span className="text-primary font-mono">{calculateSectionTotal(section).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>
+                                    <span className="text-primary font-mono">{totals.sectionTotals[section]?.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) || '$0.00'}</span>
                                 </div>
                             </AccordionTrigger>
                             <AccordionContent className="px-1">
-                                {Object.keys(budget[section]).map(item => <BudgetInputRow key={item} section={section} item={item} />)}
+                                {Object.keys(budget[section] || {}).map(item => <BudgetInputRow key={item} section={section} item={item} />)}
                                 <div className="pt-4">
                                      <Button variant="outline" size="sm" onClick={() => handleAddBudgetItem(section)}>
                                         <PlusCircle className="mr-2 h-4 w-4" /> Add Line Item to {section}
@@ -212,11 +225,17 @@ export function LoanApplicationClientPage9({ loanProgram }: { loanProgram: strin
                         <Button onClick={handleAddSection}>Add Section</Button>
                     </div>
                 </div>
-                <div className="mt-6 pt-4 border-t">
-                    <div className="flex justify-between items-center">
-                        <h3 className="text-xl font-bold">Total Work Sunk</h3>
+                 <div className="mt-6 pt-4 border-t space-y-4">
+                    <div className="p-4 bg-primary/5 rounded-lg">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xl font-bold">Total Work Sunk</h3>
+                             <Button onClick={handleCalculateTotals}>
+                                <Calculator className="mr-2 h-4 w-4"/>
+                                Calculate Total
+                            </Button>
+                        </div>
                         <p className="text-2xl font-bold text-green-600 font-mono">
-                            {calculateGrandTotal().toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                            {totals.grandTotal.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
                         </p>
                     </div>
                 </div>
