@@ -33,40 +33,58 @@ const initialBudgetStructure: Record<string, string[]> = {
     "Project Management": ["Supervision", "General Conditions", "Contingency (Hard)", "Final Cleanup"],
 };
 
-const BudgetInputRow = ({ 
+const BudgetInputRow = ({
+    item,
     initialCost,
     initialNarrative,
-    onBlur,
-    onRemove,
-    item,
-}: { 
-    initialCost: string,
-    initialNarrative: string,
-    onBlur: (field: keyof BudgetItem, value: string) => void, 
-    onRemove?: () => void,
-    item: string
+    onBudgetChange,
+    onRemove
+}: {
+    item: string;
+    initialCost: string;
+    initialNarrative: string;
+    onBudgetChange: (field: keyof BudgetItem, value: string) => void;
+    onRemove?: () => void;
 }) => {
     const [cost, setCost] = useState(initialCost);
     const [narrative, setNarrative] = useState(initialNarrative);
-    
+
+    // Sync with parent state if initial values change (e.g. on reset)
+    useEffect(() => {
+        setCost(initialCost);
+    }, [initialCost]);
+
+    useEffect(() => {
+        setNarrative(initialNarrative);
+    }, [initialNarrative]);
+
+
+    const handleCostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setCost(e.target.value);
+        onBudgetChange('cost', e.target.value);
+    };
+
+    const handleNarrativeChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setNarrative(e.target.value);
+        onBudgetChange('narrative', e.target.value);
+    };
+
     return (
         <div className="py-2 border-b grid md:grid-cols-3 gap-4 items-start relative">
             <Label className="font-semibold md:col-span-1 pt-2">{item}</Label>
             <div className="space-y-2 md:col-span-1">
-                <Input 
+                <Input
                     type="text"
-                    placeholder="Cost" 
+                    placeholder="Cost"
                     value={cost}
-                    onChange={(e) => setCost(e.target.value)}
-                    onBlur={() => onBlur('cost', cost)}
+                    onChange={handleCostChange}
                 />
             </div>
             <div className="space-y-2 md:col-span-1">
-                <Textarea 
-                    placeholder="Narrative..." 
+                <Textarea
+                    placeholder="Narrative..."
                     value={narrative}
-                    onChange={(e) => setNarrative(e.target.value)}
-                    onBlur={() => onBlur('narrative', narrative)}
+                    onChange={handleNarrativeChange}
                     rows={1}
                 />
             </div>
@@ -192,7 +210,7 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
                                         item={item}
                                         initialCost={budget[section][item]?.cost || ''}
                                         initialNarrative={budget[section][item]?.narrative || ''}
-                                        onBlur={(field, value) => handleBudgetChange(section, item, field, value)}
+                                        onBudgetChange={(field, value) => handleBudgetChange(section, item, field, value)}
                                         onRemove={!initialBudgetStructure[section]?.includes(item) ? () => handleRemoveBudgetItem(section, item) : undefined}
                                     />
                                 ))}
@@ -219,17 +237,17 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
                 </div>
 
                 <div className="mt-6 pt-4 border-t space-y-4">
-                    <div className="flex justify-between items-center p-4 bg-primary/5 rounded-lg">
-                        <div>
+                    <div className="p-4 bg-primary/5 rounded-lg">
+                        <div className="flex justify-between items-center mb-4">
                             <h3 className="text-xl font-bold">Total Budget</h3>
-                            <p className="text-2xl font-bold text-green-600 font-mono">
-                                {(totals.grandTotal || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
-                            </p>
+                             <Button onClick={handleCalculateTotals}>
+                                <Calculator className="mr-2 h-4 w-4"/>
+                                Calculate Total Budget
+                            </Button>
                         </div>
-                        <Button onClick={handleCalculateTotals}>
-                           <Calculator className="mr-2 h-4 w-4"/>
-                           Calculate Total Budget
-                       </Button>
+                        <p className="text-2xl font-bold text-green-600 font-mono">
+                            {(totals.grandTotal || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                        </p>
                     </div>
                 </div>
             </CardContent>
