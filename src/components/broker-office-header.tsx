@@ -9,18 +9,22 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { UserCircle, LogOut, ChevronDown } from 'lucide-react';
+import { UserCircle, LogOut, ChevronDown, AlertTriangle } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { useAuth } from '@/contexts/auth-context';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
+import { Menu } from 'lucide-react';
 
 export function BrokerOfficeHeader() {
   const { user, logOut } = useAuth();
   const pathname = usePathname();
   const [isClient, setIsClient] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
 
   useEffect(() => {
     setIsClient(true);
@@ -29,6 +33,7 @@ export function BrokerOfficeHeader() {
   const navLinks = [
     { href: '/broker-office', label: 'Pipeline' },
     { href: '/broker-office/documents', label: 'New Application' },
+    { href: '/dashboard/documents', label: 'Loan Actions' },
   ];
 
   if (!isClient) {
@@ -54,7 +59,7 @@ export function BrokerOfficeHeader() {
                     pathname === item.href ? 'text-primary' : 'text-muted-foreground'
                 )}
               >
-                {item.label}
+                {item.href === '/dashboard/documents' ? <Button variant="secondary"><AlertTriangle className="mr-2 h-4 w-4"/> {item.label}</Button> : item.label}
               </Link>
             ))}
           </nav>
@@ -86,6 +91,35 @@ export function BrokerOfficeHeader() {
                     </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              <div className="md:hidden">
+                <Sheet open={isOpen} onOpenChange={setIsOpen}>
+                    <SheetTrigger asChild>
+                        <Button variant="outline" size="icon">
+                            <Menu className="h-6 w-6" />
+                            <span className="sr-only">Open menu</span>
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent side="right">
+                        <div className="flex flex-col gap-6 p-6">
+                            <Link href="/" onClick={() => setIsOpen(false)}>
+                                <Logo />
+                            </Link>
+                            <nav className="flex flex-col gap-4">
+                                {navLinks.map((item) => (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        className="text-muted-foreground hover:text-primary"
+                                        onClick={() => setIsOpen(false)}
+                                    >
+                                        {item.label}
+                                    </Link>
+                                ))}
+                            </nav>
+                        </div>
+                    </SheetContent>
+                </Sheet>
+            </div>
         </div>
       </div>
     </header>
