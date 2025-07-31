@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -17,12 +18,7 @@ import { useState, useEffect } from 'react';
 
 export function BrokerOfficeHeader() {
   const { user, logOut } = useAuth();
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
+  
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -32,8 +28,7 @@ export function BrokerOfficeHeader() {
             </div>
         </Link>
         
-        {isClient ? (
-          <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 px-2">
@@ -60,12 +55,6 @@ export function BrokerOfficeHeader() {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-        ) : (
-           <div className="flex items-center gap-2 h-10">
-                <div className="h-8 w-8 rounded-full bg-muted animate-pulse"></div>
-                <div className="hidden md:block h-5 w-24 rounded-md bg-muted animate-pulse"></div>
-            </div>
-        )}
       </div>
     </header>
   );
