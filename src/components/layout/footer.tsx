@@ -35,7 +35,7 @@ export function Footer() {
   return (
     <footer className="bg-primary/5 border-t">
       <div className="container mx-auto px-4 py-12">
-        <div className="flex flex-col items-center text-center">
+        <div className="flex flex-col items-center text-center mb-8">
             <Link href="/" className="inline-block">
               <Logo className="h-auto w-56" />
             </Link>
@@ -44,7 +44,7 @@ export function Footer() {
             </p>
           </div>
         
-        <div className="mt-8 pt-8 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
           <div>
             <h3 className="font-headline font-semibold text-primary">Lending</h3>
               <ul className="mt-4 space-y-2">
