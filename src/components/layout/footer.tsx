@@ -33,8 +33,8 @@ export function Footer() {
   }
   
   return (
-    <footer className="bg-primary/5 border-t">
-      <div className="container mx-auto px-4 py-12 flex flex-col">
+    <footer className="bg-primary/5">
+      <div className="container mx-auto px-4 py-12">
         <div className="flex flex-col items-center text-center mb-8">
             <Link href="/" className="inline-block">
               <Logo className="h-auto w-56" />
