@@ -14,9 +14,19 @@ import { UserCircle, LogOut, ChevronDown } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { useAuth } from '@/contexts/auth-context';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useState, useEffect } from 'react';
 
 export function BrokerOfficeHeader() {
   const { user, logOut } = useAuth();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return null; // Don't render on the server
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -26,6 +36,15 @@ export function BrokerOfficeHeader() {
               <Logo />
             </div>
         </Link>
+        
+        <nav className="flex items-center gap-6">
+            <Link href="/broker-office" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+                Pipeline
+            </Link>
+             <Link href="/broker-office/documents" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+                New Application
+            </Link>
+        </nav>
 
         <div className="flex items-center gap-4">
           <DropdownMenu>
