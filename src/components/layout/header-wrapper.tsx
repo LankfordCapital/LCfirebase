@@ -3,7 +3,6 @@
 
 import { usePathname } from 'next/navigation';
 import { Header } from '@/components/layout/header';
-import { Footer } from '@/components/layout/footer';
 import { BorrowerDashboardHeader } from '@/components/borrower-dashboard-header';
 import { BrokerOfficeHeader } from '@/components/broker-office-header';
 import { WorkforceOfficeHeader } from '@/components/workforce-office-header';
@@ -22,22 +21,17 @@ export function HeaderWrapper() {
   const isBorrowerDashboard = pathname.startsWith('/dashboard');
 
   let HeaderComponent = Header;
-  let showFooter = true;
   let showAIAssistant = true;
   
   if (isAuthPage) {
     HeaderComponent = () => null;
-    showFooter = false;
     showAIAssistant = false;
   } else if (isBorrowerDashboard) {
     HeaderComponent = BorrowerDashboardHeader;
-    showFooter = false;
   } else if (isBrokerOffice) {
     HeaderComponent = BrokerOfficeHeader;
-    showFooter = false;
   } else if (isWorkforceOffice) {
     HeaderComponent = WorkforceOfficeHeader;
-    showFooter = false;
   }
 
   return (
@@ -56,7 +50,6 @@ export function HeaderWrapper() {
           <AIAssistant />
         </>
       )}
-      {showFooter && <Footer />}
     </>
   );
 }

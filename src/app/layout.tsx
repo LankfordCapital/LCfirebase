@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { Providers } from '@/components/providers';
 import { HeaderWrapper } from '@/components/layout/header-wrapper';
+import { Footer } from '@/components/layout/footer';
 
 const fontBody = Inter({
   subsets: ['latin'],
@@ -40,6 +41,7 @@ export default function RootLayout({
         <Providers>
             <HeaderWrapper />
             <main className="flex-1">{children}</main>
+            <Footer />
             <Toaster />
         </Providers>
       </body>

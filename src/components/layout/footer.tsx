@@ -1,10 +1,12 @@
 
+'use client';
 
 import Link from 'next/link';
 import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
 import { Twitter, Linkedin, Facebook } from 'lucide-react';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 
 const lendingProducts1 = [
     { href: '/lending/residential-noo', label: 'Residential NOO' },
@@ -20,6 +22,14 @@ const lendingProducts2 = [
 ]
 
 export function Footer() {
+  const pathname = usePathname();
+  const noFooterPaths = ['/dashboard', '/broker-office', '/workforce-office', '/auth'];
+  const shouldHideFooter = noFooterPaths.some(path => pathname.startsWith(path));
+
+  if (shouldHideFooter) {
+    return null;
+  }
+  
   return (
     <footer className="bg-primary/5 border-t">
       <div className="container mx-auto px-4 py-12">
