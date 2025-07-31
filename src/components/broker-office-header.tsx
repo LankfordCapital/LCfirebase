@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -10,7 +9,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { FileText, UserCircle, LogOut, ChevronDown } from 'lucide-react';
+import { UserCircle, LogOut, ChevronDown } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { useAuth } from '@/contexts/auth-context';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
