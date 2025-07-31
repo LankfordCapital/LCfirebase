@@ -1,8 +1,6 @@
 
 'use client';
 
-import { BrokerOfficeHeader } from "@/components/broker-office-header";
-
 export default function BrokerOfficeLayout({
   children,
 }: {
@@ -10,7 +8,6 @@ export default function BrokerOfficeLayout({
 }) {
   return (
         <div className="bg-primary/5 min-h-screen">
-          <BrokerOfficeHeader />
           <main className="p-4 md:p-8">
             {children}
           </main>
