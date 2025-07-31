@@ -70,12 +70,12 @@ export function Footer() {
           </div>
         </div>
         
-         <div className="mt-8 pt-8 text-center text-sm text-muted-foreground border-t">
-          <div className="flex justify-center mb-4">
-            <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" alt="Lankford Capital Icon" width={40} height={40} />
-          </div>
-          <p>&copy; {new Date().getFullYear()} Lankford Capital. All rights reserved.</p>
-           <div className="mt-4 flex justify-center space-x-2">
+         <div className="mt-8 pt-8 text-sm text-muted-foreground border-t flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+                <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" alt="Lankford Capital Icon" width={30} height={30} />
+                <span>&copy; {new Date().getFullYear()} Lankford Capital. All rights reserved.</span>
+            </div>
+           <div className="flex items-center space-x-1">
               <Button variant="ghost" size="icon" asChild>
                 <a href="#" aria-label="Twitter">
                   <Twitter className="h-5 w-5" />
