@@ -1,10 +1,11 @@
+
 import { AIPReUnderwriterClient } from "@/components/ai-pre-underwriter-client"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, FileText } from "lucide-react";
+import { AlertCircle, FileText, HelpCircle } from "lucide-react";
 import Link from "next/link";
 
 const missingDocuments = [
@@ -29,9 +30,15 @@ export default function DocumentsPage() {
               <CardContent className="space-y-4">
                   {missingDocuments.map((doc) => (
                        <div key={doc.id} className="p-3 rounded-md border bg-muted/20">
-                          <div className="flex items-center space-x-3">
-                            <Checkbox id={doc.id} />
-                            <Label htmlFor={doc.id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{doc.name}</Label>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                                <Checkbox id={doc.id} />
+                                <Label htmlFor={doc.id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{doc.name}</Label>
+                            </div>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <HelpCircle className="h-4 w-4" />
+                                <span className="sr-only">Ask a question about {doc.name}</span>
+                            </Button>
                           </div>
                           {doc.note && (
                             <p className="mt-2 ml-7 text-xs text-muted-foreground bg-background p-2 rounded-md border">{doc.note}</p>
