@@ -8,18 +8,16 @@ import { Twitter, Linkedin, Facebook } from 'lucide-react';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
-const lendingProducts1 = [
+const lendingProducts = [
     { href: '/lending/residential-noo', label: 'Residential NOO' },
     { href: '/lending/commercial', label: 'Commercial' },
     { href: '/lending/industrial', label: 'Industrial' },
     { href: '/lending/land-acquisition', label: 'Land Acquisition' },
-];
-
-const lendingProducts2 = [
     { href: '/lending/mezzanine-loans', label: 'Mezzanine Loans' },
     { href: '/lending/mobilization-funding', label: 'Mobilization Funding' },
     { href: '/lending/equipment-financing', label: 'Equipment Financing' },
-]
+];
+
 
 export function Footer() {
   const pathname = usePathname();
@@ -62,24 +60,16 @@ export function Footer() {
               </Button>
             </div>
           </div>
-        <div className="mt-8 pt-8 border-t grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left">
+        <div className="mt-8 pt-8 border-t grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
           <div className="md:col-span-1">
               <div>
                 <h3 className="font-headline font-semibold text-primary">Lending</h3>
                   <ul className="mt-4 space-y-2">
-                      {lendingProducts1.map(item => (
+                      {lendingProducts.map(item => (
                            <li key={item.href}><Link href={item.href} className="text-sm text-muted-foreground hover:text-primary">{item.label}</Link></li>
                       ))}
                   </ul>
               </div>
-          </div>
-           <div className="md:col-span-1">
-              <h3 className="font-headline font-semibold text-primary invisible hidden md:block">More</h3>
-               <ul className="mt-4 space-y-2 md:mt-11">
-                  {lendingProducts2.map(item => (
-                       <li key={item.href}><Link href={item.href} className="text-sm text-muted-foreground hover:text-primary">{item.label}</Link></li>
-                  ))}
-              </ul>
           </div>
            <div>
             <h3 className="font-headline font-semibold text-primary">Company</h3>
