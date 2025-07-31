@@ -141,7 +141,7 @@ export default function DashboardPage() {
                         </div>
                     ))}
                      <Button className="w-full mt-2" asChild>
-                        <Link href="/dashboard/profile">Upload Documents</Link>
+                        <Link href="/dashboard/documents">Upload Documents</Link>
                     </Button>
                 </CardContent>
             </Card>
