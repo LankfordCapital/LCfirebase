@@ -60,6 +60,14 @@ export function Footer() {
               </Button>
             </div>
           </div>
+
+        <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
+          <div className="flex justify-center mb-4">
+            <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" alt="Lankford Capital Icon" width={40} height={40} />
+          </div>
+          <p>&copy; {new Date().getFullYear()} Lankford Capital. All rights reserved.</p>
+        </div>
+
         <div className="mt-8 pt-8 border-t grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
           <div>
             <h3 className="font-headline font-semibold text-primary">Lending</h3>
@@ -84,12 +92,6 @@ export function Footer() {
               <li><Link href="/terms-of-service" className="text-sm text-muted-foreground hover:text-primary">Terms of Service</Link></li>
             </ul>
           </div>
-        </div>
-        <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
-          <div className="flex justify-center mb-4">
-            <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" alt="Lankford Capital Icon" width={40} height={40} />
-          </div>
-          <p>&copy; {new Date().getFullYear()} Lankford Capital. All rights reserved.</p>
         </div>
       </div>
     </footer>
