@@ -31,6 +31,9 @@ export function BrokerOfficeHeader() {
             <Link href="/broker-office/documents" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
                 New Application
             </Link>
+             <Link href="/broker-office/documents" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+                Loan Actions
+            </Link>
              <Link href="/broker-office" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
                 Pipeline
             </Link>
