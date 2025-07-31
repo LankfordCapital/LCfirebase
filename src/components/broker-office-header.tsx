@@ -25,6 +25,7 @@ export function BrokerOfficeHeader() {
   const pathname = usePathname();
   const [isClient, setIsClient] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [hasMissingDocs, setHasMissingDocs] = useState(true); // Mock state for missing docs
 
 
   useEffect(() => {
@@ -52,16 +53,17 @@ export function BrokerOfficeHeader() {
           </Link>
           <nav className="hidden md:flex items-center gap-6">
             {navLinks.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                    'text-sm font-medium transition-colors hover:text-primary',
-                    pathname === item.href ? 'text-primary' : 'text-muted-foreground'
-                )}
-              >
-                {item.href === '/broker-office/loan-actions' ? <Button variant="secondary"><AlertTriangle className="mr-2 h-4 w-4"/> {item.label}</Button> : item.label}
-              </Link>
+                <Button key={item.href} asChild variant="link" className={cn('text-sm font-medium transition-colors hover:text-primary', pathname === item.href ? 'text-primary' : 'text-muted-foreground')}>
+                  <Link
+                    href={item.href}
+                    className={cn(
+                        item.href === '/broker-office/loan-actions' && hasMissingDocs && 'blinking-gold rounded-md p-2'
+                    )}
+                  >
+                    {item.href === '/broker-office/loan-actions' && hasMissingDocs && <AlertTriangle className="mr-2 h-4 w-4"/>}
+                    {item.label}
+                  </Link>
+                </Button>
             ))}
           </nav>
         </div>

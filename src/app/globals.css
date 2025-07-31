@@ -82,3 +82,17 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  @keyframes blink {
+    50% {
+      background-color: hsl(var(--primary) / 0.8);
+      color: hsl(var(--primary-foreground));
+    }
+  }
+  .blinking-gold {
+    animation: blink 1.5s infinite;
+    background-color: hsl(var(--primary) / 0.2);
+    color: hsl(var(--primary));
+  }
+}
