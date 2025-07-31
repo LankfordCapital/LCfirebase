@@ -69,8 +69,9 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        
-         <div className="mt-8 pt-8 text-sm text-muted-foreground border-t flex flex-col md:flex-row items-center justify-between gap-4">
+      </div>
+      <div className="border-t">
+         <div className="container mx-auto px-4 py-6 text-sm text-muted-foreground flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
                 <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" alt="Lankford Capital Icon" width={30} height={30} />
                 <span>&copy; {new Date().getFullYear()} Lankford Capital. All rights reserved.</span>
