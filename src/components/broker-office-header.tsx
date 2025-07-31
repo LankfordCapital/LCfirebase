@@ -15,23 +15,47 @@ import { Logo } from '@/components/logo';
 import { useAuth } from '@/contexts/auth-context';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 export function BrokerOfficeHeader() {
   const { user, logOut } = useAuth();
   const [isClient, setIsClient] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
-  
+
+  const navLinks = [
+    { href: '/broker-office', label: 'Pipeline' },
+    { href: '/broker-office/documents', label: 'New Application' },
+  ];
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2">
-           <div className="font-headline text-2xl tracking-tight flex items-baseline gap-1">
-              <Logo />
+        <div className="flex items-center gap-6">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="font-headline text-2xl tracking-tight flex items-baseline gap-1">
+                <Logo />
             </div>
-        </Link>
+          </Link>
+          <nav className="hidden md:flex items-center gap-6">
+            {navLinks.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                    'text-sm font-medium transition-colors hover:text-primary',
+                    pathname === item.href ? 'text-primary' : 'text-muted-foreground'
+                )}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
         
         <div className="flex items-center gap-4">
             {isClient && (
