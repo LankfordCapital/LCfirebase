@@ -91,7 +91,7 @@
     }
   }
   .blinking-gold {
-    animation: blink 1.5s infinite;
+    animation: blink 2.5s infinite;
     background-color: hsl(var(--primary) / 0.2);
     color: hsl(var(--primary));
   }
