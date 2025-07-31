@@ -65,20 +65,12 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
   };
   
   const handleNextPage = () => {
-    const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
+    const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&g/, 'and');
     const isConstructionOrRehab = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('rehab');
-    const isLandAcquisition = loanProgram.toLowerCase().includes('land acquisition');
-    const isMezzanine = loanProgram.toLowerCase().includes('mezzanine');
-    const isMobilization = loanProgram.toLowerCase().includes('mobilization funding');
-    const isEquipmentFinancing = loanProgram.toLowerCase().includes('equipment financing');
-
 
     if (isConstructionOrRehab) {
       router.push(`/dashboard/application/${programSlug}/page-6`);
-    } else if (isLandAcquisition || isMezzanine || isMobilization || isEquipmentFinancing) {
-      router.push(`/dashboard/application/${programSlug}/page-8`);
-    }
-     else {
+    } else {
       router.push(`/dashboard/application/${programSlug}/page-8`);
     }
   }
@@ -92,7 +84,7 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
   return (
     <div className="space-y-6">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 5 of 12</h1>
+            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 5 of 11</h1>
             <p className="text-muted-foreground">{loanProgram.replace(/Noo/g, 'NOO').replace(/Dscr/g, 'DSCR')}</p>
         </div>
         
@@ -233,7 +225,7 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
                <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 4
             </Button>
             <Button onClick={handleNextPage}>
-                Continue to Page 6 <ArrowRight className="ml-2 h-4 w-4" />
+                Continue <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
         </div>
     </div>

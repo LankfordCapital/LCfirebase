@@ -74,7 +74,7 @@ export function Header() {
             </Link>
           ))}
            <Button asChild className="text-black hover:bg-primary/90">
-              <Link href="/broker">For Brokers</Link>
+              <Link href="/lending/commercial">For Brokers</Link>
             </Button>
         </nav>
 
@@ -147,7 +147,7 @@ export function Header() {
                         {item.label}
                     </Link>
                     ))}
-                    <Link href="/broker" className="font-bold" onClick={() => setIsOpen(false)}>For Brokers</Link>
+                    <Link href="/lending/commercial" className="font-bold" onClick={() => setIsOpen(false)}>For Brokers</Link>
                 </div>
                 <hr />
                 <div className="flex flex-col gap-2">

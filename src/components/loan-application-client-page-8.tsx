@@ -50,21 +50,13 @@ export default function LoanApplicationClientPage8({ loanProgram }: { loanProgra
   };
 
   const handleGoBack = () => {
-    // For non-construction, page 5 links here, so we go back to 5.
-    // For construction, page 7 links here, so we go back to 7.
-    const isConstructionOrRehab = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('rehab');
-     if (isConstructionOrRehab) {
-        router.back(); // Goes back to page 7
-     } else {
-        const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&g/, 'and');
-        router.push(`/dashboard/application/${programSlug}/page-5`);
-     }
+    router.back();
   }
 
   return (
     <div className="space-y-6">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 8 of 12</h1>
+            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 8 of 11</h1>
             <p className="text-muted-foreground">{loanProgram.replace(/Dscr/g, 'DSCR')}</p>
         </div>
         
