@@ -23,7 +23,32 @@ export function Footer() {
   return (
     <footer className="bg-primary/5 border-t">
       <div className="container mx-auto px-4 py-12 text-center">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="flex flex-col items-center">
+            <Link href="/">
+              <Logo className="h-auto w-48" />
+            </Link>
+            <p className="mt-4 text-sm text-muted-foreground">
+              Your trusted partner in financial growth.
+            </p>
+            <div className="mt-4 flex space-x-2">
+              <Button variant="ghost" size="icon" asChild>
+                <a href="#" aria-label="Twitter">
+                  <Twitter className="h-5 w-5" />
+                </a>
+              </Button>
+              <Button variant="ghost" size="icon" asChild>
+                <a href="#" aria-label="LinkedIn">
+                  <Linkedin className="h-5 w-5" />
+                </a>
+              </Button>
+               <Button variant="ghost" size="icon" asChild>
+                <a href="#" aria-label="Facebook">
+                  <Facebook className="h-5 w-5" />
+                </a>
+              </Button>
+            </div>
+          </div>
+        <div className="mt-8 pt-8 border-t grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-1">
               <div>
                 <h3 className="font-headline font-semibold text-primary">Lending</h3>
@@ -58,31 +83,6 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <div className="mt-8 pt-8 border-t flex flex-col items-center">
-            <Link href="/">
-              <Logo className="h-auto w-48" />
-            </Link>
-            <p className="mt-4 text-sm text-muted-foreground">
-              Your trusted partner in financial growth.
-            </p>
-            <div className="mt-4 flex space-x-2">
-              <Button variant="ghost" size="icon" asChild>
-                <a href="#" aria-label="Twitter">
-                  <Twitter className="h-5 w-5" />
-                </a>
-              </Button>
-              <Button variant="ghost" size="icon" asChild>
-                <a href="#" aria-label="LinkedIn">
-                  <Linkedin className="h-5 w-5" />
-                </a>
-              </Button>
-               <Button variant="ghost" size="icon" asChild>
-                <a href="#" aria-label="Facebook">
-                  <Facebook className="h-5 w-5" />
-                </a>
-              </Button>
-            </div>
-          </div>
         <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
           <div className="flex justify-center mb-4">
             <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" alt="Lankford Capital Icon" width={40} height={40} />
