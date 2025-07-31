@@ -13,7 +13,7 @@ export default function WorkforceOfficeLayout({
     // <ProtectedRoute redirectTo="/auth/workforce-signin">
         <div className="flex flex-col min-h-screen">
           <WorkforceOfficeHeader />
-          <main className="flex-1 bg-primary/5">
+          <main className="flex-1 bg-primary/5 p-4 md:p-8">
             {children}
           </main>
         </div>
