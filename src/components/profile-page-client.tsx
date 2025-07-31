@@ -242,7 +242,7 @@ export default function ProfilePage() {
 
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4 md:p-8">
       <div>
         <h1 className="font-headline text-3xl font-bold">Your Profile</h1>
         <p className="text-muted-foreground">Manage your personal and contact information.</p>
