@@ -17,21 +17,6 @@ import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
-const BrokerOfficeHeaderSkeleton = () => (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-            <div className="flex items-center gap-6">
-                <div className="h-6 w-32 rounded-md bg-muted animate-pulse"></div>
-                <div className="hidden md:flex items-center gap-6">
-                    <div className="h-5 w-20 rounded-md bg-muted animate-pulse"></div>
-                    <div className="h-5 w-20 rounded-md bg-muted animate-pulse"></div>
-                </div>
-            </div>
-            <div className="h-8 w-24 rounded-md bg-muted animate-pulse"></div>
-        </div>
-    </header>
-);
-
 export function BrokerOfficeHeader() {
   const { user, logOut } = useAuth();
   const pathname = usePathname();
@@ -45,11 +30,11 @@ export function BrokerOfficeHeader() {
     { href: '/broker-office', label: 'Pipeline' },
     { href: '/broker-office/documents', label: 'New Application' },
   ];
-  
-  if (!isClient) {
-    return <BrokerOfficeHeaderSkeleton />;
-  }
 
+  if (!isClient) {
+    return null;
+  }
+  
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
