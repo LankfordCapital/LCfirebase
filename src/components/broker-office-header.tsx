@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -30,7 +31,7 @@ export function BrokerOfficeHeader() {
     { href: '/broker-office', label: 'Pipeline' },
     { href: '/broker-office/documents', label: 'New Application' },
   ];
-
+  
   if (!isClient) {
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -42,7 +43,7 @@ export function BrokerOfficeHeader() {
                         <div className="h-5 w-20 rounded-md bg-muted animate-pulse"></div>
                     </div>
                 </div>
-                <div className="flex items-center gap-2 h-10">
+                <div className="flex items-center gap-2">
                     <div className="h-8 w-8 rounded-full bg-muted animate-pulse"></div>
                     <div className="hidden md:block h-5 w-24 rounded-md bg-muted animate-pulse"></div>
                 </div>
@@ -50,6 +51,7 @@ export function BrokerOfficeHeader() {
         </header>
     );
   }
+
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
