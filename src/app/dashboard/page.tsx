@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { DollarSign, FileCheck, FileClock, PlusCircle, AlertCircle, Calendar, Briefcase, UserCheck } from "lucide-react";
+import { DollarSign, FileCheck, FileClock, PlusCircle, AlertCircle, Calendar, Briefcase, UserCheck, ArrowRight } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/auth-context";
@@ -17,7 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const summaryCards = [
     { title: "Active Loans", value: "1", icon: <DollarSign className="h-4 w-4 text-muted-foreground" /> },
     { title: "Documents Submitted", value: "8", icon: <FileCheck className="h-4 w-4 text-muted-foreground" /> },
-    { title: "Pending Actions", value: "2", icon: <FileClock className="h-4 w-4 text-muted-foreground" /> },
+    { title: "Pending Actions", value: "2", icon: <FileClock className="h-4 w-4 text-muted-foreground" />, cta: { href: "/dashboard/profile", text: "View Actions"} },
 ];
 
 const loanApplications = [
@@ -69,6 +69,14 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">{card.value}</div>
+                     {card.cta && (
+                        <Button variant="link" asChild className="p-0 text-xs">
+                          <Link href={card.cta.href}>
+                            {card.cta.text}
+                            <ArrowRight className="ml-1 h-3 w-3" />
+                          </Link>
+                        </Button>
+                      )}
                 </CardContent>
             </Card>
         ))}
