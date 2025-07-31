@@ -21,7 +21,7 @@ interface Message {
 }
 
 export function AIAssistant() {
-  const { isAssistantOpen, setAssistantOpen } = useUI();
+  const { isAssistantOpen, closeAssistant, assistantContext } = useUI();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -29,16 +29,22 @@ export function AIAssistant() {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (isAssistantOpen && messages.length === 0) {
+    if (isAssistantOpen) {
+      const initialText = assistantContext
+        ? `Hello! I see you have a question about "${assistantContext.replace(/i have a question about the|document/gi, '').replace(/"/g, '').trim()}". How can I help you with that?`
+        : "Hello! I'm Lankford Capital's AI Assistant. How can I help you today? Feel free to ask about our loan products, eligibility, or the application process.";
+
+      if (messages.length === 0 || assistantContext) {
         setMessages([
-            {
-                id: 'initial',
-                text: "Hello! I'm Lankford Capital's AI Assistant. How can I help you today? Feel free to ask about our loan products, eligibility, or the application process.",
-                sender: 'ai'
-            }
-        ])
+          {
+            id: 'initial',
+            text: initialText,
+            sender: 'ai'
+          }
+        ]);
+      }
     }
-  }, [isAssistantOpen, messages.length]);
+  }, [isAssistantOpen, assistantContext, messages.length]);
 
 
   useEffect(() => {
@@ -94,16 +100,7 @@ export function AIAssistant() {
   };
 
   return (
-    <>
-      <Button
-        className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-2xl z-50"
-        size="icon"
-        onClick={() => setAssistantOpen(true)}
-      >
-        <MessageSquare className="h-8 w-8" />
-        <span className="sr-only">Open AI Assistant</span>
-      </Button>
-      <Sheet open={isAssistantOpen} onOpenChange={setAssistantOpen}>
+      <Sheet open={isAssistantOpen} onOpenChange={(open) => !open && closeAssistant()}>
         <SheetContent className="flex flex-col">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2 font-headline text-xl">
@@ -175,6 +172,5 @@ export function AIAssistant() {
           </SheetFooter>
         </SheetContent>
       </Sheet>
-    </>
   );
 }

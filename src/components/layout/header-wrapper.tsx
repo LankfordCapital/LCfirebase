@@ -7,38 +7,56 @@ import { Footer } from '@/components/layout/footer';
 import { BorrowerDashboardHeader } from '@/components/borrower-dashboard-header';
 import { BrokerOfficeHeader } from '@/components/broker-office-header';
 import { WorkforceOfficeHeader } from '@/components/workforce-office-header';
+import { AIAssistant } from '../ai-assistant';
+import { Button } from '../ui/button';
+import { MessageSquare } from 'lucide-react';
+import { useUI } from '@/contexts/ui-context';
 
 export function HeaderWrapper() {
   const pathname = usePathname();
+  const { openAssistant } = useUI();
 
   const isAuthPage = pathname.startsWith('/auth') || pathname.startsWith('/book-appointment');
   const isBrokerOffice = pathname.startsWith('/broker-office');
   const isWorkforceOffice = pathname.startsWith('/workforce-office');
   const isBorrowerDashboard = pathname.startsWith('/dashboard');
 
-  if (isAuthPage) {
-    return null; // No header or footer on auth pages
-  }
-
-  if (isBorrowerDashboard) {
-    return <BorrowerDashboardHeader />;
-  }
-
-  if (isBrokerOffice) {
-    return <BrokerOfficeHeader />;
-  }
+  let HeaderComponent = Header;
+  let showFooter = true;
+  let showAIAssistant = true;
   
-  if (isWorkforceOffice) {
-    return <WorkforceOfficeHeader />;
+  if (isAuthPage) {
+    HeaderComponent = () => null;
+    showFooter = false;
+    showAIAssistant = false;
+  } else if (isBorrowerDashboard) {
+    HeaderComponent = BorrowerDashboardHeader;
+    showFooter = false;
+  } else if (isBrokerOffice) {
+    HeaderComponent = BrokerOfficeHeader;
+    showFooter = false;
+  } else if (isWorkforceOffice) {
+    HeaderComponent = WorkforceOfficeHeader;
+    showFooter = false;
   }
 
-  // Default public-facing header and footer
   return (
     <>
-      <Header />
-      <div className="flex-1" /> {/* This is a placeholder for the main content that is outside this component */}
-      <Footer />
+      <HeaderComponent />
+      {showAIAssistant && (
+         <>
+          <Button
+            className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-2xl z-50"
+            size="icon"
+            onClick={() => openAssistant()}
+          >
+            <MessageSquare className="h-8 w-8" />
+            <span className="sr-only">Open AI Assistant</span>
+          </Button>
+          <AIAssistant />
+        </>
+      )}
+      {showFooter && <Footer />}
     </>
   );
 }
-

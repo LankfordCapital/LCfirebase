@@ -4,7 +4,6 @@ import { Inter, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
-import { AIAssistant } from '@/components/ai-assistant';
 import { Providers } from '@/components/providers';
 import { HeaderWrapper } from '@/components/layout/header-wrapper';
 
@@ -37,11 +36,10 @@ export default function RootLayout({
           <link rel="icon" href="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" />
           <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" />
       </head>
-      <body className="font-body antialiased">
+      <body className="font-body antialiased flex flex-col min-h-screen">
         <Providers>
             <HeaderWrapper />
-            <main>{children}</main>
-            <AIAssistant />
+            <main className="flex-1">{children}</main>
             <Toaster />
         </Providers>
       </body>

@@ -19,7 +19,7 @@ const missingDocuments = [
 ];
 
 export default function DocumentsPage() {
-  const { setAssistantOpen } = useUI();
+  const { openAssistant } = useUI();
   
   return (
     <div className="space-y-6 p-4 md:p-6 lg:p-8">
@@ -40,7 +40,7 @@ export default function DocumentsPage() {
                                 <Checkbox id={doc.id} />
                                 <Label htmlFor={doc.id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{doc.name}</Label>
                             </div>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setAssistantOpen(true)}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openAssistant(`I have a question about the "${doc.name}" document.`)}>
                                 <HelpCircle className="h-4 w-4" />
                                 <span className="sr-only">Ask a question about {doc.name}</span>
                             </Button>
