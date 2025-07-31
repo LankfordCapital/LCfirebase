@@ -23,10 +23,14 @@ const lendingProducts2 = [
 
 export function Footer() {
   const pathname = usePathname();
-  const noFooterPaths = ['/dashboard', '/broker-office', '/workforce-office', '/auth'];
-  const shouldHideFooter = noFooterPaths.some(path => pathname.startsWith(path));
+  const noFooterPaths = ['/auth', '/book-appointment'];
 
-  if (shouldHideFooter) {
+  // This check hides the footer on specific dashboard routes
+  if (pathname.startsWith('/dashboard') || pathname.startsWith('/broker-office') || pathname.startsWith('/workforce-office')) {
+    return null;
+  }
+  
+   if (noFooterPaths.some(path => pathname.startsWith(path))) {
     return null;
   }
   
@@ -34,8 +38,8 @@ export function Footer() {
     <footer className="bg-primary/5 border-t">
       <div className="container mx-auto px-4 py-12">
         <div className="flex flex-col items-center text-center">
-            <Link href="/">
-              <Logo className="h-auto w-48" />
+            <Link href="/" className="mx-auto">
+              <Logo className="h-auto w-56" />
             </Link>
             <p className="mt-4 text-sm text-muted-foreground">
               Your trusted partner in financial growth.
