@@ -7,7 +7,7 @@ import { Twitter, Linkedin, Facebook } from 'lucide-react';
 import Image from 'next/image';
 
 const lendingProducts1 = [
-    { href: '/lending/residential-NOO', label: 'Residential NOO' },
+    { href: '/lending/residential-noo', label: 'Residential NOO' },
     { href: '/lending/commercial', label: 'Commercial' },
     { href: '/lending/industrial', label: 'Industrial' },
     { href: '/lending/land-acquisition', label: 'Land Acquisition' },
@@ -60,8 +60,8 @@ export function Footer() {
               </div>
           </div>
            <div className="md:col-span-1">
-              <h3 className="font-headline font-semibold text-primary invisible">More</h3>
-               <ul className="mt-4 space-y-2">
+              <h3 className="font-headline font-semibold text-primary invisible hidden md:block">More</h3>
+               <ul className="mt-4 space-y-2 md:mt-11">
                   {lendingProducts2.map(item => (
                        <li key={item.href}><Link href={item.href} className="text-sm text-muted-foreground hover:text-primary">{item.label}</Link></li>
                   ))}
