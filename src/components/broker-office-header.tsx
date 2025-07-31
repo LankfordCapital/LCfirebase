@@ -32,12 +32,6 @@ export function BrokerOfficeHeader() {
             </div>
         </Link>
         
-        <nav className="flex items-center gap-6">
-            <Link href="/broker-office" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
-                Pipeline
-            </Link>
-        </nav>
-
         <div className="flex items-center gap-4">
           {isClient && (
             <DropdownMenu>
