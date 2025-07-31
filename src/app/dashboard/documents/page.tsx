@@ -1,7 +1,6 @@
 
 'use client';
 
-import { AIPReUnderwriterClient } from "@/components/ai-pre-underwriter-client"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,12 +10,28 @@ import { useUI } from "@/contexts/ui-context";
 import { AlertCircle, FileText, HelpCircle } from "lucide-react";
 import Link from "next/link";
 
-const missingDocuments = [
-    { id: "doc1", name: "2023 Personal Tax Returns", note: "Please provide the complete, signed return including all schedules." },
-    { id: "doc2", name: "2023 Business Tax Returns", note: "Must be the final version filed with the IRS." },
-    { id: "doc3", name: "Signed Purchase Agreement", note: null },
-    { id: "doc4", name: "Driver's License", note: "Ensure the image is clear and not expired." },
+const loanFiles = [
+    { 
+        id: "LL-00124", 
+        property: "123 Main St, Anytown",
+        type: "Fix and Flip",
+        missingDocuments: [
+            { id: "doc1", name: "2023 Personal Tax Returns", note: "Please provide the complete, signed return including all schedules." },
+            { id: "doc4", name: "Driver's License", note: "Ensure the image is clear and not expired." },
+        ]
+    },
+    { 
+        id: "LL-00127",
+        property: "789 Pine Ln, Otherville",
+        type: "Ground Up Construction",
+        missingDocuments: [
+            { id: "doc2", name: "2023 Business Tax Returns", note: "Must be the final version filed with the IRS." },
+            { id: "doc3", name: "Signed Purchase Agreement", note: null },
+            { id: "doc5", name: "Approved Plans", note: "Must be stamped by the city." },
+        ]
+    }
 ];
+
 
 export default function DocumentsPage() {
   const { openAssistant } = useUI();
@@ -24,23 +39,28 @@ export default function DocumentsPage() {
   return (
     <div className="space-y-6 p-4 md:p-6 lg:p-8">
        <div className="space-y-6">
-          <Card>
+        {loanFiles.map(loan => (
+          <Card key={loan.id}>
               <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                       <AlertCircle className="h-5 w-5 text-destructive" />
-                      Missing Documents
+                      Missing Documents for {loan.property}
                   </CardTitle>
-                  <CardDescription>Please upload the following documents to proceed. Notes from our team are included below each item.</CardDescription>
+                  <CardDescription>
+                      Loan ID: {loan.id} | Type: <Badge variant="secondary">{loan.type}</Badge>
+                      <br/>
+                      Please upload the following documents to proceed. Notes from our team are included below each item.
+                  </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                  {missingDocuments.map((doc) => (
+                  {loan.missingDocuments.map((doc) => (
                        <div key={doc.id} className="p-3 rounded-md border bg-muted/20">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-3">
-                                <Checkbox id={doc.id} />
-                                <Label htmlFor={doc.id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{doc.name}</Label>
+                                <Checkbox id={`${loan.id}-${doc.id}`} />
+                                <Label htmlFor={`${loan.id}-${doc.id}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{doc.name}</Label>
                             </div>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openAssistant(`I have a question about the "${doc.name}" document.`)}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openAssistant(`I have a question about the "${doc.name}" document for my loan on ${loan.property}.`)}>
                                 <HelpCircle className="h-4 w-4" />
                                 <span className="sr-only">Ask a question about {doc.name}</span>
                             </Button>
@@ -55,6 +75,7 @@ export default function DocumentsPage() {
                   </Button>
               </CardContent>
           </Card>
+        ))}
        </div>
     </div>
   )
