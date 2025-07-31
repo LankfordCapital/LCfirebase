@@ -66,7 +66,7 @@ export default function DocumentsPage() {
                        <div key={doc.id} className="p-3 rounded-md border bg-muted/20">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-3">
-                                <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" alt="Lankford Capital Icon" width={20} height={20} />
+                                <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" alt="Lankford Capital Icon" width={28} height={28} />
                                 <Label htmlFor={`${loan.id}-${doc.id}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{doc.name}</Label>
                             </div>
                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openAssistant(`I have a question about the "${doc.name}" document for my loan on ${loan.property}.`)}>
@@ -75,7 +75,7 @@ export default function DocumentsPage() {
                             </Button>
                           </div>
                           {doc.note && (
-                            <p className="mt-2 ml-7 text-xs text-muted-foreground bg-background p-2 rounded-md border">{doc.note}</p>
+                            <p className="mt-2 ml-11 text-xs text-muted-foreground bg-background p-2 rounded-md border">{doc.note}</p>
                           )}
                       </div>
                   ))}
