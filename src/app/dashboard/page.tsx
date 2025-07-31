@@ -14,10 +14,17 @@ import { useAuth } from "@/contexts/auth-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 
+const missingDocuments = [
+    { id: "doc1", name: "2023 Personal Tax Returns" },
+    { id: "doc2", name: "2023 Business Tax Returns" },
+    { id: "doc3", name: "Signed Purchase Agreement" },
+    { id: "doc4", name: "Driver's License" },
+];
+
 const summaryCards = [
     { title: "Active Loans", value: "1", icon: <DollarSign className="h-4 w-4 text-muted-foreground" /> },
     { title: "Documents Submitted", value: "8", icon: <FileCheck className="h-4 w-4 text-muted-foreground" /> },
-    { title: "Pending Actions", value: "2", icon: <FileClock className="h-4 w-4 text-muted-foreground" />, cta: { href: "/dashboard/profile", text: "View Actions"} },
+    { title: "Pending Actions", value: missingDocuments.length.toString(), icon: <FileClock className="h-4 w-4 text-muted-foreground" />, cta: { href: "#missing-documents", text: "View Actions"} },
 ];
 
 const loanApplications = [
@@ -31,12 +38,7 @@ const recentActivity = [
     { date: "5 days ago", "description": "Loan officer requested 'Proof of Insurance'." },
 ]
 
-const missingDocuments = [
-    { id: "doc1", name: "2023 Personal Tax Returns" },
-    { id: "doc2", name: "2023 Business Tax Returns" },
-    { id: "doc3", name: "Signed Purchase Agreement" },
-    { id: "doc4", name: "Driver's License" },
-]
+
 
 // Mock data for workforce members. In a real app, this would come from a database.
 const workforceMembers = [
@@ -122,7 +124,7 @@ export default function DashboardPage() {
                 </CardContent>
             </Card>
         </div>
-        <div>
+        <div id="missing-documents">
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
