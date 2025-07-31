@@ -26,9 +26,9 @@ export function BorrowerDashboardHeader() {
 
   const menuItems = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/dashboard/documents', label: 'New Application', icon: FileText },
-    { href: '/dashboard/profile', label: 'Profile', icon: UserCircle },
-    { href: '/dashboard/documents', label: 'Loan Actions', icon: AlertTriangle },
+    { href: '/dashboard/documents', label: 'New Application', icon: FileText, exact: false }, // Updated
+    { href: '/dashboard/profile', label: 'Profile', icon: UserCircle, exact: false },
+    { href: '/dashboard/documents', label: 'Loan Actions', icon: AlertTriangle, exact: true }, // Updated
   ];
 
   return (
@@ -41,18 +41,42 @@ export function BorrowerDashboardHeader() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
-          {menuItems.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className={cn(
-                'text-sm font-medium transition-colors hover:text-primary',
-                pathname.startsWith(item.href) && (item.href !== '/dashboard' || pathname === '/dashboard') ? 'text-primary' : 'text-muted-foreground'
-              )}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {menuItems.map((item) => {
+            // Updated logic for highlighting
+            let isActive = false;
+            if (item.label === 'Loan Actions') {
+                isActive = pathname === item.href;
+            } else if (item.label === 'New Application') {
+                // This link should not be active when Loan Actions is active.
+                isActive = pathname.startsWith(item.href) && pathname !== '/dashboard/documents';
+            } else if (item.href === '/dashboard') {
+                isActive = pathname === item.href;
+            } else {
+                 isActive = pathname.startsWith(item.href);
+            }
+
+            // A special case for the dashboard itself to not stay active on sub-routes
+            if (item.href === '/dashboard' && pathname !== '/dashboard') {
+                isActive = false;
+            }
+            // Ensure New Application isn't active on the Loan Actions page
+            if (item.label === 'New Application' && pathname === '/dashboard/documents') {
+                isActive = false;
+            }
+
+            return (
+                <Link
+                key={item.label}
+                href={item.href}
+                className={cn(
+                    'text-sm font-medium transition-colors hover:text-primary',
+                    isActive ? 'text-primary' : 'text-muted-foreground'
+                )}
+                >
+                {item.label}
+                </Link>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-4">
