@@ -26,10 +26,6 @@ export function BrokerOfficeHeader() {
             </div>
         </Link>
 
-        <nav className="flex items-center gap-6">
-            {/* The navigation links that caused hydration errors have been removed. */}
-        </nav>
-
         <div className="flex items-center gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
