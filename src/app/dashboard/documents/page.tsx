@@ -40,11 +40,11 @@ export default function DocumentsPage() {
     <div className="space-y-6 p-4 md:p-6 lg:p-8">
        <div className="flex justify-between items-center">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Documents</h1>
+            <h1 className="font-headline text-3xl font-bold">Loan Actions</h1>
             <p className="text-muted-foreground">Manage required documents for your loans.</p>
         </div>
         <Button asChild>
-            <Link href="/dashboard/profile"><PlusCircle className="mr-2 h-4 w-4"/> Start New Application</Link>
+            <Link href="/dashboard/application"><PlusCircle className="mr-2 h-4 w-4"/> Start New Application</Link>
         </Button>
        </div>
        <div className="space-y-6">

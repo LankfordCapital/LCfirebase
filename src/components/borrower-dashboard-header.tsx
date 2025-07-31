@@ -26,7 +26,8 @@ export function BorrowerDashboardHeader() {
 
   const menuItems = [
     { href: '/dashboard', label: 'Dashboard' },
-    { href: '/dashboard/documents', label: 'Documents' },
+    { href: '/dashboard/application', label: 'Start New Application' },
+    { href: '/dashboard/documents', label: 'Loan Actions' },
     { href: '/dashboard/profile', label: 'Profile' },
   ];
 
