@@ -38,9 +38,11 @@ export function Footer() {
     <footer className="bg-primary/5 border-t">
       <div className="container mx-auto px-4 py-12">
         <div className="flex flex-col items-center text-center">
-            <Link href="/" className="mx-auto">
-              <Logo className="h-auto w-56" />
-            </Link>
+            <div>
+              <Link href="/">
+                <Logo className="h-auto w-56" />
+              </Link>
+            </div>
             <p className="mt-4 text-sm text-muted-foreground">
               Your trusted partner in financial growth.
             </p>
