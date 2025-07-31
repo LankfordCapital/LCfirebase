@@ -31,12 +31,19 @@ function LayoutWrapper({ children }: { children: React.ReactNode }) {
   // The main dashboard layout applies to /dashboard and its children, but not the specialty portals
   const isBorrowerDashboard = pathname.startsWith('/dashboard');
 
-  if (isAuthPage || isSpecialtyPortal) {
+  const showAIAssistant = !isAuthPage;
+
+  if (isAuthPage) {
     return <main>{children}</main>;
   }
-
-  if (isBorrowerDashboard) {
-     return <main>{children}</main>
+  
+  if (isSpecialtyPortal || isBorrowerDashboard) {
+    return (
+        <>
+            <main>{children}</main>
+            {showAIAssistant && <AIAssistant />}
+        </>
+    );
   }
 
   return (
