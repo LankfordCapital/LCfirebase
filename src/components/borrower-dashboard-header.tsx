@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { LayoutDashboard, FileText, UserCircle, LogOut, ChevronDown, Menu } from 'lucide-react';
+import { LayoutDashboard, FileText, UserCircle, LogOut, ChevronDown, Menu, AlertTriangle } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -28,6 +28,7 @@ export function BorrowerDashboardHeader() {
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/dashboard/documents', label: 'New Application', icon: FileText },
     { href: '/dashboard/profile', label: 'Profile', icon: UserCircle },
+    { href: '/dashboard/documents', label: 'Loan Actions', icon: AlertTriangle },
   ];
 
   return (
@@ -42,7 +43,7 @@ export function BorrowerDashboardHeader() {
         <nav className="hidden md:flex items-center gap-6">
           {menuItems.map((item) => (
             <Link
-              key={item.href}
+              key={item.label}
               href={item.href}
               className={cn(
                 'text-sm font-medium transition-colors hover:text-primary',
