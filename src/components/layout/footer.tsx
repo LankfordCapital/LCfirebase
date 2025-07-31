@@ -61,15 +61,13 @@ export function Footer() {
             </div>
           </div>
         <div className="mt-8 pt-8 border-t grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-          <div className="md:col-span-1">
-              <div>
-                <h3 className="font-headline font-semibold text-primary">Lending</h3>
-                  <ul className="mt-4 space-y-2">
-                      {lendingProducts.map(item => (
-                           <li key={item.href}><Link href={item.href} className="text-sm text-muted-foreground hover:text-primary">{item.label}</Link></li>
-                      ))}
-                  </ul>
-              </div>
+          <div>
+            <h3 className="font-headline font-semibold text-primary">Lending</h3>
+              <ul className="mt-4 space-y-2">
+                  {lendingProducts.map(item => (
+                       <li key={item.href}><Link href={item.href} className="text-sm text-muted-foreground hover:text-primary">{item.label}</Link></li>
+                  ))}
+              </ul>
           </div>
            <div>
             <h3 className="font-headline font-semibold text-primary">Company</h3>
