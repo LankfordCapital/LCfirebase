@@ -4,11 +4,11 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useUI } from "@/contexts/ui-context";
-import { AlertCircle, FileText, HelpCircle, PlusCircle } from "lucide-react";
+import { AlertCircle, HelpCircle, PlusCircle } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 const loanFiles = [
     { 
@@ -66,7 +66,7 @@ export default function DocumentsPage() {
                        <div key={doc.id} className="p-3 rounded-md border bg-muted/20">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-3">
-                                <Checkbox id={`${loan.id}-${doc.id}`} />
+                                <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" alt="Lankford Capital Icon" width={20} height={20} />
                                 <Label htmlFor={`${loan.id}-${doc.id}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{doc.name}</Label>
                             </div>
                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openAssistant(`I have a question about the "${doc.name}" document for my loan on ${loan.property}.`)}>
