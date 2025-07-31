@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -33,8 +32,8 @@ export function BrokerOfficeHeader() {
             </div>
         </Link>
         
-        <div className="flex items-center gap-4">
-          {isClient && (
+        {isClient ? (
+          <div className="flex items-center gap-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 px-2">
@@ -60,8 +59,13 @@ export function BrokerOfficeHeader() {
                   </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          )}
-        </div>
+          </div>
+        ) : (
+           <div className="flex items-center gap-2 h-10">
+                <div className="h-8 w-8 rounded-full bg-muted animate-pulse"></div>
+                <div className="hidden md:block h-5 w-24 rounded-md bg-muted animate-pulse"></div>
+            </div>
+        )}
       </div>
     </header>
   );
