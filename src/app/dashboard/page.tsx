@@ -24,7 +24,7 @@ const missingDocuments = [
 const summaryCards = [
     { title: "Active Loans", value: "1", icon: <DollarSign className="h-4 w-4 text-muted-foreground" /> },
     { title: "Documents Submitted", value: "8", icon: <FileCheck className="h-4 w-4 text-muted-foreground" /> },
-    { title: "Pending Actions", value: missingDocuments.length.toString(), icon: <FileClock className="h-4 w-4 text-muted-foreground" />, cta: { href: "#missing-documents", text: "View Actions"} },
+    { title: "Pending Actions", value: missingDocuments.length.toString(), icon: <FileClock className="h-4 w-4 text-muted-foreground" />, cta: { href: "/dashboard/documents", text: "View Actions"} },
 ];
 
 const loanApplications = [
@@ -58,7 +58,7 @@ export default function DashboardPage() {
           <p className="text-muted-foreground">Lankford Lending Solutions</p>
         </div>
         <Button asChild>
-            <Link href="/dashboard/documents"><PlusCircle className="mr-2 h-4 w-4"/> Start New Application</Link>
+            <Link href="/dashboard/application"><PlusCircle className="mr-2 h-4 w-4"/> Start New Application</Link>
         </Button>
       </div>
       
