@@ -12,6 +12,7 @@ import { answerVisitorQuestion, type AnswerVisitorQuestionOutput } from '@/ai/fl
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { CustomLoader } from './ui/custom-loader';
+import { useUI } from '@/contexts/ui-context';
 
 interface Message {
   id: string;
@@ -20,7 +21,7 @@ interface Message {
 }
 
 export function AIAssistant() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isAssistantOpen, setAssistantOpen } = useUI();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +29,7 @@ export function AIAssistant() {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (isOpen && messages.length === 0) {
+    if (isAssistantOpen && messages.length === 0) {
         setMessages([
             {
                 id: 'initial',
@@ -37,7 +38,7 @@ export function AIAssistant() {
             }
         ])
     }
-  }, [isOpen, messages.length]);
+  }, [isAssistantOpen, messages.length]);
 
 
   useEffect(() => {
@@ -97,12 +98,12 @@ export function AIAssistant() {
       <Button
         className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-2xl z-50"
         size="icon"
-        onClick={() => setIsOpen(true)}
+        onClick={() => setAssistantOpen(true)}
       >
         <MessageSquare className="h-8 w-8" />
         <span className="sr-only">Open AI Assistant</span>
       </Button>
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <Sheet open={isAssistantOpen} onOpenChange={setAssistantOpen}>
         <SheetContent className="flex flex-col">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2 font-headline text-xl">

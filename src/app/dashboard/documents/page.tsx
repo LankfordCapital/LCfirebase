@@ -1,10 +1,13 @@
 
+'use client';
+
 import { AIPReUnderwriterClient } from "@/components/ai-pre-underwriter-client"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { useUI } from "@/contexts/ui-context";
 import { AlertCircle, FileText, HelpCircle } from "lucide-react";
 import Link from "next/link";
 
@@ -16,6 +19,8 @@ const missingDocuments = [
 ];
 
 export default function DocumentsPage() {
+  const { setAssistantOpen } = useUI();
+  
   return (
     <div className="space-y-6 p-4 md:p-6 lg:p-8">
        <div className="space-y-6">
@@ -35,7 +40,7 @@ export default function DocumentsPage() {
                                 <Checkbox id={doc.id} />
                                 <Label htmlFor={doc.id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{doc.name}</Label>
                             </div>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setAssistantOpen(true)}>
                                 <HelpCircle className="h-4 w-4" />
                                 <span className="sr-only">Ask a question about {doc.name}</span>
                             </Button>
