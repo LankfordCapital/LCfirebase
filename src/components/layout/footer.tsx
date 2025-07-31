@@ -42,23 +42,6 @@ export function Footer() {
             <p className="mt-4 text-sm text-muted-foreground">
               Your trusted partner in financial growth.
             </p>
-            <div className="mt-4 flex space-x-2">
-              <Button variant="ghost" size="icon" asChild>
-                <a href="#" aria-label="Twitter">
-                  <Twitter className="h-5 w-5" />
-                </a>
-              </Button>
-              <Button variant="ghost" size="icon" asChild>
-                <a href="#" aria-label="LinkedIn">
-                  <Linkedin className="h-5 w-5" />
-                </a>
-              </Button>
-               <Button variant="ghost" size="icon" asChild>
-                <a href="#" aria-label="Facebook">
-                  <Facebook className="h-5 w-5" />
-                </a>
-              </Button>
-            </div>
           </div>
         
         <div className="mt-8 pt-8 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
@@ -91,6 +74,23 @@ export function Footer() {
             <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" alt="Lankford Capital Icon" width={40} height={40} />
           </div>
           <p>&copy; {new Date().getFullYear()} Lankford Capital. All rights reserved.</p>
+           <div className="mt-4 flex justify-center space-x-2">
+              <Button variant="ghost" size="icon" asChild>
+                <a href="#" aria-label="Twitter">
+                  <Twitter className="h-5 w-5" />
+                </a>
+              </Button>
+              <Button variant="ghost" size="icon" asChild>
+                <a href="#" aria-label="LinkedIn">
+                  <Linkedin className="h-5 w-5" />
+                </a>
+              </Button>
+               <Button variant="ghost" size="icon" asChild>
+                <a href="#" aria-label="Facebook">
+                  <Facebook className="h-5 w-5" />
+                </a>
+              </Button>
+            </div>
         </div>
       </div>
     </footer>
