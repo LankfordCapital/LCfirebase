@@ -34,7 +34,7 @@ export function Footer() {
   
   return (
     <footer className="bg-primary/5 border-t">
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 py-12 flex flex-col">
         <div className="flex flex-col items-center text-center mb-8">
             <Link href="/" className="inline-block">
               <Logo className="h-auto w-56" />
@@ -42,9 +42,9 @@ export function Footer() {
             <p className="mt-4 text-sm text-muted-foreground">
               Your trusted partner in financial growth.
             </p>
-          </div>
+        </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left mb-8">
           <div>
             <h3 className="font-headline font-semibold text-primary">Lending</h3>
               <ul className="mt-4 space-y-2">
@@ -69,9 +69,8 @@ export function Footer() {
             </ul>
           </div>
         </div>
-      </div>
-      <div className="border-t">
-         <div className="container mx-auto px-4 py-6 text-sm text-muted-foreground flex flex-col md:flex-row items-center justify-between gap-4">
+
+        <div className="border-t pt-6 text-sm text-muted-foreground flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
                 <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" alt="Lankford Capital Icon" width={30} height={30} />
                 <span>&copy; {new Date().getFullYear()} Lankford Capital. All rights reserved.</span>
