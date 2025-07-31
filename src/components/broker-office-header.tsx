@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -33,7 +34,7 @@ export function BrokerOfficeHeader() {
   const navLinks = [
     { href: '/broker-office', label: 'Pipeline' },
     { href: '/broker-office/documents', label: 'New Application' },
-    { href: '/dashboard/documents', label: 'Loan Actions' },
+    { href: '/broker-office/loan-actions', label: 'Loan Actions' },
   ];
 
   if (!isClient) {
@@ -59,7 +60,7 @@ export function BrokerOfficeHeader() {
                     pathname === item.href ? 'text-primary' : 'text-muted-foreground'
                 )}
               >
-                {item.href === '/dashboard/documents' ? <Button variant="secondary"><AlertTriangle className="mr-2 h-4 w-4"/> {item.label}</Button> : item.label}
+                {item.href === '/broker-office/loan-actions' ? <Button variant="secondary"><AlertTriangle className="mr-2 h-4 w-4"/> {item.label}</Button> : item.label}
               </Link>
             ))}
           </nav>
