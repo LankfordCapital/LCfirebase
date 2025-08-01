@@ -70,7 +70,7 @@ export function Footer() {
             </p>
         </div>
 
-        <div className="border-t pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="border-t pt-6 flex flex-col items-center justify-center gap-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" alt="Lankford Capital Icon" width={30} height={30} />
                 <span>&copy; {new Date().getFullYear()} Lankford Capital. All rights reserved.</span>
