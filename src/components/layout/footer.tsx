@@ -62,14 +62,12 @@ export function Footer() {
         </div>
 
         <div className="border-t pt-8 mt-8 flex flex-col items-center text-center gap-6">
-            <div className="flex flex-col items-center">
-                 <Link href="/" className="inline-block">
-                    <Logo className="h-auto w-56" />
-                </Link>
-                <p className="mt-4 text-sm text-muted-foreground">
-                    Your trusted partner in financial growth.
-                </p>
-            </div>
+            <Link href="/" className="inline-block">
+                <Logo className="h-auto w-56" />
+            </Link>
+            <p className="text-sm text-muted-foreground -mt-4">
+                Your trusted partner in financial growth.
+            </p>
         
            <div className="flex items-center space-x-1">
               <Button variant="ghost" size="icon" asChild>
