@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, ChevronDown, Building, Wrench, Factory, LandPlot, Layers, Truck, Handshake, LogIn, UserPlus } from 'lucide-react';
+import { Menu, ChevronDown, Building, Wrench, Factory, LandPlot, Layers, Truck, Handshake, LogIn, UserPlus, LayoutDashboard } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -26,10 +26,10 @@ const lendingProducts = [
   { href: '/lending/equipment-financing', label: 'Equipment Financing', icon: Truck },
 ];
 
-const signInLinks = [
-    { href: '/auth/signin', label: 'Borrower Sign In'},
-    { href: '/auth/broker-signin', label: 'Broker Sign In'},
-    { href: '/auth/workforce-signin', label: 'Workforce Sign In'},
+const dashboardLinks = [
+    { href: '/dashboard', label: 'Borrower Dashboard'},
+    { href: '/broker-office', label: 'Broker Dashboard'},
+    { href: '/workforce-office', label: 'Workforce Dashboard'},
 ]
 
 export function Header() {
@@ -72,25 +72,19 @@ export function Header() {
         <div className="hidden md:flex items-center gap-2">
            <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost">
-                <LogIn className="mr-2"/>
-                Sign In
+              <Button>
+                <LayoutDashboard className="mr-2"/>
+                Dashboards
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-64">
-                {signInLinks.map(link => (
+                {dashboardLinks.map(link => (
                     <DropdownMenuItem key={link.href} asChild>
                         <Link href={link.href}>{link.label}</Link>
                     </DropdownMenuItem>
                 ))}
-                 <DropdownMenuItem asChild>
-                        <Link href="/auth/admin-signup">Admin Access</Link>
-                    </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-           <Button asChild>
-            <Link href="/auth/signup"><UserPlus className="mr-2"/> Sign Up</Link>
-           </Button>
         </div>
 
         <div className="md:hidden">
@@ -128,11 +122,8 @@ export function Header() {
                 </div>
                 <hr />
                 <div className="flex flex-col gap-2">
-                   <Button variant="ghost" asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/auth/signin">Sign In</Link>
-                  </Button>
-                  <Button asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/auth/signup">Sign Up</Link>
+                   <Button asChild onClick={() => setIsOpen(false)}>
+                    <Link href="/workforce-office">Go to Dashboard</Link>
                   </Button>
                 </div>
               </div>
