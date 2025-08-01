@@ -14,14 +14,19 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useAuth } from "@/contexts/auth-context";
-import { useState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useState, FormEvent, Suspense, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { CustomLoader } from "@/components/ui/custom-loader";
 import { updateProfile } from "firebase/auth";
 import Image from "next/image";
+import { db } from "@/lib/firebase";
+import { doc, setDoc } from "firebase/firestore";
 
-export default function SignUpPage() {
+function SignUpForm() {
+  const searchParams = useSearchParams();
+  const roleFromQuery = searchParams.get('role');
+  
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,15 +35,39 @@ export default function SignUpPage() {
   const router = useRouter();
   const { toast } = useToast();
 
+  const isBrokerSignUp = roleFromQuery === 'broker';
+
+  useEffect(() => {
+    // Prefill for workforce creation if needed, you can expand this logic
+    if (roleFromQuery === 'workforce') {
+        // You might want to add more security around this
+    }
+  }, [roleFromQuery]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
+    const role = isBrokerSignUp ? 'broker' : 'borrower';
+    
     try {
       const userCredential = await signUp(email, password);
       await updateProfile(userCredential.user, {
         displayName: fullName
       });
-      router.push('/dashboard');
+      
+      // Create user profile in Firestore
+      await setDoc(doc(db, "users", userCredential.user.uid), {
+        uid: userCredential.user.uid,
+        email: userCredential.user.email,
+        fullName: fullName,
+        role: role,
+        status: 'pending', // All new users are pending approval
+        createdAt: new Date(),
+      });
+
+      // Redirect to a pending approval page instead of the dashboard
+      router.push('/auth/pending-approval');
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -67,9 +96,9 @@ export default function SignUpPage() {
             <Card className="shadow-2xl">
                 <form onSubmit={handleSubmit}>
                 <CardHeader className="text-center">
-                    <CardTitle className="font-headline text-2xl">Create an Account</CardTitle>
+                    <CardTitle className="font-headline text-2xl">Create {isBrokerSignUp ? 'a Broker' : 'an'} Account</CardTitle>
                     <CardDescription>
-                    Join Lankford Capital to start your application.
+                    {isBrokerSignUp ? 'Register to partner with us.' : 'Join Lankford Capital to start your application.'}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-4">
@@ -100,7 +129,7 @@ export default function SignUpPage() {
                     </div>
                     <div className="text-center text-sm">
                         Already have an account?{" "}
-                        <Link href="/auth/signin" className="underline">
+                        <Link href={isBrokerSignUp ? "/auth/broker-signin" : "/auth/signin"} className="underline">
                         Sign in
                         </Link>
                     </div>
@@ -112,4 +141,12 @@ export default function SignUpPage() {
       </div>
     </div>
   )
+}
+
+export default function SignUpPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <SignUpForm />
+        </Suspense>
+    )
 }

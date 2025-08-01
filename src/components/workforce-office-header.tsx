@@ -17,7 +17,7 @@ import {
 import {
   LayoutDashboard, LogOut, ChevronDown, Bot, Mail, BarChartHorizontal,
   MessageSquare, FileJson, AreaChart, Hammer, BookCopy, Shield, FileBarChart,
-  Database, Users, ClipboardList, Calendar, Notebook, Menu
+  Database, Users, ClipboardList, Calendar, Notebook, Menu, UserCog
 } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { useAuth } from '@/contexts/auth-context';
@@ -29,6 +29,7 @@ import React from 'react';
 
 const navLinks = [
     { href: '/workforce-office', label: 'Pipeline' },
+    { href: '/workforce-office/user-management', label: 'User Management' },
     { href: '/workforce-office/lender-database', label: 'Lenders' },
     { href: '/workforce-office/amc-database', label: 'AMCs' },
     { href: '/workforce-office/reports', label: 'Reporting' },

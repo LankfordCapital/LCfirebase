@@ -11,10 +11,13 @@ export default function BrokerOfficeLayout({
   children: React.ReactNode;
 }) {
   return (
-        <div className="bg-primary/5 min-h-screen">
-          <main>
-            {children}
-          </main>
-        </div>
+        <ProtectedRoute allowedRoles={['broker']} redirectTo="/auth/broker-signin">
+          <div className="bg-primary/5 min-h-screen">
+            <BrokerOfficeHeader />
+            <main>
+              {children}
+            </main>
+          </div>
+        </ProtectedRoute>
   );
 }
