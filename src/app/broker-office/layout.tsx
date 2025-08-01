@@ -12,8 +12,7 @@ export default function BrokerOfficeLayout({
 }) {
   return (
         <ProtectedRoute allowedRoles={['broker']} redirectTo="/auth/broker-signin">
-          <div className="bg-primary/5 min-h-screen">
-            <BrokerOfficeHeader />
+          <div className="flex flex-col min-h-screen">
             <main>
               {children}
             </main>
