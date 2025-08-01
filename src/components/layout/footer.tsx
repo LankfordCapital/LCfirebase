@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -61,16 +60,16 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center text-center my-8">
-            <Link href="/" className="inline-block">
-              <Logo className="h-auto w-56" />
-            </Link>
-            <p className="mt-4 text-sm text-muted-foreground">
-              Your trusted partner in financial growth.
-            </p>
-        </div>
-
-        <div className="border-t pt-6 flex flex-col items-center justify-center gap-4">
+        <div className="border-t pt-8 mt-8 flex flex-col items-center text-center gap-6">
+            <div className="flex flex-col items-center">
+                 <Link href="/" className="inline-block">
+                    <Logo className="h-auto w-56" />
+                </Link>
+                <p className="mt-4 text-sm text-muted-foreground">
+                    Your trusted partner in financial growth.
+                </p>
+            </div>
+        
            <div className="flex items-center space-x-1">
               <Button variant="ghost" size="icon" asChild>
                 <a href="#" aria-label="Twitter">
@@ -88,10 +87,10 @@ export function Footer() {
                 </a>
               </Button>
             </div>
-            <div className="flex justify-center mt-4">
+            <div className="flex justify-center">
                 <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" alt="Lankford Capital Icon" width={30} height={30} />
             </div>
-             <div className="flex items-center gap-2 text-sm text-muted-foreground mt-4">
+             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span>&copy; {new Date().getFullYear()} Lankford Capital. All rights reserved.</span>
           </div>
         </div>
