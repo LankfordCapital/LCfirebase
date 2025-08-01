@@ -35,15 +35,6 @@ export function Footer() {
   return (
     <footer className="bg-primary/5">
       <div className="container mx-auto px-4 py-12">
-        <div className="flex flex-col items-center text-center mb-8">
-            <Link href="/" className="inline-block">
-              <Logo className="h-auto w-56" />
-            </Link>
-            <p className="mt-4 text-sm text-muted-foreground">
-              Your trusted partner in financial growth.
-            </p>
-        </div>
-        
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left mb-8">
           <div>
             <h3 className="font-headline font-semibold text-primary">Lending</h3>
@@ -68,6 +59,15 @@ export function Footer() {
               <li><Link href="/terms-of-service" className="text-sm text-muted-foreground hover:text-primary">Terms of Service</Link></li>
             </ul>
           </div>
+        </div>
+
+        <div className="flex flex-col items-center text-center my-8">
+            <Link href="/" className="inline-block">
+              <Logo className="h-auto w-56" />
+            </Link>
+            <p className="mt-4 text-sm text-muted-foreground">
+              Your trusted partner in financial growth.
+            </p>
         </div>
 
         <div className="border-t pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
