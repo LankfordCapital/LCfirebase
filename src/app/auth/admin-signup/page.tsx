@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useAuth } from "@/contexts/auth-context";
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { CustomLoader } from "@/components/ui/custom-loader";
@@ -32,6 +32,16 @@ export default function AdminSignUpPage() {
   const router = useRouter();
   const { toast } = useToast();
 
+  useEffect(() => {
+    if (isSignedIn) {
+        // Redirect after a short delay to show the success message
+        const timer = setTimeout(() => {
+            router.push('/workforce-office');
+        }, 1500);
+        return () => clearTimeout(timer);
+    }
+  }, [isSignedIn, router]);
+
   const handleSignInOrCreate = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -42,7 +52,7 @@ export default function AdminSignUpPage() {
       await signIn(email, password);
       toast({
           title: 'Sign In Successful',
-          description: `Successfully signed in as ${email}.`,
+          description: `Successfully signed in as ${email}. Redirecting...`,
       });
       setIsSignedIn(true);
     } catch (error: any) {
@@ -57,7 +67,7 @@ export default function AdminSignUpPage() {
             await signIn(email, password);
             toast({
                 title: 'Admin Account Created',
-                description: `Successfully created and signed in as ${email}.`,
+                description: `Successfully created and signed in as ${email}. Redirecting...`,
             });
             setIsSignedIn(true);
         } catch (signUpError: any) {
@@ -110,29 +120,15 @@ export default function AdminSignUpPage() {
                     {isSignedIn && (
                         <div className="flex items-center gap-2 text-green-600 bg-green-50 p-3 rounded-md">
                             <CheckCircle className="h-5 w-5" />
-                            <p className="font-semibold">Sign in successful!</p>
+                            <p className="font-semibold">Sign in successful! Redirecting...</p>
                         </div>
                     )}
                 </CardContent>
                 <CardFooter className="flex flex-col gap-4">
-                    {!isSignedIn ? (
-                        <Button className="w-full" type="submit" disabled={isLoading}>
-                            {isLoading && <CustomLoader className="mr-2 h-4 w-4" />}
-                            Sign In to Admin
-                        </Button>
-                    ) : (
-                        <div className="w-full space-y-2">
-                             <Button className="w-full" asChild>
-                                <Link href="/workforce-office">Go to Workforce Dashboard</Link>
-                            </Button>
-                             <Button className="w-full" asChild variant="outline">
-                                <Link href="/broker-office">Go to Broker Dashboard</Link>
-                            </Button>
-                             <Button className="w-full" asChild variant="outline">
-                                <Link href="/dashboard">Go to Borrower Dashboard</Link>
-                            </Button>
-                        </div>
-                    )}
+                    <Button className="w-full" type="submit" disabled={isLoading || isSignedIn}>
+                        {isLoading && <CustomLoader className="mr-2 h-4 w-4" />}
+                        {isSignedIn ? 'Redirecting...' : 'Sign In to Admin'}
+                    </Button>
                     <div className="text-center text-sm">
                         <Link href="/auth/signin" className="underline">
                             Back to Regular Sign In

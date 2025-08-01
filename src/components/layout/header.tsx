@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, ChevronDown, Building, Wrench, Warehouse, LandPlot, Layers, Truck, Handshake, Factory, LayoutDashboard } from 'lucide-react';
+import { Menu, ChevronDown, Building, Wrench, Factory, LandPlot, Layers, Truck, Handshake, LogIn, UserPlus } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -26,8 +26,11 @@ const lendingProducts = [
   { href: '/lending/equipment-financing', label: 'Equipment Financing', icon: Truck },
 ];
 
-const mainNav: { href: string, label: string }[] = [
-];
+const signInLinks = [
+    { href: '/auth/signin', label: 'Borrower Sign In'},
+    { href: '/auth/broker-signin', label: 'Broker Sign In'},
+    { href: '/auth/workforce-signin', label: 'Workforce Sign In'},
+]
 
 export function Header() {
   const pathname = usePathname();
@@ -61,49 +64,33 @@ export function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {mainNav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                'font-semibold transition-colors hover:text-primary',
-                pathname === item.href ? 'text-primary' : 'text-muted-foreground'
-              )}
-            >
-              {item.label}
+           <Link href="/broker" className={cn('text-sm font-semibold transition-colors hover:text-primary', pathname === '/broker' ? 'text-primary' : 'text-muted-foreground')}>
+              For Brokers
             </Link>
-          ))}
-           <Button asChild className="text-black hover:bg-primary/90">
-              <Link href="/lending/commercial">For Brokers</Link>
-            </Button>
         </nav>
 
         <div className="hidden md:flex items-center gap-2">
            <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button>
-                <LayoutDashboard className="mr-2"/>
-                Dashboards
+              <Button variant="ghost">
+                <LogIn className="mr-2"/>
+                Sign In
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-64">
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard">
-                    Borrower Dashboard
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/broker-office">
-                    Broker Dashboard
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/workforce-office">
-                    Workforce Dashboard
-                  </Link>
-                </DropdownMenuItem>
+                {signInLinks.map(link => (
+                    <DropdownMenuItem key={link.href} asChild>
+                        <Link href={link.href}>{link.label}</Link>
+                    </DropdownMenuItem>
+                ))}
+                 <DropdownMenuItem asChild>
+                        <Link href="/auth/admin-signup">Admin Access</Link>
+                    </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+           <Button asChild>
+            <Link href="/auth/signup"><UserPlus className="mr-2"/> Sign Up</Link>
+           </Button>
         </div>
 
         <div className="md:hidden">
@@ -137,31 +124,15 @@ export function Header() {
                     </Link>
                   ))}
                   <hr/>
-                   {mainNav.map((item) => (
-                    <Link
-                        key={item.href}
-                        href={item.href}
-                        className="font-bold"
-                        onClick={() => setIsOpen(false)}
-                    >
-                        {item.label}
-                    </Link>
-                    ))}
-                    <Link href="/lending/commercial" className="font-bold" onClick={() => setIsOpen(false)}>For Brokers</Link>
+                    <Link href="/broker" className="font-bold" onClick={() => setIsOpen(false)}>For Brokers</Link>
                 </div>
                 <hr />
                 <div className="flex flex-col gap-2">
                    <Button variant="ghost" asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/auth/signin">Borrower Sign In</Link>
-                  </Button>
-                   <Button variant="ghost" asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/auth/broker-signin">Broker Sign In</Link>
-                  </Button>
-                  <Button variant="ghost" asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/auth/workforce-signin">Workforce Sign In</Link>
+                    <Link href="/auth/signin">Sign In</Link>
                   </Button>
                   <Button asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/dashboard">Borrower Dashboard</Link>
+                    <Link href="/auth/signup">Sign Up</Link>
                   </Button>
                 </div>
               </div>
