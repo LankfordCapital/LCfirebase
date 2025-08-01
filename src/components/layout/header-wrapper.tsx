@@ -20,7 +20,7 @@ export function HeaderWrapper() {
   const isWorkforceOffice = pathname.startsWith('/workforce-office');
   const isBorrowerDashboard = pathname.startsWith('/dashboard');
 
-  let HeaderComponent = Header;
+  let HeaderComponent: React.ComponentType = Header;
   let showAIAssistant = true;
   
   if (isAuthPage) {

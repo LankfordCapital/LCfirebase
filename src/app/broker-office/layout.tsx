@@ -1,7 +1,6 @@
 
 'use client';
 
-import { BrokerOfficeHeader } from '@/components/broker-office-header';
 import { ProtectedRoute } from '@/components/protected-route';
 
 
