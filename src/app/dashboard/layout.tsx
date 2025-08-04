@@ -10,7 +10,7 @@ export default function DashboardLayout({
 }) {
 
   return (
-    <ProtectedRoute allowedRoles={['borrower']}>
+    <ProtectedRoute allowedRoles={['borrower']} redirectTo="/auth/signin">
       <div className="flex flex-col min-h-screen">
           <main className="flex-1 bg-primary/5">
             {children}

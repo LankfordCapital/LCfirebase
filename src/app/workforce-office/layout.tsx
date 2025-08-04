@@ -9,7 +9,7 @@ export default function WorkforceOfficeLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ProtectedRoute allowedRoles={['workforce']} redirectTo="/auth/workforce-signin">
+    <ProtectedRoute allowedRoles={['workforce', 'admin']} redirectTo="/auth/workforce-signin">
         <div className="flex flex-col min-h-screen">
           <main className="flex-1 bg-primary/5 p-4 md:p-8">
             {children}
