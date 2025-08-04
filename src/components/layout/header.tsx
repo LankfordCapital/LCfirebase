@@ -64,7 +64,7 @@ export function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-           <Link href="/broker" className={cn('text-sm font-semibold transition-colors hover:text-primary', pathname === '/broker' ? 'text-primary' : 'text-muted-foreground')}>
+           <Link href="/broker" className={cn('text-sm font-semibold transition-colors hover:text-primary', pathname === '/broker' ? 'text-primary' : 'text-foreground')}>
               For Brokers
             </Link>
         </nav>
