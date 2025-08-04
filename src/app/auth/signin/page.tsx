@@ -62,7 +62,7 @@ export default function SignInPage() {
             <Card className="shadow-2xl">
                 <form onSubmit={handleSubmit}>
                 <CardHeader className="text-center">
-                    <CardTitle className="font-headline text-2xl">Borrower Sign In</CardTitle>
+                    <CardTitle className="font-headline text-2xl">Sign In</CardTitle>
                     <CardDescription>Sign in to access your borrower dashboard.</CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-4">
