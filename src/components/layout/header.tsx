@@ -64,27 +64,18 @@ export function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-           <Link href="/broker" className={cn('text-sm font-semibold transition-colors hover:text-primary', pathname === '/broker' ? 'text-primary' : 'text-foreground')}>
+           <Link href="/broker" className={cn('text-sm font-semibold transition-colors hover:text-primary', pathname === '/broker' ? 'text-primary' : 'text-foreground/90')}>
               For Brokers
             </Link>
         </nav>
 
         <div className="hidden md:flex items-center gap-2">
-           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button>
-                <LayoutDashboard className="mr-2"/>
-                Dashboards
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-64">
-                {dashboardLinks.map(link => (
-                    <DropdownMenuItem key={link.href} asChild>
-                        <Link href={link.href}>{link.label}</Link>
-                    </DropdownMenuItem>
-                ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+           <Button asChild>
+              <Link href="/auth/signin">
+                <LogIn className="mr-2"/>
+                Log In
+              </Link>
+            </Button>
         </div>
 
         <div className="md:hidden">
@@ -123,7 +114,7 @@ export function Header() {
                 <hr />
                 <div className="flex flex-col gap-2">
                    <Button asChild onClick={() => setIsOpen(false)}>
-                    <Link href="/workforce-office">Go to Dashboard</Link>
+                    <Link href="/auth/signin">Log In</Link>
                   </Button>
                 </div>
               </div>
