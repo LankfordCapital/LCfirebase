@@ -63,7 +63,7 @@ export default function SignInPage() {
                 <form onSubmit={handleSubmit}>
                 <CardHeader className="text-center">
                     <CardTitle className="font-headline text-2xl">Sign In</CardTitle>
-                    <CardDescription>Sign in to access your borrower dashboard.</CardDescription>
+                    <CardDescription>Sign in to your account.</CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-4">
                     <div className="grid gap-2">
@@ -95,6 +95,11 @@ export default function SignInPage() {
                     <div className="mt-2">
                         <Link href="/auth/workforce-signin" className="underline">
                         Workforce Sign In
+                        </Link>
+                    </div>
+                     <div className="mt-2">
+                        <Link href="/auth/broker-signin" className="underline">
+                        Broker Sign In
                         </Link>
                     </div>
                     </div>
