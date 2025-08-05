@@ -38,16 +38,16 @@ export default function AboutUsPage() {
       </section>
 
       <section className="py-16 md:py-24">
-        <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
-          <div className="relative h-96 w-full rounded-lg overflow-hidden shadow-lg">
-             <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/shutterstock_2014536932.jpg?alt=media&token=0f9f98aa-3be5-4a28-8e24-377e1977e80e" alt="A modern office interior with business people meeting" layout="fill" objectFit="cover" data-ai-hint="business meeting" />
-          </div>
-          <div>
+        <div className="container mx-auto px-4 text-center">
             <h2 className="font-headline text-3xl font-bold text-primary">Our Mission</h2>
-            <p className="mt-4 text-lg text-foreground/70">
+            <p className="mt-4 max-w-4xl mx-auto text-lg text-foreground/70">
                 At Lankford Capital, our mission is to empower real estate investors and business owners by providing them with the flexible, innovative, and reliable financing they need to thrive. We are committed to streamlining the lending process, fostering long-term partnerships, and contributing to the growth of the communities we serve.
             </p>
-          </div>
+        </div>
+         <div className="container mx-auto px-4 mt-16">
+            <div className="relative h-96 w-full rounded-lg overflow-hidden shadow-lg max-w-4xl mx-auto">
+                <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/shutterstock_2014536932.jpg?alt=media&token=0f9f98aa-3be5-4a28-8e24-377e1977e80e" alt="A modern office interior with business people meeting" layout="fill" objectFit="cover" data-ai-hint="business meeting" />
+            </div>
         </div>
       </section>
 
