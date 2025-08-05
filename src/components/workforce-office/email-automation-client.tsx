@@ -174,7 +174,7 @@ export function EmailAutomationClient() {
                         <Textarea
                             id="loanDetails"
                             placeholder="e.g., Loan for 123 Main St, $500,000"
-                            value={details.loanDetails}
+                            value={details.loanDetails ?? ''}
                             onChange={(e) => handleDetailChange('loanDetails', e.target.value)}
                         />
                     </div>
@@ -186,7 +186,7 @@ export function EmailAutomationClient() {
                         <Textarea
                             id="adverseActionReason"
                             placeholder="Provide a clear and compliant reason for the loan denial."
-                            value={details.adverseActionReason}
+                            value={details.adverseActionReason ?? ''}
                             onChange={(e) => handleDetailChange('adverseActionReason', e.target.value)}
                         />
                     </div>
@@ -198,7 +198,7 @@ export function EmailAutomationClient() {
                         <Textarea
                             id="customInstructions"
                             placeholder="Enter the specific instructions for the email content..."
-                            value={details.customInstructions}
+                            value={details.customInstructions ?? ''}
                             onChange={(e) => handleDetailChange('customInstructions', e.target.value)}
                             className="h-32"
                         />

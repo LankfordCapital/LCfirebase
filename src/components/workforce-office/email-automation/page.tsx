@@ -1,5 +1,4 @@
-
-import { EmailAutomationClient } from '@/components/email-automation-client';
+import { EmailAutomationClient } from '@/components/workforce-office/email-automation-client';
 
 export default function EmailAutomationPage() {
     return (
