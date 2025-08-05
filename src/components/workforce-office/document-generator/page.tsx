@@ -1,3 +1,5 @@
+
+
 import { DocumentGeneratorClient } from '@/components/document-generator-client';
 
 export default function DocumentGeneratorPage() {
