@@ -40,7 +40,7 @@ export default function AboutUsPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
           <div className="relative h-96 w-full rounded-lg overflow-hidden shadow-lg">
-             <Image src="https://placehold.co/600x400.png" alt="A modern office interior" layout="fill" objectFit="cover" data-ai-hint="modern office" />
+             <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/shutterstock_2014536932.jpg?alt=media&token=0f9f98aa-3be5-4a28-8e24-377e1977e80e" alt="A modern office interior with business people meeting" layout="fill" objectFit="cover" data-ai-hint="business meeting" />
           </div>
           <div>
             <h2 className="font-headline text-3xl font-bold text-primary">Our Mission</h2>
