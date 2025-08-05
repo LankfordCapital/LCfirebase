@@ -177,11 +177,11 @@ export default function Home() {
             </div>
             <div className="relative h-80 lg:h-full w-full rounded-lg overflow-hidden shadow-2xl">
                 <Image
-                    src="https://firebasestorage.googleapis.com/v0/b/lankford-homebase.firebasestorage.app/o/shutterstock_2142010187.jpg?alt=media&token=e0145a4a-dd04-445c-ba23-e764980f713e"
-                    alt="Business meeting about financing"
+                    src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/shutterstock_2021639264.jpg?alt=media&token=45a49432-6ac0-4c30-9988-2c5cdb0c482b"
+                    alt="Financial district cityscape"
                     layout="fill"
                     objectFit="cover"
-                    data-ai-hint="financial meeting"
+                    data-ai-hint="financial district"
                 />
             </div>
           </div>
