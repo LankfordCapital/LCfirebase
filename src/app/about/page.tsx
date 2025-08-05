@@ -28,10 +28,20 @@ const values = [
 export default function AboutUsPage() {
   return (
     <div>
-      <section className="relative bg-primary/5 py-20 md:py-28 text-center">
-        <div className="container mx-auto px-4">
-            <h1 className="font-headline text-4xl font-bold text-primary md:text-5xl">About <span className="text-foreground">Us</span></h1>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
+      <section className="relative h-[50vh] flex items-center justify-center text-white py-20 md:py-28">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute top-0 left-0 w-full h-full object-cover z-0"
+        >
+          <source src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/shutterstock_3552320785%20(1).mp4?alt=media&token=31dbe4d6-dd5f-46a7-b61b-71e814f2d8f1" type="video/mp4" />
+        </video>
+        <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
+        <div className="container relative z-20 mx-auto px-4 text-center">
+            <h1 className="font-headline text-4xl font-bold text-primary md:text-5xl">About <span className="text-white">Us</span></h1>
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Your dedicated partner in achieving financial growth and success.
           </p>
         </div>
