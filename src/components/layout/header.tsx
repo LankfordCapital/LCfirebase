@@ -45,8 +45,8 @@ const lendingLinks: { title: string; href: string; description: string }[] = [
 ];
 
 const ListItem = React.forwardRef<
-  React.ElementRef<'a'>,
-  React.ComponentPropsWithoutRef<'a'>
+  React.ElementRef<typeof Link>,
+  React.ComponentPropsWithoutRef<typeof Link> & { title: string }
 >(({ className, title, children, href, ...props }, ref) => {
   return (
     <li>
@@ -84,9 +84,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2">
-            <Logo />
-          </Link>
+          <Logo />
           <NavigationMenu className="hidden lg:flex">
             <NavigationMenuList>
                 <NavigationMenuItem>
@@ -107,7 +105,7 @@ export default function Header() {
               </NavigationMenuItem>
               {navLinks.map((link) => (
                  <NavigationMenuItem key={link.href}>
-                    <Link href={link.href} passHref asChild>
+                    <Link href={link.href} passHref legacyBehavior={false} asChild>
                       <NavigationMenuLink active={pathname === link.href} className={navigationMenuTriggerStyle()}>
                         {link.label}
                       </NavigationMenuLink>
@@ -137,9 +135,7 @@ export default function Header() {
           <SheetContent side="left" className="flex flex-col">
             <SheetHeader>
                 <SheetTitle>
-                    <Link href="/" className="flex items-center gap-2">
-                        <Logo />
-                    </Link>
+                    <Logo />
                 </SheetTitle>
                 <SheetDescription>
                     Navigate Lankford Capital
