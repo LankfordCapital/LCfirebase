@@ -1,42 +1,36 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Firebase
+.firebase
+firebase.json
+database.rules.json
+storage.rules
 
-# dependencies
+# Sensitive files
+secrets.txt
+.env
+.env.local
+.env.*.local
+
+# Misc
+.DS_Store
+*.pem
+
+# Dependencies
 /node_modules
 /.pnp
 .pnp.js
 
-# testing
-/coverage
-
-# next.js
+# Next.js
 /.next/
 /out/
 
-# production
+# Production
 /build
 
-# misc
-.DS_Store
-*.pem
-
-# debug
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
-# local env files
-.env*.local
-.env
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# lfs
-*.*-lfs.*
-
-# secrets
-secrets.txt
+# Local History
+.history
