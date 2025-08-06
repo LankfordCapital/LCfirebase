@@ -1,21 +1,24 @@
-# Firebase
-.firebase
-firebase.json
-database.rules.json
-storage.rules
+# Environment variables
+.env
+.env*.local
 
 # Secrets
 secrets.txt
-.env
-*.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+*.secret
 
-# General
-.DS_Store
+# Node
 node_modules/
-dist/
-build/
-coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Next.js
+.next/
+out/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*~
