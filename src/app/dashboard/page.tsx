@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/auth-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useToast } from "@/hooks/use-toast";
 
 
 const missingDocuments = [
@@ -44,11 +45,12 @@ const recentActivity = [
 const workforceMembers = [
     { uid: 'workforce-user-1', name: 'Alex Johnson', title: 'Senior Loan Officer' },
     { uid: 'workforce-user-2', name: 'Maria Garcia', title: 'Underwriting Manager' },
-    { uid: 'workforce-user-3', name: 'Chris Lee', title: 'Closing Coordinator' },
+    { uid: 'workforce-user-3', name: 'Closing Coordinator' },
 ];
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { toast } = useToast();
   
   return (
     <div className="space-y-6 p-4 md:p-8">
@@ -57,9 +59,23 @@ export default function DashboardPage() {
           <h1 className="font-headline text-3xl font-bold">Welcome Back, {user?.displayName || 'Borrower'}!</h1>
           <p className="text-muted-foreground">Lankford Lending Solutions</p>
         </div>
-        <Button asChild>
-            <Link href="/dashboard/application"><PlusCircle className="mr-2 h-4 w-4"/> Start New Application</Link>
-        </Button>
+        <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                toast({
+                  title: "Example Toast",
+                  description: "This is how you display a toast notification!",
+                  duration: 5000,
+                });
+              }}
+            >
+              Show Toast
+            </Button>
+            <Button asChild>
+                <Link href="/dashboard/application"><PlusCircle className="mr-2 h-4 w-4"/> Start New Application</Link>
+            </Button>
+        </div>
       </div>
       
       <div className="grid gap-4 md:grid-cols-3">
