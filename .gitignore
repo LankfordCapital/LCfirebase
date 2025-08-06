@@ -28,5 +28,15 @@ yarn-error.log*
 .env*.local
 .env
 
-# secrets files
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# pangea files
+pangea_summary.json
+
+# secrets file
 secrets.txt
