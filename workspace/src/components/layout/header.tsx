@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Mountain } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import { cn } from '@/lib/utils';
-import { Logo } from './logo';
+import { Logo } from '../logo';
 import React from 'react';
 
 const lendingLinks: { title: string; href: string; description: string }[] = [
@@ -106,7 +106,7 @@ export default function Header() {
               </NavigationMenuItem>
               {navLinks.map((link) => (
                  <NavigationMenuItem key={link.href}>
-                    <Link href={link.href} legacyBehavior={false} passHref>
+                    <Link href={link.href} legacyBehavior passHref>
                         <NavigationMenuLink active={pathname === link.href} className={navigationMenuTriggerStyle()}>
                             {link.label}
                         </NavigationMenuLink>
