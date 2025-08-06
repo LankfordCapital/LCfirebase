@@ -68,9 +68,6 @@
     "typescript": "^5"
   },
   "overrides": {
-    "react-hook-form": {
-      "react": "$react"
-    },
     "lucide-react": {
       "react": "$react"
     },
