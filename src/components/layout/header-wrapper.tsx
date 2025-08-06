@@ -1,10 +1,11 @@
+
 'use client';
 
 import { usePathname } from 'next/navigation';
 import Header from './header';
-import { BorrowerDashboardHeader } from '../borrower-dashboard-header';
-import { BrokerOfficeHeader } from '../broker-office-header';
-import { WorkforceOfficeHeader } from '../workforce-office-header';
+import BorrowerDashboardHeader from '../borrower-dashboard-header';
+import BrokerOfficeHeader from '../broker-office-header';
+import WorkforceOfficeHeader from '../workforce-office-header';
 
 
 export default function HeaderWrapper() {
