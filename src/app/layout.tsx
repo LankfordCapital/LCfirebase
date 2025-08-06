@@ -5,8 +5,8 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { Providers } from '@/components/providers';
-import { HeaderWrapper } from '@/components/layout/header-wrapper';
-import { Footer } from '@/components/layout/footer';
+import HeaderWrapper from '@/components/layout/header-wrapper';
+import Footer from '@/components/layout/footer';
 
 const fontBody = Inter({
   subsets: ['latin'],
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.Node;
 }>) {
   return (
     <html lang="en" className={cn(fontBody.variable, fontHeadline.variable, "h-full")}>
