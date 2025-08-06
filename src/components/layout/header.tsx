@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
 import { Menu } from 'lucide-react';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import { cn } from '@/lib/utils';
@@ -106,9 +106,11 @@ export default function Header() {
               </NavigationMenuItem>
               {navLinks.map((link) => (
                  <NavigationMenuItem key={link.href}>
-                    <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                        <Link href={link.href}>{link.label}</Link>
-                    </NavigationMenuLink>
+                    <Link href={link.href} legacyBehavior passHref>
+                        <NavigationMenuLink active={pathname === link.href} className={navigationMenuTriggerStyle()}>
+                            {link.label}
+                        </NavigationMenuLink>
+                    </Link>
                 </NavigationMenuItem>
               ))}
             </NavigationMenuList>
@@ -131,19 +133,26 @@ export default function Header() {
               <span className="sr-only">Toggle navigation menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left">
-            <div className="flex flex-col gap-6 p-6">
-                <Link href="/" className="flex items-center gap-2">
-                    <Logo />
-                </Link>
-                <nav className="grid gap-4">
+          <SheetContent side="left" className="flex flex-col">
+            <SheetHeader>
+                <SheetTitle>
+                    <Link href="/" className="flex items-center gap-2">
+                        <Logo />
+                    </Link>
+                </SheetTitle>
+                <SheetDescription>
+                    Navigate Lankford Capital
+                </SheetDescription>
+            </SheetHeader>
+            <div className="flex-grow flex flex-col justify-between">
+                <nav className="grid gap-4 py-6">
                     {navLinks.map((link) => (
                         <Link key={link.href} href={link.href} className={cn("text-lg font-medium", pathname === link.href ? 'text-primary' : 'text-muted-foreground hover:text-foreground')}>
                             {link.label}
                         </Link>
                     ))}
                 </nav>
-                 <div className="mt-auto flex flex-col gap-2">
+                 <div className="flex flex-col gap-2">
                     <Button variant="ghost" asChild>
                         <Link href="/auth/signin">Sign In</Link>
                     </Button>
