@@ -53,7 +53,7 @@ function Footer() {
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-8">
             <div className="col-span-1 md:col-span-4 lg:col-span-2 space-y-4">
-                <Logo />
+                <Logo className="text-2xl" />
                 <p className="text-sm text-secondary-foreground/70">
                     Your trusted partner in innovative and reliable financing solutions for real estate and business ambitions.
                 </p>
