@@ -35,11 +35,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Firebase
-.firebase
-firestore.rules
-storage.rules
-apphosting.yaml
-
-# Secrets file for git-filter-repo
+# temp
+.git_filerepo_temp_strip_blobs_with_ids.txt
 secrets.txt
