@@ -23,5 +23,9 @@ export default function HeaderWrapper() {
       return <WorkforceOfficeHeader />
   }
 
+  if (pathname.startsWith('/auth')) {
+    return null;
+  }
+
   return <Header />;
 }
