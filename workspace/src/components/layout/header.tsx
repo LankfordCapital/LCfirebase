@@ -8,7 +8,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, Mountain } from 'lucide-react';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import { cn } from '@/lib/utils';
-import { Logo } from '../logo';
+import { Logo } from './logo';
 import React from 'react';
 
 const lendingLinks: { title: string; href: string; description: string }[] = [
@@ -106,7 +106,7 @@ export default function Header() {
               </NavigationMenuItem>
               {navLinks.map((link) => (
                  <NavigationMenuItem key={link.href}>
-                    <Link href={link.href} legacyBehavior passHref>
+                    <Link href={link.href} legacyBehavior={false} passHref>
                         <NavigationMenuLink active={pathname === link.href} className={navigationMenuTriggerStyle()}>
                             {link.label}
                         </NavigationMenuLink>
