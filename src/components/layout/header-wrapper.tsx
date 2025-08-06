@@ -6,16 +6,29 @@ import Header from './header';
 import BorrowerDashboardHeader from '../borrower-dashboard-header';
 import BrokerOfficeHeader from '../broker-office-header';
 import WorkforceOfficeHeader from '../workforce-office-header';
+import { useAuth } from '@/contexts/auth-context';
+import { CustomLoader } from '../ui/custom-loader';
 
 
 export default function HeaderWrapper() {
   const pathname = usePathname();
+  const { loading } = useAuth();
 
-  if (pathname.startsWith('/dashboard')) {
+  const isAuthPage = pathname.startsWith('/auth');
+  const isDashboardPage = pathname.startsWith('/dashboard');
+  const isBrokerOfficePage = pathname.startsWith('/broker-office');
+  const isWorkforceOfficePage = pathname.startsWith('/workforce-office');
+
+  // While auth state is loading, don't show any header for protected areas to prevent flashing.
+  if (loading && (isDashboardPage || isBrokerOfficePage || isWorkforceOfficePage)) {
+    return null;
+  }
+
+  if (isDashboardPage) {
     return <BorrowerDashboardHeader />;
   }
 
-  if (pathname.startsWith('/broker-office')) {
+  if (isBrokerOfficePage) {
     return <BrokerOfficeHeader />;
   }
   
@@ -23,7 +36,7 @@ export default function HeaderWrapper() {
       return <WorkforceOfficeHeader />
   }
 
-  if (pathname.startsWith('/auth')) {
+  if (isAuthPage) {
     return null;
   }
 
