@@ -7,8 +7,6 @@ import BorrowerDashboardHeader from '../borrower-dashboard-header';
 import BrokerOfficeHeader from '../broker-office-header';
 import WorkforceOfficeHeader from '../workforce-office-header';
 import { useAuth } from '@/contexts/auth-context';
-import { CustomLoader } from '../ui/custom-loader';
-
 
 export default function HeaderWrapper() {
   const pathname = usePathname();
