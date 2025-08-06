@@ -1,15 +1,2 @@
-# Secrets
 secrets.txt
 .env
-.env.local
-
-# Next.js
-/.next/
-/out/
-
-# Node
-/node_modules/
-
-# IDE files
-.vscode/
-.idea/
