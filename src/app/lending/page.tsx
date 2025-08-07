@@ -75,7 +75,7 @@ export default function LendingHubPage() {
       <section id="programs" className="py-16 md:py-24 bg-primary/5">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="font-headline text-3xl font-bold text-primary">Our Loan Programs</h2>
+            <h2 className="font-headline text-3xl font-bold text-primary">Our Loan <span className="text-foreground">Programs</span></h2>
             <p className="mt-2 text-muted-foreground">Find the perfect financing solution for your next project.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
