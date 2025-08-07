@@ -45,7 +45,7 @@ export default function CommercialAcquisitionBridgeLoansPage() {
     <div>
       <section className="relative bg-primary/5 py-20 md:py-28 text-center">
         <div className="container mx-auto px-4">
-          <h1 className="font-headline text-4xl font-bold text-primary md:text-5xl">Acquisition & Bridge Loans</h1>
+          <h1 className="font-headline text-4xl font-bold md:text-5xl"><span className="text-primary">Acquisition & </span><span className="text-white">Bridge Loans</span></h1>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
             Seize opportunities with fast and flexible short-term financing.
           </p>
