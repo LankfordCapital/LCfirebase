@@ -72,7 +72,7 @@ export default function CommercialAcquisitionBridgeLoansPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div>
-            <h2 className="font-headline text-3xl font-bold text-primary">Move Quickly and Confidently</h2>
+            <h2 className="font-headline text-3xl font-bold"><span className="text-black">Move Quickly</span> <span className="text-primary">and Confidently</span></h2>
             <p className="mt-4 text-lg text-foreground/70">
                 In the fast-paced world of commercial real estate, speed is critical. Our acquisition and bridge loans provide the short-term capital needed to acquire properties quickly, execute on a business plan, or bridge a gap until permanent financing is secured.
             </p>
