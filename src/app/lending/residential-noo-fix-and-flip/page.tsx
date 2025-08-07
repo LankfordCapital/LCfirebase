@@ -56,10 +56,17 @@ export default function ResidentialNOOFixAndFlipPage() {
         </video>
         <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
         <div className="container relative z-20 mx-auto px-4 text-center">
-          <h1 className="font-headline text-4xl font-bold text-primary md:text-5xl">Fix and Flip Loans</h1>
+          <h1 className="font-headline text-4xl font-bold md:text-5xl">
+            <span className="text-white">Fix and Flip</span> <span className="text-primary">Loans</span>
+            </h1>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Capitalize on your next renovation project with our flexible financing.
           </p>
+           <div className="mt-8 flex justify-center gap-4">
+                <Button asChild size="lg">
+                  <Link href="/dashboard/application">Apply Now</Link>
+                </Button>
+            </div>
         </div>
       </section>
 
