@@ -1,8 +1,9 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, FileText, GanttChartSquare, TrendingUp, Calculator } from "lucide-react";
 
 const features = [
     "No personal income or DTI calculations required",
@@ -18,6 +19,29 @@ const features = [
     "Quick closings in 2-3 weeks",
     "Vacant properties OK (if leased within 90 days)",
     "Experience preferred but not required"
+];
+
+const processSteps = [
+    {
+        icon: <FileText className="h-8 w-8 text-primary" />,
+        title: "Submit Property Info",
+        description: "Provide the property details and rental information for our team to analyze."
+    },
+    {
+        icon: <Calculator className="h-8 w-8 text-primary" />,
+        title: "Cash Flow Analysis",
+        description: "We qualify the loan based on the property's Debt Service Coverage Ratio."
+    },
+    {
+        icon: <GanttChartSquare className="h-8 w-8 text-primary" />,
+        title: "Appraisal & Title",
+        description: "Our team orders the necessary third-party reports for underwriting."
+    },
+    {
+        icon: <TrendingUp className="h-8 w-8 text-primary" />,
+        title: "Close & Fund",
+        description: "Finalize your loan and receive funding to grow your rental portfolio."
+    }
 ];
 
 export default function ResidentialNOODscrPage() {
@@ -56,6 +80,22 @@ export default function ResidentialNOODscrPage() {
           </div>
         </div>
       </section>
+
+       <section className="py-16 md:py-24 bg-primary/5">
+            <div className="container mx-auto px-4 text-center">
+                 <h2 className="font-headline text-3xl font-bold">How It <span className="text-primary">Works</span></h2>
+                 <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">Our DSCR loan process focuses on the property's performance for a faster, simpler experience.</p>
+                <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {processSteps.map((step, index) => (
+                        <Card key={index} className="text-center p-6 border-t-4 border-primary">
+                            <div className="flex justify-center mb-4">{step.icon}</div>
+                            <h3 className="text-xl font-bold">{step.title}</h3>
+                            <p className="text-muted-foreground mt-2">{step.description}</p>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </section>
     </div>
   );
 }
