@@ -77,7 +77,7 @@ export default function CommercialGroundUpConstructionPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div>
-            <h2 className="font-headline text-3xl font-bold text-primary">Comprehensive Construction Financing</h2>
+            <h2 className="font-headline text-3xl font-bold text-primary"><span className="text-foreground">Comprehensive</span> Construction Financing</h2>
             <p className="mt-4 text-lg text-foreground/70">
                 Our Ground Up Construction loans provide the capital you need to take your commercial project from concept to completion. We offer structured financing solutions designed to support every phase of your new build, ensuring a smooth process from groundbreaking to grand opening.
             </p>
