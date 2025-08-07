@@ -53,7 +53,7 @@ export default function CommercialConventionalLongTermDebtPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div>
-            <h2 className="font-headline text-3xl font-bold text-primary">Secure Your Investment for the Long Haul</h2>
+            <h2 className="font-headline text-3xl font-bold"><span className="text-primary">Secure Your Investment for the </span><span className="text-foreground">Long Haul</span></h2>
             <p className="mt-4 text-lg text-foreground/70">
                 For stabilized, income-generating commercial properties, our conventional and long-term debt solutions provide the stability you need. Secure competitive rates and favorable terms to maximize your cash flow and hold your assets for the long term.
             </p>
