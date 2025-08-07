@@ -5,14 +5,19 @@ import {getAuth} from 'firebase/auth';
 import {getFirestore} from 'firebase/firestore';
 import {getStorage} from 'firebase/storage';
 
-const firebaseConfig = {
-  projectId: 'lankford-lending',
-  appId: '1:940157326397:web:02fbefc8cd0a13c2160654',
-  storageBucket: 'lankford-lending.appspot.com',
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: 'lankford-lending.firebaseapp.com',
-  messagingSenderId: '940157326397',
-};
+const firebaseConfigString = process.env.NEXT_PUBLIC_FIREBASE_CONFIG;
+let firebaseConfig = {};
+
+if (firebaseConfigString) {
+    try {
+        firebaseConfig = JSON.parse(firebaseConfigString);
+    } catch (e) {
+        console.error("Could not parse NEXT_PUBLIC_FIREBASE_CONFIG. Please ensure it is a valid JSON string.", e);
+    }
+} else {
+    console.error("Firebase config environment variable not set.");
+}
+
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
