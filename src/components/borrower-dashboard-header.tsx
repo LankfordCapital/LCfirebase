@@ -25,9 +25,7 @@ export default function BorrowerDashboardHeader() {
     <header className="sticky top-0 z-50 w-full border-b bg-background">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-6">
-          <Link href="/dashboard">
-            <Logo />
-          </Link>
+          <Logo />
           <nav className="hidden items-center gap-4 md:flex">
             {navLinks.map(link => (
                 <Link
