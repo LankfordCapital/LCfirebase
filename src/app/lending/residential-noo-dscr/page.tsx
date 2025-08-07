@@ -59,7 +59,7 @@ export default function ResidentialNOODscrPage() {
         </video>
         <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
         <div className="container relative z-20 mx-auto px-4 text-center">
-          <h1 className="font-headline text-4xl font-bold text-primary md:text-5xl">DSCR Loans for Investors</h1>
+          <h1 className="font-headline text-4xl font-bold md:text-5xl"><span className="text-white">DSCR Loans</span> <span className="text-primary">for Investors</span></h1>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Secure financing based on your property's income potential, not your personal income.
           </p>
