@@ -45,7 +45,7 @@ export default function ResidentialNOOBridgePage() {
     <div>
       <section className="relative bg-primary/5 py-20 md:py-28 text-center">
         <div className="container mx-auto px-4">
-          <h1 className="font-headline text-4xl font-bold text-primary md:text-5xl">Residential NOO Bridge Lending</h1>
+          <h1 className="font-headline text-4xl font-bold md:text-5xl"><span className="text-white">Residential NOO</span> <span className="text-primary">Bridge Lending</span></h1>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
             Bridge the gap to your next residential investment property.
           </p>
