@@ -113,9 +113,6 @@ export default function ResidentialNOOConstructionPage() {
                         ))}
                     </ul>
                 </div>
-                <div className="relative h-96 w-full rounded-lg overflow-hidden shadow-lg">
-                    <Image src="https://placehold.co/600x400.png" alt="Architectural blueprints and a hard hat" layout="fill" objectFit="cover" data-ai-hint="architectural blueprints" />
-                </div>
             </div>
         </section>
 
