@@ -74,7 +74,7 @@ export default function CommercialRehabLoansPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div>
-            <h2 className="font-headline text-3xl font-bold text-primary">Unlock Your Property's Potential</h2>
+            <h2 className="font-headline text-3xl font-bold"><span className="text-black">Unlock</span> <span className="text-primary">Your Property's Potential</span></h2>
             <p className="mt-4 text-lg text-foreground/70">
                 Our commercial rehab loans are designed for investors looking to renovate, repair, or improve commercial properties. Whether you're undertaking a minor facelift or a major overhaul, we provide the necessary capital to increase your property's value and cash flow.
             </p>
