@@ -73,7 +73,7 @@ export default function ResidentialNOOFixAndFlipPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
           <div>
-            <h2 className="font-headline text-3xl font-bold">Fix and Flip Lending</h2>
+            <h2 className="font-headline text-3xl font-bold"><span className="text-foreground">Fix and Flip</span> <span className="text-primary">Lending</span></h2>
             <p className="mt-4 text-lg text-foreground/70">
               Our Fix and Flip loans provide real estate investors with the short-term financing needed to purchase and renovate properties. With competitive leverage and interest-only payment structures, we empower you to maximize your returns and move quickly in a competitive market.
             </p>
