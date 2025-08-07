@@ -1,8 +1,9 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, FileText, GanttChartSquare, TrendingUp, CheckCircle } from "lucide-react";
 
 const features = [
     "Rates starting at 9.5% and 2 points",
@@ -14,6 +15,29 @@ const features = [
     "Short-term financing from 12-24 months",
     "Interest-only payments to maximize cash flow",
     "Clear path to permanent financing"
+];
+
+const processSteps = [
+    {
+        icon: <FileText className="h-8 w-8 text-primary" />,
+        title: "Submit Deal",
+        description: "Provide the property and deal information in our simple application."
+    },
+    {
+        icon: <GanttChartSquare className="h-8 w-8 text-primary" />,
+        title: "Get Terms",
+        description: "Receive a competitive term sheet from us within 24-48 hours."
+    },
+    {
+        icon: <CheckCircle className="h-8 w-8 text-primary" />,
+        title: "Underwriting & Approval",
+        description: "Our in-house team quickly processes your file for a final approval."
+    },
+    {
+        icon: <TrendingUp className="h-8 w-8 text-primary" />,
+        title: "Fund & Close",
+        description: "Close your loan quickly and secure your next investment property."
+    }
 ];
 
 export default function ResidentialNOOBridgePage() {
@@ -52,6 +76,22 @@ export default function ResidentialNOOBridgePage() {
           </div>
         </div>
       </section>
+      
+      <section className="py-16 md:py-24 bg-primary/5">
+            <div className="container mx-auto px-4 text-center">
+                 <h2 className="font-headline text-3xl font-bold">How It <span className="text-primary">Works</span></h2>
+                 <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">Our bridge loan process is designed for speed and efficiency to help you secure properties fast.</p>
+                <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {processSteps.map((step, index) => (
+                        <Card key={index} className="text-center p-6 border-t-4 border-primary">
+                            <div className="flex justify-center mb-4">{step.icon}</div>
+                            <h3 className="text-xl font-bold">{step.title}</h3>
+                            <p className="text-muted-foreground mt-2">{step.description}</p>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </section>
     </div>
   );
 }
