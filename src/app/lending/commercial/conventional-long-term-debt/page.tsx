@@ -2,7 +2,8 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, FileText, GanttChartSquare, CheckCircle, TrendingUp } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 const features = [
     "Long-term financing for stabilized commercial properties",
@@ -16,6 +17,29 @@ const features = [
     "Up to 75% for cash-out refinancing",
     "Full documentation required",
     "660 minimum FICO Score"
+];
+
+const processSteps = [
+    {
+        icon: <FileText className="h-8 w-8 text-primary" />,
+        title: "Submit Application",
+        description: "Provide your property's financials and your personal information through our secure portal."
+    },
+    {
+        icon: <GanttChartSquare className="h-8 w-8 text-primary" />,
+        title: "Initial Underwriting",
+        description: "Our team will review your submission and provide a preliminary term sheet."
+    },
+    {
+        icon: <CheckCircle className="h-8 w-8 text-primary" />,
+        title: "Full Approval",
+        description: "We'll work with you to gather final documentation for a full loan approval."
+    },
+    {
+        icon: <TrendingUp className="h-8 w-8 text-primary" />,
+        title: "Close & Fund",
+        description: "Finalize your long-term financing and secure your investment for the future."
+    }
 ];
 
 export default function CommercialConventionalLongTermDebtPage() {
@@ -53,7 +77,7 @@ export default function CommercialConventionalLongTermDebtPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div>
-            <h2 className="font-headline text-3xl font-bold"><span className="text-primary">Secure Your Investment for the </span><span className="text-foreground">Long Haul</span></h2>
+            <h2 className="font-headline text-3xl font-bold"><span className="text-primary">Secure Your Investment for the </span><span className="text-black">Long Haul</span></h2>
             <p className="mt-4 text-lg text-foreground/70">
                 For stabilized, income-generating commercial properties, our conventional and long-term debt solutions provide the stability you need. Secure competitive rates and favorable terms to maximize your cash flow and hold your assets for the long term.
             </p>
@@ -71,6 +95,22 @@ export default function CommercialConventionalLongTermDebtPage() {
           </div>
         </div>
       </section>
+
+       <section className="py-16 md:py-24 bg-primary/5">
+            <div className="container mx-auto px-4 text-center">
+                 <h2 className="font-headline text-3xl font-bold">How It <span className="text-primary">Works</span></h2>
+                 <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">Our streamlined process for long-term debt financing.</p>
+                <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {processSteps.map((step, index) => (
+                        <Card key={index} className="text-center p-6 border-t-4 border-primary">
+                            <div className="flex justify-center mb-4">{step.icon}</div>
+                            <h3 className="text-xl font-bold">{step.title}</h3>
+                            <p className="text-muted-foreground mt-2">{step.description}</p>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </section>
     </div>
   );
 }
