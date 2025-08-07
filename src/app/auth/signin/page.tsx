@@ -92,14 +92,19 @@ export default function SignInPage() {
                         Sign up
                         </Link>
                     </div>
+                     <div className="mt-2">
+                        <Link href="/auth/broker-signin" className="underline">
+                        Broker Sign In
+                        </Link>
+                    </div>
                     <div className="mt-2">
                         <Link href="/auth/workforce-signin" className="underline">
                         Workforce Sign In
                         </Link>
                     </div>
-                     <div className="mt-2">
-                        <Link href="/auth/broker-signin" className="underline">
-                        Broker Sign In
+                     <div className="mt-2 pt-2 border-t">
+                        <Link href="/auth/admin-signup" className="underline text-primary">
+                        Admin Master Access
                         </Link>
                     </div>
                     </div>
