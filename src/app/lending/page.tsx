@@ -75,7 +75,7 @@ export default function LendingHubPage() {
       <section id="programs" className="py-16 md:py-24 bg-primary/5">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="font-headline text-3xl font-bold text-primary">Our Loan <span className="text-foreground">Programs</span></h2>
+            <h2 className="font-headline text-3xl font-bold"><span className="text-primary">Our Loan</span> <span className="text-foreground">Programs</span></h2>
             <p className="mt-2 text-muted-foreground">Find the perfect financing solution for your next project.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -101,7 +101,7 @@ export default function LendingHubPage() {
 
       <section className="bg-background py-16 md:py-24">
         <div className="container mx-auto px-4 text-center">
-            <h2 className="font-headline text-3xl font-bold text-primary">Ready to Get Started?</h2>
+            <h2 className="font-headline text-3xl font-bold"><span className="text-foreground">Ready to</span> <span className="text-primary">Get Started?</span></h2>
             <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/70">
                 Our streamlined application process and dedicated team make it easy to secure the funding you need.
             </p>
