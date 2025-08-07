@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
@@ -20,10 +21,20 @@ const features = [
 export default function ResidentialNOOFixAndFlipPage() {
   return (
     <div>
-      <section className="relative bg-primary/5 py-20 md:py-28 text-center">
-        <div className="container mx-auto px-4">
+      <section className="relative h-[50vh] flex items-center justify-center text-white py-20 md:py-28">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute top-0 left-0 w-full h-full object-cover z-0"
+        >
+          <source src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/shutterstock_3707052671.mp4?alt=media&token=f40dd8b7-4cde-4a0a-94f1-51c2b399226d" type="video/mp4" />
+        </video>
+        <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
+        <div className="container relative z-20 mx-auto px-4 text-center">
           <h1 className="font-headline text-4xl font-bold text-primary md:text-5xl">Fix and Flip Loans</h1>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Capitalize on your next renovation project with our flexible financing.
           </p>
         </div>
