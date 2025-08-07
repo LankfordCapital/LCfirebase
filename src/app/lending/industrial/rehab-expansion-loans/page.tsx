@@ -72,7 +72,7 @@ export default function IndustrialRehabExpansionLoansPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div>
-            <h2 className="font-headline text-3xl font-bold text-primary">Unlock Your Property's Potential</h2>
+            <h2 className="font-headline text-3xl font-bold"><span className="text-black">Unlock</span> <span className="text-primary">Your Property's Potential</span></h2>
             <p className="mt-4 text-lg text-foreground/70">
                 Our industrial rehab and expansion loans are designed for businesses looking to renovate, modernize, or expand their facilities. Whether you're upgrading machinery, adding square footage, or improving logistics, we provide the necessary capital to boost your property's value and operational efficiency.
             </p>
