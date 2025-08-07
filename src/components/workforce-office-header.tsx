@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { LogOut, Settings, User as UserIcon, Cog, Shield, Users, LineChart, Briefcase, BotMessageSquare, FileText, Database, GitBranch, MessageSquare, Calendar, PencilRuler, FileType } from 'lucide-react';
-import { Logo } from '../logo';
+import { Logo } from '@/components/logo';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import React from 'react';
 import { cn } from '@/lib/utils';
