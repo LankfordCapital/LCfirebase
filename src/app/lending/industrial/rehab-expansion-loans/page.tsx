@@ -48,7 +48,7 @@ export default function IndustrialRehabExpansionLoansPage() {
           playsInline
           className="absolute top-0 left-0 w-full h-full object-cover z-0"
         >
-          <source src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/shutterstock_1101919271.mp4?alt=media&token=4a2f076e-7f73-4796-8edd-57f973f7ebd6" type="video/mp4" />
+          <source src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/shutterstock_3536062857.mp4?alt=media&token=fd92d81a-9c17-4e9d-93a2-8f3359aa9170" type="video/mp4" />
         </video>
         <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
         <div className="container relative z-20 mx-auto px-4 text-center">
