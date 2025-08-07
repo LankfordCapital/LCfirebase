@@ -21,6 +21,7 @@ import { CustomLoader } from "@/components/ui/custom-loader";
 import { updateProfile } from "firebase/auth";
 import Image from "next/image";
 import { CheckCircle } from "lucide-react";
+import { FirebaseError } from "firebase/app";
 
 export default function AdminSignUpPage() {
   const [fullName, setFullName] = useState('Admin User');
@@ -48,35 +49,49 @@ export default function AdminSignUpPage() {
     setIsSignedIn(false);
     
     try {
-      // First, try to sign in. If it succeeds, we are done.
+      // First, try to sign in.
       await signIn(email, password);
       toast({
           title: 'Sign In Successful',
           description: `Successfully signed in as ${email}. Redirecting...`,
       });
       setIsSignedIn(true);
-    } catch (error: any) {
-        // If sign-in fails for any reason, assume the user may not exist or password is wrong,
-        // and proceed to create the account. This is a robust way to handle the "master key" logic.
-        try {
-            const userCredential = await signUp(email, password);
-            await updateProfile(userCredential.user, {
-                displayName: fullName
+    } catch (error) {
+        // If sign-in fails because the user is not found, then create it.
+        if (error instanceof FirebaseError && error.code === 'auth/user-not-found') {
+             try {
+                const userCredential = await signUp(email, password);
+                await updateProfile(userCredential.user, {
+                    displayName: fullName
+                });
+                // After successful creation, sign in again to ensure session is correctly established.
+                await signIn(email, password);
+                toast({
+                    title: 'Admin Account Created',
+                    description: `Successfully created and signed in as ${email}. Redirecting...`,
+                });
+                setIsSignedIn(true);
+            } catch (signUpError: any) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Admin Creation Failed',
+                    description: signUpError.message,
+                });
+            }
+        } else if (error instanceof FirebaseError) {
+            // Handle other Firebase errors like wrong password
+             toast({
+                variant: 'destructive',
+                title: 'Sign In Failed',
+                description: error.message,
             });
-            // After successful creation, sign in again to ensure session is correctly established.
-            await signIn(email, password);
-            toast({
-                title: 'Admin Account Created',
-                description: `Successfully created and signed in as ${email}. Redirecting...`,
-            });
-            setIsSignedIn(true);
-        } catch (signUpError: any) {
-             // If sign up also fails (e.g., email already in use with a different password from a previous failed state),
-             // it means we must use the sign-in flow. We already tried that, so we show a generic error.
+        }
+        else {
+             // Handle non-Firebase errors
             toast({
                 variant: 'destructive',
                 title: 'An Error Occurred',
-                description: `Could not sign in or create the admin account. The account may already exist with a different password. Please contact support.`,
+                description: `An unexpected error occurred. Please try again.`,
             });
         }
     } finally {
