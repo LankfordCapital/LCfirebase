@@ -88,14 +88,13 @@ function Footer() {
             </div>
         </div>
         <div className="mt-12 pt-8 border-t border-border/20 flex items-center justify-between text-sm text-secondary-foreground/60">
+            <p className="text-center">&copy; {new Date().getFullYear()} Lankford Capital. All Rights Reserved.</p>
             <Image 
               src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" 
               alt="Lankford Capital Icon"
               width={24}
               height={24}
             />
-            <p className="text-center">&copy; {new Date().getFullYear()} Lankford Capital. All Rights Reserved.</p>
-            <div className="w-6"></div>
         </div>
       </div>
     </footer>
