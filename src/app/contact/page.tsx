@@ -48,7 +48,7 @@ export default function ContactPage() {
                 <Phone className="h-6 w-6 text-accent mt-1 flex-shrink-0" />
                 <div>
                     <h3 className="font-semibold">Call Us</h3>
-                    <p className="text-muted-foreground">888-708-6146</p>
+                    <p className="text-muted-foreground">+1 888-489-6564</p>
                 </div>
              </div>
           </div>
