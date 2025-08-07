@@ -33,7 +33,7 @@ export default function CommercialConventionalLongTermDebtPage() {
         </video>
         <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
         <div className="container relative z-20 mx-auto px-4 text-center">
-          <h1 className="font-headline text-4xl font-bold text-primary md:text-5xl">Conventional / Long Term Debt</h1>
+          <h1 className="font-headline text-4xl font-bold md:text-5xl"><span className="text-white">Conventional</span><span className="text-primary"> / Long Term Debt</span></h1>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Stable, reliable financing for your income-producing assets.
           </p>
