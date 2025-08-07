@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
@@ -38,13 +39,37 @@ const processSteps = [
 export default function IndustrialGroundUpConstructionPage() {
   return (
     <div>
-      <section className="relative bg-primary/5 py-20 md:py-28 text-center">
-        <div className="container mx-auto px-4">
-          <h1 className="font-headline text-4xl font-bold text-primary md:text-5xl">Industrial Ground Up Construction</h1>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
+      <section className="relative h-[50vh] flex items-center justify-center text-white py-20 md:py-28">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute top-0 left-0 w-full h-full object-cover z-0"
+        >
+          <source src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/shutterstock_3536062857.mp4?alt=media&token=fd92d81a-9c17-4e9d-93a2-8f3359aa9170" type="video/mp4" />
+        </video>
+        <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
+        <div className="container relative z-20 mx-auto px-4 text-center">
+          <h1 className="font-headline text-4xl font-bold md:text-5xl">
+            <span className="text-primary">Industrial</span> <span className="text-white">Ground Up Construction</span>
+            </h1>
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Building your industrial vision from the ground up with tailored financing.
           </p>
+          <div className="mt-8 flex justify-center gap-4">
+                <Button asChild size="lg">
+                  <Link href="/auth/signup">Apply Now</Link>
+                </Button>
+            </div>
         </div>
+        <Image
+            src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5"
+            alt="Lankford Capital Icon"
+            width={64}
+            height={64}
+            className="absolute bottom-4 right-4 z-20"
+        />
       </section>
 
       <section className="py-16 md:py-24">
