@@ -80,14 +80,14 @@ export default function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-secondary">
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <div className="flex items-center gap-6">
           <Logo />
           <NavigationMenu className="hidden lg:flex">
             <NavigationMenuList>
                 <NavigationMenuItem>
-                <NavigationMenuTrigger>Lending</NavigationMenuTrigger>
+                <NavigationMenuTrigger className="bg-secondary text-secondary-foreground hover:bg-secondary/80">Lending</NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                     {lendingLinks.map((component) => (
@@ -104,7 +104,7 @@ export default function Header() {
               </NavigationMenuItem>
               {navLinks.map((link) => (
                  <NavigationMenuItem key={link.href}>
-                    <NavigationMenuLink asChild active={pathname === link.href} className={navigationMenuTriggerStyle()}>
+                    <NavigationMenuLink asChild active={pathname === link.href} className={cn(navigationMenuTriggerStyle(), "bg-secondary text-secondary-foreground hover:bg-secondary/80")}>
                       <Link href={link.href}>
                         {link.label}
                       </Link>
@@ -116,7 +116,7 @@ export default function Header() {
         </div>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <Button variant="ghost" asChild>
+          <Button variant="ghost" asChild className="text-secondary-foreground hover:bg-secondary/80 hover:text-secondary-foreground">
             <Link href="/auth/signin">Sign In</Link>
           </Button>
           <Button asChild>
