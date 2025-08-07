@@ -80,18 +80,18 @@ export default function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-secondary">
+    <header className="sticky top-0 z-50 w-full border-b bg-background">
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <div className="flex items-center gap-6">
           <Logo className="text-2xl" />
           <NavigationMenu className="hidden lg:flex">
             <NavigationMenuList>
                 <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-secondary text-primary hover:bg-secondary/80">Lending</NavigationMenuTrigger>
+                <NavigationMenuTrigger>Lending</NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                     {lendingLinks.map((component) => (
-                      <ListItem
+                       <ListItem
                         key={component.title}
                         title={component.title}
                         href={component.href}
@@ -104,11 +104,11 @@ export default function Header() {
               </NavigationMenuItem>
               {navLinks.map((link) => (
                  <NavigationMenuItem key={link.href}>
-                    <NavigationMenuLink asChild active={pathname === link.href} className={cn(navigationMenuTriggerStyle(), "bg-secondary text-primary hover:bg-secondary/80")}>
-                      <Link href={link.href}>
-                        {link.label}
-                      </Link>
-                    </NavigationMenuLink>
+                    <Link href={link.href} legacyBehavior passHref>
+                        <NavigationMenuLink active={pathname === link.href} className={navigationMenuTriggerStyle()}>
+                            {link.label}
+                        </NavigationMenuLink>
+                    </Link>
                 </NavigationMenuItem>
               ))}
             </NavigationMenuList>
@@ -116,7 +116,7 @@ export default function Header() {
         </div>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <Button variant="ghost" asChild className="text-primary hover:bg-secondary/80 hover:text-primary">
+          <Button variant="ghost" asChild>
             <Link href="/auth/signin">Sign In</Link>
           </Button>
           <Button asChild>
@@ -126,7 +126,7 @@ export default function Header() {
 
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="default" size="icon" className="lg:hidden">
+            <Button variant="outline" size="icon" className="lg:hidden">
               <Menu className="h-6 w-6" />
               <span className="sr-only">Toggle navigation menu</span>
             </Button>
