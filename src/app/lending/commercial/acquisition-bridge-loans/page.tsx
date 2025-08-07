@@ -56,9 +56,12 @@ export default function CommercialAcquisitionBridgeLoansPage() {
         <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
         <div className="container relative z-20 mx-auto px-4 text-center">
           <h1 className="font-headline text-4xl font-bold md:text-5xl"><span className="text-primary">Acquisition & </span><span className="text-white">Bridge Loans</span></h1>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Seize opportunities with fast and flexible short-term financing.
           </p>
+           <Button asChild size="lg" className="mt-8">
+              <Link href="/dashboard/application">Apply Now</Link>
+            </Button>
         </div>
         <Image
             src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5"
