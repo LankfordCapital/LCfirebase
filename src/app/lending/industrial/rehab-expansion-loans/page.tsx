@@ -1,7 +1,9 @@
+
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, FileText, GanttChartSquare, CheckCircle, TrendingUp } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 const features = [
     "Financing for property acquisition and renovation costs",
@@ -10,6 +12,30 @@ const features = [
     "Flexible terms for various project scopes",
     "Increase efficiency and capacity of your facilities",
 ];
+
+const processSteps = [
+    {
+        icon: <FileText className="h-8 w-8 text-primary" />,
+        title: "Submit Plan",
+        description: "Provide the property details and your renovation/expansion plan."
+    },
+    {
+        icon: <GanttChartSquare className="h-8 w-8 text-primary" />,
+        title: "Underwriting & Valuation",
+        description: "We assess the project's feasibility and after-renovation value (ARV)."
+    },
+    {
+        icon: <CheckCircle className="h-8 w-8 text-primary" />,
+        title: "Loan Approval",
+        description: "Receive a competitive term sheet for your industrial rehab project."
+    },
+    {
+        icon: <TrendingUp className="h-8 w-8 text-primary" />,
+        title: "Fund & Renovate",
+        description: "Close the loan and begin your renovation with structured funding draws."
+    }
+];
+
 
 export default function IndustrialRehabExpansionLoansPage() {
   return (
@@ -47,6 +73,22 @@ export default function IndustrialRehabExpansionLoansPage() {
           </div>
         </div>
       </section>
+
+       <section className="py-16 md:py-24 bg-primary/5">
+            <div className="container mx-auto px-4 text-center">
+                 <h2 className="font-headline text-3xl font-bold">How It <span className="text-primary">Works</span></h2>
+                 <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">Our streamlined process for industrial rehab and expansion financing.</p>
+                <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {processSteps.map((step, index) => (
+                        <Card key={index} className="text-center p-6 border-t-4 border-primary">
+                            <div className="flex justify-center mb-4">{step.icon}</div>
+                            <h3 className="text-xl font-bold">{step.title}</h3>
+                            <p className="text-muted-foreground mt-2">{step.description}</p>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </section>
     </div>
   );
 }
