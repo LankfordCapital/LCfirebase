@@ -129,7 +129,7 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {loanProducts.map((product) => (
-              <Card key={product.title} className="group transform-gpu transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+              <Card key={product.title} className="group transform-gpu transition-all duration-300 hover:-translate-y-2 hover:shadow-xl relative overflow-hidden">
                 <CardHeader className="flex flex-col items-start gap-4">
                   {product.icon}
                   <CardTitle className="font-headline text-xl">{product.title}</CardTitle>
@@ -142,6 +142,13 @@ export default function Home() {
                     </Link>
                   </Button>
                 </CardContent>
+                <Image
+                    src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5"
+                    alt="Lankford Capital Icon"
+                    width={40}
+                    height={40}
+                    className="absolute bottom-4 right-4 opacity-50 group-hover:opacity-100 transition-opacity"
+                />
               </Card>
             ))}
           </div>
