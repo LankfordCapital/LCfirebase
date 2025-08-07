@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, FileText, GanttChartSquare, CheckCircle, TrendingUp } from "lucide-react";
 
 const features = [
     "Financing for a wide range of new and used equipment",
@@ -16,6 +16,29 @@ const features = [
     "Minimum FICO Score of 660",
     "Low-doc, full-doc, and application-only options",
     "Fast approvals and funding"
+];
+
+const processSteps = [
+    {
+        icon: <FileText className="h-8 w-8 text-primary" />,
+        title: "Submit Application",
+        description: "Complete our simple online application and provide quotes for the equipment you need."
+    },
+    {
+        icon: <GanttChartSquare className="h-8 w-8 text-primary" />,
+        title: "Credit Review",
+        description: "Our team will quickly review your application and financial information."
+    },
+    {
+        icon: <CheckCircle className="h-8 w-8 text-primary" />,
+        title: "Approval & Documents",
+        description: "Receive your loan approval and sign the financing documents electronically."
+    },
+    {
+        icon: <TrendingUp className="h-8 w-8 text-primary" />,
+        title: "Fund & Acquire",
+        description: "We fund the dealer directly, and you get your equipment. It's that simple."
+    }
 ];
 
 export default function EquipmentFinancingPage() {
@@ -78,6 +101,22 @@ export default function EquipmentFinancingPage() {
           </div>
         </div>
       </section>
+      
+        <section className="py-16 md:py-24 bg-primary/5">
+            <div className="container mx-auto px-4 text-center">
+                 <h2 className="font-headline text-3xl font-bold">How It <span className="text-primary">Works</span></h2>
+                 <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">Our streamlined process for equipment financing.</p>
+                <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {processSteps.map((step, index) => (
+                        <Card key={index} className="text-center p-6 border-t-4 border-primary">
+                            <div className="flex justify-center mb-4">{step.icon}</div>
+                            <h3 className="text-xl font-bold">{step.title}</h3>
+                            <p className="text-muted-foreground mt-2">{step.description}</p>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </section>
     </div>
   );
 }
