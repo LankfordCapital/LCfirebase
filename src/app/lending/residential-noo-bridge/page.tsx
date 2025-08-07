@@ -59,13 +59,18 @@ export default function ResidentialNOOBridgePage() {
           <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Bridge the gap to your next residential investment property.
           </p>
+           <div className="mt-8 flex justify-center gap-4">
+                <Button asChild size="lg">
+                  <Link href="/auth/signup">Apply Now</Link>
+                </Button>
+            </div>
         </div>
       </section>
 
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div>
-            <h2 className="font-headline text-3xl font-bold text-primary">Secure <span className="text-foreground">Opportunities</span> Quickly</h2>
+            <h2 className="font-headline text-3xl font-bold"><span className="text-foreground">Secure</span> <span className="text-black">Opportunities</span> <span className="text-foreground">Quickly</span></h2>
             <p className="mt-4 text-lg text-foreground/70">
                 Our Residential NOO (Non-Owner Occupied) Bridge Loans provide fast, short-term financing to help investors seize opportunities quickly. Whether you're acquiring a new property before long-term financing is in place or need to close a deal fast, our bridge loans provide the capital you need.
             </p>
