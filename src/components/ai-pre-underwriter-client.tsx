@@ -61,7 +61,7 @@ export function AIPReUnderwriterClient() {
       });
       return;
     }
-    const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
+    const programSlug = loanProgram.toLowerCase().replace(/\s-\s/g, '-').replace(/ /g, '-').replace(/&/g, 'and');
     router.push(`/dashboard/application/${programSlug}`);
   };
 
@@ -82,7 +82,7 @@ export function AIPReUnderwriterClient() {
                     <SelectContent>
                         <SelectGroup>
                             <SelectLabel>Residential NOO</SelectLabel>
-                            <SelectItem value="Residential NOO Ground Up Construction">Ground Up Construction</SelectItem>
+                            <SelectItem value="Residential NOO - Ground Up Construction">Ground Up Construction</SelectItem>
                             <SelectItem value="Residential NOO - Fix and Flip">Fix and Flip</SelectItem>
                             <SelectItem value="Residential NOO - DSCR">DSCR Loan</SelectItem>
                             <SelectItem value="Residential NOO - Bridge">Bridge Loan</SelectItem>

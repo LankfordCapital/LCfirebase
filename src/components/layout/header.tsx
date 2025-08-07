@@ -88,21 +88,15 @@ export default function Header() {
           <NavigationMenu className="hidden lg:flex">
             <NavigationMenuList>
                 <NavigationMenuItem>
-                <NavigationMenuTrigger>Lending</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                    {lendingLinks.map((component) => (
-                       <ListItem
-                        key={component.title}
-                        title={component.title}
-                        href={component.href}
+                    <NavigationMenuLink asChild>
+                      <Link
+                        href="/lending"
+                        className={cn(navigationMenuTriggerStyle(), { 'bg-accent': pathname.startsWith('/lending') })}
                       >
-                        {component.description}
-                      </ListItem>
-                    ))}
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
+                        Lending
+                      </Link>
+                    </NavigationMenuLink>
+                </NavigationMenuItem>
               {navLinks.map((link) => (
                  <NavigationMenuItem key={link.href}>
                     <NavigationMenuLink asChild>
@@ -146,12 +140,14 @@ export default function Header() {
             </SheetHeader>
             <div className="flex-grow flex flex-col justify-between">
                 <nav className="grid gap-4 py-6">
+                     <Link href="/lending" className={cn("text-lg font-medium", pathname.startsWith('/lending') ? 'text-primary' : 'text-muted-foreground hover:text-foreground')}>
+                        Lending
+                    </Link>
                     {navLinks.map((link) => (
                         <Link key={link.href} href={link.href} className={cn("text-lg font-medium", pathname === link.href ? 'text-primary' : 'text-muted-foreground hover:text-foreground')}>
                             {link.label}
                         </Link>
                     ))}
-                     <Link href="/lending/residential-noo" className="text-lg font-medium text-muted-foreground hover:text-foreground">Lending</Link>
                 </nav>
                  <div className="flex flex-col gap-2">
                     <Button variant="ghost" asChild>
