@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { LogOut, Settings, User as UserIcon, Cog, Shield, Users, LineChart, Briefcase, BotMessageSquare, FileText, Database, GitBranch, MessageSquare, Calendar, PencilRuler, FileType } from 'lucide-react';
-import { Logo } from './logo';
+import { Logo } from '@/components/logo';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import React from 'react';
 import { cn } from '@/lib/utils';
@@ -71,7 +71,7 @@ export default function WorkforceOfficeHeader() {
           <NavigationMenu className="hidden lg:flex">
             <NavigationMenuList>
                 <NavigationMenuItem>
-                    <Link href="/workforce-office" legacyBehavior passHref>
+                    <Link href="/workforce-office">
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>Dashboard</NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
@@ -116,29 +116,29 @@ export default function WorkforceOfficeHeader() {
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                    <Link href="/workforce-office/user-management" legacyBehavior passHref>
+                    <Link href="/workforce-office/user-management">
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>User Management</NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
 
                  <NavigationMenuItem>
-                    <Link href="/workforce-office/communications" legacyBehavior passHref>
+                    <Link href="/workforce-office/communications">
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>Chat</NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
                  <NavigationMenuItem>
-                    <Link href="/workforce-office/scheduler" legacyBehavior passHref>
+                    <Link href="/workforce-office/scheduler">
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>Scheduler</NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
                   <NavigationMenuItem>
-                    <Link href="/workforce-office/docs" legacyBehavior passHref>
+                    <Link href="/workforce-office/docs">
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>Docs</NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
 
                  <NavigationMenuItem>
-                    <Link href="/workforce-office/reports" legacyBehavior passHref>
+                    <Link href="/workforce-office/reports">
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>Reports</NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
