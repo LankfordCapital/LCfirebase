@@ -50,7 +50,7 @@ function Footer() {
   }
 
   return (
-    <footer className="bg-secondary text-secondary-foreground border-t">
+    <footer className="bg-secondary text-secondary-foreground">
        <style jsx global>{`
         footer #logo-capital {
           color: white !important;
