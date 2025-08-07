@@ -71,7 +71,7 @@ export default function WorkforceOfficeHeader() {
           <NavigationMenu className="hidden lg:flex">
             <NavigationMenuList>
                 <NavigationMenuItem>
-                    <Link href="/workforce-office" asChild>
+                    <Link href="/workforce-office" legacyBehavior passHref>
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>Dashboard</NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
@@ -116,29 +116,29 @@ export default function WorkforceOfficeHeader() {
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                    <Link href="/workforce-office/user-management" asChild>
+                    <Link href="/workforce-office/user-management" legacyBehavior passHref>
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>User Management</NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
 
                  <NavigationMenuItem>
-                    <Link href="/workforce-office/communications" asChild>
+                    <Link href="/workforce-office/communications" legacyBehavior passHref>
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>Chat</NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
                  <NavigationMenuItem>
-                    <Link href="/workforce-office/scheduler" asChild>
+                    <Link href="/workforce-office/scheduler" legacyBehavior passHref>
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>Scheduler</NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
                   <NavigationMenuItem>
-                    <Link href="/workforce-office/docs" asChild>
+                    <Link href="/workforce-office/docs" legacyBehavior passHref>
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>Docs</NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
 
                  <NavigationMenuItem>
-                    <Link href="/workforce-office/reports" asChild>
+                    <Link href="/workforce-office/reports" legacyBehavior passHref>
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>Reports</NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
