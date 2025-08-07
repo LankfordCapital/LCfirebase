@@ -63,8 +63,8 @@ function Footer() {
                     <Image 
                       src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5" 
                       alt="Lankford Capital Icon"
-                      width={32}
-                      height={32}
+                      width={40}
+                      height={40}
                     />
                     <Logo className="text-2xl" />
                 </div>
