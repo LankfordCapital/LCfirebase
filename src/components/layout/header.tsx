@@ -84,7 +84,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background">
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <div className="flex items-center gap-6">
-          <Logo className="text-2xl" />
+          <Logo />
           <NavigationMenu className="hidden lg:flex">
             <NavigationMenuList>
                 <NavigationMenuItem>
@@ -105,7 +105,7 @@ export default function Header() {
               </NavigationMenuItem>
               {navLinks.map((link) => (
                  <NavigationMenuItem key={link.href}>
-                    <Link href={link.href} passHref>
+                    <Link href={link.href} asChild>
                       <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                         {link.label}
                       </NavigationMenuLink>
