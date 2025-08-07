@@ -11,6 +11,7 @@ import { Logo } from '@/components/logo';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { usePathname } from 'next/navigation';
 
 
 const aiToolsLinks = [
@@ -62,6 +63,7 @@ ListItem.displayName = 'ListItem';
 
 export default function WorkforceOfficeHeader() {
   const { user, logOut } = useAuth();
+  const pathname = usePathname();
   
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background">
@@ -71,9 +73,9 @@ export default function WorkforceOfficeHeader() {
           <NavigationMenu className="hidden lg:flex">
             <NavigationMenuList>
                 <NavigationMenuItem>
-                    <Link href="/workforce-office" passHref legacyBehavior>
-                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>Dashboard</NavigationMenuLink>
-                    </Link>
+                    <NavigationMenuLink asChild>
+                        <Link href="/workforce-office" className={cn(navigationMenuTriggerStyle(), { 'bg-accent': pathname === '/workforce-office' })}>Dashboard</Link>
+                    </NavigationMenuLink>
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
@@ -116,31 +118,31 @@ export default function WorkforceOfficeHeader() {
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                    <Link href="/workforce-office/user-management" passHref legacyBehavior>
-                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>User Management</NavigationMenuLink>
-                    </Link>
+                    <NavigationMenuLink asChild>
+                        <Link href="/workforce-office/user-management" className={cn(navigationMenuTriggerStyle(), { 'bg-accent': pathname === '/workforce-office/user-management' })}>User Management</Link>
+                    </NavigationMenuLink>
                 </NavigationMenuItem>
 
                  <NavigationMenuItem>
-                    <Link href="/workforce-office/communications" passHref legacyBehavior>
-                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>Chat</NavigationMenuLink>
-                    </Link>
+                    <NavigationMenuLink asChild>
+                        <Link href="/workforce-office/communications" className={cn(navigationMenuTriggerStyle(), { 'bg-accent': pathname === '/workforce-office/communications' })}>Chat</Link>
+                    </NavigationMenuLink>
                 </NavigationMenuItem>
                  <NavigationMenuItem>
-                    <Link href="/workforce-office/scheduler" passHref legacyBehavior>
-                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>Scheduler</NavigationMenuLink>
-                    </Link>
+                    <NavigationMenuLink asChild>
+                        <Link href="/workforce-office/scheduler" className={cn(navigationMenuTriggerStyle(), { 'bg-accent': pathname === '/workforce-office/scheduler' })}>Scheduler</Link>
+                    </NavigationMenuLink>
                 </NavigationMenuItem>
                   <NavigationMenuItem>
-                    <Link href="/workforce-office/docs" passHref legacyBehavior>
-                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>Docs</NavigationMenuLink>
-                    </Link>
+                    <NavigationMenuLink asChild>
+                        <Link href="/workforce-office/docs" className={cn(navigationMenuTriggerStyle(), { 'bg-accent': pathname === '/workforce-office/docs' })}>Docs</Link>
+                    </NavigationMenuLink>
                 </NavigationMenuItem>
 
                  <NavigationMenuItem>
-                    <Link href="/workforce-office/reports" passHref legacyBehavior>
-                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>Reports</NavigationMenuLink>
-                    </Link>
+                    <NavigationMenuLink asChild>
+                        <Link href="/workforce-office/reports" className={cn(navigationMenuTriggerStyle(), { 'bg-accent': pathname === '/workforce-office/reports' })}>Reports</Link>
+                    </NavigationMenuLink>
                 </NavigationMenuItem>
 
             </NavigationMenuList>
