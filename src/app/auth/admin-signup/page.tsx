@@ -120,7 +120,7 @@ export default function AdminSignUpPage() {
                 <CardHeader className="text-center">
                     <CardTitle className="font-headline text-2xl">Admin Master Access</CardTitle>
                     <CardDescription>
-                    Use these fixed credentials to access all dashboards.
+                    Use these fixed credentials to access all dashboards. This will create the admin account if it doesn't exist.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-4">
