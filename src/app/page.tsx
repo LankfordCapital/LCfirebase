@@ -192,7 +192,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-               <h2 className="font-headline text-3xl font-bold text-primary md:text-4xl">Ready to Start Your Next Project?</h2>
+               <h2 className="font-headline text-3xl font-bold text-primary md:text-4xl">Ready to <span className="text-foreground">Start</span> Your Next Project?</h2>
               <p className="mt-4 text-lg text-foreground/70">
                 Let's discuss your financing needs. Fill out our inquiry form for a prompt, no-obligation consultation with one of our lending specialists. We're here to help you achieve your goals.
               </p>
