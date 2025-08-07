@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { Check, FileText, GanttChartSquare, TrendingUp, Calculator } from "lucide-react";
+import { Check, FileText, GanttChartSquare, TrendingUp, Calculator, CheckCircle } from "lucide-react";
 
 const features = [
     "No personal income or DTI calculations required",
@@ -38,7 +38,7 @@ const processSteps = [
         description: "Our team orders the necessary third-party reports for underwriting."
     },
     {
-        icon: <TrendingUp className="h-8 w-8 text-primary" />,
+        icon: <CheckCircle className="h-8 w-8 text-primary" />,
         title: "Close & Fund",
         description: "Finalize your loan and receive funding to grow your rental portfolio."
     }
@@ -72,9 +72,9 @@ export default function ResidentialNOODscrPage() {
       </section>
 
       <section className="py-16 md:py-24">
-        <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
+        <div className="container mx-auto px-4">
           <div>
-            <h2 className="font-headline text-3xl font-bold"><span className="text-primary">Invest with</span> <span className="text-foreground">Intelligence</span></h2>
+            <h2 className="font-headline text-3xl font-bold"><span className="text-primary">Invest with</span> <span className="text-black">Intelligence</span></h2>
             <p className="mt-4 text-lg text-foreground/70">
               Our Debt Service Coverage Ratio (DSCR) loans are the perfect tool for savvy real estate investors. We assess loan eligibility based on the property's ability to generate enough income to cover its debt obligations. This approach simplifies the loan process and allows you to scale your rental portfolio more effectively.
             </p>
