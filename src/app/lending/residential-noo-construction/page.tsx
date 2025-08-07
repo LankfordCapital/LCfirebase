@@ -77,14 +77,15 @@ export default function ResidentialNOOConstructionPage() {
   return (
     <div>
         <section className="relative h-[60vh] flex items-center justify-center text-white py-20 md:py-28" id="top">
-            <Image
-                src="https://placehold.co/1920x1080.png"
-                alt="Modern residential house under construction"
-                layout="fill"
-                objectFit="cover"
+            <video
+                autoPlay
+                muted
+                loop
+                playsInline
                 className="absolute top-0 left-0 w-full h-full object-cover z-0"
-                data-ai-hint="construction site"
-            />
+            >
+                <source src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/shutterstock_3629933761.mp4?alt=media&token=2bd8a9c2-aec1-4752-aad1-98187f5757e0" type="video/mp4" />
+            </video>
             <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
             <div className="container relative z-20 mx-auto px-4 text-center">
                 <h1 className="font-headline text-4xl font-bold md:text-6xl">Residential Ground-Up Construction Financing</h1>
