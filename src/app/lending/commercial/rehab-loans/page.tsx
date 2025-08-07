@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
@@ -44,13 +45,30 @@ const processSteps = [
 export default function CommercialRehabLoansPage() {
   return (
     <div>
-      <section className="relative bg-primary/5 py-20 md:py-28 text-center">
-        <div className="container mx-auto px-4">
-          <h1 className="font-headline text-4xl font-bold text-primary md:text-5xl">Commercial Rehab Loans</h1>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
+      <section className="relative h-[50vh] flex items-center justify-center text-white py-20 md:py-28">
+        <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute top-0 left-0 w-full h-full object-cover z-0"
+        >
+            <source src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/shutterstock_3842954193.mp4?alt=media&token=bede9a0a-c5e2-469f-8330-91cd7fb2aa29" type="video/mp4" />
+        </video>
+        <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
+        <div className="container relative z-20 mx-auto px-4 text-center">
+          <h1 className="font-headline text-4xl font-bold text-white md:text-5xl">Commercial <span className="text-primary">Rehab</span> Loans</h1>
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Funding the transformation of your commercial properties.
           </p>
         </div>
+        <Image
+            src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5"
+            alt="Lankford Capital Icon"
+            width={64}
+            height={64}
+            className="absolute bottom-4 right-4 z-20"
+        />
       </section>
 
       <section className="py-16 md:py-24">
