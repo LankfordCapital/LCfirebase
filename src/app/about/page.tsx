@@ -80,7 +80,7 @@ export default function AboutUsPage() {
       
        <section className="bg-primary text-primary-foreground py-16 md:py-24">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="font-headline text-3xl font-bold">Ready to Build with Us?</h2>
+          <h2 className="font-headline text-3xl font-bold"><span className="text-foreground">Ready to Build</span> with Us?</h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-primary-foreground/80">
             Let's discuss how our financing solutions can help you achieve your next big goal.
           </p>
