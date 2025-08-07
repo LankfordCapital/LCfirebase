@@ -6,7 +6,7 @@ import {getFirestore} from 'firebase/firestore';
 import {getStorage} from 'firebase/storage';
 
 const firebaseConfig = {
-  "apiKey": "API_KEY",
+  "apiKey": "SECRET_API_KEY",
   "authDomain": "lankford-lending.firebaseapp.com",
   "projectId": "lankford-lending",
   "storageBucket": "lankford-lending.appspot.com",
