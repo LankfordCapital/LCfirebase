@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, FileText, GanttChartSquare, CheckCircle, TrendingUp } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 const features = [
     "Customized financing for new builds",
@@ -9,6 +10,29 @@ const features = [
     "Flexible draw schedules to match construction milestones",
     "Expert support from experienced industrial lenders",
     "Financing for a variety of property types like warehouses and manufacturing plants",
+];
+
+const processSteps = [
+    {
+        icon: <FileText className="h-8 w-8 text-primary" />,
+        title: "Submit Plan & Proforma",
+        description: "Provide project details, architectural plans, and financial projections."
+    },
+    {
+        icon: <GanttChartSquare className="h-8 w-8 text-primary" />,
+        title: "Project Underwriting",
+        description: "Our team conducts a thorough review of the project's feasibility and borrower qualifications."
+    },
+    {
+        icon: <CheckCircle className="h-8 w-8 text-primary" />,
+        title: "Term Sheet Issued",
+        description: "Receive a competitive term sheet outlining the loan structure and terms."
+    },
+    {
+        icon: <TrendingUp className="h-8 w-8 text-primary" />,
+        title: "Fund & Build",
+        description: "Close the loan and begin construction with a structured draw process."
+    }
 ];
 
 export default function IndustrialGroundUpConstructionPage() {
@@ -47,6 +71,21 @@ export default function IndustrialGroundUpConstructionPage() {
           </div>
         </div>
       </section>
+      <section className="py-16 md:py-24 bg-primary/5">
+            <div className="container mx-auto px-4 text-center">
+                 <h2 className="font-headline text-3xl font-bold">How It <span className="text-primary">Works</span></h2>
+                 <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">Our streamlined process for industrial construction financing.</p>
+                <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {processSteps.map((step, index) => (
+                        <Card key={index} className="text-center p-6 border-t-4 border-primary">
+                            <div className="flex justify-center mb-4">{step.icon}</div>
+                            <h3 className="text-xl font-bold">{step.title}</h3>
+                            <p className="text-muted-foreground mt-2">{step.description}</p>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </section>
     </div>
   );
 }
