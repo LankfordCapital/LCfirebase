@@ -47,12 +47,13 @@ const lendingLinks: { title: string; href: string; description: string }[] = [
 const ListItem = React.forwardRef<
   React.ElementRef<typeof Link>,
   React.ComponentPropsWithoutRef<typeof Link>
->(({ className, title, children, ...props }, ref) => {
+>(({ className, title, children, href, ...props }, ref) => {
   return (
     <li>
       <NavigationMenuLink asChild>
         <Link
           ref={ref}
+          href={href}
           className={cn(
             'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
             className
@@ -104,7 +105,7 @@ export default function Header() {
               </NavigationMenuItem>
               {navLinks.map((link) => (
                  <NavigationMenuItem key={link.href}>
-                    <Link href={link.href} legacyBehavior passHref>
+                    <Link href={link.href} passHref>
                         <NavigationMenuLink active={pathname === link.href} className={navigationMenuTriggerStyle()}>
                             {link.label}
                         </NavigationMenuLink>
@@ -126,8 +127,8 @@ export default function Header() {
 
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="default" size="icon" className="lg:hidden">
-              <Menu className="h-6 w-6" />
+            <Button variant="default" size="icon" className="lg:hidden bg-primary hover:bg-primary/90">
+              <Menu className="h-6 w-6 text-primary-foreground" />
               <span className="sr-only">Toggle navigation menu</span>
             </Button>
           </SheetTrigger>
