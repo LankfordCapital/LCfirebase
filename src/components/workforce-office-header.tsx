@@ -34,14 +34,15 @@ const databaseLinks = [
 ];
 
 const ListItem = React.forwardRef<
-  React.ElementRef<'a'>,
-  React.ComponentPropsWithoutRef<'a'>
->(({ className, title, children, ...props }, ref) => {
+  React.ElementRef<typeof Link>,
+  React.ComponentPropsWithoutRef<typeof Link>
+>(({ className, title, children, href, ...props }, ref) => {
   return (
     <li>
       <NavigationMenuLink asChild>
-        <a
+        <Link
           ref={ref}
+          href={href!}
           className={cn(
             'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
             className
@@ -52,7 +53,7 @@ const ListItem = React.forwardRef<
           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
             {children}
           </p>
-        </a>
+        </Link>
       </NavigationMenuLink>
     </li>
   );
@@ -72,7 +73,7 @@ export default function WorkforceOfficeHeader() {
           <NavigationMenu className="hidden lg:flex">
             <NavigationMenuList>
                 <NavigationMenuItem>
-                    <Link href="/workforce-office" passHref>
+                    <Link href="/workforce-office" legacyBehavior passHref>
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>Dashboard</NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
@@ -117,29 +118,29 @@ export default function WorkforceOfficeHeader() {
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                    <Link href="/workforce-office/user-management" passHref>
+                    <Link href="/workforce-office/user-management" legacyBehavior passHref>
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>User Management</NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
 
                  <NavigationMenuItem>
-                    <Link href="/workforce-office/communications" passHref>
+                    <Link href="/workforce-office/communications" legacyBehavior passHref>
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>Chat</NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
                  <NavigationMenuItem>
-                    <Link href="/workforce-office/scheduler" passHref>
+                    <Link href="/workforce-office/scheduler" legacyBehavior passHref>
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>Scheduler</NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
                   <NavigationMenuItem>
-                    <Link href="/workforce-office/docs" passHref>
+                    <Link href="/workforce-office/docs" legacyBehavior passHref>
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>Docs</NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
 
                  <NavigationMenuItem>
-                    <Link href="/workforce-office/reports" passHref>
+                    <Link href="/workforce-office/reports" legacyBehavior passHref>
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>Reports</NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
