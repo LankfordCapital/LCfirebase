@@ -49,7 +49,7 @@ export default function AboutUsPage() {
 
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4 text-center">
-            <h2 className="font-headline text-3xl font-bold text-primary">Our Mission</h2>
+            <h2 className="font-headline text-3xl font-bold"><span className="text-foreground">Our</span> <span className="text-primary">Mission</span></h2>
             <p className="mt-4 max-w-4xl mx-auto text-lg text-foreground/70">
                 At Lankford Capital, our mission is to empower real estate investors and business owners by providing them with the flexible, innovative, and reliable financing they need to thrive. We are committed to streamlining the lending process, fostering long-term partnerships, and contributing to the growth of the communities we serve.
             </p>
