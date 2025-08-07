@@ -151,18 +151,15 @@ export default function ResidentialNOOConstructionPage() {
         </section>
 
         <section className="py-16 md:py-24">
-             <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
-                  <div className="relative h-96 w-full rounded-lg overflow-hidden shadow-lg">
-                    <Image src="https://placehold.co/600x400.png" alt="A team of professionals in a meeting" layout="fill" objectFit="cover" data-ai-hint="team meeting" />
-                </div>
+             <div className="container mx-auto px-4 grid lg:grid-cols-1 gap-16 items-center">
                 <div>
-                    <h2 className="font-headline text-3xl font-bold">Why <span className="text-primary">Lankford Lending?</span></h2>
-                    <div className="mt-6 space-y-6">
+                    <h2 className="font-headline text-3xl font-bold text-center">Why <span className="text-primary">Lankford Lending?</span></h2>
+                    <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
                         {whyUs.map((item, index) => (
-                            <div key={index}>
+                            <Card key={index} className="p-6 text-center">
                                 <h3 className="text-xl font-bold">{item.title}</h3>
                                 <p className="text-muted-foreground mt-1">{item.description}</p>
-                            </div>
+                            </Card>
                         ))}
                     </div>
                 </div>
