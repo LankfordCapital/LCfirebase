@@ -89,9 +89,6 @@ export default function ResidentialNOOFixAndFlipPage() {
               <Link href="/dashboard">Fund Your Flip</Link>
             </Button>
           </div>
-           <div className="relative h-96 w-full rounded-lg overflow-hidden shadow-lg">
-             <Image src="https://placehold.co/600x400.png" alt="Home under renovation" layout="fill" objectFit="cover" data-ai-hint="home renovation" />
-          </div>
         </div>
       </section>
 
