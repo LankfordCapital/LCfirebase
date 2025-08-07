@@ -74,7 +74,7 @@ export default function ResidentialNOODscrPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
           <div>
-            <h2 className="font-headline text-3xl font-bold text-primary">Invest with Intelligence</h2>
+            <h2 className="font-headline text-3xl font-bold"><span className="text-primary">Invest with</span> <span className="text-foreground">Intelligence</span></h2>
             <p className="mt-4 text-lg text-foreground/70">
               Our Debt Service Coverage Ratio (DSCR) loans are the perfect tool for savvy real estate investors. We assess loan eligibility based on the property's ability to generate enough income to cover its debt obligations. This approach simplifies the loan process and allows you to scale your rental portfolio more effectively.
             </p>
