@@ -51,7 +51,7 @@ export default function BrokerPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-                <h2 className="font-headline text-3xl font-bold text-primary">The Lankford Advantage for Brokers</h2>
+                <h2 className="font-headline text-3xl font-bold text-primary">The Lankford <span className="text-foreground">Advantage</span> for Brokers</h2>
             </div>
             <div className="grid md:grid-cols-3 gap-8 text-center">
                 {benefits.map(benefit => (
