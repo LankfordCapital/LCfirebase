@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, FileText, GanttChartSquare, CheckCircle, TrendingUp } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 const features = [
     "Fast access to capital for time-sensitive industrial acquisitions",
@@ -9,6 +10,29 @@ const features = [
     "Solutions for complex or non-traditional transactions",
     "Flexible terms tailored to your specific operational needs",
     "Interest-only payment options available",
+];
+
+const processSteps = [
+    {
+        icon: <FileText className="h-8 w-8 text-primary" />,
+        title: "Submit Deal",
+        description: "Provide the property and transaction details through our simple online application."
+    },
+    {
+        icon: <GanttChartSquare className="h-8 w-8 text-primary" />,
+        title: "Get Terms",
+        description: "Receive a competitive term sheet from our lending specialists within 24-48 hours."
+    },
+    {
+        icon: <CheckCircle className="h-8 w-8 text-primary" />,
+        title: "Underwriting & Approval",
+        description: "Our in-house team quickly processes your file for a final approval and closing."
+    },
+    {
+        icon: <TrendingUp className="h-8 w-8 text-primary" />,
+        title: "Fund & Acquire",
+        description: "Close your loan quickly and secure your next investment property without delay."
+    }
 ];
 
 export default function IndustrialAcquisitionBridgeLoansPage() {
@@ -47,6 +71,22 @@ export default function IndustrialAcquisitionBridgeLoansPage() {
           </div>
         </div>
       </section>
+      
+      <section className="py-16 md:py-24 bg-primary/5">
+            <div className="container mx-auto px-4 text-center">
+                 <h2 className="font-headline text-3xl font-bold">How It <span className="text-primary">Works</span></h2>
+                 <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">Our streamlined process for acquisition and bridge financing.</p>
+                <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {processSteps.map((step, index) => (
+                        <Card key={index} className="text-center p-6 border-t-4 border-primary">
+                            <div className="flex justify-center mb-4">{step.icon}</div>
+                            <h3 className="text-xl font-bold">{step.title}</h3>
+                            <p className="text-muted-foreground mt-2">{step.description}</p>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </section>
     </div>
   );
 }
