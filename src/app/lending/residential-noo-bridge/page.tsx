@@ -63,7 +63,7 @@ export default function ResidentialNOOBridgePage() {
       </section>
 
       <section className="py-16 md:py-24">
-        <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
+        <div className="container mx-auto px-4">
           <div>
             <h2 className="font-headline text-3xl font-bold text-primary">Secure Opportunities Quickly</h2>
             <p className="mt-4 text-lg text-foreground/70">
@@ -80,9 +80,6 @@ export default function ResidentialNOOBridgePage() {
              <Button asChild size="lg" className="mt-8">
               <Link href="/dashboard">Apply for a Bridge Loan</Link>
             </Button>
-          </div>
-           <div className="relative h-96 w-full rounded-lg overflow-hidden shadow-lg">
-             <Image src="https://placehold.co/600x400.png" alt="House keys on a blueprint" layout="fill" objectFit="cover" data-ai-hint="house investment" />
           </div>
         </div>
       </section>
