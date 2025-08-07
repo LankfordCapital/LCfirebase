@@ -64,7 +64,7 @@ export default function AboutUsPage() {
       <section className="bg-primary/5 py-16 md:py-24">
         <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-                <h2 className="font-headline text-3xl font-bold text-foreground">Our Core Values</h2>
+                <h2 className="font-headline text-3xl font-bold"><span className="text-primary">Our</span> <span className="text-foreground">Core</span> <span className="text-primary">Values</span></h2>
             </div>
             <div className="grid md:grid-cols-3 gap-8 text-center">
                 {values.map(value => (
