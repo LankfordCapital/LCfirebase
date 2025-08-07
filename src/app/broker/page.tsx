@@ -38,7 +38,7 @@ export default function BrokerPage() {
         </video>
         <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
         <div className="container relative z-20 mx-auto px-4 text-center">
-          <h1 className="font-headline text-4xl font-bold text-white md:text-5xl">Partner with Lankford Capital</h1>
+          <h1 className="font-headline text-4xl font-bold text-white md:text-5xl">Partner with <span className="text-primary">Lankford Capital</span></h1>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Expand your offerings and close more deals by partnering with a trusted, efficient, and reliable lender.
           </p>
