@@ -40,13 +40,33 @@ const processSteps = [
 export default function IndustrialRehabExpansionLoansPage() {
   return (
     <div>
-      <section className="relative bg-primary/5 py-20 md:py-28 text-center">
-        <div className="container mx-auto px-4">
-          <h1 className="font-headline text-4xl font-bold text-primary md:text-5xl">Industrial Rehab & Expansion Loans</h1>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
+      <section className="relative h-[50vh] flex items-center justify-center text-white py-20 md:py-28">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute top-0 left-0 w-full h-full object-cover z-0"
+        >
+          <source src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/shutterstock_1101919271.mp4?alt=media&token=4a2f076e-7f73-4796-8edd-57f973f7ebd6" type="video/mp4" />
+        </video>
+        <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10" />
+        <div className="container relative z-20 mx-auto px-4 text-center">
+          <h1 className="font-headline text-4xl font-bold md:text-5xl"><span className="text-primary">Industrial</span> <span className="text-white">Rehab & Expansion Loans</span></h1>
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Funding the transformation and growth of your industrial properties.
           </p>
+           <Button asChild size="lg" className="mt-8">
+              <Link href="/dashboard/application">Apply Now</Link>
+            </Button>
         </div>
+        <Image
+            src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5"
+            alt="Lankford Capital Icon"
+            width={64}
+            height={64}
+            className="absolute bottom-4 right-4 z-20"
+        />
       </section>
 
       <section className="py-16 md:py-24">
