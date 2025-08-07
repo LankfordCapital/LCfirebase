@@ -72,16 +72,18 @@ export default function IndustrialLendingPage() {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {loanTypes.map((loan) => (
-              <Card key={loan.title}>
-                <CardHeader>
+              <Card key={loan.title} className="flex flex-col">
+                <CardHeader className="flex-grow">
                   <CardTitle className="font-headline text-2xl">{loan.title}</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex-grow">
                   <p className="text-muted-foreground">{loan.description}</p>
+                </CardContent>
+                <div className="p-6 pt-0">
                    <Button asChild className="w-full mt-6">
                     <Link href={loan.href}>Learn More</Link>
                   </Button>
-                </CardContent>
+                </div>
               </Card>
             ))}
           </div>
