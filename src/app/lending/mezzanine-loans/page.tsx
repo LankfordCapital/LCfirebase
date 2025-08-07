@@ -3,7 +3,30 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { Layers, ArrowRight } from "lucide-react";
+import { Layers, ArrowRight, FileText, GanttChartSquare, CheckCircle, TrendingUp } from "lucide-react";
+
+const processSteps = [
+    {
+        icon: <FileText className="h-8 w-8 text-primary" />,
+        title: "Submit Capital Request",
+        description: "Provide your project details, pro-forma, and senior debt terms."
+    },
+    {
+        icon: <GanttChartSquare className="h-8 w-8 text-primary" />,
+        title: "Structuring & Term Sheet",
+        description: "Our team structures a custom mezzanine solution and provides a term sheet."
+    },
+    {
+        icon: <CheckCircle className="h-8 w-8 text-primary" />,
+        title: "Due Diligence & Approval",
+        description: "We conduct thorough due diligence alongside the senior lender for final approval."
+    },
+    {
+        icon: <TrendingUp className="h-8 w-8 text-primary" />,
+        title: "Fund & Close",
+        description: "Seamlessly close both senior and mezzanine loans to complete your capital stack."
+    }
+];
 
 export default function MezzanineLoansPage() {
   return (
@@ -69,6 +92,22 @@ export default function MezzanineLoansPage() {
           </div>
         </div>
       </section>
+
+      <section className="py-16 md:py-24 bg-primary/5">
+        <div className="container mx-auto px-4 text-center">
+             <h2 className="font-headline text-3xl font-bold">How It <span className="text-primary">Works</span></h2>
+             <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">Our streamlined process for mezzanine financing.</p>
+            <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {processSteps.map((step, index) => (
+                    <Card key={index} className="text-center p-6 border-t-4 border-primary">
+                        <div className="flex justify-center mb-4">{step.icon}</div>
+                        <h3 className="text-xl font-bold">{step.title}</h3>
+                        <p className="text-muted-foreground mt-2">{step.description}</p>
+                    </Card>
+                ))}
+            </div>
+        </div>
+    </section>
     </div>
   );
 }
