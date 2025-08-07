@@ -6,13 +6,13 @@ import {getFirestore} from 'firebase/firestore';
 import {getStorage} from 'firebase/storage';
 
 const firebaseConfig = {
-  "apiKey": "SECRET_API_KEY",
-  "authDomain": "lankford-lending.firebaseapp.com",
   "projectId": "lankford-lending",
-  "storageBucket": "lankford-lending.appspot.com",
-  "messagingSenderId": "488394495446",
-  "appId": "1:488394495446:web:a62b32d207865223c72b53",
-  "measurementId": "G-404W344P0H"
+  "appId": "1:940157326397:web:02fbefc8cd0a13c2160654",
+  "storageBucket": "lankford-lending.firebasestorage.app",
+  "apiKey": "AIzaSyCu0RxaSo1IKfWQ-as3xOLx8mSMm4CzrpI",
+  "authDomain": "lankford-lending.firebaseapp.com",
+  "measurementId": "",
+  "messagingSenderId": "940157326397"
 };
 
 
