@@ -59,7 +59,7 @@ export default function LendingHubPage() {
         <div className="absolute top-0 left-0 w-full h-full bg-black/60 z-10" />
         <div className="container relative z-20 mx-auto px-4 text-center">
           <h1 className="font-headline text-4xl font-bold text-white md:text-5xl">
-            Explore Flexible Lending Solutions
+            Explore <span className="text-primary">Flexible</span> Lending Solutions
           </h1>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-white/90">
             Tailored capital programs for residential, commercial, industrial, equipment, and land development needs.
