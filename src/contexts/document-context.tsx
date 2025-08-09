@@ -4,7 +4,7 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { scanFile } from '@/app/actions/scan-file';
 import { useToast } from '@/hooks/use-toast';
-import { storage } from '@/lib/firebase';
+import { storage as firebaseStorage } from '@/lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuth } from './auth-context';
 
@@ -79,9 +79,15 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
         return false;
     }
 
+    // Ensure storage is initialized
+    if (!firebaseStorage) {
+      toast({ variant: 'destructive', title: 'Upload Failed', description: 'Storage service is not available.' });
+      return false;
+    }
+
     // Step 2: If clean, upload to Firebase Storage
     const storagePath = `documents/${user.uid}/${doc.name}`;
-    const storageRef = ref(storage, storagePath);
+    const storageRef = ref(firebaseStorage, storagePath);
 
     try {
         await uploadBytes(storageRef, doc.file);
