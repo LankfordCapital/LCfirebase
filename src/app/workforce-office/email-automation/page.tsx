@@ -1,5 +1,6 @@
 
-import { EmailAutomationClient } from '@/components/email-automation-client';
+
+import { EmailAutomationClient } from '@/components/workforce-office/email-automation-client';
 
 export default function EmailAutomationPage() {
     return (
@@ -7,7 +8,7 @@ export default function EmailAutomationPage() {
             <div>
                 <h1 className="font-headline text-3xl font-bold">AI Email Automation</h1>
                 <p className="text-muted-foreground">
-                    Generate automated email reminders for users with missing documents.
+                    Generate automated email drafts for users with missing documents.
                 </p>
             </div>
             <EmailAutomationClient />

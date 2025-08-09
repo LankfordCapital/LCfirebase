@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -7,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PlusCircle, Trash2, Edit, Save, X, FileText } from 'lucide-react';
+import { PlusCircle, Trash2, Edit, Save, X, FileText } from 'lucide-react';
 import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import {
@@ -19,6 +20,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { CustomLoader } from '@/components/ui/custom-loader';
 
 interface Doc {
     id: string;
@@ -141,7 +143,7 @@ export default function DocsPage() {
                     </div>
                     <DialogFooter>
                         <Button type="submit" onClick={handleSaveDoc} disabled={isSubmitting}>
-                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+                            {isSubmitting && <CustomLoader className="mr-2 h-4 w-4"/>}
                             Save changes
                         </Button>
                     </DialogFooter>
@@ -178,4 +180,3 @@ export default function DocsPage() {
         </div>
     );
 }
-

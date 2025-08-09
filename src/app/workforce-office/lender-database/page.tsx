@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PlusCircle, Trash2, Edit, Save, X, ExternalLink } from 'lucide-react';
+import { PlusCircle, Trash2, Edit, Save, X, ExternalLink } from 'lucide-react';
 import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { type LenderProfile } from '@/ai/flows/lender-match-types';
@@ -21,6 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Link from 'next/link';
+import { CustomLoader } from '@/components/ui/custom-loader';
 
 export default function LenderDatabasePage() {
     const [lenders, setLenders] = useState<LenderProfile[]>([]);
@@ -166,7 +167,7 @@ export default function LenderDatabasePage() {
                         <div className="flex justify-end gap-2">
                             {editingId && <Button type="button" variant="outline" onClick={resetForm}><X className="mr-2 h-4 w-4"/> Cancel</Button>}
                             <Button type="submit" disabled={isSubmitting}>
-                                {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (editingId ? <Save className="mr-2 h-4 w-4" /> : <PlusCircle className="mr-2 h-4 w-4" />)}
+                                {isSubmitting ? <CustomLoader className="mr-2 h-4 w-4" /> : (editingId ? <Save className="mr-2 h-4 w-4" /> : <PlusCircle className="mr-2 h-4 w-4" />)}
                                 {editingId ? 'Save Changes' : 'Add Lender'}
                             </Button>
                         </div>
