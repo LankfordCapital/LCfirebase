@@ -5,3 +5,7 @@ runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
   maxInstances: 1
+  # Make the Gemini API Key available to the app.
+  # The secret must be created in Google Secret Manager.
+  secrets:
+    - GEMINI_API_KEY
