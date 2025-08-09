@@ -31,7 +31,7 @@ function SignUpForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { signUp } = useAuth();
+  const { signUp, signIn } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -56,18 +56,26 @@ function SignUpForm() {
         displayName: fullName
       });
       
-      // Create user profile in Firestore
+      // Create user profile in Firestore with 'approved' status
       await setDoc(doc(db, "users", userCredential.user.uid), {
         uid: userCredential.user.uid,
         email: userCredential.user.email,
         fullName: fullName,
         role: role,
-        status: 'pending', // All new users are pending approval
+        status: 'approved', // New users are now automatically approved
         createdAt: new Date(),
       });
 
-      // Redirect to a pending approval page instead of the dashboard
-      router.push('/auth/pending-approval');
+      // Sign the user in immediately after sign up
+      await signIn(email, password);
+
+      // Redirect to the appropriate dashboard
+      if (role === 'broker') {
+          router.push('/broker-office');
+      } else {
+          router.push('/dashboard');
+      }
+
     } catch (error: any) {
       toast({
         variant: 'destructive',
