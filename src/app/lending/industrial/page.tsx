@@ -93,7 +93,7 @@ export default function IndustrialLendingPage() {
       <section className="bg-primary/5 py-16 md:py-24">
         <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
           <div className="relative h-80 w-full rounded-lg overflow-hidden shadow-lg">
-             <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-homebase.firebasestorage.app/o/shutterstock_2605496977.jpg?alt=media&token=57a23a29-1c77-4a49-bca0-61b47cbfa66e" alt="Large modern warehouse interior" layout="fill" objectFit="cover" data-ai-hint="warehouse" />
+             <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-homebase.firebasestorage.app/o/shutterstock_2605496977.jpg?alt=media&token=57a23a29-1c77-4a49-bca0-61b47cbfa66e" alt="Large modern warehouse interior" fill className="object-cover" data-ai-hint="warehouse" />
           </div>
           <div>
             <h2 className="font-headline text-3xl font-bold text-primary">Built for <span className="text-foreground">Industry</span></h2>

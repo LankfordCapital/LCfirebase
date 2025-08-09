@@ -100,7 +100,7 @@ export default function ResidentialNOOPage() {
       <section className="bg-primary/5 py-16 md:py-24">
         <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
           <div className="relative h-80 w-full rounded-lg overflow-hidden shadow-lg">
-             <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-homebase.firebasestorage.app/o/shutterstock_2494829643.jpg?alt=media&token=99af025c-48a0-4921-bb37-c28aeaffef5c" alt="Modern residential house" layout="fill" objectFit="cover" data-ai-hint="family home" />
+             <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-homebase.firebasestorage.app/o/shutterstock_2494829643.jpg?alt=media&token=99af025c-48a0-4921-bb37-c28aeaffef5c" alt="Modern residential house" fill className="object-cover" data-ai-hint="family home" />
           </div>
           <div>
             <h2 className="font-headline text-3xl font-bold text-primary"><span className="text-foreground">Partner</span> with the Experts</h2>

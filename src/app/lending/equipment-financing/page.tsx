@@ -97,7 +97,7 @@ export default function EquipmentFinancingPage() {
             </Button>
           </div>
            <div className="relative h-96 w-full rounded-lg overflow-hidden shadow-lg">
-             <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/shutterstock_2164656897.jpg?alt=media&token=8194891b-517e-43ec-b10a-7b2382e592d0" alt="Heavy construction equipment on a worksite" layout="fill" objectFit="cover" data-ai-hint="heavy equipment" />
+             <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/shutterstock_2164656897.jpg?alt=media&token=8194891b-517e-43ec-b10a-7b2382e592d0" alt="Heavy construction equipment on a worksite" fill className="object-cover" data-ai-hint="heavy equipment" />
           </div>
         </div>
       </section>

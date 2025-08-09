@@ -63,7 +63,7 @@ export default function AboutUsPage() {
         </div>
          <div className="container mx-auto px-4 mt-16">
             <div className="relative h-96 w-full rounded-lg overflow-hidden shadow-lg max-w-4xl mx-auto">
-                <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/shutterstock_2014536932.jpg?alt=media&token=0f9f98aa-3be5-4a28-8e24-377e1977e80e" alt="A modern office interior with business people meeting" layout="fill" objectFit="cover" data-ai-hint="business meeting" />
+                <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/shutterstock_2014536932.jpg?alt=media&token=0f9f98aa-3be5-4a28-8e24-377e1977e80e" alt="A modern office interior with business people meeting" fill className="object-cover" data-ai-hint="business meeting" />
             </div>
         </div>
       </section>

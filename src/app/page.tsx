@@ -186,8 +186,8 @@ export default function Home() {
                 <Image
                     src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/shutterstock_2021639264.jpg?alt=media&token=45a49432-6ac0-4c30-9988-2c5cdb0c482b"
                     alt="Financial district cityscape"
-                    layout="fill"
-                    objectFit="cover"
+                    fill
+                    className="object-cover"
                     data-ai-hint="financial district"
                 />
             </div>

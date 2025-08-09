@@ -53,7 +53,7 @@ export default function MobilizationFundingPage() {
             </Button>
           </div>
           <div className="relative h-96 w-full rounded-lg overflow-hidden shadow-lg">
-            <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-homebase.firebasestorage.app/o/shutterstock_2359333313.jpg?alt=media&token=e7f4ac89-3c9b-42cd-8413-8c94a277f02f" alt="Shipping containers at a port, representing logistics and mobilization" layout="fill" objectFit="cover" data-ai-hint="shipping containers" />
+            <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-homebase.firebasestorage.app/o/shutterstock_2359333313.jpg?alt=media&token=e7f4ac89-3c9b-42cd-8413-8c94a277f02f" alt="Shipping containers at a port, representing logistics and mobilization" fill className="object-cover" data-ai-hint="shipping containers" />
           </div>
         </div>
       </section>

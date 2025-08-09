@@ -114,7 +114,7 @@ export default function CommercialLendingPage() {
             </Button>
           </div>
           <div className="relative h-80 w-full rounded-lg overflow-hidden shadow-lg">
-             <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-homebase.firebasestorage.app/o/shutterstock_1712804041.jpg?alt=media&token=25df546e-1545-4d2f-9505-dd3162e41769" alt="Business handshake over documents" layout="fill" objectFit="cover" data-ai-hint="business handshake" />
+             <Image src="https://firebasestorage.googleapis.com/v0/b/lankford-homebase.firebasestorage.app/o/shutterstock_1712804041.jpg?alt=media&token=25df546e-1545-4d2f-9505-dd3162e41769" alt="Business handshake over documents" fill className="object-cover" data-ai-hint="business handshake" />
           </div>
         </div>
       </section>
