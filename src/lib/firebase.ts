@@ -1,4 +1,3 @@
-
 // Do NOT add "use client" here; this module is used by both sides.
 // It remains safe because we only access Auth in a client-only function.
 
@@ -7,21 +6,17 @@ import { getFirestore, type Firestore } from 'firebase/firestore';
 import { getStorage, type FirebaseStorage } from 'firebase/storage';
 import type { Auth } from 'firebase/auth';
 
-// IMPORTANT: Access NEXT_PUBLIC_* directly. No "process = {}" shims, no destructuring.
+// Hardcoded Firebase configuration to ensure it is always available.
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  // Optional:
-  ...(process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
-    ? { measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }
-    : {}),
+  apiKey: "AIzaSyCu0RxaSo1IKfWQ-as3xOLx8mSMm4CzrpI",
+  authDomain: "lankford-lending.firebaseapp.com",
+  projectId: "lankford-lending",
+  storageBucket: "lankford-lending.firebasestorage.app",
+  messagingSenderId: "940157326397",
+  appId: "1:940157326397:web:02fbefc8cd0a13c2160654",
 };
 
-// Minimal runtime validation that does NOT touch "process" beyond the inlined reads above.
+// Minimal runtime validation.
 const required = [
   ['apiKey', firebaseConfig.apiKey],
   ['authDomain', firebaseConfig.authDomain],
@@ -34,9 +29,9 @@ const required = [
 const missing = required.filter(([, v]) => !v || v === 'YOUR_API_KEY' || v?.trim() === '');
 if (missing.length) {
   throw new Error(
-    `[firebase] Missing required env vars: ${missing.map(([k]) => k).join(
+    `[firebase] Missing required config values: ${missing.map(([k]) => k).join(
       ', '
-    )}. Put them in .env.local with NEXT_PUBLIC_ prefixes and restart dev server.`
+    )}.`
   );
 }
 
