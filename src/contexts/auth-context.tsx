@@ -15,11 +15,11 @@ import {
   signOut,
   UserCredential,
   onAuthStateChanged,
+  updateProfile,
 } from 'firebase/auth';
-import { auth } from '@/lib/firebase-client';
+import { auth, db } from '@/lib/firebase-client';
 import { CustomLoader } from '@/components/ui/custom-loader';
-import { doc, setDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase-client';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 interface AuthContextType {
   user: User | null;
@@ -45,14 +45,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signUp = useCallback(async (email: string, pass: string, fullName: string, role: string) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(userCredential.user, { displayName: fullName });
+    
     await setDoc(doc(db, "users", userCredential.user.uid), {
         uid: userCredential.user.uid,
         email: userCredential.user.email,
         fullName: fullName,
         role: role,
-        status: 'approved',
-        createdAt: new Date(),
+        status: role === 'workforce' || role === 'admin' ? 'approved' : 'pending',
+        createdAt: serverTimestamp(),
       });
+      
+    // Manually set the user in the context after sign-up and profile update
+    setUser(userCredential.user);
+    
     return userCredential;
   }, []);
 

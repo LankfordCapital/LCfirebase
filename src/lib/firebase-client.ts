@@ -15,6 +15,13 @@ const firebaseConfig = {
   measurementId: ""
 };
 
+// Throw loudly if any required key is missing
+for (const [key, value] of Object.entries(firebaseConfig)) {
+    if (!value && key !== 'measurementId') {
+        throw new Error(`Missing required Firebase config value for: ${key}`);
+    }
+}
+
 
 const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
