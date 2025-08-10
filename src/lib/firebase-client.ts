@@ -5,7 +5,6 @@ import { getAuth, setPersistence, browserLocalPersistence, type Auth } from "fir
 import { getFirestore, type Firestore } from "firebase/firestore";
 import { getStorage, type FirebaseStorage } from "firebase/storage";
 
-
 const firebaseConfig = {
   apiKey: "AIzaSyCu0RxaSo1IKfWQ-as3xOLx8mSMm4CzrpI",
   authDomain: "lankford-lending.firebaseapp.com",
@@ -16,17 +15,18 @@ const firebaseConfig = {
   measurementId: "",
 };
 
+
 const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 const auth: Auth = getAuth(app);
 const db: Firestore = getFirestore(app);
 const storage: FirebaseStorage = getStorage(app);
 
+// This was missing from previous attempts and is crucial for client-side persistence.
 if (typeof window !== 'undefined') {
     setPersistence(auth, browserLocalPersistence).catch((error) => { 
         console.warn("Firebase persistence error", error);
     });
 }
-
 
 export { app, auth, db, storage };
