@@ -20,7 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CustomLoader } from "@/components/ui/custom-loader";
 import { updateProfile } from "firebase/auth";
 import Image from "next/image";
-import { db } from "@/lib/firebase";
+import { db } from "@/lib/firebase-client";
 import { doc, setDoc } from "firebase/firestore";
 
 function SignUpForm() {

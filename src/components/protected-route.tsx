@@ -5,7 +5,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { db } from '@/lib/firebase-client';
 import { CustomLoader } from './ui/custom-loader';
 
 interface ProtectedRouteProps {

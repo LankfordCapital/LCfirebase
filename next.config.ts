@@ -44,7 +44,7 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: "lankford-lending.firebasestorage.app",
     NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "940157326397",
     NEXT_PUBLIC_FIREBASE_APP_ID: "1:940157326397:web:02fbefc8cd0a13c2160654",
-  },
+  }
 };
 
 export default nextConfig;

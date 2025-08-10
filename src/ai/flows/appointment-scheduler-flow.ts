@@ -6,7 +6,7 @@
 
 import { z } from 'zod';
 import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { db } from '@/lib/firebase-client';
 
 const AppointmentSchema = z.object({
   id: z.string().optional(),
@@ -44,4 +44,3 @@ export async function getAppointments(input: GetAppointmentsInput): Promise<Appo
 
 // Note: No Genkit flow definition is needed here as we are directly interacting
 // with Firestore and not an LLM. These functions can be called directly from server components.
-

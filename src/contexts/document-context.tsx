@@ -4,7 +4,7 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { scanFile } from '@/app/actions/scan-file';
 import { useToast } from '@/hooks/use-toast';
-import { storage as firebaseStorage } from '@/lib/firebase';
+import { storage as firebaseStorage } from '@/lib/firebase-client';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuth } from './auth-context';
 

@@ -7,13 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Sparkles, User, Percent, Star } from 'lucide-react';
+import { Loader2, Sparkles, User, Percent, Star } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { db } from '@/lib/firebase-client';
 import { findBestLenders, type LenderProfile, type LenderMatchOutput } from '@/ai/flows/lender-match-flow';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { CustomLoader } from '@/components/ui/custom-loader';
 
 export default function LenderMatcherPage() {
     const [dealId, setDealId] = useState('');
@@ -118,7 +117,7 @@ export default function LenderMatcherPage() {
                             <Textarea id="dealSummary" value={dealSummary} onChange={(e) => setDealSummary(e.target.value)} placeholder="Briefly describe the deal..." />
                         </div>
                         <Button onClick={handleFindLenders} disabled={isLoading} className="w-full">
-                            {isLoading ? <CustomLoader className="mr-2 h-4 w-4" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                             Find Best Lenders
                         </Button>
                     </CardContent>
@@ -133,7 +132,7 @@ export default function LenderMatcherPage() {
                         <CardContent>
                             {isLoading && (
                                 <div className="flex justify-center items-center h-48">
-                                    <CustomLoader className="h-8 w-8 text-primary" />
+                                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
                                 </div>
                             )}
                             {!isLoading && !results && (
