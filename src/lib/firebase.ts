@@ -1,3 +1,4 @@
+
 // Do NOT add "use client" here; this module is used by both sides.
 // It remains safe because we only access Auth in a client-only function.
 
@@ -11,29 +12,18 @@ const firebaseConfig = {
   apiKey: "AIzaSyCu0RxaSo1IKfWQ-as3xOLx8mSMm4CzrpI",
   authDomain: "lankford-lending.firebaseapp.com",
   projectId: "lankford-lending",
-  storageBucket: "lankford-lending.firebasestorage.app",
+  storageBucket: "lankford-lending.appspot.com",
   messagingSenderId: "940157326397",
   appId: "1:940157326397:web:02fbefc8cd0a13c2160654",
 };
 
-// Minimal runtime validation.
-const required = [
-  ['apiKey', firebaseConfig.apiKey],
-  ['authDomain', firebaseConfig.authDomain],
-  ['projectId', firebaseConfig.projectId],
-  ['storageBucket', firebaseConfig.storageBucket],
-  ['messagingSenderId', firebaseConfig.messagingSenderId],
-  ['appId', firebaseConfig.appId],
-] as const;
-
-const missing = required.filter(([, v]) => !v || v === 'YOUR_API_KEY' || v?.trim() === '');
-if (missing.length) {
+const required = Object.entries(firebaseConfig).filter(([, v]) => !v);
+if (required.length) {
   throw new Error(
-    `[firebase] Missing required config values: ${missing.map(([k]) => k).join(
-      ', '
-    )}.`
+    `[firebase] Missing required config values: ${required.map(([k]) => k).join(', ')}.`
   );
 }
+
 
 export const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 export const db: Firestore = getFirestore(app);
