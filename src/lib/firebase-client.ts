@@ -6,10 +6,6 @@ import { getAuth, setPersistence, inMemoryPersistence, type Auth } from "firebas
 import { getFirestore, type Firestore } from "firebase/firestore";
 import { getStorage, type FirebaseStorage } from "firebase/storage";
 
-/**
- * Client-side Firebase web config.
- * These are NOT secrets and must be present at runtime in the browser.
- */
 const firebaseConfig = {
   apiKey: "AIzaSyCu0RxaSo1IKfWQ-as3xOLx8mSMm4CzrpI",
   authDomain: "lankford-lending.firebaseapp.com",
@@ -21,9 +17,12 @@ const firebaseConfig = {
 
 const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-// Initialize modules once
 const auth: Auth = getAuth(app);
-setPersistence(auth, inMemoryPersistence).catch(() => { /* non-fatal */ });
+// Note: Not awaiting setPersistence here as it's not critical for initialization
+// and we want to avoid any top-level awaits in a client file.
+setPersistence(auth, inMemoryPersistence).catch((error) => {
+  console.warn("Firebase persistence error", error);
+});
 
 const db: Firestore = getFirestore(app);
 const storage: FirebaseStorage = getStorage(app);
