@@ -36,16 +36,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [auth, setAuth] = useState<Auth | null>(null);
 
-
   useEffect(() => {
-    const authInstance = getClientAuth();
-    setAuth(authInstance);
-    const unsubscribe = onAuthStateChanged(authInstance, (user) => {
-      setUser(user);
-      setLoading(false);
+    getClientAuth().then(authInstance => {
+      setAuth(authInstance);
+      const unsubscribe = onAuthStateChanged(authInstance, (user) => {
+        setUser(user);
+        setLoading(false);
+      });
+      return () => unsubscribe();
+    }).catch(error => {
+        console.error("Failed to initialize Firebase Auth", error);
+        setLoading(false);
     });
-
-    return () => unsubscribe();
   }, []);
 
   const signUp = useCallback(async (email: string, pass: string) => {
