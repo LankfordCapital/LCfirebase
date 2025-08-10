@@ -118,7 +118,7 @@ export default function Header() {
             <Link href="/auth/signin">Sign In</Link>
           </Button>
           <Button asChild>
-            <Link href="/dashboard">Get Started</Link>
+            <Link href="/auth/signup">Sign Up</Link>
           </Button>
         </div>
 
@@ -154,7 +154,7 @@ export default function Header() {
                         <Link href="/auth/signin">Sign In</Link>
                     </Button>
                     <Button asChild>
-                        <Link href="/dashboard">Get Started</Link>
+                        <Link href="/auth/signup">Sign Up</Link>
                     </Button>
                 </div>
             </div>
