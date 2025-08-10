@@ -8,16 +8,14 @@ import type { Auth } from 'firebase/auth';
 
 // IMPORTANT: Access NEXT_PUBLIC_* directly. No "process = {}" shims, no destructuring.
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY as string | undefined,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN as string | undefined,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID as string | undefined,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET as string | undefined,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID as string | undefined,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID as string | undefined,
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   // Optional:
-  ...(process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
-    ? { measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID as string }
-    : {}),
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 // Minimal runtime validation that does NOT touch "process" beyond the inlined reads above.
@@ -35,7 +33,7 @@ if (missing.length) {
   throw new Error(
     `[firebase] Missing required env vars: ${missing.map(([k]) => k).join(
       ', '
-    )}. Put real values in .env.local with NEXT_PUBLIC_ prefixes and restart dev server.`
+    )}. Put them in .env.local with NEXT_PUBLIC_ prefixes and restart dev server.`
   );
 }
 

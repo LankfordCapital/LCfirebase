@@ -65,17 +65,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return signOut(auth);
   }, [auth]);
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <CustomLoader className="h-10 w-10" />
-      </div>
-    );
-  }
-
   return (
     <AuthContext.Provider value={{ user, loading, signUp, signIn, logOut }}>
-      {children}
+      {loading ? (
+         <div className="flex min-h-screen items-center justify-center">
+            <CustomLoader className="h-10 w-10" />
+        </div>
+      ) : children}
     </AuthContext.Provider>
   );
 };
