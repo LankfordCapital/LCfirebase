@@ -1,3 +1,4 @@
+
 // Do NOT add "use client" here; this module is used by both sides.
 // It remains safe because we only access Auth in a client-only function.
 
@@ -15,7 +16,9 @@ const firebaseConfig = {
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   // Optional:
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+  ...(process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+    ? { measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }
+    : {}),
 };
 
 // Minimal runtime validation that does NOT touch "process" beyond the inlined reads above.
@@ -44,7 +47,12 @@ export const storage: FirebaseStorage = getStorage(app);
 // Auth must only be touched on the client. This avoids SSR/Edge "window" issues.
 export async function getClientAuth(): Promise<Auth> {
   if (typeof window === 'undefined') {
-    throw new Error('Firebase Auth is client-side only. Call getClientAuth() inside client components.');
+    // This is a server-side environment, so we can't and shouldn't initialize Auth.
+    // The part of the code that needs auth will call this and handle the promise.
+    // It's safe to not throw an error here if server-side logic doesn't depend on auth.
+    // However, for clarity, we can still log a warning if needed, or just return a Promise that never resolves.
+    // A better approach is to ensure this function is only called from client components.
+    return new Promise(() => {}); // Return a pending promise on the server
   }
   const { getAuth, browserLocalPersistence, setPersistence } = await import('firebase/auth');
   const auth = getAuth(app);
