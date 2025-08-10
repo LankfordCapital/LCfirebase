@@ -1,42 +1,48 @@
+
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Allow users to create their own profile upon signup,
-    // and read/update their own data once authenticated.
+    // Default deny all reads and writes
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    
+    // Allow users to read and write their own documents
     match /users/{userId} {
-      allow read, update: if request.auth.uid == userId;
-      allow create: if request.auth.uid == userId;
+      allow read, update, delete: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null;
     }
 
-    // Allow authenticated users to manage their own appointments
+    // Allow workforce members to manage appointments
     match /appointments/{appointmentId} {
-      allow read, write: if request.auth.uid == request.resource.data.workforceMemberId || 
-                            (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'borrower' && 
-                             exists(/databases/$(database)/documents/users/$(request.resource.data.workforceMemberId)));
+      allow read, write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['workforce', 'admin'];
     }
 
-    // Allow workforce members to manage internal documents
-    match /workforce-docs/{docId} {
-        allow read, write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['workforce', 'admin'];
+    // Allow anyone to create an appointment (for public booking pages)
+    match /appointments/{appointmentId} {
+        allow create: if true;
     }
 
-    // Allow workforce members to manage the lender database
+    // Allow workforce members to manage lenders
     match /lenders/{lenderId} {
-        allow read, write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['workforce', 'admin'];
+        allow read, write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['workforce', 'admin'];
     }
 
-    // Allow workforce members to manage the AMC database
+    // Allow workforce members to manage amcs
     match /amcs/{amcId} {
-        allow read, write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['workforce', 'admin'];
+        allow read, write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['workforce', 'admin'];
     }
 
-    // Make chat rooms writeable by any authenticated user, but not readable.
-    // In a real app you would lock this down to specific participants.
-    match /chats/{roomId}/{messageId} {
-        allow write: if request.auth != null;
-        allow read: if request.auth != null; // Keeping this open for now for simplicity
+    // Allow workforce members to manage internal docs
+    match /workforce-docs/{docId} {
+        allow read, write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['workforce', 'admin'];
+    }
+
+    // Rules for chat rooms
+    match /chats/{roomId}/messages/{messageId} {
+      allow read, create: if request.auth != null;
     }
   }
 }
