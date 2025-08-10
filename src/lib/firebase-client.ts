@@ -22,7 +22,6 @@ const auth: Auth = getAuth(app);
 const db: Firestore = getFirestore(app);
 const storage: FirebaseStorage = getStorage(app);
 
-// This was missing from previous attempts and is crucial for client-side persistence.
 if (typeof window !== 'undefined') {
     setPersistence(auth, browserLocalPersistence).catch((error) => { 
         console.warn("Firebase persistence error", error);
