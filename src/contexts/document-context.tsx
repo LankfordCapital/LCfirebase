@@ -4,9 +4,9 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { scanFile } from '@/app/actions/scan-file';
 import { useToast } from '@/hooks/use-toast';
-import { storage as firebaseStorage } from '@/lib/firebase-client';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuth } from './auth-context';
+import { app } from '@/lib/firebase-client';
 
 export type UploadStatus = 'pending' | 'uploaded' | 'verified' | 'missing';
 
@@ -78,8 +78,9 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
         });
         return false;
     }
-
+    
     // Step 2: If clean, upload to Firebase Storage
+    const firebaseStorage = getStorage(app);
     const storagePath = `documents/${user.uid}/${doc.name}`;
     const storageRef = ref(firebaseStorage, storagePath);
 
