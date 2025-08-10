@@ -1,3 +1,4 @@
+
 "use client";
 
 import { initializeApp, getApp, getApps, type FirebaseApp } from "firebase/app";
@@ -17,7 +18,9 @@ const firebaseConfig = {
   storageBucket: "lankford-lending.firebasestorage.app",
   messagingSenderId: "940157326397",
   appId: "1:940157326397:web:02fbefc8cd0a13c2160654",
+  measurementId: "",
 };
+
 
 const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
