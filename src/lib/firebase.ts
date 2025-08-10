@@ -1,3 +1,4 @@
+
 // src/lib/firebase.ts
 import { initializeApp, getApp, getApps, type FirebaseApp } from 'firebase/app';
 import { getFirestore, type Firestore } from 'firebase/firestore';
@@ -20,14 +21,8 @@ const storage: FirebaseStorage = getStorage(app);
 
 // ---- Auth: client-only getter to avoid SSR trouble ----
 export const getClientAuth = (): Auth => {
-  if (typeof window === 'undefined') {
-    // On the server, we can still return a basic auth instance,
-    // but it won't have user state. This is fine for server-side
-    // logic that doesn't depend on the current user.
-    // For client-side logic, we'll get the full auth instance.
-    return getAuth(app);
-  }
-  // On the client, this will return the same instance with user state.
+  // This function will only be called on the client side,
+  // so we can safely get the auth instance.
   return getAuth(app);
 };
 
