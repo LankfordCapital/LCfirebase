@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from "@/components/ui/button"
@@ -18,10 +17,7 @@ import { useState, FormEvent, Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { CustomLoader } from "@/components/ui/custom-loader";
-import { updateProfile } from "firebase/auth";
 import Image from "next/image";
-import { db } from "@/lib/firebase-client";
-import { doc, setDoc } from "firebase/firestore";
 
 function SignUpForm() {
   const searchParams = useSearchParams();
@@ -31,7 +27,7 @@ function SignUpForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { signUp, signIn } = useAuth();
+  const { signUp } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -51,23 +47,12 @@ function SignUpForm() {
     const role = isBrokerSignUp ? 'broker' : 'borrower';
     
     try {
-      const userCredential = await signUp(email, password);
-      await updateProfile(userCredential.user, {
-        displayName: fullName
-      });
+      await signUp(email, password, fullName, role);
       
-      // Create user profile in Firestore with 'approved' status
-      await setDoc(doc(db, "users", userCredential.user.uid), {
-        uid: userCredential.user.uid,
-        email: userCredential.user.email,
-        fullName: fullName,
-        role: role,
-        status: 'approved', // New users are now automatically approved
-        createdAt: new Date(),
+      toast({
+        title: 'Sign Up Successful!',
+        description: "Welcome to Lankford Capital.",
       });
-
-      // Sign the user in immediately after sign up
-      await signIn(email, password);
 
       // Redirect to the appropriate dashboard
       if (role === 'broker') {
@@ -77,6 +62,7 @@ function SignUpForm() {
       }
 
     } catch (error: any) {
+      console.error("Sign Up Error:", error);
       toast({
         variant: 'destructive',
         title: 'Sign Up Failed',

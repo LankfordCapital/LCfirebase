@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -19,11 +18,13 @@ import {
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase-client';
 import { CustomLoader } from '@/components/ui/custom-loader';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase-client';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signUp: (email: string, pass: string) => Promise<UserCredential>;
+  signUp: (email: string, pass: string, fullName: string, role: string) => Promise<UserCredential>;
   signIn: (email: string, pass: string) => Promise<UserCredential>;
   logOut: () => Promise<void>;
 }
@@ -42,8 +43,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
-  const signUp = useCallback(async (email: string, pass: string) => {
-    return createUserWithEmailAndPassword(auth, email, pass);
+  const signUp = useCallback(async (email: string, pass: string, fullName: string, role: string) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+    await setDoc(doc(db, "users", userCredential.user.uid), {
+        uid: userCredential.user.uid,
+        email: userCredential.user.email,
+        fullName: fullName,
+        role: role,
+        status: 'approved',
+        createdAt: new Date(),
+      });
+    return userCredential;
   }, []);
 
   const signIn = useCallback(async (email: string, pass: string) => {
