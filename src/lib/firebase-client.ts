@@ -1,3 +1,4 @@
+
 "use client";
 
 import { initializeApp, getApp, getApps, type FirebaseApp } from "firebase/app";
@@ -14,14 +15,6 @@ const firebaseConfig = {
   appId: "1:940157326397:web:02fbefc8cd0a13c2160654",
   measurementId: ""
 };
-
-// Throw loudly if any required key is missing
-for (const [key, value] of Object.entries(firebaseConfig)) {
-    if (!value && key !== 'measurementId') {
-        throw new Error(`Missing required Firebase config value for: ${key}`);
-    }
-}
-
 
 const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
