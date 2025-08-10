@@ -11,7 +11,8 @@ const firebaseConfig = {
   projectId: "lankford-lending",
   storageBucket: "lankford-lending.firebasestorage.app",
   messagingSenderId: "940157326397",
-  appId: "1:940157326397:web:02fbefc8cd0a13c2160654"
+  appId: "1:940157326397:web:02fbefc8cd0a13c2160654",
+  measurementId: ""
 };
 
 
