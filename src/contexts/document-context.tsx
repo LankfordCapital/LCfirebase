@@ -79,12 +79,6 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
         return false;
     }
 
-    // Ensure storage is initialized
-    if (!firebaseStorage) {
-      toast({ variant: 'destructive', title: 'Upload Failed', description: 'Storage service is not available.' });
-      return false;
-    }
-
     // Step 2: If clean, upload to Firebase Storage
     const storagePath = `documents/${user.uid}/${doc.name}`;
     const storageRef = ref(firebaseStorage, storagePath);

@@ -7,60 +7,64 @@ import {
   useState,
   useEffect,
   ReactNode,
+  useCallback,
 } from 'react';
 import {
-  getAuth,
-  onAuthStateChanged,
   User,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  type Auth,
+  UserCredential,
+  onAuthStateChanged,
 } from 'firebase/auth';
-import { auth as firebaseAuth } from '@/lib/firebase';
-import {useRouter} from 'next/navigation';
+import { getClientAuth } from '@/lib/firebase';
 import { CustomLoader } from '@/components/ui/custom-loader';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signUp: (email: string, pass: string) => Promise<any>;
-  signIn: (email: string, pass: string) => Promise<any>;
-  logOut: () => Promise<any>;
+  signUp: (email: string, pass: string) => Promise<UserCredential>;
+  signIn: (email: string, pass: string) => Promise<UserCredential>;
+  logOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({children}: {children: ReactNode}) => {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [auth, setAuth] = useState<Auth | null>(null);
+
 
   useEffect(() => {
-    // Ensure firebaseAuth is available before using it
-    if (!firebaseAuth) {
-      setLoading(false);
-      return;
-    };
-    const unsubscribe = onAuthStateChanged(firebaseAuth, user => {
+    const authInstance = getClientAuth();
+    setAuth(authInstance);
+    const unsubscribe = onAuthStateChanged(authInstance, (user) => {
       setUser(user);
       setLoading(false);
     });
+
     return () => unsubscribe();
   }, []);
 
-  const signUp = (email: string, pass: string) => {
-    return createUserWithEmailAndPassword(firebaseAuth, email, pass);
-  };
+  const signUp = useCallback(async (email: string, pass: string) => {
+    if (!auth) throw new Error("Auth service is not available.");
+    return createUserWithEmailAndPassword(auth, email, pass);
+  }, [auth]);
 
-  const signIn = (email: string, pass: string) => {
-    return signInWithEmailAndPassword(firebaseAuth, email, pass);
-  };
+  const signIn = useCallback(async (email: string, pass: string) => {
+    if (!auth) throw new Error("Auth service is not available.");
+    return signInWithEmailAndPassword(auth, email, pass);
+  }, [auth]);
 
-  const logOut = () => {
-    return signOut(firebaseAuth);
-  };
+  const logOut = useCallback(async () => {
+    if (!auth) throw new Error("Auth service is not available.");
+    return signOut(auth);
+  }, [auth]);
 
   if (loading) {
-     return (
+    return (
       <div className="flex min-h-screen items-center justify-center">
         <CustomLoader className="h-10 w-10" />
       </div>
@@ -68,7 +72,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
   }
 
   return (
-    <AuthContext.Provider value={{user, loading, signUp, signIn, logOut}}>
+    <AuthContext.Provider value={{ user, loading, signUp, signIn, logOut }}>
       {children}
     </AuthContext.Provider>
   );
