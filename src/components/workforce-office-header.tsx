@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { LogOut, Settings, User as UserIcon, Cog, Shield, Users, LineChart, Briefcase, BotMessageSquare, FileText, Database, GitBranch, MessageSquare, Calendar, PencilRuler, FileType } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import React from 'react';
@@ -69,7 +69,7 @@ export default function WorkforceOfficeHeader() {
     <header className="sticky top-0 z-50 w-full border-b bg-background">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-6">
-          <Logo />
+          <Logo href="/workforce-office"/>
           <NavigationMenu className="hidden lg:flex">
             <NavigationMenuList>
                 <NavigationMenuItem>

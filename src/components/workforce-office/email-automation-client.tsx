@@ -125,7 +125,7 @@ export function EmailAutomationClient() {
                             <SelectContent>
                                 <SelectGroup>
                                     <SelectLabel>Residential NOO</SelectLabel>
-                                    <SelectItem value="Residential NOO Ground Up Construction">Ground Up Construction</SelectItem>
+                                    <SelectItem value="Residential NOO - Ground Up Construction">Ground Up Construction</SelectItem>
                                     <SelectItem value="Residential NOO - Fix and Flip">Fix and Flip</SelectItem>
                                     <SelectItem value="Residential NOO - DSCR">DSCR Loan</SelectItem>
                                     <SelectItem value="Residential NOO - Bridge">Bridge Loan</SelectItem>

@@ -8,7 +8,7 @@ export default function EmailAutomationPage() {
             <div>
                 <h1 className="font-headline text-3xl font-bold">AI Email Automation</h1>
                 <p className="text-muted-foreground">
-                    Generate automated email drafts for users with missing documents.
+                    Generate automated email drafts for various user scenarios.
                 </p>
             </div>
             <EmailAutomationClient />

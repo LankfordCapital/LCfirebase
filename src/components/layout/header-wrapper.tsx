@@ -7,6 +7,7 @@ import BorrowerDashboardHeader from '../borrower-dashboard-header';
 import BrokerOfficeHeader from '../broker-office-header';
 import WorkforceOfficeHeader from '../workforce-office-header';
 import { useAuth } from '@/contexts/auth-context';
+import { CustomLoader } from '../ui/custom-loader';
 
 export default function HeaderWrapper() {
   const pathname = usePathname();
@@ -16,34 +17,30 @@ export default function HeaderWrapper() {
   const isDashboardPage = pathname.startsWith('/dashboard');
   const isBrokerOfficePage = pathname.startsWith('/broker-office');
   const isWorkforceOfficePage = pathname.startsWith('/workforce-office');
-  const isProtected = isDashboardPage || isBrokerOfficePage || isWorkforceOfficePage;
 
-  if (loading && isProtected) {
-    return null; // Don't render any header while checking auth for protected pages
-  }
-
-  // If on a protected route but there's no user, render nothing.
-  // This prevents the header flash before the redirect.
-  if (isProtected && !user) {
-    return null;
-  }
-
-  if (isDashboardPage) {
-    return <BorrowerDashboardHeader />;
-  }
-
-  if (isBrokerOfficePage) {
-    return <BrokerOfficeHeader />;
+  if (loading) {
+    return (
+      <div className="flex h-16 items-center justify-center border-b bg-background">
+        <CustomLoader />
+      </div>
+    );
   }
   
-  if (isWorkforceOfficePage) {
-      return <WorkforceOfficeHeader />
-  }
-
   if (isAuthPage) {
     return null;
   }
 
+  if (isDashboardPage && user) {
+    return <BorrowerDashboardHeader />;
+  }
+
+  if (isBrokerOfficePage && user) {
+    return <BrokerOfficeHeader />;
+  }
+  
+  if (isWorkforceOfficePage && user) {
+      return <WorkforceOfficeHeader />
+  }
+
   return <Header />;
 }
-
