@@ -2,7 +2,7 @@
 "use client";
 
 import { initializeApp, getApp, getApps, type FirebaseApp } from "firebase/app";
-import { getAuth, setPersistence, browserLocalPersistence, type Auth } from "firebase/auth";
+import { getAuth, setPersistence, browserLocalPersistence, type Auth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
 import { getStorage, type FirebaseStorage } from "firebase/storage";
 
@@ -22,10 +22,16 @@ const auth: Auth = getAuth(app);
 const db: Firestore = getFirestore(app);
 const storage: FirebaseStorage = getStorage(app);
 
+// Initialize Google Auth Provider
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  prompt: 'select_account'
+});
+
 if (typeof window !== 'undefined') {
     setPersistence(auth, browserLocalPersistence).catch((error) => { 
         console.warn("Firebase persistence error", error);
     });
 }
 
-export { app, auth, db, storage };
+export { app, auth, db, storage, googleProvider };
