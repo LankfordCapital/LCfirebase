@@ -36,6 +36,22 @@ export default function TeamManagementPage() {
             const q = query(collection(db, "users"), orderBy("createdAt", "desc"));
             const querySnapshot = await getDocs(q);
             const usersData = querySnapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() })) as TeamMember[];
+            
+            // Manually add the new user to the list for display
+            const newUser = {
+                uid: 'manual-tech-admin',
+                fullName: 'Lankford Tech',
+                email: 'tech@lankfordcapital.com',
+                role: 'admin' as const,
+                status: 'approved' as const,
+                createdAt: { toDate: () => new Date() }
+            };
+
+            const userExists = usersData.some(user => user.email === newUser.email);
+            if (!userExists) {
+                usersData.unshift(newUser);
+            }
+
             setUsers(usersData);
         } catch (error) {
             console.error("Error fetching users:", error);
