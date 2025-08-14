@@ -9,6 +9,22 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  webpack: (config, { isServer }) => {
+    // Handle optional AI dependencies
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      '@genkit-ai/firebase': false,
+      '@opentelemetry/exporter-jaeger': false,
+    };
+    
+    // Handle handlebars webpack compatibility
+    config.module.rules.push({
+      test: /\.handlebars$/,
+      use: 'handlebars-loader',
+    });
+    
+    return config;
+  },
   images: {
     remotePatterns: [
       {

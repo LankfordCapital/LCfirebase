@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Sparkles, User, Percent, Star } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { db } from '@/lib/firebase-client';
 import { findBestLenders, type LenderProfile, type LenderMatchOutput } from '@/ai/flows/lender-match-flow';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 

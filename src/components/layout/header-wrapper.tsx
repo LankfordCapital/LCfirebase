@@ -11,10 +11,11 @@ import { CustomLoader } from '../ui/custom-loader';
 
 export default function HeaderWrapper() {
   const pathname = usePathname();
-  const { user, loading } = useAuth();
+  const { user, loading, isAdmin } = useAuth();
 
   const isAuthPage = pathname.startsWith('/auth');
   const isDashboardPage = pathname.startsWith('/dashboard');
+  const isAdminPage = pathname.startsWith('/admin');
   const isBrokerOfficePage = pathname.startsWith('/broker-office');
   const isWorkforceOfficePage = pathname.startsWith('/workforce-office');
 
@@ -30,6 +31,11 @@ export default function HeaderWrapper() {
     return null;
   }
 
+  // Handle admin pages - show borrower dashboard header for admin users
+  if (isAdminPage && user && isAdmin) {
+    return <BorrowerDashboardHeader />;
+  }
+
   if (isDashboardPage && user) {
     return <BorrowerDashboardHeader />;
   }
@@ -39,7 +45,7 @@ export default function HeaderWrapper() {
   }
   
   if (isWorkforceOfficePage && user) {
-      return <WorkforceOfficeHeader />
+      return <WorkforceOfficeHeader />;
   }
 
   return <Header />;

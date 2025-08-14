@@ -1,6 +1,7 @@
 
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -14,44 +15,144 @@ import { useAuth } from "@/contexts/auth-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 
+interface LoanApplication {
+  id: string;
+  property: string;
+  type: string;
+  status: string;
+  progress: number;
+  userId: string;
+  createdAt: any;
+}
 
-const missingDocuments = [
-    { id: "doc1", name: "2023 Personal Tax Returns" },
-    { id: "doc2", name: "2023 Business Tax Returns" },
-    { id: "doc3", name: "Signed Purchase Agreement" },
-    { id: "doc4", name: "Driver's License" },
-];
-
-const summaryCards = [
-    { title: "Active Loans", value: "1", icon: <DollarSign className="h-4 w-4 text-muted-foreground" /> },
-    { title: "Documents Submitted", value: "8", icon: <FileCheck className="h-4 w-4 text-muted-foreground" /> },
-    { title: "Pending Actions", value: missingDocuments.length.toString(), icon: <FileClock className="h-4 w-4 text-muted-foreground" />, cta: { href: "/dashboard/documents", text: "View Actions"} },
-];
-
-const loanApplications = [
-    { id: "LL-00124", property: "123 Main St, Anytown", type: "Fix and Flip", status: "Underwriting", progress: 60 },
-    { id: "LL-00119", property: "456 Oak Ave, Somecity", type: "DSCR", status: "Approved", progress: 100 },
-];
-
-const recentActivity = [
-    { date: "2 days ago", description: "Document 'Bank Statement Q1' was approved." },
-    { date: "3 days ago", "description": "You uploaded 'Signed Purchase Agreement'." },
-    { date: "5 days ago", "description": "Loan officer requested 'Proof of Insurance'." },
-]
-
-
-
-// Mock data for workforce members. In a real app, this would come from a database.
-const workforceMembers = [
-    { uid: 'workforce-user-1', name: 'Alex Johnson', title: 'Senior Loan Officer' },
-    { uid: 'workforce-user-2', name: 'Maria Garcia', title: 'Underwriting Manager' },
-    { uid: 'workforce-user-3', name: 'Closing Coordinator' },
-];
+interface Document {
+  id: string;
+  name: string;
+  status: string;
+  userId: string;
+  createdAt: any;
+}
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const { toast } = useToast();
-  
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Debug logging
+    console.log('Dashboard page - User:', user);
+    console.log('Dashboard page - User UID:', user?.uid);
+    console.log('Dashboard page - User displayName:', user?.displayName);
+    
+    // Force load after a short delay, regardless of auth state
+    const timer = setTimeout(() => {
+      console.log('Dashboard loading timeout - forcing load');
+      setLoading(false);
+    }, 1500); // 1.5 second timeout
+
+    return () => clearTimeout(timer);
+  }, []); // Remove user dependency to prevent re-renders
+
+  // Demo data
+  const loanApplications: LoanApplication[] = [
+    {
+      id: 'LL-00124',
+      property: '123 Main St, Anytown, CA',
+      type: 'Fix and Flip',
+      status: 'Underwriting',
+      progress: 60,
+      userId: user?.uid || 'demo-user',
+      createdAt: new Date()
+    },
+    {
+      id: 'LL-00119',
+      property: '456 Oak Ave, Somecity, TX',
+      type: 'DSCR',
+      status: 'Approved',
+      progress: 100,
+      userId: user?.uid || 'demo-user',
+      createdAt: new Date()
+    }
+  ];
+
+  const documents: Document[] = [
+    {
+      id: 'doc1',
+      name: '2023 Personal Tax Returns',
+      status: 'submitted',
+      userId: user?.uid || 'demo-user',
+      createdAt: new Date()
+    },
+    {
+      id: 'doc2',
+      name: 'Bank Statement Q1',
+      status: 'approved',
+      userId: user?.uid || 'demo-user',
+      createdAt: new Date()
+    },
+    {
+      id: 'doc3',
+      name: 'Signed Purchase Agreement',
+      status: 'pending',
+      userId: user?.uid || 'demo-user',
+      createdAt: new Date()
+    },
+    {
+      id: 'doc4',
+      name: 'Driver\'s License',
+      status: 'requested',
+      userId: user?.uid || 'demo-user',
+      createdAt: new Date()
+    }
+  ];
+
+  const activeLoans = loanApplications.filter(loan => loan.status !== 'Completed' && loan.status !== 'Cancelled');
+  const submittedDocuments = documents.filter(doc => doc.status === 'submitted' || doc.status === 'approved');
+  const pendingDocuments = documents.filter(doc => doc.status === 'pending' || doc.status === 'requested');
+
+  const summaryCards = [
+    { 
+      title: "Active Loans", 
+      value: activeLoans.length.toString(), 
+      icon: <DollarSign className="h-4 w-4 text-muted-foreground" /> 
+    },
+    { 
+      title: "Documents Submitted", 
+      value: submittedDocuments.length.toString(), 
+      icon: <FileCheck className="h-4 w-4 text-muted-foreground" /> 
+    },
+    { 
+      title: "Pending Actions", 
+      value: pendingDocuments.length.toString(), 
+      icon: <FileClock className="h-4 w-4 text-muted-foreground" />, 
+      cta: { href: "/dashboard/documents", text: "View Actions"} 
+    },
+  ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p>Loading dashboard...</p>
+          <p className="text-sm text-muted-foreground mt-2">User: {user ? 'Logged in' : 'Not logged in'}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If no user, show a message
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Not Logged In</h2>
+          <p className="text-muted-foreground">Please log in to view your dashboard.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 p-4 md:p-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -150,7 +251,7 @@ export default function DashboardPage() {
                     <CardDescription>Please upload the following documents to proceed.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    {missingDocuments.map((doc) => (
+                    {pendingDocuments.map((doc) => (
                          <div key={doc.id} className="flex items-center space-x-2">
                             <Checkbox id={doc.id} />
                             <Label htmlFor={doc.id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{doc.name}</Label>
@@ -172,12 +273,19 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                     <ul className="space-y-4">
-                        {recentActivity.map((activity, index) => (
-                            <li key={index} className="flex items-start gap-4">
-                                <span className="text-xs text-muted-foreground w-24 flex-shrink-0">{activity.date}</span>
-                                <p className="text-sm">{activity.description}</p>
-                            </li>
-                        ))}
+                        {/* Recent activity data would be fetched here if available */}
+                        <li className="flex items-start gap-4">
+                            <span className="text-xs text-muted-foreground w-24 flex-shrink-0">2 days ago</span>
+                            <p className="text-sm">Document 'Bank Statement Q1' was approved.</p>
+                        </li>
+                        <li className="flex items-start gap-4">
+                            <span className="text-xs text-muted-foreground w-24 flex-shrink-0">3 days ago</span>
+                            <p className="text-sm">You uploaded 'Signed Purchase Agreement'.</p>
+                        </li>
+                        <li className="flex items-start gap-4">
+                            <span className="text-xs text-muted-foreground w-24 flex-shrink-0">5 days ago</span>
+                            <p className="text-sm">Loan officer requested 'Proof of Insurance'.</p>
+                        </li>
                     </ul>
                 </CardContent>
             </Card>
@@ -192,23 +300,52 @@ export default function DashboardPage() {
                     <CardDescription>Need to talk? Book a time with one of our team members.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                   {workforceMembers.map(member => (
-                       <div key={member.uid} className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
-                           <div className="flex items-center gap-3">
-                               <Avatar className="h-10 w-10">
-                                   <AvatarImage src={`https://i.pravatar.cc/40?u=${member.uid}`} />
-                                   <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                               </Avatar>
-                               <div>
-                                   <p className="font-semibold">{member.name}</p>
-                                   <p className="text-xs text-muted-foreground">{member.title}</p>
-                               </div>
+                   {/* Workforce members data would be fetched here if available */}
+                   <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
+                       <div className="flex items-center gap-3">
+                           <Avatar className="h-10 w-10">
+                               <AvatarImage src={`https://i.pravatar.cc/40?u=workforce-user-1`} />
+                               <AvatarFallback>AJ</AvatarFallback>
+                           </Avatar>
+                           <div>
+                               <p className="font-semibold">Alex Johnson</p>
+                               <p className="text-xs text-muted-foreground">Senior Loan Officer</p>
                            </div>
-                           <Button asChild variant="outline" size="sm">
-                               <Link href={`/book-appointment/${member.uid}`} target="_blank">Book Now</Link>
-                           </Button>
                        </div>
-                   ))}
+                       <Button asChild variant="outline" size="sm">
+                           <Link href={`/book-appointment/workforce-user-1`} target="_blank">Book Now</Link>
+                       </Button>
+                   </div>
+                   <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
+                       <div className="flex items-center gap-3">
+                           <Avatar className="h-10 w-10">
+                               <AvatarImage src={`https://i.pravatar.cc/40?u=workforce-user-2`} />
+                               <AvatarFallback>MG</AvatarFallback>
+                           </Avatar>
+                           <div>
+                               <p className="font-semibold">Maria Garcia</p>
+                               <p className="text-xs text-muted-foreground">Underwriting Manager</p>
+                           </div>
+                       </div>
+                       <Button asChild variant="outline" size="sm">
+                           <Link href={`/book-appointment/workforce-user-2`} target="_blank">Book Now</Link>
+                       </Button>
+                   </div>
+                   <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
+                       <div className="flex items-center gap-3">
+                           <Avatar className="h-10 w-10">
+                               <AvatarImage src={`https://i.pravatar.cc/40?u=workforce-user-3`} />
+                               <AvatarFallback>CC</AvatarFallback>
+                           </Avatar>
+                           <div>
+                               <p className="font-semibold">Closing Coordinator</p>
+                               <p className="text-xs text-muted-foreground">Workforce Member</p>
+                           </div>
+                       </div>
+                       <Button asChild variant="outline" size="sm">
+                           <Link href={`/book-appointment/workforce-user-3`} target="_blank">Book Now</Link>
+                       </Button>
+                   </div>
                 </CardContent>
             </Card>
         </div>

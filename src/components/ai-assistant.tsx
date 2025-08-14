@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Send, MessageSquare, Sparkles } from 'lucide-react';
-import { answerVisitorQuestion, type AnswerVisitorQuestionOutput } from '@/ai/flows/ai-assistant';
+// Lazy load the AI functionality
+// import { answerVisitorQuestion, type AnswerVisitorQuestionOutput } from '@/ai/flows/ai-assistant';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { CustomLoader } from './ui/custom-loader';
@@ -71,7 +72,9 @@ export function AIAssistant() {
     setIsLoading(true);
 
     try {
-      const result: AnswerVisitorQuestionOutput = await answerVisitorQuestion({
+      // Dynamically import AI functionality only when needed
+      const { answerVisitorQuestion } = await import('@/ai/flows/ai-assistant');
+      const result = await answerVisitorQuestion({
         question: inputValue,
       });
 

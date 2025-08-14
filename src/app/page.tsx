@@ -93,7 +93,9 @@ export default function Home() {
           muted
           loop
           playsInline
+          preload="metadata"
           className="absolute top-0 left-0 w-full h-full object-cover z-0"
+          style={{ willChange: 'auto' }}
         >
           <source src="https://firebasestorage.googleapis.com/v0/b/lankford-homebase.firebasestorage.app/o/Adobe%20Express%20-%20shutterstock_3599048629.mp4?alt=media&token=a42649e7-9a18-4028-b277-b60390039ee2" type="video/mp4" />
         </video>
