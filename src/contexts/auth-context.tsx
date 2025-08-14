@@ -14,6 +14,8 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
+  sendPasswordResetEmail,
+  fetchSignInMethodsForEmail,
   UserCredential,
   onAuthStateChanged,
   updateProfile,
@@ -29,6 +31,8 @@ interface AuthContextType {
   signIn: (email: string, pass: string) => Promise<UserCredential>;
   signInWithGoogle: () => Promise<UserCredential>;
   signUpWithGoogle: (role: string) => Promise<UserCredential>;
+  checkEmailExists: (email: string) => Promise<boolean>;
+  sendPasswordReset: (email: string) => Promise<void>;
   logOut: () => Promise<void>;
 }
 
@@ -120,12 +124,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  const checkEmailExists = useCallback(async (email: string) => {
+    try {
+      const methods = await fetchSignInMethodsForEmail(auth, email);
+      return methods.length > 0;
+    } catch (error) {
+      console.error('Email check error:', error);
+      // If there's an error checking, we'll assume the email doesn't exist for security
+      return false;
+    }
+  }, []);
+
+  const sendPasswordReset = useCallback(async (email: string) => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+    } catch (error) {
+      console.error('Password reset error:', error);
+      throw error;
+    }
+  }, []);
+
   const logOut = useCallback(async () => {
     return signOut(auth);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, signUp, signIn, signInWithGoogle, signUpWithGoogle, logOut }}>
+    <AuthContext.Provider value={{ user, loading, signUp, signIn, signInWithGoogle, signUpWithGoogle, checkEmailExists, sendPasswordReset, logOut }}>
       {loading ? (
          <div className="flex min-h-screen items-center justify-center">
             <CustomLoader className="h-10 w-10" />
