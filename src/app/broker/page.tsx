@@ -43,7 +43,7 @@ export default function BrokerPage() {
             Expand your offerings and close more deals by partnering with a trusted, efficient, and reliable lender.
           </p>
            <Button asChild size="lg" className="mt-8">
-              <Link href="/auth/broker-signin">Broker Login</Link>
+              <Link href="/auth/signup?role=broker">Broker Login</Link>
             </Button>
         </div>
         <Image

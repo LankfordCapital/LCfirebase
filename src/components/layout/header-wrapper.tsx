@@ -11,7 +11,16 @@ import { CustomLoader } from '../ui/custom-loader';
 
 export default function HeaderWrapper() {
   const pathname = usePathname();
-  const { user, loading, isAdmin } = useAuth();
+  const { user, loading, isAdmin, isLoggingOut } = useAuth();
+
+  // If logging out, show minimal header to prevent redirects
+  if (isLoggingOut) {
+    return (
+      <div className="flex h-16 items-center justify-center border-b bg-background">
+        <CustomLoader />
+      </div>
+    );
+  }
 
   const isAuthPage = pathname.startsWith('/auth');
   const isDashboardPage = pathname.startsWith('/dashboard');

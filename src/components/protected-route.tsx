@@ -15,11 +15,16 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, allowedRoles, redirectTo = '/auth/signin' }: ProtectedRouteProps) {
-  const { user, loading } = useAuth();
+  const { user, loading, getRedirectPath, isLoggingOut } = useAuth();
   const router = useRouter();
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
+    // If logging out, don't do any redirects
+    if (isLoggingOut) {
+      return;
+    }
+
     if (loading) {
       return; // Wait for the auth state to be determined
     }
@@ -37,25 +42,55 @@ export function ProtectedRoute({ children, allowedRoles, redirectTo = '/auth/sig
                 if (allowedRoles.includes(userData.role)) {
                     setIsAuthorized(true);
                 } else {
-                    // Role not allowed, redirect to a safe page (e.g., main dashboard or sign-in)
-                     router.push('/dashboard'); 
+                    // Role not allowed, redirect to appropriate page based on user role
+                    try {
+                        const redirectPath = getRedirectPath();
+                        router.push(redirectPath);
+                    } catch (redirectError) {
+                        console.error('Redirect failed, going to home:', redirectError);
+                        router.push('/');
+                    }
                 }
             } else if (user.email === 'admin@lankfordcapital.com' && (allowedRoles.includes('workforce') || allowedRoles.includes('admin'))) {
                 setIsAuthorized(true);
             }
             else {
                  console.warn(`No user document found for UID: ${user.uid}. Redirecting.`);
-                 router.push(redirectTo);
+                 // Try to redirect to appropriate page, fallback to home if that fails
+                 try {
+                     const redirectPath = getRedirectPath();
+                     router.push(redirectPath);
+                 } catch (redirectError) {
+                     console.error('Redirect failed, going to home:', redirectError);
+                     router.push('/');
+                 }
             }
         } catch (error) {
             console.error("Authorization check failed:", error);
-            router.push(redirectTo);
+            // If we can't check authorization due to permissions, try to redirect based on user info
+            // Check if this is a known admin user
+            const isAdminUser = user.uid === 'UCqwzQPlG4Xcb3BzcxGQ8JvjDba2' || 
+                           user.uid === 'LQYGVdjvcAOB58nnK4lzP3sgW6B2' || 
+                           user.uid === 'Wvzsq4sWJWf3NOjwMgMhqpw4O9b2';
+            
+            if (isAdminUser && (allowedRoles.includes('workforce') || allowedRoles.includes('admin'))) {
+                // Known admin user, allow access
+                setIsAuthorized(true);
+            } else {
+                try {
+                    const redirectPath = getRedirectPath();
+                    router.push(redirectPath);
+                } catch (redirectError) {
+                    console.error('Fallback redirect failed, going to home:', redirectError);
+                    router.push('/');
+                }
+            }
         }
     };
     
     checkUserRole();
 
-  }, [user, loading, router, allowedRoles, redirectTo]);
+  }, [user, loading, router, allowedRoles, redirectTo, getRedirectPath, isLoggingOut]);
 
   if (loading || !isAuthorized) {
     return (

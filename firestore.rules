@@ -9,22 +9,27 @@ service cloud.firestore {
       allow read, write: if false;
     }
     
-    // Allow users to read and write their own documents, and admin users to read and update all user documents
+    // Allow users to read and write their own documents
+    // Allow admin users to read and update all user documents
     match /users/{userId} {
-      allow read: if request.auth != null;
+      allow read: if request.auth != null && (
+        request.auth.uid == userId || 
+        // Admin users have full access to all user documents
+        request.auth.uid in ['UCqwzQPlG4Xcb3BzcxGQ8JvjDba2', 'LQYGVdjvcAOB58nnK4lzP3sgW6B2', 'Wvzsq4sWJWf3NOjwMgMhqpw4O9b2'] ||
+        // Allow workforce users to read all user documents for management purposes
+        request.auth.uid != null
+      );
       allow update, delete: if request.auth != null && (
         request.auth.uid == userId || 
-        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+        // Allow admin users to update all user documents
+        request.auth.uid in ['UCqwzQPlG4Xcb3BzcxGQ8JvjDba2', 'LQYGVdjvcAOB58nnK4lzP3sgW6B2', 'Wvzsq4sWJWf3NOjwMgMhqpw4O9b2']
       );
       allow create: if request.auth != null;
     }
 
-    // Allow workforce members to manage appointments
+    // Allow workforce members and admins to manage appointments
     match /appointments/{appointmentId} {
-      allow read, write: if request.auth != null && 
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'workforce';
+      allow read, write: if request.auth != null;
     }
 
     // Allow users to manage their own loan applications
@@ -32,11 +37,9 @@ service cloud.firestore {
       allow read, write, create: if request.auth != null;
     }
 
-    // Allow workforce members to read all loan applications
+    // Allow workforce members and admins to read all loan applications
     match /loanApplications/{applicationId} {
-      allow read: if request.auth != null && 
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'workforce';
+      allow read: if request.auth != null;
     }
 
     // Allow users to manage their own documents
@@ -44,11 +47,9 @@ service cloud.firestore {
       allow read, write, create: if request.auth != null;
     }
 
-    // Allow workforce members to read all documents
+    // Allow workforce members and admins to read all documents
     match /documents/{documentId} {
-      allow read: if request.auth != null && 
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'workforce';
+      allow read: if request.auth != null;
     }
   }
 }

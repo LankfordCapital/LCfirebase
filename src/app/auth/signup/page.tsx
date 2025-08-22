@@ -13,39 +13,30 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useAuth } from "@/contexts/auth-context";
-import { useState, FormEvent, Suspense, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { CustomLoader } from "@/components/ui/custom-loader";
 import Image from "next/image";
 
-function SignUpForm() {
+export default function SignUpPage() {
   const searchParams = useSearchParams();
   const roleFromQuery = searchParams.get('role');
-  
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState<string>(roleFromQuery || 'borrower');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [showPasswordInfo, setShowPasswordInfo] = useState(false);
+  const [generatedPassword, setGeneratedPassword] = useState('');
   const { signUp, signUpWithGoogle } = useAuth();
-  const router = useRouter();
   const { toast } = useToast();
-
-  const isBrokerSignUp = roleFromQuery === 'broker';
-
-  useEffect(() => {
-    // Prefill for workforce creation if needed, you can expand this logic
-    if (roleFromQuery === 'workforce') {
-        // You might want to add more security around this
-    }
-  }, [roleFromQuery]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    console.log('Submitting form with role:', role);
     setIsLoading(true);
-
-    const role = isBrokerSignUp ? 'broker' : 'borrower';
     
     try {
       await signUp(email, password, fullName, role);
@@ -55,12 +46,7 @@ function SignUpForm() {
         description: "Welcome to Lankford Capital.",
       });
 
-      // Redirect to the appropriate dashboard
-      if (role === 'broker') {
-          router.push('/broker-office');
-      } else {
-          router.push('/dashboard');
-      }
+      // Let the automatic redirect handle routing - no manual redirect needed
 
     } catch (error: any) {
       console.error("Sign Up Error:", error);
@@ -75,22 +61,23 @@ function SignUpForm() {
 
   const handleGoogleSignUp = async () => {
     setIsGoogleLoading(true);
-    const role = isBrokerSignUp ? 'broker' : 'borrower';
+    console.log('Google sign-up with role:', role);
     
     try {
-      await signUpWithGoogle(role);
+      const { credential, generatedPassword: password } = await signUpWithGoogle(role);
+      
+      // Set the generated password to display to the user
+      setGeneratedPassword(password);
       
       toast({
         title: 'Sign Up Successful!',
-        description: "Welcome to Lankford Capital.",
+        description: "Welcome to Lankford Capital. Your account has been created with both authentication methods.",
       });
 
-      // Redirect to the appropriate dashboard
-      if (role === 'broker') {
-          router.push('/broker-office');
-      } else {
-          router.push('/dashboard');
-      }
+      // Show password information
+      setShowPasswordInfo(true);
+      
+      // Let the automatic redirect handle routing - no manual redirect needed
 
     } catch (error: any) {
       console.error("Google Sign Up Error:", error);
@@ -103,7 +90,16 @@ function SignUpForm() {
     }
   };
 
-
+  // Function to copy password to clipboard
+  const copyPasswordToClipboard = () => {
+    if (generatedPassword) {
+      navigator.clipboard.writeText(generatedPassword);
+      toast({
+        title: 'Password Copied!',
+        description: 'Your password has been copied to clipboard.',
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -124,132 +120,148 @@ function SignUpForm() {
       <div className="flex items-center justify-center min-h-screen px-4">
         <div className="w-full max-w-md">
           <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-            <form onSubmit={handleSubmit}>
-              <CardHeader className="text-center pb-6">
-                <CardTitle className="font-headline text-3xl font-semibold text-gray-900 mb-2">
-                  Create Account
-                </CardTitle>
-                <CardDescription className="text-gray-600 text-base">
-                  {isBrokerSignUp ? 'Join Lankford Capital as a broker partner' : 'Start your lending journey with us'}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Google Sign Up Button */}
-                <Button 
-                  variant="outline" 
-                  type="button" 
-                  onClick={handleGoogleSignUp}
-                  disabled={isGoogleLoading}
-                  className="w-full h-12 text-base font-medium border-gray-300 hover:bg-gray-50"
-                >
-                  {isGoogleLoading ? (
-                    <CustomLoader className="mr-3 h-5 w-5" />
-                  ) : (
-                    <svg className="mr-3 h-5 w-5" viewBox="0 0 24 24">
-                      <path
-                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                        fill="#4285F4"
-                      />
-                      <path
-                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                        fill="#34A853"
-                      />
-                      <path
-                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                        fill="#FBBC05"
-                      />
-                      <path
-                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                        fill="#EA4335"
-                      />
-                    </svg>
-                  )}
-                  {isGoogleLoading ? 'Creating account...' : `Continue with Google${isBrokerSignUp ? ' (Broker)' : ''}`}
-                </Button>
-                
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-gray-300" />
+            <CardHeader className="text-center pb-6">
+              <CardTitle className="font-headline text-3xl font-semibold text-gray-900 mb-2">
+                Create Account
+              </CardTitle>
+              <CardDescription className="text-gray-600 text-base">
+                Join Lankford Capital today
+              </CardDescription>
+            </CardHeader>
+            
+            {showPasswordInfo && (
+              <CardContent className="pb-6">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                  <h3 className="font-semibold text-green-800 mb-2">Account Created Successfully!</h3>
+                  <p className="text-sm text-green-700 mb-3">
+                    Your account has been created with both Google authentication and email/password login.
+                  </p>
+                  <div className="bg-white border border-green-300 rounded p-3 mb-3">
+                    <p className="text-sm text-green-800 mb-1">Generated Password:</p>
+                    <p className="font-mono text-lg font-bold text-green-900">{generatedPassword}</p>
                   </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="bg-white px-4 text-gray-500">
-                      or continue with email
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="full-name" className="text-sm font-medium text-gray-700">
-                      Full name
-                    </Label>
-                    <Input 
-                      id="full-name" 
-                      placeholder="Enter your full name" 
-                      required 
-                      value={fullName} 
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="h-12 text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                      Email address
-                    </Label>
-                    <Input 
-                      id="email" 
-                      type="email" 
-                      placeholder="Enter your email" 
-                      required 
-                      value={email} 
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="h-12 text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="password" className="text-sm font-medium text-gray-700">
-                      Password
-                    </Label>
-                    <Input 
-                      id="password" 
-                      type="password" 
-                      placeholder="Create a password" 
-                      required 
-                      value={password} 
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="h-12 text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
+                  <Button 
+                    onClick={copyPasswordToClipboard}
+                    size="sm"
+                    className="w-full bg-green-600 hover:bg-green-700"
+                  >
+                    Copy Password
+                  </Button>
+                  <p className="text-xs text-green-600 mt-2 text-center">
+                    Save this password! You can now sign in with either Google or email/password.
+                  </p>
                 </div>
               </CardContent>
-              <CardFooter className="flex flex-col space-y-4 pt-6 border-t border-gray-200">
-                <Button 
-                  className="w-full h-12 text-base font-medium bg-blue-600 hover:bg-blue-700" 
-                  type="submit" 
-                  disabled={isLoading}
-                >
-                  {isLoading && <CustomLoader className="mr-2 h-5 w-5" />}
-                  Create account
-                </Button>
-                <div className="text-center text-sm text-gray-600">
-                  Already have an account?{" "}
-                  <Link href={isBrokerSignUp ? "/auth/broker-signin" : "/auth/signin"} className="font-medium text-blue-600 hover:text-blue-500">
-                    Sign in
-                  </Link>
+            )}
+
+            <CardContent className="space-y-6">
+              {/* Google Sign Up Button */}
+              <Button 
+                onClick={handleGoogleSignUp}
+                disabled={isGoogleLoading}
+                variant="outline" 
+                className="w-full"
+              >
+                {isGoogleLoading && <CustomLoader className="mr-2 h-4 w-4" />}
+                Continue with Google
+              </Button>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
                 </div>
-              </CardFooter>
-            </form>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white/80 px-2 text-muted-foreground">
+                    Or continue with email
+                  </span>
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder="Enter your full name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="role">Sign up as</Label>
+                  <div className="mt-2 space-y-3">
+                    <label className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors cursor-pointer">
+                      <input
+                        type="checkbox"
+                        id="role-borrower"
+                        name="role"
+                        value="borrower"
+                        checked={role === 'borrower'}
+                        onChange={(e) => setRole(e.target.checked ? 'borrower' : '')}
+                        className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                      />
+                      <span className="text-sm font-medium text-gray-900">Borrower</span>
+                    </label>
+                    
+                    <label className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors cursor-pointer">
+                      <input
+                        type="checkbox"
+                        id="role-broker"
+                        name="role"
+                        value="broker"
+                        checked={role === 'broker'}
+                        onChange={(e) => setRole(e.target.checked ? 'broker' : '')}
+                        className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                      />
+                      <span className="text-sm font-medium text-gray-900">Broker</span>
+                    </label>
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Create a password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={6}
+                  />
+                </div>
+                <Button type="submit" disabled={isLoading} className="w-full">
+                  {isLoading && <CustomLoader className="mr-2 h-4 w-4" />}
+                  Create Account
+                </Button>
+              </form>
+            </CardContent>
+
+            <CardFooter className="flex justify-center">
+              <p className="text-sm text-gray-600">
+                Already have an account?{" "}
+                <Link href="/auth/signin" className="text-primary hover:underline">
+                  Sign in
+                </Link>
+              </p>
+            </CardFooter>
           </Card>
         </div>
       </div>
     </div>
-  )
-}
-
-export default function SignUpPage() {
-    return (
-        <Suspense fallback={<div>Loading...</div>}>
-            <SignUpForm />
-        </Suspense>
-    )
+  );
 }
