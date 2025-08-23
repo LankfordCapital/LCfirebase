@@ -43,13 +43,6 @@ export default function ProfilePage() {
 
   const companyId = useId();
 
-  const [hostname, setHostname] = useState('');
-  useEffect(() => {
-    // This will run only on the client side
-    setHostname(window.location.hostname);
-  }, []);
-
-
   const [companies, setCompanies] = useState<Company[]>([
     { id: companyId, companyName: '', companyAddress: '', companyPhone: '', companyEin: '' },
   ]);
@@ -299,26 +292,6 @@ export default function ProfilePage() {
           <h1 className="font-headline text-4xl font-bold text-gray-900">Your Profile</h1>
           <p className="text-gray-600 text-lg">Manage your personal information, documents, and business details</p>
         </div>
-
-        {hostname && (
-            <Card className="bg-yellow-50 border-yellow-300">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-yellow-800">
-                        <AlertTriangle className="h-5 w-5" />
-                        Action Required for Google Sign-In
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                    <p className="text-yellow-700">To enable Google Sign-In, please add the following domain to the list of authorized domains in your Firebase project's Authentication settings:</p>
-                    <div className="bg-white p-3 rounded-md border border-yellow-200">
-                        <code className="font-mono text-lg font-bold text-yellow-900">{hostname}</code>
-                    </div>
-                    <Button variant="outline" onClick={() => navigator.clipboard.writeText(hostname)}>
-                        Copy Domain
-                    </Button>
-                </CardContent>
-            </Card>
-        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
