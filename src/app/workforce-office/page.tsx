@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { PlusCircle, Users, BarChart, DollarSign, MoreHorizontal, FileWarning, Search, Briefcase, UserPlus, Home, Mail, Phone, ArrowRight, Percent, Construction } from "lucide-react";
+import { PlusCircle, Users, BarChart, DollarSign, MoreHorizontal, FileWarning, Search, Briefcase, UserPlus, Home, Mail, Phone, ArrowRight, Percent, Construction, MessageSquare } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -353,9 +353,15 @@ export default function WorkforceOfficePage() {
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            <DropdownMenuItem>View Pipeline</DropdownMenuItem>
-                                            <DropdownMenuItem>Manage Broker</DropdownMenuItem>
-                                            <DropdownMenuItem>Send Communication</DropdownMenuItem>
+                                            <DropdownMenuItem asChild>
+                                                <Link href={`/workforce-office/broker-pipeline/${broker.id}`}>View Pipeline</Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem asChild>
+                                                <Link href={`/workforce-office/manage-broker/${broker.id}`}>Manage Broker</Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem asChild>
+                                                <Link href={`/workforce-office/communications?roomId=${broker.id}`}>Send Communication</Link>
+                                            </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                     </TableCell>
