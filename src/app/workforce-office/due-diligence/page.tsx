@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -20,6 +20,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Textarea } from '@/components/ui/textarea';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type ReportType = 'marketAnalysis' | 'comparableProperty' | 'constructionFeasibility' | 'mapReport' | 'salesHistory' | 'titleEscrow' | 'insurance';
 
@@ -42,6 +43,13 @@ interface ReportResults {
     titleEscrow?: GenerateTitleEscrowInstructionsOutput;
     insurance?: GenerateInsuranceInstructionsOutput;
 }
+
+// Mock loan data - in a real app this would be fetched from your database
+const activeLoans = [
+    { id: "LL-00125", borrower: { name: "John Doe" }, property: "123 Main St", type: "Fix and Flip", loanAmount: 350000, purchasePrice: 280000, constructionBudget: 50000 },
+    { id: "LL-00127", borrower: { name: "Sam Wilson" }, property: "789 Pine Ln", type: "Ground Up Construction", loanAmount: 1200000, purchasePrice: 300000, constructionBudget: 900000 },
+    { id: "LL-00128", borrower: { name: "Alpha Corp" }, property: "101 Factory Rd", type: "Industrial Rehab", loanAmount: 2500000, purchasePrice: 1500000, constructionBudget: 1000000 },
+];
 
 const fileToDataUri = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -74,6 +82,20 @@ export default function DueDiligenceHubPage() {
     const [results, setResults] = useState<ReportResults | null>(null);
     const { toast } = useToast();
     const reportContainerRef = useRef<HTMLDivElement>(null);
+    
+    const handleLoanSelect = (loanId: string) => {
+        const selectedLoan = activeLoans.find(loan => loan.id === loanId);
+        if (selectedLoan) {
+            setAddress(selectedLoan.property);
+            setBorrowerName(selectedLoan.borrower.name);
+            setDealType(selectedLoan.type);
+            setPropertyType(selectedLoan.type); // Or a more specific type if available
+            setLoanAmount(selectedLoan.loanAmount);
+            setPurchasePrice(selectedLoan.purchasePrice);
+            setConstructionBudgetText(selectedLoan.constructionBudget?.toString() || '');
+        }
+    };
+
 
     const handleReportSelection = (reportId: ReportType) => {
         setSelectedReports(prev =>
@@ -196,9 +218,25 @@ export default function DueDiligenceHubPage() {
             <Card>
                 <CardHeader>
                     <CardTitle>New Due Diligence Request</CardTitle>
-                    <CardDescription>Enter a property address and select the reports you need.</CardDescription>
+                    <CardDescription>Select an active loan to auto-fill details or enter them manually.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                     <div className="space-y-2">
+                        <Label htmlFor="loan-select">Select Active Loan</Label>
+                        <Select onValueChange={handleLoanSelect}>
+                            <SelectTrigger id="loan-select">
+                                <SelectValue placeholder="Select a loan to begin..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {activeLoans.map(loan => (
+                                    <SelectItem key={loan.id} value={loan.id}>
+                                        {loan.id} - {loan.borrower.name} - {loan.property}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
                     <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="address">Subject Property Address</Label>
