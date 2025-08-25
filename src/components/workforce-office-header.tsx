@@ -15,6 +15,7 @@ import { usePathname } from 'next/navigation';
 
 
 const aiToolsLinks = [
+    { title: "Due Diligence Hub", href: "/workforce-office/due-diligence", description: "Order all AI reports from a single dashboard." },
     { title: "Market Analysis", href: "/workforce-office/market-analysis", description: "Generate traffic, demographic, and zoning reports." },
     { title: "Comparable Property Report", href: "/workforce-office/comparable-property-report", description: "Create AI-powered appraisal and market analysis." },
     { title: "Construction Feasibility", href: "/workforce-office/construction-feasibility", description: "Analyze project budgets against local costs." },
