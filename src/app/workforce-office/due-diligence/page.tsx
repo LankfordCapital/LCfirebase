@@ -22,9 +22,9 @@ import html2canvas from 'html2canvas';
 type ReportType = 'marketAnalysis' | 'comparableProperty' | 'constructionFeasibility' | 'mapReport' | 'salesHistory';
 
 const reportOptions: { id: ReportType; label: string, description: string }[] = [
-    { id: 'marketAnalysis', label: 'Market Analysis', description: 'Demographics, economic drivers, zoning, etc.' },
+    { id: 'marketAnalysis', label: 'Market Analysis', description: 'Demographics, economic drivers, zoning, and permit status.' },
     { id: 'comparableProperty', label: 'Comparable Property Report', description: 'Sales comps, lease market analysis, and proforma validation.' },
-    { id: 'constructionFeasibility', label: 'Construction Feasibility', description: 'Budget vs. local costs analysis.' },
+    { id: 'constructionFeasibility', label: 'Construction Feasibility', description: 'Budget vs. local costs and architectural plan analysis.' },
     { id: 'mapReport', label: 'Map Report', description: 'Text-based map describing nearby attractions and comps.' },
     { id: 'salesHistory', label: 'Sales History Report', description: 'Recorded sales history for the subject property.' },
 ];

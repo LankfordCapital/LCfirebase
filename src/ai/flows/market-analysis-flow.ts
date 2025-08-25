@@ -69,6 +69,7 @@ Generate a report on the property's zoning and land use. Include:
 - A detailed description of what this zoning code permits (e.g., permitted uses, density, height restrictions, setback requirements).
 - Any relevant overlays or special districts that apply.
 - A brief summary of whether the stated "{{dealType}}" is a permitted use under the current zoning.
+- An analysis of recent or pending permits in the immediate area that could indicate development trends.
 {{/if}}
 
 Please provide each requested report in its corresponding field in the output.

@@ -25,11 +25,12 @@ const prompt = ai.definePrompt({
 
 1.  **Analyze Local Costs:** Based on the subject property address, use your knowledge of regional construction data to estimate the typical costs for labor and materials in that specific area.
 2.  **Review Budget vs. Plans:** Compare the provided construction budget line items against the uploaded plans (if available) and the scope of work described.
-3.  **Factor in Work Sunk:** Account for the work already completed and paid for ("work sunk") and subtract it from the overall project scope.
-4.  **Feasibility Conclusion:** Determine if the remaining budget is sufficient to complete the remaining work based on your local cost analysis. Set the 'isFeasible' flag accordingly.
-5.  **Calculate Shortfall:** If the budget is insufficient, estimate the 'potentialShortfall'.
-6.  **Provide Detailed Analysis:** In 'costAnalysis', provide a detailed breakdown of your findings. Compare the submitted budget line items to your estimated costs. Highlight areas that are significantly under-budgeted.
-7.  **Give Recommendations:** In 'recommendations', provide actionable advice. This could include suggestions for cost savings, reallocating funds, or warnings about specific high-risk items.
+3.  **Architectural Plan Analysis (if provided):** Review the architectural plans for completeness, adherence to common building standards, and potential issues. Note any obvious errors, inconsistencies, or areas that may lead to cost overruns.
+4.  **Factor in Work Sunk:** Account for the work already completed and paid for ("work sunk") and subtract it from the overall project scope.
+5.  **Feasibility Conclusion:** Determine if the remaining budget is sufficient to complete the remaining work based on your local cost analysis. Set the 'isFeasible' flag accordingly.
+6.  **Calculate Shortfall:** If the budget is insufficient, estimate the 'potentialShortfall'.
+7.  **Provide Detailed Analysis:** In 'costAnalysis', provide a detailed breakdown of your findings. Compare the submitted budget line items to your estimated costs. Highlight areas that are significantly under-budgeted.
+8.  **Give Recommendations:** In 'recommendations', provide actionable advice. This could include suggestions for cost savings, reallocating funds, or warnings about specific high-risk items identified in the plans or budget.
 
 **Project Information:**
 
