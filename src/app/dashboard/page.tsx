@@ -14,6 +14,8 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/auth-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
+import { BorrowerInfoModal } from "@/components/borrower-info-modal";
+import { useRouter } from "next/navigation";
 
 interface LoanApplication {
   id: string;
@@ -36,6 +38,7 @@ interface Document {
 export default function DashboardPage() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -176,9 +179,18 @@ export default function DashboardPage() {
             <Button variant="outline" asChild>
                 <Link href="/dashboard/applications">View Programs</Link>
             </Button>
-            <Button asChild>
-                <Link href="/dashboard/application"><PlusCircle className="mr-2 h-4 w-4"/> Start New Application</Link>
-            </Button>
+            <BorrowerInfoModal 
+              trigger={
+                <Button>
+                  <PlusCircle className="mr-2 h-4 w-4"/> Start New Application
+                </Button>
+              }
+              onBorrowerAdded={(borrowerInfo: any) => {
+                console.log('Borrower added:', borrowerInfo);
+                // Navigate to the loan application page with borrower ID
+                router.push(`/dashboard/application?borrowerId=${borrowerInfo.id}`);
+              }}
+            />
         </div>
       </div>
       

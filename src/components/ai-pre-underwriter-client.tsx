@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowRight, CheckCircle, FileText } from 'lucide-react';
 import { getDocumentChecklist, type GetDocumentChecklistOutput } from '@/ai/flows/document-checklist-flow';
 import { CustomLoader } from './ui/custom-loader';
+import { BorrowerInfoModal } from './borrower-info-modal';
 
 type Checklist = GetDocumentChecklistOutput['documentRequestList'];
 
@@ -61,8 +62,13 @@ export function AIPReUnderwriterClient() {
       });
       return;
     }
+    // The borrower modal will handle the navigation after borrower info is collected
+  };
+
+  const handleBorrowerAdded = (borrowerInfo: any) => {
+    // Navigate to the loan application page with the selected program
     const programSlug = encodeURIComponent(loanProgram.toLowerCase().replace(/\s-\s/g, '-').replace(/ /g, '-').replace(/&/g, 'and'));
-    router.push(`/dashboard/application/${programSlug}`);
+    router.push(`/dashboard/application/${programSlug}?borrowerId=${borrowerInfo.id}`);
   };
 
 
@@ -150,9 +156,14 @@ export function AIPReUnderwriterClient() {
                         )
                     ))}
                 </div>
-                 <Button onClick={handleContinue}>
-                    Continue to Application <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                 <BorrowerInfoModal
+                   trigger={
+                     <Button>
+                       Continue to Application <ArrowRight className="ml-2 h-4 w-4" />
+                     </Button>
+                   }
+                   onBorrowerAdded={handleBorrowerAdded}
+                 />
             </div>
         )}
       </CardContent>
