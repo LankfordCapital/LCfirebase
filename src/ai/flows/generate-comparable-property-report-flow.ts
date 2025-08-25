@@ -25,12 +25,12 @@ const prompt = ai.definePrompt({
 
 1.  **Comparable Sales Analysis:**
     -   Identify at least 3-5 recent, relevant comparable sales ("comps") in the immediate vicinity, following standard appraisal principles (similar size, age, condition, property type).
-    -   For each comp, provide: Address, Sale Price, Sale Date, Square Footage, Price per Square Foot, and Days on Market.
+    -   For each comp, provide: Address, Sale Price, Sale Date, Square Footage, Price per Square Foot, Number of Units, Lot Size, Year Built, Amenities, and Days on Market.
     -   Provide a summary of the sales comparison analysis, including average days on market, and conclude with an estimated value for the subject property based on this data.
 
 2.  **Rental Market Analysis:**
     -   Identify at least 3-5 current, relevant rental listings ("rental comps") in the immediate vicinity.
-    -   For each rental comp, provide: Address, Monthly Rent, Square Footage, and Rent per Square Foot.
+    -   For each rental comp, provide: Address, Monthly Rent, Square Footage, Rent per Square Foot, Number of Units, Lot Size, Year Built, and Amenities.
     -   Analyze and report on the typical:
         -   Vacancy rates and overall occupancy rates for this property type in the area.
         -   Operating expense ratios (as a percentage of gross income).
