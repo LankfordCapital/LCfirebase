@@ -1,11 +1,11 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChatClient } from "@/components/chat-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
-import { Hash, MessageSquare, Briefcase, Users, Building, PlusCircle, Trash2 } from "lucide-react";
+import { Hash, MessageSquare, Briefcase, Users, Building, PlusCircle, Trash2, Search } from "lucide-react";
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/auth-context';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { ProtectedRoute } from '@/components/protected-route';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 // In a real application, this list would be dynamically generated
 // based on the user's loans, teams, etc.
@@ -31,17 +32,16 @@ const initialChannels = {
     ]
 }
 
-const mockUsers = [
-    { id: 'user-1', name: 'Alice (Broker)', avatar: '/avatars/1.png' },
-    { id: 'user-2', name: 'Bob (Borrower)', avatar: '/avatars/2.png' },
-    { id: 'user-3', name: 'Charlie (Workforce)', avatar: '/avatars/3.png' },
-    { id: 'user-4', name: 'Diana (Admin)', avatar: '/avatars/4.png' },
-    { id: 'user-5', name: 'Evan (Workforce)', avatar: '/avatars/5.png' },
-];
+interface UserProfile {
+    uid: string;
+    fullName: string;
+    email: string;
+    role: 'borrower' | 'broker' | 'workforce' | 'admin';
+}
 
 
 export default function CommunicationsPage() {
-    const { user, isAdmin } = useAuth();
+    const { user, isAdmin, getAllUsers } = useAuth();
     const { toast } = useToast();
     const [channels, setChannels] = useState(initialChannels);
     const [selectedRoomId, setSelectedRoomId] = useState<string>('workforce-internal-chat');
@@ -49,6 +49,9 @@ export default function CommunicationsPage() {
     const [newChannelName, setNewChannelName] = useState('');
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
     const [isManageDialogOpen, setIsManageDialogOpen] = useState(false);
+    
+    // Member management state
+    const [allUsers, setAllUsers] = useState<UserProfile[]>([]);
     const [channelMembers, setChannelMembers] = useState<Record<string, string[]>>({
         'workforce-internal-chat': ['user-3', 'user-4', 'user-5'],
         'loan-LL-00125': ['user-2', 'user-4'],
@@ -56,6 +59,26 @@ export default function CommunicationsPage() {
         'broker-alice-chat': ['user-1', 'user-4'],
         'borrower-johndoe-chat': ['user-2', 'user-4'],
     });
+    
+    // Invite state
+    const [inviteName, setInviteName] = useState('');
+    const [inviteEmail, setInviteEmail] = useState('');
+    const [isInviting, setIsInviting] = useState(false);
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            if(isAdmin) {
+                try {
+                    const usersData = await getAllUsers();
+                    setAllUsers(usersData);
+                } catch(e) {
+                    console.error("Failed to fetch users", e);
+                }
+            }
+        }
+        fetchUsers();
+    }, [isAdmin, getAllUsers]);
+
 
     if (!user) {
         return <div>Loading...</div>;
@@ -103,6 +126,20 @@ export default function CommunicationsPage() {
         toast({ title: 'Member Removed', description: 'The user has been removed from the channel.' });
     };
 
+    const handleInviteUser = async () => {
+        if(!inviteName || !inviteEmail) {
+            toast({ variant: 'destructive', title: 'Missing fields', description: 'Please provide name and email.' });
+            return;
+        }
+        setIsInviting(true);
+        // Simulate sending invite
+        await new Promise(res => setTimeout(res, 1000));
+        toast({ title: 'Invite Sent', description: `Invitation sent to ${inviteEmail}.`});
+        setInviteName('');
+        setInviteEmail('');
+        setIsInviting(false);
+    }
+
 
     const renderChannelList = (title: string, items: {id: string, name: string, icon: React.ReactNode}[]) => (
          <div className="space-y-1">
@@ -125,7 +162,7 @@ export default function CommunicationsPage() {
     );
 
     const currentMembers = channelMembers[selectedRoomId] || [];
-    const availableUsersToAdd = mockUsers.filter(u => !currentMembers.includes(u.id));
+    const availableUsersToAdd = allUsers.filter(u => !currentMembers.includes(u.uid));
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-6 h-[calc(100vh-10rem)]">
@@ -179,19 +216,23 @@ export default function CommunicationsPage() {
                             <DialogTrigger asChild>
                                 <Button variant="outline" size="sm">Manage Members</Button>
                             </DialogTrigger>
-                             <DialogContent>
+                             <DialogContent className="sm:max-w-[525px]">
                                 <DialogHeader>
                                     <DialogTitle>Manage Members in #{selectedRoomName}</DialogTitle>
                                 </DialogHeader>
-                                <div className="py-4 space-y-4">
-                                    <div>
-                                        <h4 className="font-semibold mb-2">Current Members ({currentMembers.length})</h4>
-                                        <div className="space-y-2 max-h-48 overflow-y-auto">
+                                <Tabs defaultValue="add-existing" className="mt-4">
+                                    <TabsList className="grid w-full grid-cols-3">
+                                        <TabsTrigger value="current">Current ({currentMembers.length})</TabsTrigger>
+                                        <TabsTrigger value="add-existing">Add Existing</TabsTrigger>
+                                        <TabsTrigger value="invite-new">Invite New</TabsTrigger>
+                                    </TabsList>
+                                    <TabsContent value="current" className="mt-4 max-h-96 overflow-y-auto">
+                                        <div className="space-y-2">
                                             {currentMembers.map(userId => {
-                                                const member = mockUsers.find(u => u.id === userId);
+                                                const member = allUsers.find(u => u.uid === userId);
                                                 return (
                                                     <div key={userId} className="flex items-center justify-between p-2 rounded-md bg-muted">
-                                                        <span>{member?.name || userId}</span>
+                                                        <span>{member?.fullName || member?.email || userId}</span>
                                                         <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleRemoveMember(selectedRoomId, userId)}>
                                                             <Trash2 className="h-4 w-4" />
                                                         </Button>
@@ -199,20 +240,36 @@ export default function CommunicationsPage() {
                                                 );
                                             })}
                                         </div>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-semibold mb-2">Add New Member</h4>
+                                    </TabsContent>
+                                    <TabsContent value="add-existing" className="mt-4 max-h-96 overflow-y-auto">
                                         <div className="space-y-2">
                                             {availableUsersToAdd.map(userToAdd => (
-                                                <div key={userToAdd.id} className="flex items-center justify-between p-2 rounded-md border">
-                                                    <span>{userToAdd.name}</span>
-                                                    <Button variant="outline" size="sm" onClick={() => handleAddMember(selectedRoomId, userToAdd.id)}>Add</Button>
+                                                <div key={userToAdd.uid} className="flex items-center justify-between p-2 rounded-md border">
+                                                    <div>
+                                                        <p>{userToAdd.fullName}</p>
+                                                        <p className="text-xs text-muted-foreground">{userToAdd.email}</p>
+                                                    </div>
+                                                    <Button variant="outline" size="sm" onClick={() => handleAddMember(selectedRoomId, userToAdd.uid)}>Add</Button>
                                                 </div>
                                             ))}
-                                            {availableUsersToAdd.length === 0 && <p className="text-sm text-muted-foreground">All users are in this channel.</p>}
+                                            {availableUsersToAdd.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">All users are in this channel.</p>}
                                         </div>
-                                    </div>
-                                </div>
+                                    </TabsContent>
+                                     <TabsContent value="invite-new" className="mt-4">
+                                        <div className="space-y-4">
+                                            <p className="text-sm text-muted-foreground">Send an invitation to someone who is not on the platform yet.</p>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="invite-name">Full Name</Label>
+                                                <Input id="invite-name" value={inviteName} onChange={e => setInviteName(e.target.value)} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="invite-email">Email Address</Label>
+                                                <Input id="invite-email" type="email" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} />
+                                            </div>
+                                            <Button className="w-full" onClick={handleInviteUser} disabled={isInviting}>Send Invite</Button>
+                                        </div>
+                                    </TabsContent>
+                                </Tabs>
                             </DialogContent>
                         </Dialog>
                     )}
@@ -224,3 +281,5 @@ export default function CommunicationsPage() {
         </div>
     )
 }
+
+    
