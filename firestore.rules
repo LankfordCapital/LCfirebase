@@ -51,5 +51,10 @@ service cloud.firestore {
     match /documents/{documentId} {
       allow read: if request.auth != null;
     }
+
+    // Allow workforce members and admins to manage workforce documents
+    match /workforce-docs/{documentId} {
+      allow read, write, create, delete: if request.auth != null;
+    }
   }
 }

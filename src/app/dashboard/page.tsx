@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { DollarSign, FileCheck, FileClock, PlusCircle, AlertCircle, Calendar, Briefcase, UserCheck, ArrowRight } from "lucide-react";
+import { DollarSign, FileCheck, FileClock, PlusCircle, AlertCircle, Calendar, Briefcase, UserCheck, ArrowRight, FileText } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/auth-context";
@@ -112,6 +112,12 @@ export default function DashboardPage() {
 
   const summaryCards = [
     { 
+      title: "Available Programs", 
+      value: "18", 
+      icon: <FileText className="h-4 w-4 text-muted-foreground" />,
+      cta: { href: "/dashboard/applications", text: "View All"}
+    },
+    { 
       title: "Active Loans", 
       value: activeLoans.length.toString(), 
       icon: <DollarSign className="h-4 w-4 text-muted-foreground" /> 
@@ -120,12 +126,6 @@ export default function DashboardPage() {
       title: "Documents Submitted", 
       value: submittedDocuments.length.toString(), 
       icon: <FileCheck className="h-4 w-4 text-muted-foreground" /> 
-    },
-    { 
-      title: "Pending Actions", 
-      value: pendingDocuments.length.toString(), 
-      icon: <FileClock className="h-4 w-4 text-muted-foreground" />, 
-      cta: { href: "/dashboard/documents", text: "View Actions"} 
     },
   ];
 
@@ -172,6 +172,9 @@ export default function DashboardPage() {
               }}
             >
               Show Toast
+            </Button>
+            <Button variant="outline" asChild>
+                <Link href="/dashboard/applications">View Programs</Link>
             </Button>
             <Button asChild>
                 <Link href="/dashboard/application"><PlusCircle className="mr-2 h-4 w-4"/> Start New Application</Link>

@@ -61,9 +61,11 @@ export function AIPReUnderwriterClient() {
       });
       return;
     }
-    const programSlug = loanProgram.toLowerCase().replace(/\s-\s/g, '-').replace(/ /g, '-').replace(/&/g, 'and');
+    const programSlug = encodeURIComponent(loanProgram.toLowerCase().replace(/\s-\s/g, '-').replace(/ /g, '-').replace(/&/g, 'and'));
     router.push(`/dashboard/application/${programSlug}`);
   };
+
+
 
   return (
     <Card>
@@ -75,11 +77,21 @@ export function AIPReUnderwriterClient() {
         <div className="space-y-2">
             <Label>Loan Program</Label>
             <div className="flex items-center gap-2">
-                <Select onValueChange={setLoanProgram} value={loanProgram}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select a program..." />
-                    </SelectTrigger>
-                    <SelectContent>
+                <div className="loan-program-select">
+                    <Select onValueChange={setLoanProgram} value={loanProgram}>
+                        <SelectTrigger className="w-[600px]">
+                            <SelectValue placeholder="Select a program..." />
+                        </SelectTrigger>
+                        <SelectContent 
+                            style={{ 
+                                maxHeight: 'none',
+                                height: 'auto',
+                                overflow: 'visible',
+                                minWidth: '500px',
+                                width: 'auto'
+                            }} 
+                            className="max-h-none loan-program-dropdown"
+                        >
                         <SelectGroup>
                             <SelectLabel>Residential NOO</SelectLabel>
                             <SelectItem value="Residential NOO - Ground Up Construction">Ground Up Construction</SelectItem>
@@ -110,6 +122,7 @@ export function AIPReUnderwriterClient() {
                         </SelectGroup>
                     </SelectContent>
                 </Select>
+                </div>
                  <Button onClick={handleGenerateChecklist} disabled={!loanProgram || isLoading}>
                     {isLoading ? <CustomLoader className="mr-2 h-4 w-4" /> : <CheckCircle className="mr-2 h-4 w-4" />}
                     Generate Checklist

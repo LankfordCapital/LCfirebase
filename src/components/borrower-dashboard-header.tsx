@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { LayoutDashboard, LogOut, User as UserIcon, Shield } from 'lucide-react';
+import { LayoutDashboard, LogOut, User as UserIcon, Building2, Users, Briefcase } from 'lucide-react';
 import { Logo } from './logo';
 import { usePathname } from 'next/navigation';
 
@@ -19,8 +19,6 @@ export default function BorrowerDashboardHeader() {
       { href: '/dashboard/application', label: 'New Application' },
       { href: '/dashboard/documents', label: 'Loan Actions' },
       { href: '/dashboard/profile', label: 'My Profile' },
-      // Add admin panel tab for admin users
-      ...(isAdmin ? [{ href: '/admin', label: 'Admin Panel' }] : []),
   ];
   
   return (
@@ -67,13 +65,30 @@ export default function BorrowerDashboardHeader() {
                <DropdownMenuItem asChild>
                 <Link href="/dashboard"><LayoutDashboard className="mr-2 h-4 w-4" />Dashboard</Link>
               </DropdownMenuItem>
-              {/* Add admin panel option for admin users */}
-              {isAdmin && (
-                <DropdownMenuItem asChild>
-                  <Link href="/admin"><Shield className="mr-2 h-4 w-4" />Admin Panel</Link>
-                </DropdownMenuItem>
-              )}
               <DropdownMenuSeparator />
+              {isAdmin && (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link href="/workforce-office">
+                      <Users className="mr-2 h-4 w-4" />
+                      <span>Workforce Office</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/broker-office">
+                      <Briefcase className="mr-2 h-4 w-4" />
+                      <span>Broker Office</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard">
+                      <Building2 className="mr-2 h-4 w-4" />
+                      <span>Borrower Dashboard</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               <DropdownMenuItem onClick={logOut}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>

@@ -95,4 +95,100 @@
     background-color: hsl(var(--primary) / 0.2);
     color: hsl(var(--primary));
   }
+  
+  /* Override SelectContent max height for loan program dropdown */
+  .loan-program-select [data-radix-popper-content-wrapper] {
+    max-height: none !important;
+  }
+  
+  .loan-program-select [data-radix-select-content] {
+    max-height: none !important;
+  }
+  
+  /* Additional selectors to ensure dropdown shows all options */
+  .loan-program-select [data-radix-select-viewport] {
+    max-height: none !important;
+  }
+  
+  .loan-program-select [data-radix-select-content] > div {
+    max-height: none !important;
+  }
+  
+  /* Target the actual content wrapper */
+  .loan-program-select [data-radix-popper-content-wrapper] > div {
+    max-height: none !important;
+  }
+  
+  /* Ensure the portal content has no height restrictions */
+  .loan-program-select [data-radix-portal] {
+    max-height: none !important;
+  }
+  
+  /* Additional comprehensive overrides for the loan program dropdown */
+  .loan-program-dropdown {
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    min-width: 500px !important;
+    width: auto !important;
+  }
+  
+  .loan-program-dropdown [data-radix-select-viewport] {
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  
+  /* Target any nested elements that might have height restrictions */
+  .loan-program-select * {
+    max-height: none !important;
+  }
+  
+  /* Ensure the dropdown content is fully visible */
+  .loan-program-select [data-radix-popper-content-wrapper] * {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  
+  /* Target the actual dropdown menu object */
+  .loan-program-select [data-radix-select-content] {
+    min-width: 500px !important;
+    width: auto !important;
+  }
+  
+  /* Ensure the viewport inside the dropdown is wide enough */
+  .loan-program-select [data-radix-select-viewport] {
+    min-width: 500px !important;
+    width: auto !important;
+  }
+  
+  /* Make the select trigger wider to match the dropdown */
+  .loan-program-select [data-radix-select-trigger] {
+    min-width: 600px !important;
+    width: 600px !important;
+  }
+  
+  /* Ensure the trigger button itself is wide */
+  .loan-program-select button[data-radix-select-trigger] {
+    min-width: 600px !important;
+    width: 600px !important;
+  }
+  
+  /* Target the actual button element */
+  .loan-program-select .w-\[600px\] {
+    min-width: 600px !important;
+    width: 600px !important;
+  }
+  
+  /* Ensure proper spacing in the dropdown items */
+  .loan-program-dropdown [data-radix-select-item] {
+    padding: 8px 12px !important;
+    white-space: nowrap !important;
+  }
+  
+  /* Make sure the dropdown content wrapper is wide enough */
+  .loan-program-select [data-radix-popper-content-wrapper] {
+    min-width: 500px !important;
+    width: auto !important;
+  }
 }

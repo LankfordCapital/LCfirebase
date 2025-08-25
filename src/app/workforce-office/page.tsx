@@ -116,9 +116,6 @@ export default function WorkforceOfficePage() {
              <Input placeholder="Search clients or loans..." className="pl-8 w-full md:w-64" />
            </div>
            <InviteUserDialog />
-            <Button asChild>
-                <Link href="/dashboard/documents"><PlusCircle className="mr-2 h-4 w-4"/> New Application</Link>
-            </Button>
         </div>
       </div>
 

@@ -8,7 +8,9 @@ import { getFirestore, type Firestore } from 'firebase-admin/firestore';
 
 let app: App;
 if (getApps().length === 0) {
-    app = initializeApp();
+    app = initializeApp({
+        projectId: 'lankford-lending'
+    });
 } else {
     app = getApp();
 }
