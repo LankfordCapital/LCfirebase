@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -691,12 +692,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           if (typeof window !== 'undefined' && window.location.pathname.startsWith('/auth/')) {
             // Get the redirect path based on current state
             let redirectPath = '/';
+            const userProfileData = userProfile;
             
-            if (userProfile?.role === 'admin' || userProfile?.role === 'workforce') {
+            if (userProfileData?.role === 'admin' || userProfileData?.role === 'workforce') {
               redirectPath = '/workforce-office';
-            } else if (userProfile?.role === 'broker') {
+            } else if (userProfileData?.role === 'broker') {
               redirectPath = '/broker-office';
-            } else if (userProfile?.role === 'borrower') {
+            } else if (userProfileData?.role === 'borrower') {
               redirectPath = '/dashboard';
             } else {
               // Fallback based on UID for admin users
@@ -726,7 +728,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [userProfile]);
 
   // Safety timeout to prevent loading state from getting stuck
   useEffect(() => {
@@ -782,3 +784,4 @@ export const useAuth = () => {
   }
   return context;
 };
+
