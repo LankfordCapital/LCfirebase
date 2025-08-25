@@ -108,12 +108,15 @@ export default function Home() {
             Lankford Capital provides tailored, innovative financing solutions to power your real estate and business ambitions.
             From ground-up construction to strategic acquisitions, we are your dedicated financial partner.
           </p>
-          <div className="mt-10 flex justify-center gap-4">
+          <div className="mt-10 flex flex-wrap justify-center gap-4">
             <Button asChild size="lg" className="font-semibold">
               <Link href="/dashboard">Get Started</Link>
             </Button>
             <Button asChild size="lg" variant="secondary" className="font-semibold">
               <Link href="/lending/commercial">Explore Loans</Link>
+            </Button>
+             <Button asChild size="lg" variant="outline" className="font-semibold text-white border-white hover:bg-white hover:text-primary">
+              <Link href="/auth/workforce-signin">Workforce</Link>
             </Button>
           </div>
         </div>
