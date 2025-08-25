@@ -13,27 +13,12 @@ const AIAssistant = dynamic(() => import('./ai-assistant').then(mod => ({ defaul
   loading: () => null,
 });
 
-function ConditionalAIAssistant() {
-  const [shouldLoadAI, setShouldLoadAI] = useState(false);
-
-  useEffect(() => {
-    // Load AI assistant immediately since video was the performance bottleneck
-    setShouldLoadAI(true);
-  }, []);
-
-  if (!shouldLoadAI) {
-    return null;
-  }
-
-  return <AIAssistant />;
-}
-
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
       <UIProvider>
         <DocumentProvider>
-          <ConditionalAIAssistant />
+          <AIAssistant />
           {children}
         </DocumentProvider>
       </UIProvider>
