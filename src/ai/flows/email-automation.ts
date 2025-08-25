@@ -151,7 +151,7 @@ const emailAutomationFlow = ai.defineFlow(
         // Add the 'from' address and handle the 'cc' logic after the AI generates the draft
         const draftedEmail = {
             ...output!.draftedEmail,
-            from: input.fromWorkforceEmail,
+            from: input.fromWorkforceEmail || 'noreply@lankfordcapital.com',
         };
 
         if (input.ccBroker && input.broker) {
