@@ -115,9 +115,6 @@ export default function Home() {
             <Button asChild size="lg" variant="secondary" className="font-semibold">
               <Link href="/lending/commercial">Explore Loans</Link>
             </Button>
-             <Button asChild size="lg" variant="outline" className="font-semibold text-white border-white hover:bg-white hover:text-primary">
-              <Link href="/auth/workforce-signin">Workforce</Link>
-            </Button>
           </div>
         </div>
         <Image
