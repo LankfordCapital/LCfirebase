@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState } from 'react';
@@ -93,8 +92,8 @@ export function EmailAutomationClient() {
             });
             setResult(response);
             toast({
-                title: 'Email Drafted',
-                description: `Successfully generated email for scenario: ${scenario}`
+                title: 'Email Sent!',
+                description: `Successfully queued email for scenario: ${scenario}`
             });
         } catch (error) {
             console.error('Email Automation Error:', error);
@@ -292,12 +291,12 @@ export function EmailAutomationClient() {
 
                 <Button onClick={handleGenerateEmail} disabled={isLoading}>
                     {isLoading ? <CustomLoader className="mr-2 h-4 w-4" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                    Generate Email Draft
+                    Generate & Send Email
                 </Button>
 
                 {result && result.draftedEmail && (
                     <div className="space-y-4 pt-4">
-                        <h3 className="text-lg font-semibold font-headline">Drafted Email</h3>
+                        <h3 className="text-lg font-semibold font-headline">Sent Email Preview</h3>
                         <Card className="bg-muted/50">
                              <CardHeader>
                                 <CardTitle className="text-base">To: {result.draftedEmail.to}</CardTitle>
@@ -306,11 +305,6 @@ export function EmailAutomationClient() {
                             </CardHeader>
                             <CardContent>
                                 <div className="prose prose-sm max-w-none p-4 border rounded-md bg-background" dangerouslySetInnerHTML={{ __html: result.draftedEmail.body.replace(/\\n/g, '<br />') }} />
-                                    <div className="mt-4 flex justify-end">
-                                    <Button size="sm">
-                                        <Send className="mr-2 h-4 w-4" /> Send Email
-                                    </Button>
-                                </div>
                             </CardContent>
                         </Card>
                     </div>

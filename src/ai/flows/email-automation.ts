@@ -2,7 +2,7 @@
 'use server';
 
 /**
- * @fileOverview This file defines a Genkit flow for generating various automated emails.
+ * @fileOverview This file defines a Genkit flow for generating and sending various automated emails.
  * 
  * - generateEmail - An async function that takes user data and a scenario to draft an email.
  * - GenerateEmailInput - The input type for the function.
@@ -12,6 +12,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import { loanProgramDocumentLists } from '@/lib/document-lists';
+import { sendEmail } from '@/lib/email-service';
 
 const UserProfileSchema = z.object({
   userId: z.string().describe('Unique identifier for the user.'),
@@ -56,6 +57,7 @@ const EmailDraftSchema = z.object({
 
 const GenerateEmailOutputSchema = z.object({
     draftedEmail: EmailDraftSchema.describe('The drafted email.'),
+    sendRecordId: z.string().optional().describe('The ID of the created record in the mail collection in Firestore.'),
 });
 export type GenerateEmailOutput = z.infer<typeof GenerateEmailOutputSchema>;
 
@@ -67,7 +69,7 @@ export async function generateEmail(input: GenerateEmailInput): Promise<Generate
 const prompt = ai.definePrompt({
     name: 'generateEmailPrompt',
     input: { schema: GenerateEmailInputSchema },
-    output: { schema: GenerateEmailOutputSchema },
+    output: { schema: z.object({ draftedEmail: EmailDraftSchema }) }, // Prompt only generates the draft
     prompt: `You are an AI assistant for Lankford Capital responsible for drafting professional emails.
 
 Your task is to generate a personalized and professional email draft based on the provided recipient profile and scenario.
@@ -143,11 +145,23 @@ const emailAutomationFlow = ai.defineFlow(
         }
 
         const { output } = await prompt(input);
+        const draftedEmail = output!.draftedEmail;
 
-        if (output && input.ccBroker && input.broker) {
-            output.draftedEmail.cc = input.broker.email;
+        if (input.ccBroker && input.broker) {
+            draftedEmail.cc = input.broker.email;
         }
         
-        return output!;
+        // Send the email by writing to Firestore
+        const sendRecordId = await sendEmail({
+            to: [draftedEmail.to],
+            cc: draftedEmail.cc ? [draftedEmail.cc] : undefined,
+            subject: draftedEmail.subject,
+            html: draftedEmail.body,
+        });
+
+        return {
+            draftedEmail,
+            sendRecordId,
+        };
     }
 );
