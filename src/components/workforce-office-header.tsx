@@ -35,6 +35,11 @@ const databaseLinks = [
     { title: "AMC & Vendor Database", href: "/workforce-office/amc-database", description: "Manage appraisal and report vendors." },
 ];
 
+const dueDiligenceLinks = [
+    ...aiToolsLinks,
+    ...generationToolsLinks
+];
+
 const ListItem = React.forwardRef<
   React.ElementRef<"a">,
   React.ComponentPropsWithoutRef<"a">
@@ -80,23 +85,10 @@ export default function WorkforceOfficeHeader() {
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                    <NavigationMenuTrigger>AI Tools</NavigationMenuTrigger>
+                    <NavigationMenuTrigger>Due Diligence</NavigationMenuTrigger>
                     <NavigationMenuContent>
                         <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                            {aiToolsLinks.map((component) => (
-                            <ListItem key={component.title} title={component.title} href={component.href}>
-                                {component.description}
-                            </ListItem>
-                            ))}
-                        </ul>
-                    </NavigationMenuContent>
-                </NavigationMenuItem>
-                
-                <NavigationMenuItem>
-                    <NavigationMenuTrigger>Generators</NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                        <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                            {generationToolsLinks.map((component) => (
+                            {dueDiligenceLinks.map((component) => (
                             <ListItem key={component.title} title={component.title} href={component.href}>
                                 {component.description}
                             </ListItem>
