@@ -6,6 +6,7 @@ import { db } from './firebase-client';
 
 interface MailPayload {
     to: string[];
+    from?: string; // Add from field
     cc?: string[];
     bcc?: string[];
     subject: string;

@@ -33,6 +33,7 @@ const BrokerProfileSchema = z.object({
 const GenerateEmailInputSchema = z.object({
     recipient: UserProfileSchema.describe('The user (borrower or broker) for whom the email is being generated.'),
     fromWorkforceName: z.string().describe('The name of the Lankford Capital workforce member sending the email.'),
+    fromWorkforceEmail: z.string().email().describe('The email address of the Lankford Capital workforce member sending the email.'),
     scenario: z.enum(['missingDocuments', 'appointmentConfirmation', 'loanApproval', 'adverseAction', 'custom'])
         .describe('The scenario for which the email is being generated.'),
     details: z.object({
@@ -50,6 +51,7 @@ export type GenerateEmailInput = z.infer<typeof GenerateEmailInputSchema>;
 
 const EmailDraftSchema = z.object({
     to: z.string().email().describe('The recipient\'s email address.'),
+    from: z.string().email().describe('The sender\'s email address.'),
     cc: z.string().email().optional().describe('The CC recipient\'s email address.'),
     subject: z.string().describe('The subject line of the email.'),
     body: z.string().describe('The HTML body content of the email.'),
@@ -69,7 +71,7 @@ export async function generateEmail(input: GenerateEmailInput): Promise<Generate
 const prompt = ai.definePrompt({
     name: 'generateEmailPrompt',
     input: { schema: GenerateEmailInputSchema },
-    output: { schema: z.object({ draftedEmail: EmailDraftSchema }) }, // Prompt only generates the draft
+    output: { schema: z.object({ draftedEmail: EmailDraftSchema.omit({ from: true }) }) }, // Prompt only generates the draft content, not the from address
     prompt: `You are an AI assistant for Lankford Capital responsible for drafting professional emails.
 
 Your task is to generate a personalized and professional email draft based on the provided recipient profile and scenario.
@@ -145,7 +147,12 @@ const emailAutomationFlow = ai.defineFlow(
         }
 
         const { output } = await prompt(input);
-        const draftedEmail = output!.draftedEmail;
+        
+        // Add the 'from' address and handle the 'cc' logic after the AI generates the draft
+        const draftedEmail = {
+            ...output!.draftedEmail,
+            from: input.fromWorkforceEmail,
+        };
 
         if (input.ccBroker && input.broker) {
             draftedEmail.cc = input.broker.email;
@@ -154,6 +161,7 @@ const emailAutomationFlow = ai.defineFlow(
         // Send the email by writing to Firestore
         const sendRecordId = await sendEmail({
             to: [draftedEmail.to],
+            from: draftedEmail.from,
             cc: draftedEmail.cc ? [draftedEmail.cc] : undefined,
             subject: draftedEmail.subject,
             html: draftedEmail.body,

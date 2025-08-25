@@ -14,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useDocumentContext } from '@/contexts/document-context';
 import { Checkbox } from '../ui/checkbox';
 import { CustomLoader } from '../ui/custom-loader';
+import { useAuth } from '@/contexts/auth-context';
 
 const sampleUsers: GenerateEmailInput['recipient'][] = [
     { userId: 'user-123', email: 'john.doe@example.com', fullName: 'John Doe', role: 'borrower', timeZone: 'America/New_York' },
@@ -29,6 +30,7 @@ const sampleBrokers = [
 
 
 export function EmailAutomationClient() {
+    const { user } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [result, setResult] = useState<GenerateEmailOutput | null>(null);
     const [scenario, setScenario] = useState<GenerateEmailInput['scenario']>('missingDocuments');
@@ -37,7 +39,7 @@ export function EmailAutomationClient() {
     const [selectedBorrowerId, setSelectedBorrowerId] = useState<string | null>(null);
     const [selectedBrokerId, setSelectedBrokerId] = useState<string | null>(null);
 
-    const [fromWorkforceName, setFromWorkforceName] = useState('Your Name');
+    const [fromWorkforceName, setFromWorkforceName] = useState(user?.displayName || 'Workforce Member');
     const [ccBroker, setCcBroker] = useState(false);
 
     const [details, setDetails] = useState<GenerateEmailInput['details']>({
@@ -57,6 +59,15 @@ export function EmailAutomationClient() {
                 variant: 'destructive',
                 title: 'No Recipient',
                 description: 'Please select a borrower to send the email to.',
+            });
+            return;
+        }
+
+        if (!user?.email) {
+            toast({
+                variant: 'destructive',
+                title: 'Authentication Error',
+                description: 'Could not identify your user email. Please log in again.',
             });
             return;
         }
@@ -82,6 +93,7 @@ export function EmailAutomationClient() {
             const response = await generateEmail({ 
                 recipient,
                 fromWorkforceName,
+                fromWorkforceEmail: user.email,
                 scenario, 
                 details: {
                     ...details,
@@ -299,7 +311,8 @@ export function EmailAutomationClient() {
                         <h3 className="text-lg font-semibold font-headline">Sent Email Preview</h3>
                         <Card className="bg-muted/50">
                              <CardHeader>
-                                <CardTitle className="text-base">To: {result.draftedEmail.to}</CardTitle>
+                                <CardTitle className="text-sm">From: {result.draftedEmail.from}</CardTitle>
+                                <CardDescription>To: {result.draftedEmail.to}</CardDescription>
                                 {result.draftedEmail.cc && <CardDescription>CC: {result.draftedEmail.cc}</CardDescription>}
                                 <CardDescription>Subject: {result.draftedEmail.subject}</CardDescription>
                             </CardHeader>
