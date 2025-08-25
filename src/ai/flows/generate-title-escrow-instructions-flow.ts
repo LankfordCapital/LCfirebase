@@ -25,6 +25,7 @@ const prompt = ai.definePrompt({
 1.  **Analyze the Deal:** Deeply analyze the provided deal parameters (deal type, loan amount, property type, etc.) to determine the necessary requirements.
 2.  **Generate Title Instructions:** Create a formal request to the title company.
     -   Specify the required lender's title insurance policy (e.g., ALTA Lender's Policy 2006).
+    -   Order a **24-month chain of title** for the subject property.
     -   Based on the deal type, list all necessary endorsements. Your reasoning must be precise.
         - For **Commercial** properties, always require Zoning 3.1, Survey, and ALTA 9 (Comprehensive) endorsements.
         - For **Construction** or major **Rehab** deals, require ALTA 32 (Construction Loan) and ALTA 33 (Disbursement) endorsements.
@@ -63,4 +64,5 @@ const generateTitleEscrowInstructionsFlow = ai.defineFlow(
         return output!;
     }
 );
+
 

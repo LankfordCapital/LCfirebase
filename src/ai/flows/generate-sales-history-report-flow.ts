@@ -21,7 +21,7 @@ const prompt = ai.definePrompt({
     output: { schema: GenerateSalesHistoryReportOutputSchema },
     prompt: `You are an expert real estate title researcher. Your task is to generate a sales history report for the given property address.
 
-Use your knowledge of public records and real estate data to find and list the previous sales of this property.
+Use your knowledge of public records and real estate data to find and list the previous sales of this property. You should search online sources like Zillow, county recorder websites, and other public real estate data aggregators to find the most complete history.
 
 **Subject Property Address:** {{{subjectPropertyAddress}}}
 
@@ -31,7 +31,7 @@ For each recorded sale, please provide:
 - Parties Involved (if available)
 - Any other relevant notes (e.g., type of sale, if it was distressed)
 
-Please generate the sales history report. If no sales history can be found, please state that.
+Please generate the sales history report. If no sales history can be found after searching online public records, please state that.
 `,
 });
 
@@ -46,3 +46,4 @@ const salesHistoryReportFlow = ai.defineFlow(
         return output!;
     }
 );
+
