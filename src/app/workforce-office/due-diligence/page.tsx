@@ -8,27 +8,33 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Sparkles, Download, FileText, FileUp } from 'lucide-react';
+import { Loader2, Sparkles, Download, FileText, FileUp, Map, History } from 'lucide-react';
 import { generateMarketAnalysis, type GenerateMarketAnalysisOutput } from '@/ai/flows/market-analysis-flow';
 import { generateComparablePropertyReport, type GenerateComparablePropertyReportOutput } from '@/ai/flows/generate-comparable-property-report-flow';
 import { generateConstructionFeasibilityReport, type GenerateConstructionFeasibilityOutput } from '@/ai/flows/construction-feasibility-flow';
+import { generateMapReport, type GenerateMapReportOutput } from '@/ai/flows/generate-map-report-flow';
+import { generateSalesHistoryReport, type GenerateSalesHistoryReportOutput } from '@/ai/flows/generate-sales-history-report-flow';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Textarea } from '@/components/ui/textarea';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-type ReportType = 'marketAnalysis' | 'comparableProperty' | 'constructionFeasibility';
+type ReportType = 'marketAnalysis' | 'comparableProperty' | 'constructionFeasibility' | 'mapReport' | 'salesHistory';
 
 const reportOptions: { id: ReportType; label: string, description: string }[] = [
     { id: 'marketAnalysis', label: 'Market Analysis', description: 'Demographics, economic drivers, zoning, etc.' },
-    { id: 'comparableProperty', label: 'Comparable Property Report', description: 'Sales comps, rental market, and proforma validation.' },
+    { id: 'comparableProperty', label: 'Comparable Property Report', description: 'Sales comps, lease market analysis, and proforma validation.' },
     { id: 'constructionFeasibility', label: 'Construction Feasibility', description: 'Budget vs. local costs analysis.' },
+    { id: 'mapReport', label: 'Map Report', description: 'Text-based map describing nearby attractions and comps.' },
+    { id: 'salesHistory', label: 'Sales History Report', description: 'Recorded sales history for the subject property.' },
 ];
 
 interface ReportResults {
     marketAnalysis?: GenerateMarketAnalysisOutput;
     comparableProperty?: GenerateComparablePropertyReportOutput;
     constructionFeasibility?: GenerateConstructionFeasibilityOutput;
+    mapReport?: GenerateMapReportOutput;
+    salesHistory?: GenerateSalesHistoryReportOutput;
 }
 
 const fileToDataUri = (file: File): Promise<string> => {
@@ -107,6 +113,10 @@ export default function DueDiligenceHubPage() {
                         if (!constructionBudgetText) throw new Error("Construction budget is required for Feasibility Report.");
                         const plansDataUri = plansFile ? await fileToDataUri(plansFile) : undefined;
                         return { type: reportType, data: await generateConstructionFeasibilityReport({ subjectPropertyAddress: address, dealType, constructionBudgetText, workSunkText, plansDataUri }) };
+                    case 'mapReport':
+                        return { type: reportType, data: await generateMapReport({ subjectPropertyAddress: address }) };
+                    case 'salesHistory':
+                        return { type: reportType, data: await generateSalesHistoryReport({ subjectPropertyAddress: address }) };
                     default:
                         return null;
                 }
@@ -297,6 +307,26 @@ export default function DueDiligenceHubPage() {
                                         </AccordionItem>
                                     </Accordion>
                                 )}
+                                 {reportType === 'mapReport' && results.mapReport && (
+                                    <Accordion type="single" collapsible className="w-full">
+                                        <AccordionItem value="item-1">
+                                            <AccordionTrigger className="text-xl font-bold flex items-center gap-2"><Map/> Map Report</AccordionTrigger>
+                                            <AccordionContent className="space-y-4 pt-4 prose prose-sm max-w-none">
+                                                {renderReportContent(results.mapReport.mapDescription)}
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    </Accordion>
+                                )}
+                                 {reportType === 'salesHistory' && results.salesHistory && (
+                                    <Accordion type="single" collapsible className="w-full">
+                                        <AccordionItem value="item-1">
+                                            <AccordionTrigger className="text-xl font-bold flex items-center gap-2"><History/> Sales History Report</AccordionTrigger>
+                                            <AccordionContent className="space-y-4 pt-4 prose prose-sm max-w-none">
+                                                {renderReportContent(results.salesHistory.salesHistory)}
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    </Accordion>
+                                )}
                             </div>
                         ))}
                     </CardContent>
@@ -305,5 +335,3 @@ export default function DueDiligenceHubPage() {
         </div>
     );
 }
-
-    
