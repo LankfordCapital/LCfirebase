@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { PlusCircle, Users, BarChart, DollarSign, MoreHorizontal, FileWarning, Search, Briefcase, UserPlus, Home, Mail, Phone } from "lucide-react";
+import { PlusCircle, Users, BarChart, DollarSign, MoreHorizontal, FileWarning, Search, Briefcase, UserPlus, Home, Mail, Phone, ArrowRight, Percent } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -27,11 +27,11 @@ const summaryCards = [
 ];
 
 const clientLoans = [
-    { id: "LL-00125", borrower: { name: "John Doe", email: "john.d@example.com", phone: "555-123-4567" }, broker: { name: "Alice Johnson", company: "Creative Capital", email: "alice.j@cc.com", phone: "555-987-6543"}, property: "123 Main St", type: "Fix and Flip", status: "Underwriting", progress: 60, missingDocuments: ["Proof of Insurance"] },
-    { id: "LL-00126", borrower: { name: "Jane Smith", email: "jane.s@example.com", phone: "555-234-5678" }, broker: { name: "Direct" }, property: "456 Oak Ave", type: "DSCR", status: "Approved", progress: 100, missingDocuments: [] },
-    { id: "LL-00127", borrower: { name: "Sam Wilson", email: "sam.w@example.com", phone: "555-345-6789" }, broker: { name: "Bob Williams", company: "Mortgage Pro", email: "bob.w@mp.com", phone: "555-876-5432" }, property: "789 Pine Ln", type: "Ground Up", status: "Missing Docs", progress: 25, missingDocuments: ["Approved Plans", "Builder's Risk Insurance"] },
-    { id: "LL-00128", borrower: { name: "Alpha Corp", email: "contact@alphacorp.com", phone: "555-456-7890" }, broker: { name: "Direct" }, property: "101 Factory Rd", type: "Industrial Rehab", status: "Initial Review", progress: 15, missingDocuments: ["Business Financials (3 years)"] },
-    { id: "LL-00129", borrower: { name: "Bridge Holdings", email: "deals@bridgeholdings.com", phone: "555-567-8901" }, broker: { name: "Diana Prince", company: "Capital Partners", email: "diana.p@cp.com", phone: "555-765-4321" }, property: "210 Commerce St", type: "Commercial Bridge", status: "Funded", progress: 100, missingDocuments: [] },
+    { id: "LL-00125", borrower: { name: "John Doe", email: "john.d@example.com", phone: "555-123-4567" }, broker: { name: "Alice Johnson", company: "Creative Capital", email: "alice.j@cc.com", phone: "555-987-6543"}, property: "123 Main St", type: "Fix and Flip", status: "Underwriting", progress: 60, missingDocuments: ["Proof of Insurance"], loanAmount: 350000, ltv: 75, arv: 500000, interestRate: 9.5, term: 12 },
+    { id: "LL-00126", borrower: { name: "Jane Smith", email: "jane.s@example.com", phone: "555-234-5678" }, broker: { name: "Direct" }, property: "456 Oak Ave", type: "DSCR", status: "Approved", progress: 100, missingDocuments: [], loanAmount: 450000, ltv: 70, arv: 600000, interestRate: 6.5, term: 360 },
+    { id: "LL-00127", borrower: { name: "Sam Wilson", email: "sam.w@example.com", phone: "555-345-6789" }, broker: { name: "Bob Williams", company: "Mortgage Pro", email: "bob.w@mp.com", phone: "555-876-5432" }, property: "789 Pine Ln", type: "Ground Up", status: "Missing Docs", progress: 25, missingDocuments: ["Approved Plans", "Builder's Risk Insurance"], loanAmount: 1200000, ltv: 65, arv: 2000000, interestRate: 8.0, term: 18 },
+    { id: "LL-00128", borrower: { name: "Alpha Corp", email: "contact@alphacorp.com", phone: "555-456-7890" }, broker: { name: "Direct" }, property: "101 Factory Rd", type: "Industrial Rehab", status: "Initial Review", progress: 15, missingDocuments: ["Business Financials (3 years)"], loanAmount: 2500000, ltv: 60, arv: 4000000, interestRate: 7.5, term: 24 },
+    { id: "LL-00129", borrower: { name: "Bridge Holdings", email: "deals@bridgeholdings.com", phone: "555-567-8901" }, broker: { name: "Diana Prince", company: "Capital Partners", email: "diana.p@cp.com", phone: "555-765-4321" }, property: "210 Commerce St", type: "Commercial Bridge", status: "Funded", progress: 100, missingDocuments: [], loanAmount: 800000, ltv: 70, arv: 1100000, interestRate: 9.0, term: 12 },
 ];
 
 const brokerPipeline = [
@@ -194,7 +194,9 @@ export default function WorkforceOfficePage() {
                                                 <DialogTrigger asChild>
                                                     <DropdownMenuItem onSelect={() => setSelectedLoan(loan)}>View Details</DropdownMenuItem>
                                                 </DialogTrigger>
-                                                <DropdownMenuItem>Manage Documents</DropdownMenuItem>
+                                                <DropdownMenuItem asChild>
+                                                    <Link href={`/dashboard/application/${loan.type.toLowerCase().replace(/ /g, '-')}`}>Manage Documents</Link>
+                                                </DropdownMenuItem>
                                                 <DropdownMenuItem>Send Reminder</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
@@ -207,45 +209,91 @@ export default function WorkforceOfficePage() {
                             <DialogHeader>
                                 <DialogTitle>Loan Details: {selectedLoan?.id}</DialogTitle>
                                 <DialogDescription>
-                                    Summary for property at {selectedLoan?.property}
+                                    Comprehensive summary for the loan on {selectedLoan?.property}.
                                 </DialogDescription>
                             </DialogHeader>
                             {selectedLoan && (
-                                <div className="space-y-6 py-4">
-                                    <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-6 py-4 max-h-[70vh] overflow-y-auto">
+                                    {/* Loan Metrics */}
+                                    <div className="space-y-4">
+                                        <h4 className="font-semibold text-primary">Loan Metrics</h4>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 border rounded-lg">
+                                            <div className="text-center">
+                                                <p className="text-sm text-muted-foreground">Loan Amount</p>
+                                                <p className="font-bold text-lg">${selectedLoan.loanAmount.toLocaleString()}</p>
+                                            </div>
+                                            <div className="text-center">
+                                                <p className="text-sm text-muted-foreground">LTV / ARV</p>
+                                                <p className="font-bold text-lg">{selectedLoan.ltv}% / ${selectedLoan.arv.toLocaleString()}</p>
+                                            </div>
+                                            <div className="text-center">
+                                                <p className="text-sm text-muted-foreground">Interest Rate</p>
+                                                <p className="font-bold text-lg">{selectedLoan.interestRate}%</p>
+                                            </div>
+                                            <div className="text-center">
+                                                <p className="text-sm text-muted-foreground">Term</p>
+                                                <p className="font-bold text-lg">{selectedLoan.term} months</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <Separator />
+
+                                    {/* Borrower & Broker Info */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
-                                            <h4 className="font-semibold text-sm">Borrower</h4>
-                                            <p>{selectedLoan.borrower.name}</p>
-                                            <p className="text-xs text-muted-foreground flex items-center gap-1"><Mail className="h-3 w-3"/> {selectedLoan.borrower.email}</p>
-                                            <p className="text-xs text-muted-foreground flex items-center gap-1"><Phone className="h-3 w-3"/> {selectedLoan.borrower.phone}</p>
+                                            <h4 className="font-semibold text-primary mb-2">Borrower Contact</h4>
+                                            <div className="flex items-center gap-3">
+                                                <Avatar>
+                                                    <AvatarFallback>{selectedLoan.borrower.name.charAt(0)}</AvatarFallback>
+                                                </Avatar>
+                                                <div>
+                                                    <p className="font-medium">{selectedLoan.borrower.name}</p>
+                                                    <p className="text-xs text-muted-foreground flex items-center gap-1"><Mail className="h-3 w-3"/> {selectedLoan.borrower.email}</p>
+                                                    <p className="text-xs text-muted-foreground flex items-center gap-1"><Phone className="h-3 w-3"/> {selectedLoan.borrower.phone}</p>
+                                                </div>
+                                            </div>
                                         </div>
                                          <div>
-                                            <h4 className="font-semibold text-sm">Broker</h4>
+                                            <h4 className="font-semibold text-primary mb-2">Broker Contact</h4>
                                              {selectedLoan.broker.company ? (
-                                                <>
-                                                    <p>{selectedLoan.broker.name} ({selectedLoan.broker.company})</p>
-                                                    <p className="text-xs text-muted-foreground flex items-center gap-1"><Mail className="h-3 w-3"/> {selectedLoan.broker.email}</p>
-                                                    <p className="text-xs text-muted-foreground flex items-center gap-1"><Phone className="h-3 w-3"/> {selectedLoan.broker.phone}</p>
-                                                </>
-                                             ) : <p>{selectedLoan.broker.name}</p>}
+                                                <div className="flex items-center gap-3">
+                                                    <Avatar>
+                                                        <AvatarFallback>{selectedLoan.broker.name.charAt(0)}</AvatarFallback>
+                                                    </Avatar>
+                                                    <div>
+                                                        <p className="font-medium">{selectedLoan.broker.name}</p>
+                                                        <p className="text-xs text-muted-foreground">({selectedLoan.broker.company})</p>
+                                                        <p className="text-xs text-muted-foreground flex items-center gap-1"><Mail className="h-3 w-3"/> {selectedLoan.broker.email}</p>
+                                                        <p className="text-xs text-muted-foreground flex items-center gap-1"><Phone className="h-3 w-3"/> {selectedLoan.broker.phone}</p>
+                                                    </div>
+                                                </div>
+                                             ) : <p className="text-sm">Direct</p>}
                                         </div>
                                     </div>
+
                                     <Separator />
-                                     <div>
-                                        <h4 className="font-semibold text-sm mb-2">Loan Info</h4>
-                                        <div className="flex justify-between items-center text-sm">
-                                            <span>Type: <Badge variant="outline">{selectedLoan.type}</Badge></span>
-                                            <span>Status: <Badge variant={selectedLoan.status === 'Approved' || selectedLoan.status === 'Funded' ? 'default' : 'destructive'} className={selectedLoan.status === 'Approved' || selectedLoan.status === 'Funded' ? 'bg-green-500 hover:bg-green-600' : ''}>{selectedLoan.status}</Badge></span>
+
+                                    {/* Property & Status */}
+                                    <div className="space-y-4">
+                                        <h4 className="font-semibold text-primary">Property & Status</h4>
+                                        <div className="text-sm">
+                                            <p><span className="font-medium">Property Address:</span> {selectedLoan.property}</p>
+                                            <p><span className="font-medium">Loan Type:</span> <Badge variant="outline">{selectedLoan.type}</Badge></p>
+                                            <p><span className="font-medium">Current Status:</span> <Badge variant={selectedLoan.status === 'Approved' || selectedLoan.status === 'Funded' ? 'default' : 'destructive'} className={selectedLoan.status === 'Approved' || selectedLoan.status === 'Funded' ? 'bg-green-500 hover:bg-green-600' : ''}>{selectedLoan.status}</Badge></p>
                                         </div>
-                                        <div className="mt-2">
-                                            <Label>Progress</Label>
-                                            <Progress value={selectedLoan.progress} className="w-full" />
-                                        </div>
-                                    </div>
-                                    <Separator />
-                                    {selectedLoan.missingDocuments.length > 0 ? (
                                         <div>
-                                            <h4 className="font-semibold text-sm text-destructive mb-2">Missing Documents</h4>
+                                            <Label className="text-sm font-medium">Progress</Label>
+                                            <Progress value={selectedLoan.progress} className="w-full mt-1" />
+                                        </div>
+                                    </div>
+                                    
+                                    <Separator />
+
+                                    {/* Missing Documents */}
+                                    <div>
+                                        <h4 className="font-semibold text-primary mb-2">Missing Documents</h4>
+                                        {selectedLoan.missingDocuments.length > 0 ? (
                                             <ul className="space-y-2">
                                                 {selectedLoan.missingDocuments.map((doc, index) => (
                                                     <li key={index} className="flex items-center gap-2 text-sm p-2 bg-destructive/10 rounded-md">
@@ -254,10 +302,10 @@ export default function WorkforceOfficePage() {
                                                     </li>
                                                 ))}
                                             </ul>
-                                        </div>
-                                    ) : (
-                                        <p className="text-sm text-muted-foreground text-center py-4">No outstanding documents for this loan.</p>
-                                    )}
+                                        ) : (
+                                            <p className="text-sm text-muted-foreground text-center py-4">No outstanding documents for this loan.</p>
+                                        )}
+                                    </div>
                                 </div>
                             )}
                         </DialogContent>
@@ -318,4 +366,5 @@ export default function WorkforceOfficePage() {
       </Tabs>
     </div>
   );
-}
+
+    
