@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { PlusCircle, Users, BarChart, DollarSign, MoreHorizontal, FileWarning, Search, Briefcase, UserPlus, Home, Mail, Phone, ArrowRight, Percent } from "lucide-react";
+import { PlusCircle, Users, BarChart, DollarSign, MoreHorizontal, FileWarning, Search, Briefcase, UserPlus, Home, Mail, Phone, ArrowRight, Percent, Construction } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -196,6 +196,9 @@ export default function WorkforceOfficePage() {
                                                 </DialogTrigger>
                                                 <DropdownMenuItem asChild>
                                                     <Link href={`/workforce-office/loan-documents/${loan.id}`}>Manage Documents</Link>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem asChild>
+                                                    <Link href="/workforce-office/due-diligence">Due Diligence</Link>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem>Send Reminder</DropdownMenuItem>
                                             </DropdownMenuContent>
