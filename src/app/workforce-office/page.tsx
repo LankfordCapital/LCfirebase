@@ -366,5 +366,4 @@ export default function WorkforceOfficePage() {
       </Tabs>
     </div>
   );
-
-    
+}
