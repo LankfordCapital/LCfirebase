@@ -24,14 +24,18 @@ const prompt = ai.definePrompt({
 **Instructions:**
 1.  **Analyze the Deal:** Deeply analyze the provided deal parameters (deal type, loan amount, property type, etc.) to determine the necessary requirements.
 2.  **Generate Title Instructions:** Create a formal request to the title company.
-    -   Specify the required lender's title insurance policy (e.g., ALTA Lender's Policy).
-    -   Based on the deal type, list all necessary endorsements (e.g., for a commercial property, you would require Zoning 3.1, Survey, and ALTA 9 endorsements).
+    -   Specify the required lender's title insurance policy (e.g., ALTA Lender's Policy 2006).
+    -   Based on the deal type, list all necessary endorsements. Your reasoning must be precise.
+        - For **Commercial** properties, always require Zoning 3.1, Survey, and ALTA 9 (Comprehensive) endorsements.
+        - For **Construction** or major **Rehab** deals, require ALTA 32 (Construction Loan) and ALTA 33 (Disbursement) endorsements.
+        - For **Industrial** properties, add an Access and Entry endorsement.
+        - For **Refinance** deals, ensure a new lender's policy is ordered, not a reissue.
     -   Include all relevant party and property information.
 3.  **Generate Escrow Instructions:** Create a separate set of instructions for the escrow company.
     -   Detail the handling of funds, including the loan amount and any deposits.
-    -   Specify how prorations for taxes, insurance, and any rents should be handled.
-    -   List all conditions that must be met before closing and disbursing funds.
-    -   Reference the title requirements to ensure alignment.
+    -   Specify how prorations for taxes, insurance, and any rents (especially for commercial/multi-family) should be handled.
+    -   List all conditions that must be met before closing and disbursing funds, referencing the specific title requirements to ensure alignment.
+    -   If it is a purchase, mention the purchase price and earnest money deposit.
 
 **Deal Parameters:**
 

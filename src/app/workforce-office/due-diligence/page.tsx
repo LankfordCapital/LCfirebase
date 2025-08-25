@@ -22,10 +22,11 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-type ReportType = 'marketAnalysis' | 'comparableProperty' | 'constructionFeasibility' | 'mapReport' | 'salesHistory' | 'titleEscrow' | 'insurance';
+type ReportType = 'marketAnalysis' | 'zoning' | 'comparableProperty' | 'constructionFeasibility' | 'mapReport' | 'salesHistory' | 'titleEscrow' | 'insurance';
 
 const reportOptions: { id: ReportType; label: string, description: string }[] = [
-    { id: 'marketAnalysis', label: 'Market Analysis', description: 'Demographics, economic drivers, zoning, and permit status.' },
+    { id: 'marketAnalysis', label: 'Market Analysis', description: 'Demographics, economic drivers, and traffic study.' },
+    { id: 'zoning', label: 'Zoning Report', description: 'Zoning designation, permitted uses, and permit history.' },
     { id: 'comparableProperty', label: 'Comparable Property Report', description: 'Sales & lease comps, and proforma validation.' },
     { id: 'constructionFeasibility', label: 'Construction Feasibility', description: 'Budget vs. local costs and architectural plan analysis.' },
     { id: 'mapReport', label: 'Map Report', description: 'Text-based map describing nearby attractions and comps.' },
@@ -42,13 +43,14 @@ interface ReportResults {
     salesHistory?: GenerateSalesHistoryReportOutput;
     titleEscrow?: GenerateTitleEscrowInstructionsOutput;
     insurance?: GenerateInsuranceInstructionsOutput;
+    zoning?: GenerateMarketAnalysisOutput;
 }
 
 // Mock loan data - in a real app this would be fetched from your database
 const activeLoans = [
-    { id: "LL-00125", borrower: { name: "John Doe" }, property: "123 Main St", type: "Fix and Flip", loanAmount: 350000, purchasePrice: 280000, constructionBudget: 50000 },
-    { id: "LL-00127", borrower: { name: "Sam Wilson" }, property: "789 Pine Ln", type: "Ground Up Construction", loanAmount: 1200000, purchasePrice: 300000, constructionBudget: 900000 },
-    { id: "LL-00128", borrower: { name: "Alpha Corp" }, property: "101 Factory Rd", type: "Industrial Rehab", loanAmount: 2500000, purchasePrice: 1500000, constructionBudget: 1000000 },
+    { id: "LL-00125", borrower: { name: "John Doe" }, property: "123 Main St, Anytown, CA 90210", type: "Fix and Flip", loanAmount: 350000, purchasePrice: 280000, constructionBudget: 50000 },
+    { id: "LL-00127", borrower: { name: "Sam Wilson" }, property: "789 Pine Ln, Otherville, TX 75001", type: "Ground Up Construction", loanAmount: 1200000, purchasePrice: 300000, constructionBudget: 900000 },
+    { id: "LL-00128", borrower: { name: "Alpha Corp" }, property: "101 Factory Rd, Industry, IL 60607", type: "Industrial Rehab", loanAmount: 2500000, purchasePrice: 1500000, constructionBudget: 1000000 },
 ];
 
 const fileToDataUri = (file: File): Promise<string> => {
@@ -141,7 +143,9 @@ export default function DueDiligenceHubPage() {
             const reportPromises = selectedReports.map(async (reportType) => {
                 switch(reportType) {
                     case 'marketAnalysis':
-                        return { type: reportType, data: await generateMarketAnalysis({ subjectPropertyAddress: address, dealType, reportTypes: ['demographics', 'economicDrivers', 'zoning', 'trafficStudy'] }) };
+                        return { type: reportType, data: await generateMarketAnalysis({ subjectPropertyAddress: address, dealType, reportTypes: ['demographics', 'economicDrivers', 'trafficStudy'] }) };
+                    case 'zoning':
+                        return { type: reportType, data: await generateMarketAnalysis({ subjectPropertyAddress: address, dealType, reportTypes: ['zoning'] }) };
                     case 'comparableProperty':
                         if (!proformaText) throw new Error("Proforma text is required for Comparable Property Report.");
                         return { type: reportType, data: await generateComparablePropertyReport({ subjectPropertyAddress: address, propertyType, proformaText }) };
@@ -343,6 +347,16 @@ export default function DueDiligenceHubPage() {
                                                         <div>{renderReportContent(value)}</div>
                                                     </div>
                                                 ))}
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    </Accordion>
+                                )}
+                                {reportType === 'zoning' && results.zoning && (
+                                    <Accordion type="single" collapsible className="w-full">
+                                        <AccordionItem value="item-1">
+                                            <AccordionTrigger className="text-xl font-bold">Zoning Report</AccordionTrigger>
+                                            <AccordionContent className="space-y-4 pt-4 prose prose-sm max-w-none">
+                                                {renderReportContent(results.zoning.zoning)}
                                             </AccordionContent>
                                         </AccordionItem>
                                     </Accordion>
