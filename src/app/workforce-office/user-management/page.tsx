@@ -129,8 +129,10 @@ export default function UserManagementPage() {
     };
 
     useEffect(() => {
-        fetchUsers();
-    }, []);
+        if (isAdmin) {
+            fetchUsers();
+        }
+    }, [isAdmin]);
 
     useEffect(() => {
         let filtered = users;
@@ -230,6 +232,17 @@ export default function UserManagementPage() {
         { title: "Approved Users", value: users.filter(u => u.status === 'approved').length, icon: Check, color: "text-green-600" },
         { title: "Admins", value: users.filter(u => u.role === 'admin').length, icon: Shield, color: "text-red-600" },
     ];
+
+    if (!isAdmin) {
+      return (
+        <div className="flex justify-center items-center h-full">
+            <Card className="p-8 text-center">
+                <CardTitle className="text-2xl">Access Denied</CardTitle>
+                <CardDescription>You do not have permission to view this page.</CardDescription>
+            </Card>
+        </div>
+      )
+    }
 
     return (
         <div className="space-y-6">
