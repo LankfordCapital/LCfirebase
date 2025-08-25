@@ -20,5 +20,8 @@ import '@/ai/flows/appointment-scheduler-flow.ts';
 import '@/ai/flows/work-sunk-scanner.ts';
 import '@/ai/flows/generate-map-report-flow.ts';
 import '@/ai/flows/generate-sales-history-report-flow.ts';
+import '@/ai/flows/generate-title-escrow-instructions-flow.ts';
+import '@/ai/flows/generate-insurance-instructions-flow.ts';
+
 
 
