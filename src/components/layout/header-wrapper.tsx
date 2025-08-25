@@ -11,11 +11,19 @@ import { CustomLoader } from '../ui/custom-loader';
 
 export default function HeaderWrapper() {
   const pathname = usePathname();
-  const { user, loading, isAdmin, isLoggingOut } = useAuth();
+  const { user, loading, userProfile, isLoggingOut } = useAuth();
 
   // If logging out, show minimal header to prevent redirects
   if (isLoggingOut) {
     return (
+      <div className="flex h-16 items-center justify-center border-b bg-background">
+        <CustomLoader />
+      </div>
+    );
+  }
+  
+  if (loading) {
+     return (
       <div className="flex h-16 items-center justify-center border-b bg-background">
         <CustomLoader />
       </div>
@@ -28,34 +36,33 @@ export default function HeaderWrapper() {
   const isBrokerOfficePage = pathname.startsWith('/broker-office');
   const isWorkforceOfficePage = pathname.startsWith('/workforce-office');
 
-  if (loading) {
-    return (
-      <div className="flex h-16 items-center justify-center border-b bg-background">
-        <CustomLoader />
-      </div>
-    );
-  }
-  
   if (isAuthPage) {
     return null;
   }
-
-  // Handle admin pages - show borrower dashboard header for admin users
-  if (isAdminPage && user && isAdmin) {
-    return <BorrowerDashboardHeader />;
-  }
-
-  if (isDashboardPage && user) {
-    return <BorrowerDashboardHeader />;
-  }
-
-  if (isBrokerOfficePage && user) {
-    return <BrokerOfficeHeader />;
+  
+  // Use userProfile to determine header, which ensures role is known
+  if (userProfile) {
+    if (userProfile.role === 'admin') {
+      if (isAdminPage || isDashboardPage || isWorkforceOfficePage) {
+        return <WorkforceOfficeHeader />;
+      }
+    } else if (userProfile.role === 'workforce') {
+      if (isWorkforceOfficePage) {
+        return <WorkforceOfficeHeader />;
+      }
+    } else if (userProfile.role === 'broker') {
+      if (isBrokerOfficePage) {
+        return <BrokerOfficeHeader />;
+      }
+    } else if (userProfile.role === 'borrower') {
+       if (isDashboardPage) {
+        return <BorrowerDashboardHeader />;
+      }
+    }
   }
   
-  if (isWorkforceOfficePage && user) {
-      return <WorkforceOfficeHeader />;
-  }
-
+  // Default public header if not in any specific dashboard
   return <Header />;
 }
+
+    

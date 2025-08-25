@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -69,9 +70,9 @@ export default function AdminHeader() {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href="/admin/profile" className="flex items-center gap-2">
+                <Link href="/workforce-office/profile" className="flex items-center gap-2">
                   <Settings className="h-4 w-4" />
-                  Admin Profile
+                  Profile
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -90,3 +91,4 @@ export default function AdminHeader() {
   );
 }
 
+    

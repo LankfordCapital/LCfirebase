@@ -1,7 +1,7 @@
 
 'use client';
 
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
 import { CustomLoader } from './ui/custom-loader';
@@ -13,33 +13,36 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, allowedRoles, redirectTo = '/auth/signin' }: ProtectedRouteProps) {
-  const { user, loading, userProfile, getRedirectPath, isLoggingOut } = useAuth();
+  const { user, loading, userProfile } = useAuth();
   const router = useRouter();
-  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    if (isLoggingOut) return;
-    if (loading) return;
+    if (loading) {
+      return; // Wait until loading is complete
+    }
 
     if (!user) {
-      router.push(redirectTo);
+      router.push(redirectTo); // No user, redirect to sign-in
       return;
     }
 
     if (userProfile) {
-      if (allowedRoles.includes(userProfile.role)) {
-        setIsAuthorized(true);
-      } else {
-        const path = getRedirectPath();
-        router.push(path);
+      if (!allowedRoles.includes(userProfile.role)) {
+         // User's role is not allowed, redirect to their default dashboard
+         if (userProfile.role === 'borrower') router.push('/dashboard');
+         else if (userProfile.role === 'broker') router.push('/broker-office');
+         else if (userProfile.role === 'workforce' || userProfile.role === 'admin') router.push('/workforce-office');
+         else router.push(redirectTo); // Fallback
       }
+      // If role is allowed, the component will render children.
     }
-    // If no userProfile, onAuthStateChanged in AuthContext will handle it
-    // or the loading screen will persist. This prevents premature redirects.
+    
+    // If there's a user but no profile yet, auth context is still resolving.
+    // The loading screen will show until profile is loaded and this effect re-runs.
 
-  }, [user, userProfile, loading, allowedRoles, redirectTo, router, getRedirectPath, isLoggingOut]);
+  }, [user, userProfile, loading, allowedRoles, redirectTo, router]);
 
-  if (loading || !isAuthorized) {
+  if (loading || !userProfile || !allowedRoles.includes(userProfile.role)) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <CustomLoader className="h-10 w-10" />
@@ -49,3 +52,5 @@ export function ProtectedRoute({ children, allowedRoles, redirectTo = '/auth/sig
 
   return <>{children}</>;
 }
+
+    

@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,6 +25,10 @@ export default function ProfilePage() {
       setCanUsePassword(canUse);
     }
   };
+
+  useEffect(() => {
+    checkPasswordSignIn();
+  }, [user]);
 
   // Add password to Google account
   const handleAddPassword = async (e: React.FormEvent) => {
@@ -56,7 +61,6 @@ export default function ProfilePage() {
       });
       setPassword('');
       setConfirmPassword('');
-      // Recheck password sign-in capability
       await checkPasswordSignIn();
     } catch (error: any) {
       toast({
@@ -69,11 +73,6 @@ export default function ProfilePage() {
     }
   };
 
-  // Check password capability on component mount
-  useState(() => {
-    checkPasswordSignIn();
-  });
-
   if (!user || !userProfile) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -81,6 +80,8 @@ export default function ProfilePage() {
       </div>
     );
   }
+
+  const isGoogleUserWithoutPassword = userProfile.authProvider === 'google' && canUsePassword === false;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -106,19 +107,15 @@ export default function ProfilePage() {
               <p className="text-sm text-gray-600 capitalize">{userProfile.role}</p>
             </div>
             <div>
-              <Label>Authentication Method</Label>
-              <p className="text-sm text-gray-600 capitalize">{userProfile.authProvider || 'email'}</p>
-            </div>
-            <div>
-              <Label>Can Sign In with Password</Label>
-              <p className="text-sm text-gray-600">
-                {canUsePassword === null ? 'Checking...' : canUsePassword ? 'Yes' : 'No'}
+              <Label>Authentication Method(s)</Label>
+              <p className="text-sm text-gray-600 capitalize">
+                {userProfile.authProvider} {canUsePassword ? ' & Password' : ''}
               </p>
             </div>
           </CardContent>
         </Card>
 
-        {userProfile.authProvider === 'google' && (
+        {isGoogleUserWithoutPassword && (
           <Card>
             <CardHeader>
               <CardTitle>Add Password to Google Account</CardTitle>
@@ -164,3 +161,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+    

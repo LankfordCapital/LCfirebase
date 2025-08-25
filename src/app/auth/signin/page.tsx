@@ -18,7 +18,6 @@ import { useState, FormEvent } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { CustomLoader } from "@/components/ui/custom-loader";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
@@ -30,17 +29,11 @@ export default function SignInPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    console.log('Starting sign-in process...');
     setIsLoading(true);
     
     try {
-      console.log('Calling signIn function...');
-      const result = await signIn(email, password);
-      console.log('Sign-in successful:', result);
-      
-      // Let the automatic redirect handle routing - no manual redirect needed
-      console.log('Waiting for automatic redirect...');
-      
+      await signIn(email, password);
+      // AuthProvider will handle the redirect on successful sign-in
     } catch (error: any) {
       console.error('Sign-in error in component:', error);
       toast({
@@ -53,17 +46,11 @@ export default function SignInPage() {
   };
 
   const handleGoogleSignIn = async () => {
-    console.log('Starting Google sign-in process...');
     setIsGoogleLoading(true);
     
     try {
-      console.log('Calling signInWithGoogle function...');
-      const result = await signInWithGoogle();
-      console.log('Google sign-in successful:', result);
-      
-      // Let the automatic redirect handle routing - no manual redirect needed
-      console.log('Waiting for automatic redirect...');
-      
+      await signInWithGoogle();
+       // AuthProvider will handle the redirect on successful sign-in
     } catch (error: any) {
       console.error('Google sign-in error in component:', error);
       toast({
@@ -106,7 +93,7 @@ export default function SignInPage() {
               {/* Google Sign In Button */}
               <Button 
                 onClick={handleGoogleSignIn}
-                disabled={isGoogleLoading}
+                disabled={isGoogleLoading || isLoading}
                 variant="outline" 
                 className="w-full"
               >
@@ -148,7 +135,7 @@ export default function SignInPage() {
                     required
                   />
                 </div>
-                <Button type="submit" disabled={isLoading} className="w-full">
+                <Button type="submit" disabled={isLoading || isGoogleLoading} className="w-full">
                   {isLoading && <CustomLoader className="mr-2 h-4 w-4" />}
                   Sign In
                 </Button>
@@ -174,3 +161,5 @@ export default function SignInPage() {
     </div>
   );
 }
+
+    
