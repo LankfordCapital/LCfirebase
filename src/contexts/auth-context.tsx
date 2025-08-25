@@ -8,7 +8,6 @@ import {
   useEffect,
   ReactNode,
   useCallback,
-  useRef,
 } from 'react';
 import {
   User,
@@ -26,9 +25,8 @@ import {
   linkWithCredential,
 } from 'firebase/auth';
 import { auth, db, googleProvider } from '@/lib/firebase-client';
-import { CustomLoader } from '@/components/ui/custom-loader';
-import { doc, setDoc, serverTimestamp, getDoc, updateDoc } from 'firebase/firestore';
-import { useRouter } from 'next/navigation';
+import { doc, setDoc, serverTimestamp, getDoc, updateDoc, collection, getDocs } from 'firebase/firestore';
+import { useRouter, usePathname } from 'next/navigation';
 
 interface UserProfile {
   uid: string;
@@ -69,12 +67,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
-  
-  // Ref to prevent multiple sign-in attempts
-  const signInAttemptedRef = useRef(false);
+  const pathname = usePathname();
 
   const isAdmin = userProfile?.role === 'admin';
-
+  
   const getRedirectPath = useCallback(() => {
     if (!userProfile) return '/auth/signin';
     switch (userProfile.role) {
@@ -89,53 +85,58 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [userProfile]);
 
-  const handleUserAuth = useCallback(async (userAuth: User | null, forceRedirect = false) => {
-    if (userAuth) {
-      setUser(userAuth);
-      try {
-        const userDocRef = doc(db, 'users', userAuth.uid);
-        const userDoc = await getDoc(userDocRef);
 
-        if (userDoc.exists()) {
-          const profile = userDoc.data() as UserProfile;
-          setUserProfile(profile);
-        } else {
-          // If user exists in Auth but not Firestore, create a profile
-          const newProfile: UserProfile = {
-            uid: userAuth.uid,
-            email: userAuth.email || '',
-            fullName: userAuth.displayName || 'New User',
-            role: 'borrower',
-            status: 'pending',
-            createdAt: serverTimestamp(),
-            authProvider: userAuth.providerData[0]?.providerId || 'password',
-          };
-          await setDoc(userDocRef, newProfile);
-          setUserProfile(newProfile);
-        }
-
-        // Redirect after sign-in if on an auth page
-        if (forceRedirect) {
-          const path = getRedirectPath();
-          router.push(path);
-        }
-      } catch (error) {
-        console.error("Error fetching/creating user profile:", error);
-        setUserProfile(null);
-      }
-    } else {
-      setUser(null);
-      setUserProfile(null);
+  const handleAuthRedirect = useCallback((profile: UserProfile) => {
+    const authPages = ['/auth/signin', '/auth/signup', '/auth/forgot-password', '/auth/reset-password', '/auth/workforce-signin'];
+    if (authPages.includes(pathname)) {
+        const path = getRedirectPath();
+        router.push(path);
     }
-    setLoading(false);
-  }, [router, getRedirectPath]);
-  
+  }, [pathname, router, getRedirectPath]);
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      handleUserAuth(user);
+    const unsubscribe = onAuthStateChanged(auth, async (userAuth) => {
+      if (userAuth) {
+        setUser(userAuth);
+        try {
+          const userDocRef = doc(db, 'users', userAuth.uid);
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists()) {
+            const profile = userDoc.data() as UserProfile;
+            setUserProfile(profile);
+            handleAuthRedirect(profile);
+          } else {
+            // This case handles users who might exist in Firebase Auth but not in Firestore.
+            // A default profile is created.
+            console.warn(`No Firestore document for user ${userAuth.uid}, creating one.`);
+            const newProfile: UserProfile = {
+              uid: userAuth.uid,
+              email: userAuth.email || '',
+              fullName: userAuth.displayName || 'New User',
+              role: 'borrower',
+              status: 'pending',
+              createdAt: serverTimestamp(),
+              authProvider: userAuth.providerData[0]?.providerId || 'password',
+            };
+            await setDoc(userDocRef, newProfile);
+            setUserProfile(newProfile);
+            handleAuthRedirect(newProfile);
+          }
+        } catch (error) {
+          console.error("Error fetching user profile:", error);
+          setUserProfile(null);
+        } finally {
+            setLoading(false);
+        }
+      } else {
+        setUser(null);
+        setUserProfile(null);
+        setLoading(false);
+      }
     });
+
     return () => unsubscribe();
-  }, [handleUserAuth]);
+  }, [handleAuthRedirect]);
 
   const signUp = async (email: string, pass: string, fullName: string, role: string) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
@@ -152,36 +153,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
     await setDoc(doc(db, "users", userCredential.user.uid), newProfile);
     
-    // Manually update state and redirect
-    await handleUserAuth(userCredential.user, true);
-
+    setUserProfile(newProfile);
+    handleAuthRedirect(newProfile);
+    
     return userCredential;
   };
   
   const signIn = async (email: string, pass: string) => {
-    if(signInAttemptedRef.current) return auth.currentUser ? { user: auth.currentUser } as UserCredential : Promise.reject("Sign in already in progress");
-    signInAttemptedRef.current = true;
-    
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, pass);
-      await handleUserAuth(userCredential.user, true);
-      return userCredential;
-    } finally {
-      signInAttemptedRef.current = false;
-    }
+    return signInWithEmailAndPassword(auth, email, pass);
   };
   
   const signInWithGoogle = async () => {
-    if(signInAttemptedRef.current) return Promise.reject("Sign in already in progress");
-    signInAttemptedRef.current = true;
-    
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      await handleUserAuth(result.user, true);
-      return result;
-    } finally {
-      signInAttemptedRef.current = false;
-    }
+    return signInWithPopup(auth, googleProvider);
   };
 
   const signUpWithGoogle = async (role: string) => {
@@ -196,7 +179,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (!userDoc.exists()) {
         generatedPassword = Math.random().toString(36).slice(-10);
         try {
-            await linkWithCredential(user, EmailAuthProvider.credential(user.email!, generatedPassword));
+            if(user.email) {
+                await linkWithCredential(user, EmailAuthProvider.credential(user.email, generatedPassword));
+            }
         } catch (error: any) {
             if (error.code !== 'auth/credential-already-in-use') throw error;
         }
@@ -212,17 +197,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         };
         await setDoc(userDocRef, newProfile);
         setUserProfile(newProfile);
+        handleAuthRedirect(newProfile);
       } else {
-        setUserProfile(userDoc.data() as UserProfile);
+        const profile = userDoc.data() as UserProfile;
+        setUserProfile(profile);
+        handleAuthRedirect(profile);
       }
-      
-      await handleUserAuth(user, true);
       
       return { credential: result, generatedPassword };
   };
 
   const addPasswordToGoogleAccount = async (password: string) => {
-    if (!user || user.providerData.some(p => p.providerId === 'password')) {
+    if (!user || !user.email || user.providerData.some(p => p.providerId === 'password')) {
         throw new Error("User not eligible or already has a password.");
     }
     const credential = EmailAuthProvider.credential(user.email!, password);
@@ -235,7 +221,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await signOut(auth);
     setUser(null);
     setUserProfile(null);
-    // Use a hard redirect to clear state and prevent component flashes
     window.location.href = '/';
   };
 
@@ -301,5 +286,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
-    

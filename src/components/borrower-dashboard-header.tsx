@@ -11,7 +11,7 @@ import { Logo } from './logo';
 import { usePathname } from 'next/navigation';
 
 export default function BorrowerDashboardHeader() {
-  const { user, logOut, isAdmin } = useAuth();
+  const { user, logOut, userProfile } = useAuth();
   const pathname = usePathname();
 
   const navLinks = [
@@ -65,7 +65,7 @@ export default function BorrowerDashboardHeader() {
                <DropdownMenuItem asChild>
                 <Link href="/dashboard"><LayoutDashboard className="mr-2 h-4 w-4" />Dashboard</Link>
               </DropdownMenuItem>
-              {isAdmin && (
+              {userProfile?.role === 'admin' && (
                 <DropdownMenuItem asChild>
                   <Link href="/workforce-office"><Shield className="mr-2 h-4 w-4" />Admin Panel</Link>
                 </DropdownMenuItem>
@@ -82,5 +82,3 @@ export default function BorrowerDashboardHeader() {
     </header>
   );
 }
-
-    

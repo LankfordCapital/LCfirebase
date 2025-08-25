@@ -11,7 +11,7 @@ import { CustomLoader } from '../ui/custom-loader';
 
 export default function HeaderWrapper() {
   const pathname = usePathname();
-  const { user, loading, userProfile, isLoggingOut } = useAuth();
+  const { userProfile, loading, isLoggingOut } = useAuth();
 
   // If logging out, show minimal header to prevent redirects
   if (isLoggingOut) {
@@ -31,10 +31,6 @@ export default function HeaderWrapper() {
   }
 
   const isAuthPage = pathname.startsWith('/auth');
-  const isDashboardPage = pathname.startsWith('/dashboard');
-  const isAdminPage = pathname.startsWith('/admin');
-  const isBrokerOfficePage = pathname.startsWith('/broker-office');
-  const isWorkforceOfficePage = pathname.startsWith('/workforce-office');
 
   if (isAuthPage) {
     return null;
@@ -42,27 +38,26 @@ export default function HeaderWrapper() {
   
   // Use userProfile to determine header, which ensures role is known
   if (userProfile) {
-    if (userProfile.role === 'admin') {
-      if (isAdminPage || isDashboardPage || isWorkforceOfficePage) {
-        return <WorkforceOfficeHeader />;
-      }
-    } else if (userProfile.role === 'workforce') {
-      if (isWorkforceOfficePage) {
-        return <WorkforceOfficeHeader />;
-      }
-    } else if (userProfile.role === 'broker') {
-      if (isBrokerOfficePage) {
-        return <BrokerOfficeHeader />;
-      }
-    } else if (userProfile.role === 'borrower') {
-       if (isDashboardPage) {
-        return <BorrowerDashboardHeader />;
-      }
+    switch (userProfile.role) {
+      case 'admin':
+      case 'workforce':
+        if (pathname.startsWith('/workforce-office') || pathname.startsWith('/dashboard')) {
+          return <WorkforceOfficeHeader />;
+        }
+        break;
+      case 'broker':
+        if (pathname.startsWith('/broker-office')) {
+          return <BrokerOfficeHeader />;
+        }
+        break;
+      case 'borrower':
+         if (pathname.startsWith('/dashboard')) {
+          return <BorrowerDashboardHeader />;
+        }
+        break;
     }
   }
   
-  // Default public header if not in any specific dashboard
+  // Default public header if not in any specific dashboard or for non-logged-in users
   return <Header />;
 }
-
-    

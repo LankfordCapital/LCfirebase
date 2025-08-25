@@ -12,6 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
+import { useAuth } from "@/contexts/auth-context";
 
 
 const summaryCards = [
@@ -33,7 +34,8 @@ const workforceMembers = [
     { uid: 'workforce-user-3', name: 'Chris Lee', title: 'Closing Coordinator' },
 ];
 
-export default function BrokerOfficePage() {
+export default function BrokerOfficePageClient() {
+    const { user, userProfile } = useAuth();
     const [selectedLoan, setSelectedLoan] = useState<(typeof borrowerLoans)[0] | null>(null);
 
   return (
@@ -41,17 +43,16 @@ export default function BrokerOfficePage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="flex items-center gap-4">
             <Avatar className="h-20 w-20">
-              <AvatarImage src="https://placehold.co/80x80.png" />
-              <AvatarFallback>BD</AvatarFallback>
+              <AvatarImage src={user?.photoURL || "https://placehold.co/80x80.png"} />
+              <AvatarFallback>{userProfile?.fullName?.charAt(0) || 'B'}</AvatarFallback>
             </Avatar>
             <div>
               <h1 className="font-headline text-3xl font-bold">Broker Back Office</h1>
-              <p className="text-muted-foreground">Broker Name | Broker Company LLC</p>
-              <Button variant="outline" size="sm" className="mt-2">Change Photo</Button>
+              <p className="text-muted-foreground">{userProfile?.fullName || 'Broker Name'}</p>
             </div>
         </div>
         <Button asChild>
-            <Link href="/broker-office/documents"><PlusCircle className="mr-2 h-4 w-4"/> Start New Application</Link>
+            <Link href="/dashboard/application"><PlusCircle className="mr-2 h-4 w-4"/> Start New Application</Link>
         </Button>
       </div>
 

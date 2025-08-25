@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
+import { ProtectedRoute } from '@/components/protected-route';
 
 // In a real application, this list would be dynamically generated
 // based on the user's loans, teams, etc.
@@ -216,7 +217,9 @@ export default function CommunicationsPage() {
                         </Dialog>
                     )}
                  </div>
-                <ChatClient key={selectedRoomId} roomId={selectedRoomId} />
+                 <ProtectedRoute allowedRoles={['admin', 'workforce', 'broker', 'borrower']}>
+                    <ChatClient key={selectedRoomId} roomId={selectedRoomId} />
+                </ProtectedRoute>
             </div>
         </div>
     )

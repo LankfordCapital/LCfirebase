@@ -75,11 +75,13 @@ export default function WorkforceOfficeHeader() {
                     <NavigationMenuTrigger>AI Tools</NavigationMenuTrigger>
                     <NavigationMenuContent>
                         <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                            {aiToolsLinks.map((component) => (
-                            <ListItem key={component.title} title={component.title} href={component.href}>
-                                {component.description}
-                            </ListItem>
-                            ))}
+                            <ListItem href="/workforce-office/due-diligence" title="Due Diligence Hub">Order all AI reports from a single dashboard.</ListItem>
+                            <ListItem href="/workforce-office/lender-matcher" title="Lender Matcher">Find the best capital partners for a deal.</ListItem>
+                            <ListItem href="/workforce-office/document-optimizer" title="Document Optimizer">Improve documents for higher approval chances.</ListItem>
+                            <ListItem href="/workforce-office/email-automation" title="Email Automation">Draft emails for various scenarios automatically.</ListItem>
+                            <ListItem href="/workforce-office/document-generator" title="Document Generator">Generate custom documents from templates.</ListItem>
+                            <ListItem href="/workforce-office/construction-feasibility" title="Construction Feasibility">Analyze construction budgets and plans.</ListItem>
+                            <ListItem href="/workforce-office/comparable-property-report" title="Comparable Property Report">AI-powered appraisal and market analysis.</ListItem>
                         </ul>
                     </NavigationMenuContent>
                 </NavigationMenuItem>
@@ -148,6 +150,10 @@ export default function WorkforceOfficeHeader() {
                   </p>
                 </div>
               </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+               <DropdownMenuItem asChild>
+                <Link href="/workforce-office/profile">Profile</Link>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={logOut}>
                 <LogOut className="mr-2 h-4 w-4" />
