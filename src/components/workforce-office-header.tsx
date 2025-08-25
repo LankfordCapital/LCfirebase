@@ -16,16 +16,8 @@ import { usePathname } from 'next/navigation';
 
 const aiToolsLinks = [
     { title: "Due Diligence Hub", href: "/workforce-office/due-diligence", description: "Order all AI reports from a single dashboard." },
-    { title: "Market Analysis", href: "/workforce-office/market-analysis", description: "Generate traffic, demographic, and zoning reports." },
-    { title: "Comparable Property Report", href: "/workforce-office/comparable-property-report", description: "Create AI-powered appraisal and market analysis." },
-    { title: "Construction Feasibility", href: "/workforce-office/construction-feasibility", description: "Analyze project budgets against local costs." },
     { title: "Lender Matcher", href: "/workforce-office/lender-matcher", description: "Find the best capital partners for a deal." },
     { title: "Document Optimizer", href: "/workforce-office/document-optimizer", description: "Improve documents for higher approval chances." },
-];
-
-const generationToolsLinks = [
-    { title: "Title & Escrow Instructions", href: "/workforce-office/title-escrow-instructions", description: "Generate custom instructions for title and escrow." },
-    { title: "Insurance Instructions", href: "/workforce-office/insurance-instructions", description: "Create tailored insurance requirements for agents." },
     { title: "Email Automation", href: "/workforce-office/email-automation", description: "Draft emails for various scenarios automatically." },
     { title: "Document Generator", href: "/workforce-office/document-generator", description: "Generate custom documents from templates." },
 ];
@@ -80,15 +72,10 @@ export default function WorkforceOfficeHeader() {
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                    <NavigationMenuTrigger>Due Diligence</NavigationMenuTrigger>
+                    <NavigationMenuTrigger>AI Tools</NavigationMenuTrigger>
                     <NavigationMenuContent>
                         <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                             {aiToolsLinks.map((component) => (
-                            <ListItem key={component.title} title={component.title} href={component.href}>
-                                {component.description}
-                            </ListItem>
-                            ))}
-                             {generationToolsLinks.map((component) => (
                             <ListItem key={component.title} title={component.title} href={component.href}>
                                 {component.description}
                             </ListItem>

@@ -8,25 +8,29 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Sparkles, Download, FileText, FileUp, Map, History } from 'lucide-react';
+import { Loader2, Sparkles, Download, FileText, FileUp, Map, History, Shield, BookCopy } from 'lucide-react';
 import { generateMarketAnalysis, type GenerateMarketAnalysisOutput } from '@/ai/flows/market-analysis-flow';
 import { generateComparablePropertyReport, type GenerateComparablePropertyReportOutput } from '@/ai/flows/generate-comparable-property-report-flow';
 import { generateConstructionFeasibilityReport, type GenerateConstructionFeasibilityOutput } from '@/ai/flows/construction-feasibility-flow';
 import { generateMapReport, type GenerateMapReportOutput } from '@/ai/flows/generate-map-report-flow';
 import { generateSalesHistoryReport, type GenerateSalesHistoryReportOutput } from '@/ai/flows/generate-sales-history-report-flow';
+import { generateTitleEscrowInstructions, type GenerateTitleEscrowInstructionsOutput } from '@/ai/flows/generate-title-escrow-instructions-flow';
+import { generateInsuranceInstructions, type GenerateInsuranceInstructionsOutput } from '@/ai/flows/generate-insurance-instructions-flow';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Textarea } from '@/components/ui/textarea';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-type ReportType = 'marketAnalysis' | 'comparableProperty' | 'constructionFeasibility' | 'mapReport' | 'salesHistory';
+type ReportType = 'marketAnalysis' | 'comparableProperty' | 'constructionFeasibility' | 'mapReport' | 'salesHistory' | 'titleEscrow' | 'insurance';
 
 const reportOptions: { id: ReportType; label: string, description: string }[] = [
     { id: 'marketAnalysis', label: 'Market Analysis', description: 'Demographics, economic drivers, zoning, and permit status.' },
-    { id: 'comparableProperty', label: 'Comparable Property Report', description: 'Sales comps, lease market analysis, and proforma validation.' },
+    { id: 'comparableProperty', label: 'Comparable Property Report', description: 'Sales & lease comps, and proforma validation.' },
     { id: 'constructionFeasibility', label: 'Construction Feasibility', description: 'Budget vs. local costs and architectural plan analysis.' },
     { id: 'mapReport', label: 'Map Report', description: 'Text-based map describing nearby attractions and comps.' },
     { id: 'salesHistory', label: 'Sales History Report', description: 'Recorded sales history for the subject property.' },
+    { id: 'titleEscrow', label: 'Title & Escrow Instructions', description: 'Generate instructions for closing agents.' },
+    { id: 'insurance', label: 'Insurance Instructions', description: 'Generate coverage requirements for the insurance agent.' },
 ];
 
 interface ReportResults {
@@ -35,6 +39,8 @@ interface ReportResults {
     constructionFeasibility?: GenerateConstructionFeasibilityOutput;
     mapReport?: GenerateMapReportOutput;
     salesHistory?: GenerateSalesHistoryReportOutput;
+    titleEscrow?: GenerateTitleEscrowInstructionsOutput;
+    insurance?: GenerateInsuranceInstructionsOutput;
 }
 
 const fileToDataUri = (file: File): Promise<string> => {
@@ -48,8 +54,16 @@ const fileToDataUri = (file: File): Promise<string> => {
 
 
 export default function DueDiligenceHubPage() {
+    // Shared state
     const [address, setAddress] = useState('');
     const [dealType, setDealType] = useState('');
+    const [propertyType, setPropertyType] = useState('');
+    const [borrowerName, setBorrowerName] = useState('');
+    const [loanAmount, setLoanAmount] = useState<number | undefined>();
+    const [purchasePrice, setPurchasePrice] = useState<number | undefined>();
+    const [additionalNotes, setAdditionalNotes] = useState('');
+
+    // Specific state
     const [proformaText, setProformaText] = useState('');
     const [constructionBudgetText, setConstructionBudgetText] = useState('');
     const [workSunkText, setWorkSunkText] = useState('');
@@ -108,7 +122,7 @@ export default function DueDiligenceHubPage() {
                         return { type: reportType, data: await generateMarketAnalysis({ subjectPropertyAddress: address, dealType, reportTypes: ['demographics', 'economicDrivers', 'zoning', 'trafficStudy'] }) };
                     case 'comparableProperty':
                         if (!proformaText) throw new Error("Proforma text is required for Comparable Property Report.");
-                        return { type: reportType, data: await generateComparablePropertyReport({ subjectPropertyAddress: address, propertyType: dealType, proformaText }) };
+                        return { type: reportType, data: await generateComparablePropertyReport({ subjectPropertyAddress: address, propertyType, proformaText }) };
                     case 'constructionFeasibility':
                         if (!constructionBudgetText) throw new Error("Construction budget is required for Feasibility Report.");
                         const plansDataUri = plansFile ? await fileToDataUri(plansFile) : undefined;
@@ -117,6 +131,12 @@ export default function DueDiligenceHubPage() {
                         return { type: reportType, data: await generateMapReport({ subjectPropertyAddress: address }) };
                     case 'salesHistory':
                         return { type: reportType, data: await generateSalesHistoryReport({ subjectPropertyAddress: address }) };
+                    case 'titleEscrow':
+                        if (!borrowerName || !loanAmount) throw new Error("Borrower name and loan amount required for Title/Escrow instructions.");
+                        return { type: reportType, data: await generateTitleEscrowInstructions({ subjectPropertyAddress: address, dealType, propertyType, loanAmount, borrowerName, purchasePrice, additionalNotes }) };
+                    case 'insurance':
+                        if (!borrowerName || !loanAmount) throw new Error("Borrower name and loan amount required for Insurance instructions.");
+                        return { type: reportType, data: await generateInsuranceInstructions({ subjectPropertyAddress: address, dealType, propertyType, loanAmount, borrowerName, purchasePrice, constructionBudget: parseFloat(constructionBudgetText) || undefined, additionalNotes }) };
                     default:
                         return null;
                 }
@@ -185,8 +205,24 @@ export default function DueDiligenceHubPage() {
                             <Input id="address" placeholder="e.g., 123 Main St, Anytown, USA" value={address} onChange={(e) => setAddress(e.target.value)} />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="dealType">Deal Type / Property Focus</Label>
-                            <Input id="dealType" placeholder="e.g., Multi-Family, Retail, Fix and Flip" value={dealType} onChange={(e) => setDealType(e.target.value)} />
+                            <Label htmlFor="dealType">Deal Type</Label>
+                            <Input id="dealType" placeholder="e.g., Fix and Flip, Commercial Acquisition" value={dealType} onChange={(e) => setDealType(e.target.value)} />
+                        </div>
+                         <div className="space-y-2">
+                            <Label htmlFor="propertyType">Property Type</Label>
+                            <Input id="propertyType" placeholder="e.g., Multi-Family, Retail, Industrial" value={propertyType} onChange={(e) => setPropertyType(e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="borrowerName">Borrower Name / Entity</Label>
+                            <Input id="borrowerName" placeholder="e.g., John Doe or ABC Holdings LLC" value={borrowerName} onChange={(e) => setBorrowerName(e.target.value)} />
+                        </div>
+                         <div className="space-y-2">
+                            <Label htmlFor="loanAmount">Loan Amount</Label>
+                            <Input id="loanAmount" type="number" placeholder="e.g., 1500000" value={loanAmount || ''} onChange={(e) => setLoanAmount(Number(e.target.value))} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="purchasePrice">Purchase Price (Optional)</Label>
+                            <Input id="purchasePrice" type="number" placeholder="e.g., 2000000" value={purchasePrice || ''} onChange={(e) => setPurchasePrice(e.target.value ? Number(e.target.value) : undefined)} />
                         </div>
                     </div>
                     
@@ -228,6 +264,13 @@ export default function DueDiligenceHubPage() {
                            </div>
                         </div>
                     )}
+                    
+                     {(selectedReports.includes('titleEscrow') || selectedReports.includes('insurance')) && (
+                        <div className="space-y-2">
+                            <Label htmlFor="additionalNotes">Additional Notes (for Instructions)</Label>
+                            <Textarea id="additionalNotes" placeholder="Provide any other specific requirements for this deal..." value={additionalNotes} onChange={(e) => setAdditionalNotes(e.target.value)} />
+                        </div>
+                     )}
 
 
                     <Button onClick={handleGenerateReports} disabled={isLoading}>
@@ -323,6 +366,33 @@ export default function DueDiligenceHubPage() {
                                             <AccordionTrigger className="text-xl font-bold flex items-center gap-2"><History/> Sales History Report</AccordionTrigger>
                                             <AccordionContent className="space-y-4 pt-4 prose prose-sm max-w-none">
                                                 {renderReportContent(results.salesHistory.salesHistory)}
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    </Accordion>
+                                )}
+                                {reportType === 'titleEscrow' && results.titleEscrow && (
+                                    <Accordion type="single" collapsible className="w-full">
+                                        <AccordionItem value="item-1">
+                                            <AccordionTrigger className="text-xl font-bold flex items-center gap-2"><BookCopy/> Title & Escrow Instructions</AccordionTrigger>
+                                            <AccordionContent className="space-y-4 pt-4 prose prose-sm max-w-none">
+                                                <div>
+                                                    <h4 className="font-semibold">Title Instructions</h4>
+                                                    <Textarea readOnly value={results.titleEscrow.titleInstructions} className="h-64 mt-2 font-mono text-xs"/>
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-semibold">Escrow Instructions</h4>
+                                                    <Textarea readOnly value={results.titleEscrow.escrowInstructions} className="h-64 mt-2 font-mono text-xs"/>
+                                                </div>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    </Accordion>
+                                )}
+                                 {reportType === 'insurance' && results.insurance && (
+                                    <Accordion type="single" collapsible className="w-full">
+                                        <AccordionItem value="item-1">
+                                            <AccordionTrigger className="text-xl font-bold flex items-center gap-2"><Shield/> Insurance Instructions</AccordionTrigger>
+                                            <AccordionContent className="space-y-4 pt-4 prose prose-sm max-w-none">
+                                                <Textarea readOnly value={results.insurance.insuranceInstructions} className="h-64 font-mono text-xs"/>
                                             </AccordionContent>
                                         </AccordionItem>
                                     </Accordion>
