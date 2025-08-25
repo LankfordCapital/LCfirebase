@@ -195,7 +195,7 @@ export default function WorkforceOfficePage() {
                                                     <DropdownMenuItem onSelect={() => setSelectedLoan(loan)}>View Details</DropdownMenuItem>
                                                 </DialogTrigger>
                                                 <DropdownMenuItem asChild>
-                                                    <Link href={`/dashboard/application/${loan.type.toLowerCase().replace(/ /g, '-')}`}>Manage Documents</Link>
+                                                    <Link href={`/workforce-office/loan-documents/${loan.id}`}>Manage Documents</Link>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem>Send Reminder</DropdownMenuItem>
                                             </DropdownMenuContent>
