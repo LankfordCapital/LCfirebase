@@ -9,18 +9,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Sparkles, Download, FileText, FileUp, Map, History, Shield, BookCopy } from 'lucide-react';
-import { generateMarketAnalysis, type GenerateMarketAnalysisOutput } from '@/ai/flows/market-analysis-flow';
-import { generateComparablePropertyReport, type GenerateComparablePropertyReportOutput } from '@/ai/flows/generate-comparable-property-report-flow';
-import { generateConstructionFeasibilityReport, type GenerateConstructionFeasibilityOutput } from '@/ai/flows/construction-feasibility-flow';
-import { generateMapReport, type GenerateMapReportOutput } from '@/ai/flows/generate-map-report-flow';
-import { generateSalesHistoryReport, type GenerateSalesHistoryReportOutput } from '@/ai/flows/generate-sales-history-report-flow';
-import { generateTitleEscrowInstructions, type GenerateTitleEscrowInstructionsOutput } from '@/ai/flows/generate-title-escrow-instructions-flow';
-import { generateInsuranceInstructions, type GenerateInsuranceInstructionsOutput } from '@/ai/flows/generate-insurance-instructions-flow';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { generateMarketAnalysis } from '@/ai/flows/market-analysis-flow';
+import { generateComparablePropertyReport } from '@/ai/flows/generate-comparable-property-report-flow';
+import { generateConstructionFeasibilityReport } from '@/ai/flows/construction-feasibility-flow';
+import { generateMapReport } from '@/ai/flows/generate-map-report-flow';
+import { generateSalesHistoryReport } from '@/ai/flows/generate-sales-history-report-flow';
+import { generateTitleEscrowInstructions } from '@/ai/flows/generate-title-escrow-instructions-flow';
+import { generateInsuranceInstructions } from '@/ai/flows/generate-insurance-instructions-flow';
 import { Textarea } from '@/components/ui/textarea';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useRouter } from 'next/navigation';
 
 type ReportType = 'marketAnalysis' | 'zoning' | 'comparableProperty' | 'constructionFeasibility' | 'mapReport' | 'salesHistory' | 'titleEscrow' | 'insurance';
 
@@ -34,17 +32,6 @@ const reportOptions: { id: ReportType; label: string, description: string }[] = 
     { id: 'titleEscrow', label: 'Title & Escrow Instructions', description: 'Generate instructions for closing agents.' },
     { id: 'insurance', label: 'Insurance Instructions', description: 'Generate coverage requirements for the insurance agent.' },
 ];
-
-interface ReportResults {
-    marketAnalysis?: GenerateMarketAnalysisOutput;
-    comparableProperty?: GenerateComparablePropertyReportOutput;
-    constructionFeasibility?: GenerateConstructionFeasibilityOutput;
-    mapReport?: GenerateMapReportOutput;
-    salesHistory?: GenerateSalesHistoryReportOutput;
-    titleEscrow?: GenerateTitleEscrowInstructionsOutput;
-    insurance?: GenerateInsuranceInstructionsOutput;
-    zoning?: GenerateMarketAnalysisOutput;
-}
 
 // Mock loan data - in a real app this would be fetched from your database
 const activeLoans = [
@@ -81,9 +68,8 @@ export default function DueDiligenceHubPage() {
 
     const [selectedReports, setSelectedReports] = useState<ReportType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [results, setResults] = useState<ReportResults | null>(null);
     const { toast } = useToast();
-    const reportContainerRef = useRef<HTMLDivElement>(null);
+    const router = useRouter();
     
     const handleLoanSelect = (loanId: string) => {
         const selectedLoan = activeLoans.find(loan => loan.id === loanId);
@@ -106,26 +92,6 @@ export default function DueDiligenceHubPage() {
                 : [...prev, reportId]
         );
     };
-    
-    const handleExportPdf = async () => {
-        if (!reportContainerRef.current) return;
-        
-        toast({ title: 'Generating PDF...' });
-
-        const canvas = await html2canvas(reportContainerRef.current, { scale: 2 });
-        const data = canvas.toDataURL('image/png');
-
-        const pdf = new jsPDF({
-            orientation: 'p',
-            unit: 'px',
-            format: [canvas.width, canvas.height]
-        });
-        
-        pdf.addImage(data, 'PNG', 0, 0, canvas.width, canvas.height);
-        pdf.save(`due-diligence-report-${address.replace(/\s/g, '-')}.pdf`);
-
-        toast({ title: 'PDF Exported Successfully' });
-    };
 
     const handleGenerateReports = async () => {
         if (!address || !dealType || selectedReports.length === 0) {
@@ -137,7 +103,6 @@ export default function DueDiligenceHubPage() {
             return;
         }
         setIsLoading(true);
-        setResults(null);
         
         try {
             const reportPromises = selectedReports.map(async (reportType) => {
@@ -170,10 +135,10 @@ export default function DueDiligenceHubPage() {
 
             const settledResults = await Promise.allSettled(reportPromises);
             
-            const finalResults: ReportResults = {};
+            const finalResults: Record<string, any> = {};
             settledResults.forEach(result => {
                 if (result.status === 'fulfilled' && result.value) {
-                    finalResults[result.value.type as keyof ReportResults] = result.value.data as any;
+                    finalResults[result.value.type as keyof typeof finalResults] = result.value.data as any;
                 } else if (result.status === 'rejected') {
                     console.error('A report failed to generate:', result.reason);
                      toast({
@@ -184,11 +149,19 @@ export default function DueDiligenceHubPage() {
                 }
             });
 
-            setResults(finalResults);
+            // Store results in sessionStorage to pass to the results page
+            sessionStorage.setItem('dueDiligenceResults', JSON.stringify({
+                results: finalResults,
+                address,
+                selectedReports
+            }));
+            
             toast({
                 title: 'Reports Generated',
-                description: 'Due diligence reports have been successfully created.',
+                description: 'Redirecting to results page...',
             });
+
+            router.push('/workforce-office/due-diligence/results');
 
         } catch (error) {
              console.error('Due Diligence Error:', error);
@@ -200,15 +173,6 @@ export default function DueDiligenceHubPage() {
         } finally {
             setIsLoading(false);
         }
-    };
-    
-    const renderReportContent = (content: string | undefined) => {
-        if (!content) return <p className="text-muted-foreground">Report not generated or no data found.</p>;
-        
-        return content.split('\\n').map((line, index) => {
-            if (line.trim() === '') return <br key={index} />;
-            return <p key={index} className="mb-2">{line}</p>;
-        });
     };
 
     return (
@@ -321,139 +285,6 @@ export default function DueDiligenceHubPage() {
                     </Button>
                 </CardContent>
             </Card>
-
-            {results && (
-                 <Card>
-                    <CardHeader className="flex flex-row justify-between items-center">
-                        <div>
-                             <CardTitle>Generated Due Diligence Package</CardTitle>
-                             <CardDescription>Address: {address}</CardDescription>
-                        </div>
-                        <Button onClick={handleExportPdf}>
-                            <Download className="mr-2 h-4 w-4"/> Export as PDF
-                        </Button>
-                    </CardHeader>
-                    <CardContent ref={reportContainerRef} className="p-6 space-y-6">
-                        {selectedReports.map(reportType => (
-                            <div key={reportType}>
-                                {reportType === 'marketAnalysis' && results.marketAnalysis && (
-                                    <Accordion type="single" collapsible className="w-full">
-                                        <AccordionItem value="item-1">
-                                            <AccordionTrigger className="text-xl font-bold">Market Analysis Report</AccordionTrigger>
-                                            <AccordionContent className="space-y-4 pt-4 prose prose-sm max-w-none">
-                                                {Object.entries(results.marketAnalysis).map(([key, value]) => value && (
-                                                    <div key={key}>
-                                                        <h4 className="font-semibold capitalize">{key.replace(/([A-Z])/g, ' $1')}</h4>
-                                                        <div>{renderReportContent(value)}</div>
-                                                    </div>
-                                                ))}
-                                            </AccordionContent>
-                                        </AccordionItem>
-                                    </Accordion>
-                                )}
-                                {reportType === 'zoning' && results.zoning && (
-                                    <Accordion type="single" collapsible className="w-full">
-                                        <AccordionItem value="item-1">
-                                            <AccordionTrigger className="text-xl font-bold">Zoning Report</AccordionTrigger>
-                                            <AccordionContent className="space-y-4 pt-4 prose prose-sm max-w-none">
-                                                {renderReportContent(results.zoning.zoning)}
-                                            </AccordionContent>
-                                        </AccordionItem>
-                                    </Accordion>
-                                )}
-                                {reportType === 'comparableProperty' && results.comparableProperty && (
-                                     <Accordion type="single" collapsible className="w-full">
-                                        <AccordionItem value="item-1">
-                                            <AccordionTrigger className="text-xl font-bold">Comparable Property Report</AccordionTrigger>
-                                            <AccordionContent className="space-y-4 pt-4 prose prose-sm max-w-none">
-                                                {Object.entries(results.comparableProperty).map(([key, value]) => value && (
-                                                     <div key={key}>
-                                                        <h4 className="font-semibold capitalize">{key.replace(/([A-Z])/g, ' $1')}</h4>
-                                                        <div className="whitespace-pre-line">{renderReportContent(value)}</div>
-                                                    </div>
-                                                ))}
-                                            </AccordionContent>
-                                        </AccordionItem>
-                                    </Accordion>
-                                )}
-                                {reportType === 'constructionFeasibility' && results.constructionFeasibility && (
-                                    <Accordion type="single" collapsible className="w-full">
-                                        <AccordionItem value="item-1">
-                                             <AccordionTrigger className="text-xl font-bold">Construction Feasibility Report</AccordionTrigger>
-                                              <AccordionContent className="space-y-4 pt-4 prose prose-sm max-w-none">
-                                                 <div className={results.constructionFeasibility.isFeasible ? 'text-green-600' : 'text-red-600'}>
-                                                    <h4 className="font-semibold">Feasibility: {results.constructionFeasibility.isFeasible ? 'FEASIBLE' : 'NOT FEASIBLE'}</h4>
-                                                    <p>{results.constructionFeasibility.feasibilitySummary}</p>
-                                                     {!results.constructionFeasibility.isFeasible && results.constructionFeasibility.potentialShortfall && (
-                                                        <p className="font-bold">Potential Shortfall: {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(results.constructionFeasibility.potentialShortfall)}</p>
-                                                    )}
-                                                 </div>
-                                                 <div>
-                                                    <h4 className="font-semibold">Cost Analysis</h4>
-                                                    <div className="whitespace-pre-line">{renderReportContent(results.constructionFeasibility.costAnalysis)}</div>
-                                                 </div>
-                                                  <div>
-                                                    <h4 className="font-semibold">Recommendations</h4>
-                                                    <ul className="list-disc pl-5">
-                                                        {results.constructionFeasibility.recommendations.map((rec, i) => <li key={i}>{rec}</li>)}
-                                                    </ul>
-                                                 </div>
-                                            </AccordionContent>
-                                        </AccordionItem>
-                                    </Accordion>
-                                )}
-                                 {reportType === 'mapReport' && results.mapReport && (
-                                    <Accordion type="single" collapsible className="w-full">
-                                        <AccordionItem value="item-1">
-                                            <AccordionTrigger className="text-xl font-bold flex items-center gap-2"><Map/> Map Report</AccordionTrigger>
-                                            <AccordionContent className="space-y-4 pt-4 prose prose-sm max-w-none">
-                                                {renderReportContent(results.mapReport.mapDescription)}
-                                            </AccordionContent>
-                                        </AccordionItem>
-                                    </Accordion>
-                                )}
-                                 {reportType === 'salesHistory' && results.salesHistory && (
-                                    <Accordion type="single" collapsible className="w-full">
-                                        <AccordionItem value="item-1">
-                                            <AccordionTrigger className="text-xl font-bold flex items-center gap-2"><History/> Sales History Report</AccordionTrigger>
-                                            <AccordionContent className="space-y-4 pt-4 prose prose-sm max-w-none">
-                                                {renderReportContent(results.salesHistory.salesHistory)}
-                                            </AccordionContent>
-                                        </AccordionItem>
-                                    </Accordion>
-                                )}
-                                {reportType === 'titleEscrow' && results.titleEscrow && (
-                                    <Accordion type="single" collapsible className="w-full">
-                                        <AccordionItem value="item-1">
-                                            <AccordionTrigger className="text-xl font-bold flex items-center gap-2"><BookCopy/> Title & Escrow Instructions</AccordionTrigger>
-                                            <AccordionContent className="space-y-4 pt-4 prose prose-sm max-w-none">
-                                                <div>
-                                                    <h4 className="font-semibold">Title Instructions</h4>
-                                                    <Textarea readOnly value={results.titleEscrow.titleInstructions} className="h-64 mt-2 font-mono text-xs"/>
-                                                </div>
-                                                <div>
-                                                    <h4 className="font-semibold">Escrow Instructions</h4>
-                                                    <Textarea readOnly value={results.titleEscrow.escrowInstructions} className="h-64 mt-2 font-mono text-xs"/>
-                                                </div>
-                                            </AccordionContent>
-                                        </AccordionItem>
-                                    </Accordion>
-                                )}
-                                 {reportType === 'insurance' && results.insurance && (
-                                    <Accordion type="single" collapsible className="w-full">
-                                        <AccordionItem value="item-1">
-                                            <AccordionTrigger className="text-xl font-bold flex items-center gap-2"><Shield/> Insurance Instructions</AccordionTrigger>
-                                            <AccordionContent className="space-y-4 pt-4 prose prose-sm max-w-none">
-                                                <Textarea readOnly value={results.insurance.insuranceInstructions} className="h-64 font-mono text-xs"/>
-                                            </AccordionContent>
-                                        </AccordionItem>
-                                    </Accordion>
-                                )}
-                            </div>
-                        ))}
-                    </CardContent>
-                </Card>
-            )}
         </div>
     );
 }
