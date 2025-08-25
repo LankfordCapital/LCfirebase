@@ -125,12 +125,6 @@ export default function WorkforceOfficeHeader() {
                     </NavigationMenuLink>
                 </NavigationMenuItem>
                 
-                 <NavigationMenuItem>
-                    <NavigationMenuLink asChild>
-                        <Link href="/workforce-office/team-management" className={cn(navigationMenuTriggerStyle(), { 'bg-accent': pathname === '/workforce-office/team-management' })}>Team</Link>
-                    </NavigationMenuLink>
-                </NavigationMenuItem>
-
             </NavigationMenuList>
           </NavigationMenu>
         </div>
