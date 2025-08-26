@@ -6,7 +6,6 @@ import { Logo } from '../logo';
 import Link from 'next/link';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import Image from 'next/image';
 
 const footerLinks = [
     {
@@ -50,16 +49,11 @@ function Footer() {
   }
 
   return (
-    <footer className="bg-secondary text-secondary-foreground">
-       <style jsx global>{`
-        footer #logo-capital {
-          color: white !important;
-        }
-      `}</style>
+    <footer className="bg-secondary text-secondary-foreground border-t">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-8">
             <div className="col-span-1 md:col-span-4 lg:col-span-2 space-y-4">
-                <Logo className="text-2xl" />
+                <Logo />
                 <p className="text-sm text-secondary-foreground/70">
                     Your trusted partner in innovative and reliable financing solutions for real estate and business ambitions.
                 </p>
@@ -83,18 +77,12 @@ function Footer() {
                  <p className="text-sm text-secondary-foreground/70 mt-4">Subscribe to our newsletter for the latest market insights.</p>
                  <div className="flex gap-2 mt-4">
                     <Input type="email" placeholder="Enter your email" className="bg-background/20 border-border/50 placeholder:text-secondary-foreground/50"/>
-                    <Button>Subscribe</Button>
+                    <Button variant="default">Subscribe</Button>
                  </div>
             </div>
         </div>
-        <div className="mt-12 pt-8 border-t border-border/20 flex items-center justify-between text-sm text-secondary-foreground/60">
+        <div className="mt-12 pt-8 border-t border-border/20 text-center text-sm text-secondary-foreground/60">
             <p>&copy; {new Date().getFullYear()} Lankford Capital. All Rights Reserved.</p>
-            <Image
-                src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/Lankford%20Capital%20Icon%20Mark%20Gold.png?alt=media&token=a7a05b83-1979-43a4-a431-511e4d8b71f5"
-                alt="Lankford Capital Icon"
-                width={40}
-                height={40}
-            />
         </div>
       </div>
     </footer>

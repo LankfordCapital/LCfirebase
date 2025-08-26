@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu } from 'lucide-react';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import { cn } from '@/lib/utils';
@@ -45,14 +45,13 @@ const lendingLinks: { title: string; href: string; description: string }[] = [
 ];
 
 const ListItem = React.forwardRef<
-  React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a">
->(({ className, title, children, href, ...props }, ref) => {
+  React.ElementRef<'a'>,
+  React.ComponentPropsWithoutRef<'a'>
+>(({ className, title, children, ...props }, ref) => {
   return (
     <li>
       <NavigationMenuLink asChild>
-        <Link
-          href={href!}
+        <a
           ref={ref}
           className={cn(
             'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
@@ -64,7 +63,7 @@ const ListItem = React.forwardRef<
           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
             {children}
           </p>
-        </Link>
+        </a>
       </NavigationMenuLink>
     </li>
   );
@@ -81,33 +80,38 @@ export default function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <div className="flex items-center gap-6">
-          <Logo />
+          <Link href="/" className="flex items-center gap-2">
+            <Logo />
+          </Link>
           <NavigationMenu className="hidden lg:flex">
             <NavigationMenuList>
                 <NavigationMenuItem>
-                    <NavigationMenuLink asChild>
-                      <Link
-                        href="/lending"
-                        className={cn(navigationMenuTriggerStyle(), { 'bg-accent': pathname.startsWith('/lending') })}
+                <NavigationMenuTrigger>Lending</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                    {lendingLinks.map((component) => (
+                      <ListItem
+                        key={component.title}
+                        title={component.title}
+                        href={component.href}
                       >
-                        Lending
-                      </Link>
-                    </NavigationMenuLink>
-                </NavigationMenuItem>
+                        {component.description}
+                      </ListItem>
+                    ))}
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
               {navLinks.map((link) => (
                  <NavigationMenuItem key={link.href}>
-                    <NavigationMenuLink asChild>
-                      <Link
-                        href={link.href}
-                        className={cn(navigationMenuTriggerStyle(), { 'bg-accent': pathname === link.href })}
-                      >
-                        {link.label}
-                      </Link>
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
+                    <Link href={link.href} legacyBehavior passHref>
+                        <NavigationMenuLink active={pathname === link.href} className={navigationMenuTriggerStyle()}>
+                            {link.label}
+                        </NavigationMenuLink>
+                    </Link>
+                </NavigationMenuItem>
               ))}
             </NavigationMenuList>
           </NavigationMenu>
@@ -118,43 +122,35 @@ export default function Header() {
             <Link href="/auth/signin">Sign In</Link>
           </Button>
           <Button asChild>
-            <Link href="/auth/signup">Sign Up</Link>
+            <Link href="/dashboard">Get Started</Link>
           </Button>
         </div>
 
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="default" size="icon" className="lg:hidden bg-primary hover:bg-primary/90">
-              <Menu className="h-6 w-6 text-primary-foreground" />
+            <Button variant="outline" size="icon" className="lg:hidden">
+              <Menu className="h-6 w-6" />
               <span className="sr-only">Toggle navigation menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="flex flex-col">
-            <SheetHeader>
-                <SheetTitle>
+          <SheetContent side="left">
+            <div className="flex flex-col gap-6 p-6">
+                <Link href="/" className="flex items-center gap-2">
                     <Logo />
-                </SheetTitle>
-                <SheetDescription>
-                    Navigate Lankford Capital
-                </SheetDescription>
-            </SheetHeader>
-            <div className="flex-grow flex flex-col justify-between">
-                <nav className="grid gap-4 py-6">
-                     <Link href="/lending" className={cn("text-lg font-medium", pathname.startsWith('/lending') ? 'text-primary' : 'text-muted-foreground hover:text-foreground')}>
-                        Lending
-                    </Link>
+                </Link>
+                <nav className="grid gap-4">
                     {navLinks.map((link) => (
                         <Link key={link.href} href={link.href} className={cn("text-lg font-medium", pathname === link.href ? 'text-primary' : 'text-muted-foreground hover:text-foreground')}>
                             {link.label}
                         </Link>
                     ))}
                 </nav>
-                 <div className="flex flex-col gap-2">
+                 <div className="mt-auto flex flex-col gap-2">
                     <Button variant="ghost" asChild>
                         <Link href="/auth/signin">Sign In</Link>
                     </Button>
                     <Button asChild>
-                        <Link href="/auth/signup">Sign Up</Link>
+                        <Link href="/dashboard">Get Started</Link>
                     </Button>
                 </div>
             </div>

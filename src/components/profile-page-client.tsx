@@ -27,6 +27,8 @@ import { updateProfile } from 'firebase/auth';
 import { DealHistory } from '@/components/deal-history';
 import { CustomLoader } from './ui/custom-loader';
 import { Separator } from '@/components/ui/separator';
+import { useBorrowerProfile } from '@/hooks/use-borrower-profile';
+import { ProfileCompletionIndicator } from '@/components/profile-completion-indicator';
 
 type Company = {
   id: string;
@@ -40,9 +42,27 @@ export default function ProfilePage() {
   const { addDocument, documents } = useDocumentContext();
   const { user } = useAuth();
   const { toast } = useToast();
+  
+  // New backend integration
+  const {
+    profile,
+    loading: profileLoading,
+    error: profileError,
+    profileCompletion,
+    updatePersonalInfo,
+    updateContactInfo,
+    updateCompanyInfo,
+    removeCompany,
+    updateCreditScores,
+    updateAssetInfo,
+    updateDocumentStatus,
+    saveFinancialStatement,
+    saveDebtSchedule
+  } = useBorrowerProfile();
 
   const companyId = useId();
 
+  // Local state for form inputs (will sync with backend data)
   const [companies, setCompanies] = useState<Company[]>([
     { id: companyId, companyName: '', companyAddress: '', companyPhone: '', companyEin: '' },
   ]);
@@ -66,13 +86,74 @@ export default function ProfilePage() {
   const [isSavingPersonal, setIsSavingPersonal] = useState(false);
   const [isSavingContact, setIsSavingContact] = useState(false);
 
+  // Sync local state with backend data when profile loads
   useEffect(() => {
-    if(user?.displayName) {
-        const nameParts = user.displayName.split(' ');
-        setFirstName(nameParts[0] || '');
-        setLastName(nameParts.slice(1).join(' ') || '');
+    if (profile) {
+      // Sync personal info
+      if (profile.personalInfo) {
+        setFirstName(profile.personalInfo.firstName || '');
+        setLastName(profile.personalInfo.lastName || '');
+        setSsn(profile.personalInfo.ssn || '');
+        if (profile.personalInfo.dateOfBirth) {
+          setDateOfBirth(new Date(profile.personalInfo.dateOfBirth));
+        }
+      }
+
+      // Sync contact info
+      if (profile.contactInfo) {
+        setPhone(profile.contactInfo.phone || '');
+      }
+
+      // Sync companies
+      if (profile.companies && profile.companies.length > 0) {
+        setCompanies(profile.companies.map(company => ({
+          id: company.id,
+          companyName: company.companyName,
+          companyAddress: company.companyAddress,
+          companyPhone: company.companyPhone,
+          companyEin: company.companyEin
+        })));
+      } else {
+        // Initialize with empty company if none exist
+        setCompanies([{ id: companyId, companyName: '', companyAddress: '', companyPhone: '', companyEin: '' }]);
+      }
+
+      // Sync credit scores
+      if (profile.financialInfo?.creditScores) {
+        setCreditScores({
+          equifaxScore: String(profile.financialInfo.creditScores.equifax || 0),
+          experianScore: String(profile.financialInfo.creditScores.experian || 0),
+          transunionScore: String(profile.financialInfo.creditScores.transunion || 0)
+        });
+      }
+
+      // Sync asset balances
+      if (profile.financialInfo?.personalAssets) {
+        setPersonalAssetBalance({
+          balance: String(profile.financialInfo.personalAssets.balance) || '$0'
+        });
+      }
+
+      if (profile.financialInfo?.companyAssets) {
+        // Use the first company's assets for now
+        const firstCompanyId = Object.keys(profile.financialInfo.companyAssets)[0];
+        if (firstCompanyId) {
+          setCompanyAssetBalance({
+            balance: String(profile.financialInfo.companyAssets[firstCompanyId].balance) || '$0'
+          });
+        }
+      }
     }
-  }, [user]);
+  }, [profile, companyId]);
+
+  // Fallback to user display name if no profile data
+  useEffect(() => {
+    if (!profile && user?.displayName) {
+      const nameParts = user.displayName.split(' ');
+      setFirstName(nameParts[0] || '');
+      setLastName(nameParts.slice(1).join(' ') || '');
+    }
+  }, [user, profile]);
 
   const profileRef = useRef<HTMLDivElement>(null);
   const creditRef = useRef<HTMLDivElement>(null);
@@ -87,6 +168,23 @@ export default function ProfilePage() {
             name: docName,
             file,
         });
+        
+        // Update document status in backend
+        try {
+          if (docName.includes('(Borrower)')) {
+            // Personal document
+            await updateDocumentStatus(docName.replace(' (Borrower)', '').toLowerCase().replace(/\s+/g, ''), true);
+          } else if (docName.includes('(Company)')) {
+            // Company document - update for first company for now
+            const companyId = companies[0]?.id;
+            if (companyId) {
+              await updateDocumentStatus(docName.replace(' (Company)', '').toLowerCase().replace(/\s+/g, ''), true, companyId);
+            }
+          }
+        } catch (error) {
+          console.error('Failed to update document status:', error);
+        }
+        
         toast({
             title: 'Document Uploaded',
             description: `${docName} has been uploaded successfully.`,
@@ -129,15 +227,53 @@ export default function ProfilePage() {
 
   const handleAddCompany = () => {
     const newId = `company-${companies.length}-${Date.now()}`;
+    const newCompany = { 
+      id: newId, 
+      companyName: '', 
+      companyAddress: '', 
+      companyPhone: '', 
+      companyEin: '',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isActive: true
+    };
     setCompanies([...companies, { id: newId, companyName: '', companyAddress: '', companyPhone: '', companyEin: '' }]);
+    
+    // Save to backend
+    updateCompanyInfo(newCompany);
   };
 
-  const handleRemoveCompany = (id: string) => {
+  const handleRemoveCompany = async (id: string) => {
     setCompanies(companies.filter(company => company.id !== id));
+    
+    // Remove from backend
+    try {
+      await removeCompany(id);
+    } catch (error) {
+      console.error('Failed to remove company:', error);
+    }
   };
 
-  const handleCompanyChange = (id: string, field: keyof Omit<Company, 'id'>, value: string) => {
-    setCompanies(companies.map(company => (company.id === id ? { ...company, [field]: value } : company)));
+  const handleCompanyChange = async (id: string, field: keyof Omit<Company, 'id'>, value: string) => {
+    const updatedCompanies = companies.map(company => 
+      company.id === id ? { ...company, [field]: value } : company
+    );
+    setCompanies(updatedCompanies);
+    
+    // Find the updated company and save to backend
+    const updatedCompany = updatedCompanies.find(c => c.id === id);
+    if (updatedCompany) {
+      try {
+        await updateCompanyInfo({
+          ...updatedCompany,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          isActive: true
+        });
+      } catch (error) {
+        console.error('Failed to update company:', error);
+      }
+    }
   };
 
   const handleScanCreditReport = async () => {
@@ -161,9 +297,18 @@ export default function ProfilePage() {
       }
       const result = await scanCreditReport({ creditReportDataUri: dataUri });
       setCreditScores(result);
+      
+      // Save credit scores to backend
+      await updateCreditScores({
+        equifax: Number(result.equifaxScore),
+        experian: Number(result.experianScore),
+        transunion: Number(result.transunionScore),
+        lastUpdated: new Date()
+      });
+      
       toast({
         title: 'Scan Complete',
-        description: 'Credit scores have been extracted successfully.',
+        description: 'Credit scores have been extracted and saved successfully.',
       });
     } catch (error) {
       console.error('Credit Score Scan Error:', error);
@@ -206,12 +351,25 @@ export default function ProfilePage() {
         const result = await scanAssetStatement({ statementDataUri: dataUri });
         if(type === 'personal') {
             setPersonalAssetBalance(result);
+            // Save personal assets to backend
+            await updateAssetInfo('personal', {
+              balance: result.balance,
+              lastStatementDate: new Date().toISOString()
+            });
         } else {
             setCompanyAssetBalance(result);
+            // Save company assets to backend
+            const companyId = companies[0]?.id;
+            if (companyId) {
+              await updateAssetInfo('company', {
+                balance: result.balance,
+                lastStatementDate: new Date().toISOString()
+              }, companyId);
+            }
         }
         toast({
             title: 'Scan Complete',
-            description: `The account balance has been extracted successfully.`,
+            description: `The account balance has been extracted and saved successfully.`,
         });
     } catch (error) {
       console.error('Asset Scan Error:', error);
@@ -233,7 +391,17 @@ export default function ProfilePage() {
     if (user) {
         setIsSavingPersonal(true);
         try {
+            // Update Firebase Auth profile
             await updateProfile(user, { displayName: `${firstName} ${lastName}`.trim() });
+            
+            // Save to backend database
+            await updatePersonalInfo({
+              firstName,
+              lastName,
+              ssn,
+              dateOfBirth: dateOfBirth?.toISOString() || ''
+            });
+            
             toast({
                 title: 'Profile Updated',
                 description: 'Your personal information has been saved successfully.',
@@ -252,26 +420,43 @@ export default function ProfilePage() {
 
   const handleSaveContactInfo = async () => {
     setIsSavingContact(true);
-    // Simulate saving contact info (you can add actual save logic here)
-    setTimeout(() => {
-        toast({
-            title: 'Contact Information Saved',
-            description: 'Your contact information has been updated successfully.',
-        });
-        setIsSavingContact(false);
-    }, 1000);
+    try {
+      // Save contact info to backend
+      await updateContactInfo({
+        phone,
+        address: profile?.contactInfo?.address // Preserve existing address if any
+      });
+      
+      toast({
+          title: 'Contact Information Saved',
+          description: 'Your contact information has been updated successfully.',
+      });
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Save Failed',
+        description: 'Failed to save contact information. Please try again.',
+      });
+    } finally {
+      setIsSavingContact(false);
+    }
   };
 
   const UploadButton = ({ docName }: { docName: string }) => {
     const fileInputId = `upload-${docName.replace(/\s+/g, '-')}`;
     const doc = documents[docName];
+    
+    // Check if document is marked as uploaded in backend
+    const isUploaded = doc || (profile?.requiredDocuments?.personal && 
+      (profile.requiredDocuments.personal as any)[docName.replace(' (Borrower)', '').toLowerCase().replace(/\s+/g, '')]);
+    
     return (
         <div className="relative">
             <Button variant="outline" className="w-full justify-start" asChild>
                 <Label htmlFor={fileInputId} className="cursor-pointer flex items-center">
                     <Upload className="mr-2 h-4 w-4" /> 
                     <span className="truncate">{docName}</span>
-                    {doc && <span className="text-green-500 ml-2 whitespace-nowrap">✓</span>}
+                    {isUploaded && <span className="text-green-500 ml-2 whitespace-nowrap">✓</span>}
                 </Label>
             </Button>
             <Input 
@@ -283,6 +468,28 @@ export default function ProfilePage() {
         </div>
     );
   };
+
+  if (profileLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 md:p-8 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <CustomLoader className="h-8 w-8 mx-auto" />
+          <p className="text-gray-600">Loading your profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (profileError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 md:p-8 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <p className="text-red-600">Error loading profile: {profileError}</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 md:p-8">
@@ -296,6 +503,9 @@ export default function ProfilePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
+            {/* Profile Completion Indicator */}
+            <ProfileCompletionIndicator completion={profileCompletion || null} />
+            
             {/* Personal Information */}
             <Card ref={profileRef} className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
               <CardHeader className="border-b border-gray-200">

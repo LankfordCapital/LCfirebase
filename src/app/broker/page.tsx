@@ -43,7 +43,7 @@ export default function BrokerPage() {
             Expand your offerings and close more deals by partnering with a trusted, efficient, and reliable lender.
           </p>
            <Button asChild size="lg" className="mt-8">
-              <Link href="/auth/signup?role=broker">Broker Login</Link>
+              <Link href="/dashboard">Broker Portal</Link>
             </Button>
         </div>
         <Image
@@ -79,7 +79,7 @@ export default function BrokerPage() {
             Register today to get access to our broker portal, submit deals, and track your pipeline.
           </p>
           <Button asChild variant="secondary" size="lg" className="mt-8">
-            <Link href="/auth/signup?role=broker">Register as a Broker</Link>
+            <Link href="/dashboard">Access Broker Portal</Link>
           </Button>
         </div>
       </section>

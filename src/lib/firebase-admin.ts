@@ -8,7 +8,22 @@ import { getFirestore, type Firestore } from 'firebase-admin/firestore';
 
 let app: App;
 if (getApps().length === 0) {
-    app = initializeApp();
+    // Check if we're in development mode and use emulator if available
+    if (process.env.NODE_ENV === 'development') {
+        app = initializeApp({
+            projectId: 'lankford-lending'
+        });
+        
+        // Use Firestore emulator in development if available
+        if (process.env.FIRESTORE_EMULATOR_HOST) {
+            console.log('Using Firestore emulator');
+        }
+    } else {
+        // Production mode - use service account or default credentials
+        app = initializeApp({
+            projectId: 'lankford-lending'
+        });
+    }
 } else {
     app = getApp();
 }

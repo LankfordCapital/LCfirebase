@@ -8,12 +8,14 @@ import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { DollarSign, FileCheck, FileClock, PlusCircle, AlertCircle, Calendar, Briefcase, UserCheck, ArrowRight } from "lucide-react";
+import { DollarSign, FileCheck, FileClock, PlusCircle, AlertCircle, Calendar, Briefcase, UserCheck, ArrowRight, FileText } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/auth-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
+import { BorrowerInfoModal } from "@/components/borrower-info-modal";
+import { useRouter } from "next/navigation";
 
 interface LoanApplication {
   id: string;
@@ -36,6 +38,7 @@ interface Document {
 export default function DashboardPage() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -112,6 +115,12 @@ export default function DashboardPage() {
 
   const summaryCards = [
     { 
+      title: "Available Programs", 
+      value: "18", 
+      icon: <FileText className="h-4 w-4 text-muted-foreground" />,
+      cta: { href: "/dashboard/applications", text: "View All"}
+    },
+    { 
       title: "Active Loans", 
       value: activeLoans.length.toString(), 
       icon: <DollarSign className="h-4 w-4 text-muted-foreground" /> 
@@ -120,12 +129,6 @@ export default function DashboardPage() {
       title: "Documents Submitted", 
       value: submittedDocuments.length.toString(), 
       icon: <FileCheck className="h-4 w-4 text-muted-foreground" /> 
-    },
-    { 
-      title: "Pending Actions", 
-      value: pendingDocuments.length.toString(), 
-      icon: <FileClock className="h-4 w-4 text-muted-foreground" />, 
-      cta: { href: "/dashboard/documents", text: "View Actions"} 
     },
   ];
 
@@ -173,9 +176,21 @@ export default function DashboardPage() {
             >
               Show Toast
             </Button>
-            <Button asChild>
-                <Link href="/dashboard/application"><PlusCircle className="mr-2 h-4 w-4"/> Start New Application</Link>
+            <Button variant="outline" asChild>
+                <Link href="/dashboard/applications">View Programs</Link>
             </Button>
+            <BorrowerInfoModal 
+              trigger={
+                <Button>
+                  <PlusCircle className="mr-2 h-4 w-4"/> Start New Application
+                </Button>
+              }
+              onBorrowerAdded={(borrowerInfo: any) => {
+                console.log('Borrower added:', borrowerInfo);
+                // Navigate to the loan application page with borrower ID
+                router.push(`/dashboard/application?borrowerId=${borrowerInfo.id}`);
+              }}
+            />
         </div>
       </div>
       

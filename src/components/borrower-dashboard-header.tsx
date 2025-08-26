@@ -6,12 +6,12 @@ import { useAuth } from '@/contexts/auth-context';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { LayoutDashboard, LogOut, User as UserIcon, Shield } from 'lucide-react';
+import { LayoutDashboard, LogOut, User as UserIcon } from 'lucide-react';
 import { Logo } from './logo';
 import { usePathname } from 'next/navigation';
 
 export default function BorrowerDashboardHeader() {
-  const { user, logOut, userProfile } = useAuth();
+  const { user, logOut } = useAuth();
   const pathname = usePathname();
 
   const navLinks = [
@@ -25,7 +25,9 @@ export default function BorrowerDashboardHeader() {
     <header className="sticky top-0 z-50 w-full border-b bg-background">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-6">
-          <Logo href="/dashboard" />
+          <Link href="/dashboard">
+            <Logo />
+          </Link>
           <nav className="hidden items-center gap-4 md:flex">
             {navLinks.map(link => (
                 <Link
@@ -65,11 +67,6 @@ export default function BorrowerDashboardHeader() {
                <DropdownMenuItem asChild>
                 <Link href="/dashboard"><LayoutDashboard className="mr-2 h-4 w-4" />Dashboard</Link>
               </DropdownMenuItem>
-              {userProfile?.role === 'admin' && (
-                <DropdownMenuItem asChild>
-                  <Link href="/workforce-office"><Shield className="mr-2 h-4 w-4" />Admin Panel</Link>
-                </DropdownMenuItem>
-              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={logOut}>
                 <LogOut className="mr-2 h-4 w-4" />

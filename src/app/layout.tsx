@@ -7,7 +7,6 @@ import { Toaster } from '@/components/ui/toaster';
 import { Providers } from '@/components/providers';
 import HeaderWrapper from '@/components/layout/header-wrapper';
 import Footer from '@/components/layout/footer';
-import ChatLauncher from '@/components/chat-launcher';
 
 const fontBody = Inter({
   subsets: ['latin'],
@@ -43,7 +42,6 @@ export default function RootLayout({
             <HeaderWrapper />
             <main className="flex-1">{children}</main>
             <Footer />
-            <ChatLauncher />
             <Toaster />
         </Providers>
       </body>
