@@ -54,7 +54,7 @@ export default function DashboardPage() {
     }, 1500); // 1.5 second timeout
 
     return () => clearTimeout(timer);
-  }, []); // Remove user dependency to prevent re-renders
+  }, [user]); // Add user to dependency array
 
   // Demo data
   const loanApplications: LoanApplication[] = [
