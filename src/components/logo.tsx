@@ -22,7 +22,7 @@ export function Logo({ className, href }: { className?: string, href?: string })
 
   if (href) {
     return (
-      <Link href={href}>
+      <Link href={href} legacyBehavior={false}>
           <LogoContent />
       </Link>
     )
