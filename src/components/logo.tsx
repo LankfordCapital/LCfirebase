@@ -15,7 +15,7 @@ export function Logo({ className, href }: { className?: string, href?: string })
         />
       <div className="flex items-baseline text-2xl">
         <span className="text-primary font-bold">Lankford</span>
-        <span id="logo-capital" className="text-secondary-foreground font-bold">Capital</span>
+        <span id="logo-capital" className="text-foreground font-bold">Capital</span>
       </div>
     </div>
   );
