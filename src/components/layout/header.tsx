@@ -83,7 +83,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/">
             <Logo />
           </Link>
           <NavigationMenu className="hidden lg:flex">
@@ -106,7 +106,7 @@ export default function Header() {
               </NavigationMenuItem>
               {navLinks.map((link) => (
                  <NavigationMenuItem key={link.href}>
-                    <Link href={link.href} legacyBehavior passHref>
+                    <Link href={link.href} passHref>
                         <NavigationMenuLink active={pathname === link.href} className={navigationMenuTriggerStyle()}>
                             {link.label}
                         </NavigationMenuLink>
@@ -135,7 +135,7 @@ export default function Header() {
           </SheetTrigger>
           <SheetContent side="left">
             <div className="flex flex-col gap-6 p-6">
-                <Link href="/" className="flex items-center gap-2">
+                <Link href="/">
                     <Logo />
                 </Link>
                 <nav className="grid gap-4">
