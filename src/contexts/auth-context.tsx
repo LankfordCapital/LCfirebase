@@ -97,20 +97,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (userAuth) => {
-      setLoading(true);
       if (userAuth) {
+        // We have a user from Firebase Auth, now let's get our custom profile
+        const userDocRef = doc(db, 'users', userAuth.uid);
+        const userDoc = await getDoc(userDocRef);
+        
         setUser(userAuth);
-        try {
-          const userDocRef = doc(db, 'users', userAuth.uid);
-          const userDoc = await getDoc(userDocRef);
-          if (userDoc.exists()) {
-            const profile = { uid: userDoc.id, ...userDoc.data() } as UserProfile;
-            setUserProfile(profile);
-            handleAuthRedirect(profile);
-          }
-        } catch (error) {
-          console.error("Error fetching user profile:", error);
-          setUserProfile(null);
+
+        if (userDoc.exists()) {
+          const profile = { uid: userDoc.id, ...userDoc.data() } as UserProfile;
+          setUserProfile(profile);
+          handleAuthRedirect(profile);
+        } else {
+            // This can happen briefly during signup
+            setUserProfile(null);
         }
       } else {
         setUser(null);
@@ -193,8 +193,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logOut = async () => {
     setIsLoggingOut(true);
     await signOut(auth);
-    setUser(null);
-    setUserProfile(null);
     router.push('/');
   };
 
