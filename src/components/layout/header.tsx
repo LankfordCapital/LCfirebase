@@ -46,7 +46,7 @@ const lendingLinks: { title: string; href: string; description: string }[] = [
 
 const ListItem = React.forwardRef<
   React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a">
+  React.ComponentPropsWithoutRef<typeof Link>
 >(({ className, title, children, href, ...props }, ref) => {
   return (
     <li>
@@ -105,7 +105,7 @@ export default function Header() {
               </NavigationMenuItem>
               {navLinks.map((link) => (
                  <NavigationMenuItem key={link.href}>
-                    <Link href={link.href} legacyBehavior passHref>
+                    <Link href={link.href} passHref legacyBehavior>
                         <NavigationMenuLink active={pathname === link.href} className={navigationMenuTriggerStyle()}>
                             {link.label}
                         </NavigationMenuLink>
