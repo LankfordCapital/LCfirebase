@@ -78,7 +78,7 @@ export default function BrokerOfficePageClient() {
                     <CardDescription>Track the status and progress of all loans submitted.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Dialog>
+                    <Dialog open={!!selectedLoan} onOpenChange={(open) => !open && setSelectedLoan(null)}>
                         <Table>
                             <TableHeader>
                                 <TableRow>

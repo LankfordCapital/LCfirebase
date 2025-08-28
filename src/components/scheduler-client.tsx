@@ -148,6 +148,9 @@ export function SchedulerClient() {
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>{currentEvent.id ? 'Edit Event' : 'Add New Event'}</DialogTitle>
+                    <DialogDescription>
+                        {currentEvent.id ? 'Make changes to your scheduled event.' : 'Create a new event or task for your schedule.'}
+                    </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                     <Input 
