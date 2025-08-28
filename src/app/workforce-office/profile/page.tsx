@@ -16,18 +16,17 @@ export default function ProfilePage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [canUsePassword, setCanUsePassword] = useState<boolean | null>(null);
+  const [hasPassword, setHasPassword] = useState<boolean | null>(null);
 
-  // Check if user can sign in with password
-  const checkPasswordSignIn = async () => {
+  const checkPasswordProvider = async () => {
     if (user?.email) {
-      const canUse = await canSignInWithPassword(user.email);
-      setCanUsePassword(canUse);
+      const hasPass = await canSignInWithPassword(user.email);
+      setHasPassword(hasPass);
     }
   };
 
   useEffect(() => {
-    checkPasswordSignIn();
+    checkPasswordProvider();
   }, [user]);
 
   // Add password to Google account
@@ -61,7 +60,7 @@ export default function ProfilePage() {
       });
       setPassword('');
       setConfirmPassword('');
-      await checkPasswordSignIn();
+      await checkPasswordProvider();
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -81,7 +80,7 @@ export default function ProfilePage() {
     );
   }
 
-  const isGoogleUserWithoutPassword = userProfile.authProvider === 'google' && canUsePassword === false;
+  const isGoogleUserWithoutPassword = userProfile.authProvider === 'google' && !hasPassword;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -109,7 +108,7 @@ export default function ProfilePage() {
             <div>
               <Label>Authentication Method(s)</Label>
               <p className="text-sm text-gray-600 capitalize">
-                {userProfile.authProvider} {canUsePassword ? ' & Password' : ''}
+                {userProfile.authProvider} {hasPassword && userProfile.authProvider === 'google' ? ' & Password' : ''}
               </p>
             </div>
           </CardContent>
@@ -161,5 +160,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-
-    

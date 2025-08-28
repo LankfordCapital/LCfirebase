@@ -36,6 +36,7 @@ interface UserProfile {
   status: 'pending' | 'approved' | 'rejected';
   createdAt: any;
   authProvider?: string;
+  hasPassword?: boolean;
 }
 
 interface AuthContextType {
@@ -47,7 +48,7 @@ interface AuthContextType {
   signUp: (email: string, pass: string, fullName: string, role: string) => Promise<UserCredential>;
   signIn: (email: string, pass: string) => Promise<UserCredential>;
   signInWithGoogle: () => Promise<UserCredential>;
-  signUpWithGoogle: (role: string) => Promise<{ credential: UserCredential; generatedPassword: string }>;
+  signUpWithGoogle: (role: string) => Promise<UserCredential>;
   checkEmailExists: (email: string) => Promise<boolean>;
   sendPasswordReset: (email: string) => Promise<void>;
   logOut: () => Promise<void>;
@@ -96,19 +97,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (userAuth) => {
+      setLoading(true);
       if (userAuth) {
         setUser(userAuth);
         try {
           const userDocRef = doc(db, 'users', userAuth.uid);
           const userDoc = await getDoc(userDocRef);
           if (userDoc.exists()) {
-            const profile = userDoc.data() as UserProfile;
+            const profile = { uid: userDoc.id, ...userDoc.data() } as UserProfile;
             setUserProfile(profile);
             handleAuthRedirect(profile);
           } else {
-            // This case handles users who might exist in Firebase Auth but not in Firestore.
-            // A default profile is created.
-            console.warn(`No Firestore document for user ${userAuth.uid}, creating one.`);
+            // This case should ideally not happen if signUp is always used
+            // But as a fallback, we create a basic profile.
             const newProfile: UserProfile = {
               uid: userAuth.uid,
               email: userAuth.email || '',
@@ -150,12 +151,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       status: role === 'workforce' || role === 'admin' ? 'approved' : 'pending',
       createdAt: serverTimestamp(),
       authProvider: 'password',
+      hasPassword: true,
     };
     await setDoc(doc(db, "users", userCredential.user.uid), newProfile);
     
     setUserProfile(newProfile);
-    handleAuthRedirect(newProfile);
-    
     return userCredential;
   };
   
@@ -164,56 +164,76 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
   
   const signInWithGoogle = async () => {
-    return signInWithPopup(auth, googleProvider);
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userDocRef);
+    if (!userDoc.exists()) {
+        // This is a first-time Google sign-in for this user. We need to know their role.
+        // For now, we'll default them to 'borrower'. In a real app, you might redirect
+        // them to a role selection page.
+        const newProfile = {
+          uid: user.uid,
+          email: user.email!,
+          fullName: user.displayName || 'New User',
+          role: 'borrower' as UserProfile['role'],
+          status: 'pending' as UserProfile['status'],
+          createdAt: serverTimestamp(),
+          authProvider: 'google',
+          hasPassword: false,
+        };
+        await setDoc(userDocRef, newProfile);
+        setUserProfile(newProfile);
+    }
+    return result;
   };
 
-  const signUpWithGoogle = async (role: string) => {
+  const signUpWithGoogle = async (role: string): Promise<UserCredential> => {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
       
       const userDocRef = doc(db, 'users', user.uid);
       const userDoc = await getDoc(userDocRef);
 
-      let generatedPassword = '';
-
       if (!userDoc.exists()) {
-        generatedPassword = Math.random().toString(36).slice(-10);
-        try {
-            if(user.email) {
-                await linkWithCredential(user, EmailAuthProvider.credential(user.email, generatedPassword));
-            }
-        } catch (error: any) {
-            if (error.code !== 'auth/credential-already-in-use') throw error;
-        }
-
-        const newProfile = {
+        const newProfile: UserProfile = {
           uid: user.uid,
           email: user.email!,
           fullName: user.displayName || 'New User',
           role: role as UserProfile['role'],
-          status: 'pending' as UserProfile['status'],
+          status: role === 'workforce' || role === 'admin' ? 'approved' : 'pending',
           createdAt: serverTimestamp(),
           authProvider: 'google',
+          hasPassword: false,
         };
         await setDoc(userDocRef, newProfile);
         setUserProfile(newProfile);
-        handleAuthRedirect(newProfile);
       } else {
-        const profile = userDoc.data() as UserProfile;
-        setUserProfile(profile);
-        handleAuthRedirect(profile);
+         const existingProfile = userDoc.data() as UserProfile;
+         setUserProfile(existingProfile);
       }
       
-      return { credential: result, generatedPassword };
+      return result;
   };
 
   const addPasswordToGoogleAccount = async (password: string) => {
-    if (!user || !user.email || user.providerData.some(p => p.providerId === 'password')) {
-        throw new Error("User not eligible or already has a password.");
+    if (!user || !user.email) {
+        throw new Error("User not eligible or email not available.");
     }
-    const credential = EmailAuthProvider.credential(user.email!, password);
+    // Check if a password provider is already linked
+    const methods = await fetchSignInMethodsForEmail(auth, user.email);
+    if (methods.includes('password')) {
+       throw new Error("An account with this email and a password already exists.");
+    }
+
+    const credential = EmailAuthProvider.credential(user.email, password);
     await linkWithCredential(user, credential);
-    await updateDoc(doc(db, "users", user.uid), { authProvider: 'google,password' });
+    await updateDoc(doc(db, "users", user.uid), { authProvider: 'google,password', hasPassword: true });
+    // Refetch profile to update UI
+    const updatedUserDoc = await getDoc(doc(db, 'users', user.uid));
+    if (updatedUserDoc.exists()) {
+        setUserProfile(updatedUserDoc.data() as UserProfile);
+    }
   };
 
   const logOut = async () => {
@@ -221,7 +241,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await signOut(auth);
     setUser(null);
     setUserProfile(null);
-    window.location.href = '/';
+    router.push('/');
   };
 
   const checkEmailExists = async (email: string) => {
@@ -232,8 +252,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const sendPasswordReset = (email: string) => sendPasswordResetEmail(auth, email);
 
   const canSignInWithPassword = async (email: string) => {
-    const methods = await fetchSignInMethodsForEmail(auth, email);
-    return methods.includes('password');
+    try {
+      const methods = await fetchSignInMethodsForEmail(auth, email);
+      return methods.includes('password');
+    } catch (error) {
+      console.error("Error checking sign in methods:", error);
+      return false;
+    }
   };
 
   // Admin functions

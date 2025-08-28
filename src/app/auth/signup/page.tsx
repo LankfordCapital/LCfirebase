@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from "@/components/ui/button"
@@ -29,8 +30,6 @@ export default function SignUpPage() {
   const [role, setRole] = useState<string>(roleFromQuery || 'borrower');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [showPasswordInfo, setShowPasswordInfo] = useState(false);
-  const [generatedPassword, setGeneratedPassword] = useState('');
   const [invitationDetails, setInvitationDetails] = useState<any>(null);
   const { signUp, signUpWithGoogle } = useAuth();
   const { toast } = useToast();
@@ -86,7 +85,6 @@ export default function SignUpPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    console.log('Submitting form with role:', role);
     setIsLoading(true);
     
     try {
@@ -99,10 +97,10 @@ export default function SignUpPage() {
       
       toast({
         title: 'Sign Up Successful!',
-        description: "Welcome to Lankford Capital.",
+        description: "Welcome to Lankford Capital. Please check for a verification email.",
       });
 
-      // Let the automatic redirect handle routing - no manual redirect needed
+      // Let the automatic redirect handle routing
 
     } catch (error: any) {
       console.error("Sign Up Error:", error);
@@ -111,29 +109,27 @@ export default function SignUpPage() {
         title: 'Sign Up Failed',
         description: error.message,
       });
-      setIsLoading(false);
+    } finally {
+        setIsLoading(false);
     }
   };
 
   const handleGoogleSignUp = async () => {
     setIsGoogleLoading(true);
-    console.log('Google sign-up with role:', role);
     
     try {
-      const { credential, generatedPassword: password } = await signUpWithGoogle(role);
-      
-      // Set the generated password to display to the user
-      setGeneratedPassword(password);
-      
+      const result = await signUpWithGoogle(role);
+       
+      if (invitationId && invitationDetails && result?.user?.uid) {
+        await acceptInvitation(result.user.uid);
+      }
+
       toast({
         title: 'Sign Up Successful!',
-        description: "Welcome to Lankford Capital. Your account has been created with both authentication methods.",
+        description: "Welcome to Lankford Capital.",
       });
 
-      // Show password information
-      setShowPasswordInfo(true);
-      
-      // Let the automatic redirect handle routing - no manual redirect needed
+      // Let the automatic redirect handle routing
 
     } catch (error: any) {
       console.error("Google Sign Up Error:", error);
@@ -142,18 +138,8 @@ export default function SignUpPage() {
         title: 'Google Sign Up Failed',
         description: error.message || 'Failed to sign up with Google',
       });
+    } finally {
       setIsGoogleLoading(false);
-    }
-  };
-
-  // Function to copy password to clipboard
-  const copyPasswordToClipboard = () => {
-    if (generatedPassword) {
-      navigator.clipboard.writeText(generatedPassword);
-      toast({
-        title: 'Password Copied!',
-        description: 'Your password has been copied to clipboard.',
-      });
     }
   };
 
@@ -192,36 +178,11 @@ export default function SignUpPage() {
               </CardDescription>
             </CardHeader>
             
-            {showPasswordInfo && (
-              <CardContent className="pb-6">
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-                  <h3 className="font-semibold text-green-800 mb-2">Account Created Successfully!</h3>
-                  <p className="text-sm text-green-700 mb-3">
-                    Your account has been created with both Google authentication and email/password login.
-                  </p>
-                  <div className="bg-white border border-green-300 rounded p-3 mb-3">
-                    <p className="text-sm text-green-800 mb-1">Generated Password:</p>
-                    <p className="font-mono text-lg font-bold text-green-900">{generatedPassword}</p>
-                  </div>
-                  <Button 
-                    onClick={copyPasswordToClipboard}
-                    size="sm"
-                    className="w-full bg-green-600 hover:bg-green-700"
-                  >
-                    Copy Password
-                  </Button>
-                  <p className="text-xs text-green-600 mt-2 text-center">
-                    Save this password! You can now sign in with either Google or email/password.
-                  </p>
-                </div>
-              </CardContent>
-            )}
-
             <CardContent className="space-y-6">
               {/* Google Sign Up Button */}
               <Button 
                 onClick={handleGoogleSignUp}
-                disabled={isGoogleLoading}
+                disabled={isGoogleLoading || isLoading}
                 variant="outline" 
                 className="w-full"
               >
@@ -258,26 +219,26 @@ export default function SignUpPage() {
                   <div className="mt-2 space-y-3">
                     <label className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors cursor-pointer">
                       <input
-                        type="checkbox"
+                        type="radio"
                         id="role-borrower"
                         name="role"
                         value="borrower"
                         checked={role === 'borrower'}
-                        onChange={(e) => setRole(e.target.checked ? 'borrower' : '')}
-                        className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                        onChange={(e) => setRole(e.target.value)}
+                        className="h-4 w-4 text-primary border-gray-300 focus:ring-2 focus:ring-primary"
                       />
                       <span className="text-sm font-medium text-gray-900">Borrower</span>
                     </label>
                     
                     <label className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors cursor-pointer">
                       <input
-                        type="checkbox"
+                        type="radio"
                         id="role-broker"
                         name="role"
                         value="broker"
                         checked={role === 'broker'}
-                        onChange={(e) => setRole(e.target.checked ? 'broker' : '')}
-                        className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                        onChange={(e) => setRole(e.target.value)}
+                        className="h-4 w-4 text-primary border-gray-300 focus:ring-2 focus:ring-primary"
                       />
                       <span className="text-sm font-medium text-gray-900">Broker</span>
                     </label>
@@ -307,7 +268,7 @@ export default function SignUpPage() {
                     minLength={6}
                   />
                 </div>
-                <Button type="submit" disabled={isLoading} className="w-full">
+                <Button type="submit" disabled={isLoading || isGoogleLoading} className="w-full">
                   {isLoading && <CustomLoader className="mr-2 h-4 w-4" />}
                   Create Account
                 </Button>
