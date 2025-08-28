@@ -14,25 +14,83 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useAuth } from "@/contexts/auth-context";
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { CustomLoader } from "@/components/ui/custom-loader";
 import Image from "next/image";
 
 export default function SignInPage() {
+  const searchParams = useSearchParams();
+  const invitationId = searchParams.get('invitationId');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [invitationDetails, setInvitationDetails] = useState<any>(null);
   const { signIn, signInWithGoogle } = useAuth();
   const { toast } = useToast();
+
+  // Fetch invitation details if invitationId is present
+  useEffect(() => {
+    if (invitationId) {
+      fetchInvitationDetails();
+    }
+  }, [invitationId]);
+
+  const fetchInvitationDetails = async () => {
+    try {
+      const response = await fetch(`/api/invitations/${invitationId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setInvitationDetails(data);
+        // Pre-fill the email with invitation data
+        setEmail(data.email || '');
+      }
+    } catch (error) {
+      console.error('Error fetching invitation details:', error);
+    }
+  };
+
+  const acceptInvitation = async (userId: string) => {
+    if (!invitationId || !invitationDetails) return;
+    
+    try {
+      const response = await fetch('/api/invitations/accept', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          invitationId,
+          userId,
+          userEmail: email
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: 'Invitation Accepted!',
+          description: `You've been added to the ${invitationDetails.roomName} chat room.`,
+        });
+      }
+    } catch (error) {
+      console.error('Error accepting invitation:', error);
+    }
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
-      await signIn(email, password);
+      const result = await signIn(email, password);
+      
+      // If this was an invitation signin, accept the invitation
+      if (invitationId && invitationDetails && result?.user?.uid) {
+        await acceptInvitation(result.user.uid);
+      }
+      
       // AuthProvider will handle the redirect on successful sign-in
     } catch (error: any) {
       console.error('Sign-in error in component:', error);
@@ -85,6 +143,13 @@ export default function SignInPage() {
               <CardTitle className="font-headline text-3xl font-semibold text-gray-900 mb-2">
                 Welcome Back
               </CardTitle>
+              {invitationDetails && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                  <p className="text-sm text-blue-800">
+                    🎉 You've been invited to join <strong>{invitationDetails.roomName}</strong>!
+                  </p>
+                </div>
+              )}
               <CardDescription className="text-gray-600 text-base">
                 Sign in to your Lankford Capital account
               </CardDescription>

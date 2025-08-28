@@ -2,27 +2,36 @@
 import { initializeApp, getApp, getApps, type App } from 'firebase-admin/app';
 import { getAuth, type Auth } from 'firebase-admin/auth';
 import { getFirestore, type Firestore } from 'firebase-admin/firestore';
-
+import { credential } from 'firebase-admin';
 // Note: This is a SERVER-only file.
 // It is not meant to be used on the client.
 
 let app: App;
 if (getApps().length === 0) {
-    // Check if we're in development mode and use emulator if available
-    if (process.env.NODE_ENV === 'development') {
-        app = initializeApp({
-            projectId: 'lankford-lending'
-        });
-        
-        // Use Firestore emulator in development if available
-        if (process.env.FIRESTORE_EMULATOR_HOST) {
-            console.log('Using Firestore emulator');
+    try {
+        // Use the service account key file via environment variable
+        const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+        if (serviceAccountPath) {
+            app = initializeApp({
+                projectId: 'lankford-lending',
+                credential: credential.applicationDefault()
+            });
+            console.log('Firebase Admin initialized with service account key');
+        } else {
+            // Fallback to basic initialization
+            app = initializeApp({
+                projectId: 'lankford-lending'
+            });
+            console.log('Firebase Admin initialized with basic config');
         }
-    } else {
-        // Production mode - use service account or default credentials
-        app = initializeApp({
-            projectId: 'lankford-lending'
-        });
+    } catch (error) {
+        console.error('Error initializing Firebase Admin:', error);
+        throw error;
+    }
+    
+    // Use Firestore emulator in development if available
+    if (process.env.FIRESTORE_EMULATOR_HOST) {
+        console.log('Using Firestore emulator');
     }
 } else {
     app = getApp();
