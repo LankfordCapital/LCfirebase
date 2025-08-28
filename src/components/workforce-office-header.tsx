@@ -164,7 +164,7 @@ export default function WorkforceOfficeHeader() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/broker-office">
+                    <Link href="/dashboard">
                       <Briefcase className="mr-2 h-4 w-4" />
                       <span>Broker Office</span>
                     </Link>
@@ -172,7 +172,7 @@ export default function WorkforceOfficeHeader() {
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard">
                       <Building2 className="mr-2 h-4 w-4" />
-                      <span>Borrower Dashboard</span>
+                      <span>Borrower Office</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />

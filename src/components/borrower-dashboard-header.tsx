@@ -6,12 +6,12 @@ import { useAuth } from '@/contexts/auth-context';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { LayoutDashboard, LogOut, User as UserIcon } from 'lucide-react';
+import { LayoutDashboard, LogOut, User as UserIcon, Users, Building2, Briefcase } from 'lucide-react';
 import { Logo } from './logo';
 import { usePathname } from 'next/navigation';
 
 export default function BorrowerDashboardHeader() {
-  const { user, logOut } = useAuth();
+  const { user, logOut, isAdmin } = useAuth();
   const pathname = usePathname();
 
   const navLinks = [
@@ -66,6 +66,30 @@ export default function BorrowerDashboardHeader() {
                 <Link href="/dashboard"><LayoutDashboard className="mr-2 h-4 w-4" />Dashboard</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+              {isAdmin && (
+                <>
+
+                  <DropdownMenuItem asChild>
+                    <Link href="/workforce-office" className="flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      <span>Workforce Office</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard" className="flex items-center gap-2">
+                      <Briefcase className="h-4 w-4" />
+                      <span>Broker Office</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard" className="flex items-center gap-2">
+                      <Building2 className="h-4 w-4" />
+                      <span>Borrower Office</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               <DropdownMenuItem onClick={logOut}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
