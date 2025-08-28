@@ -5,8 +5,6 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { Providers } from '@/components/providers';
-import HeaderWrapper from '@/components/layout/header-wrapper';
-import Footer from '@/components/layout/footer';
 
 const fontBody = Inter({
   subsets: ['latin'],
@@ -39,11 +37,9 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased flex flex-col h-full">
         <Providers>
-            <HeaderWrapper />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <Toaster />
+            {children}
         </Providers>
+        <Toaster />
       </body>
     </html>
   );

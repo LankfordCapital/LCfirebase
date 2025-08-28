@@ -1,11 +1,14 @@
 
 'use client';
 
-import { AuthProvider } from '@/contexts/auth-context';
+import { AuthProvider, useAuth } from '@/contexts/auth-context';
 import { UIProvider } from '@/contexts/ui-context';
 import { DocumentProvider } from '@/contexts/document-context';
 import dynamic from 'next/dynamic';
-import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import { CustomLoader } from './ui/custom-loader';
+import HeaderWrapper from './layout/header-wrapper';
+import Footer from './layout/footer';
 
 // Lazy load the AI assistant to improve initial page load performance
 const AIAssistant = dynamic(() => import('./ai-assistant').then(mod => ({ default: mod.AIAssistant })), {
@@ -13,13 +16,40 @@ const AIAssistant = dynamic(() => import('./ai-assistant').then(mod => ({ defaul
   loading: () => null,
 });
 
+function AppContent({ children }: { children: React.ReactNode }) {
+  const { loading, user } = useAuth();
+  const pathname = usePathname();
+
+  const isAuthPage = pathname.startsWith('/auth');
+  const isDashboard = pathname.startsWith('/dashboard') || pathname.startsWith('/broker-office') || pathname.startsWith('/workforce-office');
+
+  // Show a full-page loader while auth state is resolving,
+  // but not on public pages or auth pages to prevent layout shifts.
+  if (loading && !isAuthPage && isDashboard) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center">
+        <CustomLoader className="h-12 w-12" />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <HeaderWrapper />
+      <main className="flex-1">{children}</main>
+      <Footer />
+      <AIAssistant />
+    </>
+  );
+}
+
+
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
       <UIProvider>
         <DocumentProvider>
-          <AIAssistant />
-          {children}
+           <AppContent>{children}</AppContent>
         </DocumentProvider>
       </UIProvider>
     </AuthProvider>
