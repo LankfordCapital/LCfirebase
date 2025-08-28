@@ -55,8 +55,13 @@ const ListItem = React.forwardRef<
 ListItem.displayName = 'ListItem';
 
 export default function WorkforceOfficeHeader() {
-  const { user, logOut, isAdmin } = useAuth();
+  const { user, userProfile, logOut, isAdmin } = useAuth();
   const pathname = usePathname();
+  
+  // Don't render anything until the user profile is loaded to prevent flicker
+  if (!user || !userProfile) {
+    return null;
+  }
   
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background">

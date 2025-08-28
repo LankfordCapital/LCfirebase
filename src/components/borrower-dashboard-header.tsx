@@ -11,7 +11,7 @@ import { Logo } from './logo';
 import { usePathname } from 'next/navigation';
 
 export default function BorrowerDashboardHeader() {
-  const { user, logOut, isAdmin } = useAuth();
+  const { user, userProfile, logOut, isAdmin } = useAuth();
   const pathname = usePathname();
 
   const navLinks = [
@@ -20,6 +20,11 @@ export default function BorrowerDashboardHeader() {
       { href: '/dashboard/documents', label: 'Loan Actions' },
       { href: '/dashboard/profile', label: 'My Profile' },
   ];
+
+  // Don't render anything until the user profile is loaded to prevent flicker
+  if (!user || !userProfile) {
+    return null;
+  }
   
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background">

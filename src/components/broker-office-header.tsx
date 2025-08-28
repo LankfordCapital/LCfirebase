@@ -10,8 +10,13 @@ import { LogOut, User as UserIcon, Users, Building2, Briefcase } from 'lucide-re
 import { Logo } from './logo';
 
 export default function BrokerOfficeHeader() {
-  const { user, logOut, isAdmin } = useAuth();
+  const { user, userProfile, logOut, isAdmin } = useAuth();
   
+  // Don't render anything until the user profile is loaded to prevent flicker
+  if (!user || !userProfile) {
+    return null;
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
