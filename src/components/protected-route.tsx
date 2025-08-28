@@ -18,36 +18,36 @@ export function ProtectedRoute({ children, allowedRoles, redirectTo = '/auth/sig
 
   useEffect(() => {
     if (loading) {
-      return; // Wait until the auth state is fully resolved
+      return; 
     }
 
     if (!user) {
-      router.push(redirectTo); // Not logged in
+      router.push(redirectTo);
       return;
     }
 
-    if (userProfile) {
-        if (!allowedRoles.includes(userProfile.role)) {
-            // User role is not allowed for this route, redirect to their default dashboard
-            const defaultPath = getRedirectPath();
-            router.push(defaultPath);
-        }
-        // If role is allowed, the component will render children.
+    if (userProfile && !allowedRoles.includes(userProfile.role)) {
+        const defaultPath = getRedirectPath(userProfile);
+        router.push(defaultPath);
     }
-    // If user exists but userProfile is null, it means we're in a brief state
-    // before the profile is fetched. The loading screen will cover this.
 
   }, [user, userProfile, loading, allowedRoles, redirectTo, router, getRedirectPath]);
 
-  // Show loader while auth state is resolving or if user is not authorized yet
-  if (loading || !userProfile || !allowedRoles.includes(userProfile.role)) {
+  if (loading || !userProfile) {
     return (
       <div className="flex min-h-[calc(100vh-200px)] items-center justify-center">
         <CustomLoader className="h-10 w-10" />
       </div>
     );
   }
+  
+  if (!allowedRoles.includes(userProfile.role)) {
+       return (
+          <div className="flex min-h-[calc(100vh-200px)] items-center justify-center">
+            <CustomLoader className="h-10 w-10" />
+          </div>
+        );
+  }
 
-  // User is authenticated and authorized, render the protected content
   return <>{children}</>;
 }

@@ -189,6 +189,7 @@ export default function Home() {
                     src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/shutterstock_2021639264.jpg?alt=media&token=45a49432-6ac0-4c30-9988-2c5cdb0c482b"
                     alt="Financial district cityscape"
                     fill
+                    sizes="100vw"
                     className="object-cover"
                     data-ai-hint="financial district"
                 />

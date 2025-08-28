@@ -47,7 +47,7 @@ interface AuthContextType {
   isLoggingOut: boolean;
   signUp: (email: string, pass: string, fullName: string, role: string) => Promise<UserCredential>;
   signIn: (email: string, pass: string) => Promise<UserCredential>;
-  signInWithGoogle: () => Promise<UserCredential>;
+  signInWithGoogle: (role?: string) => Promise<UserCredential>;
   signUpWithGoogle: (role: string) => Promise<UserCredential>;
   checkEmailExists: (email: string) => Promise<boolean>;
   sendPasswordReset: (email: string) => Promise<void>;
@@ -57,7 +57,7 @@ interface AuthContextType {
   getAllUsers: () => Promise<UserProfile[]>;
   updateUserRole: (uid: string, newRole: UserProfile['role']) => Promise<void>;
   updateUserStatus: (uid: string, newStatus: UserProfile['status']) => Promise<void>;
-  getRedirectPath: () => string;
+  getRedirectPath: (profile?: UserProfile | null) => string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -72,9 +72,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const isAdmin = userProfile?.role === 'admin';
   
-  const getRedirectPath = useCallback(() => {
-    if (!userProfile) return '/auth/signin';
-    switch (userProfile.role) {
+  const getRedirectPath = useCallback((profile: UserProfile | null = userProfile) => {
+    if (!profile) return '/auth/signin';
+    switch (profile.role) {
       case 'admin':
       case 'workforce':
         return '/workforce-office';
@@ -90,7 +90,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const handleAuthRedirect = useCallback((profile: UserProfile) => {
     const authPages = ['/auth/signin', '/auth/signup', '/auth/forgot-password', '/auth/reset-password', '/auth/workforce-signin'];
     if (authPages.includes(pathname)) {
-        const path = getRedirectPath();
+        const path = getRedirectPath(profile);
         router.push(path);
     }
   }, [pathname, router, getRedirectPath]);
@@ -107,33 +107,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const profile = { uid: userDoc.id, ...userDoc.data() } as UserProfile;
             setUserProfile(profile);
             handleAuthRedirect(profile);
-          } else {
-            // This case should ideally not happen if signUp is always used
-            // But as a fallback, we create a basic profile.
-            const newProfile: UserProfile = {
-              uid: userAuth.uid,
-              email: userAuth.email || '',
-              fullName: userAuth.displayName || 'New User',
-              role: 'borrower',
-              status: 'pending',
-              createdAt: serverTimestamp(),
-              authProvider: userAuth.providerData[0]?.providerId || 'password',
-            };
-            await setDoc(userDocRef, newProfile);
-            setUserProfile(newProfile);
-            handleAuthRedirect(newProfile);
           }
         } catch (error) {
           console.error("Error fetching user profile:", error);
           setUserProfile(null);
-        } finally {
-            setLoading(false);
         }
       } else {
         setUser(null);
         setUserProfile(null);
-        setLoading(false);
       }
+      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -148,7 +131,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       email: userCredential.user.email!,
       fullName: fullName,
       role: role as UserProfile['role'],
-      status: role === 'workforce' || role === 'admin' ? 'approved' : 'pending',
+      status: (role === 'workforce' || role === 'admin') ? 'approved' : 'pending',
       createdAt: serverTimestamp(),
       authProvider: 'password',
       hasPassword: true,
@@ -163,64 +146,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return signInWithEmailAndPassword(auth, email, pass);
   };
   
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = async (role: string = 'borrower') => {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
     const userDocRef = doc(db, 'users', user.uid);
     const userDoc = await getDoc(userDocRef);
     if (!userDoc.exists()) {
-        // This is a first-time Google sign-in for this user. We need to know their role.
-        // For now, we'll default them to 'borrower'. In a real app, you might redirect
-        // them to a role selection page.
-        const newProfile = {
-          uid: user.uid,
-          email: user.email!,
-          fullName: user.displayName || 'New User',
-          role: 'borrower' as UserProfile['role'],
-          status: 'pending' as UserProfile['status'],
-          createdAt: serverTimestamp(),
-          authProvider: 'google',
-          hasPassword: false,
-        };
-        await setDoc(userDocRef, newProfile);
-        setUserProfile(newProfile);
-    }
-    return result;
-  };
-
-  const signUpWithGoogle = async (role: string): Promise<UserCredential> => {
-      const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
-      
-      const userDocRef = doc(db, 'users', user.uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (!userDoc.exists()) {
         const newProfile: UserProfile = {
           uid: user.uid,
           email: user.email!,
           fullName: user.displayName || 'New User',
           role: role as UserProfile['role'],
-          status: role === 'workforce' || role === 'admin' ? 'approved' : 'pending',
+          status: (role === 'workforce' || role === 'admin') ? 'approved' : 'pending',
           createdAt: serverTimestamp(),
           authProvider: 'google',
           hasPassword: false,
         };
         await setDoc(userDocRef, newProfile);
         setUserProfile(newProfile);
-      } else {
-         const existingProfile = userDoc.data() as UserProfile;
-         setUserProfile(existingProfile);
-      }
-      
-      return result;
+    } else {
+        setUserProfile(userDoc.data() as UserProfile);
+    }
+    return result;
   };
+
+  const signUpWithGoogle = signInWithGoogle;
 
   const addPasswordToGoogleAccount = async (password: string) => {
     if (!user || !user.email) {
         throw new Error("User not eligible or email not available.");
     }
-    // Check if a password provider is already linked
     const methods = await fetchSignInMethodsForEmail(auth, user.email);
     if (methods.includes('password')) {
        throw new Error("An account with this email and a password already exists.");
@@ -229,7 +184,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const credential = EmailAuthProvider.credential(user.email, password);
     await linkWithCredential(user, credential);
     await updateDoc(doc(db, "users", user.uid), { authProvider: 'google,password', hasPassword: true });
-    // Refetch profile to update UI
     const updatedUserDoc = await getDoc(doc(db, 'users', user.uid));
     if (updatedUserDoc.exists()) {
         setUserProfile(updatedUserDoc.data() as UserProfile);
@@ -261,7 +215,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Admin functions
   const getAllUsers = async (): Promise<UserProfile[]> => {
     if (!isAdmin) throw new Error("Unauthorized");
     const querySnapshot = await getDocs(collection(db, "users"));
