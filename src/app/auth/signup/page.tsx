@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useAuth } from "@/contexts/auth-context";
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { CustomLoader } from "@/components/ui/custom-loader";
@@ -22,6 +22,7 @@ import Image from "next/image";
 export default function SignUpPage() {
   const searchParams = useSearchParams();
   const roleFromQuery = searchParams.get('role');
+  const invitationId = searchParams.get('invitationId');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,8 +31,58 @@ export default function SignUpPage() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showPasswordInfo, setShowPasswordInfo] = useState(false);
   const [generatedPassword, setGeneratedPassword] = useState('');
+  const [invitationDetails, setInvitationDetails] = useState<any>(null);
   const { signUp, signUpWithGoogle } = useAuth();
   const { toast } = useToast();
+
+  // Fetch invitation details if invitationId is present
+  useEffect(() => {
+    if (invitationId) {
+      fetchInvitationDetails();
+    }
+  }, [invitationId]);
+
+  const fetchInvitationDetails = async () => {
+    try {
+      const response = await fetch(`/api/invitations/${invitationId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setInvitationDetails(data);
+        // Pre-fill the form with invitation data
+        setFullName(data.fullName || '');
+        setEmail(data.email || '');
+      }
+    } catch (error) {
+      console.error('Error fetching invitation details:', error);
+    }
+  };
+
+  const acceptInvitation = async (userId: string) => {
+    if (!invitationId || !invitationDetails) return;
+    
+    try {
+      const response = await fetch('/api/invitations/accept', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          invitationId,
+          userId,
+          userEmail: email
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: 'Invitation Accepted!',
+          description: `You've been added to the ${invitationDetails.roomName} chat room.`,
+        });
+      }
+    } catch (error) {
+      console.error('Error accepting invitation:', error);
+    }
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -39,7 +90,12 @@ export default function SignUpPage() {
     setIsLoading(true);
     
     try {
-      await signUp(email, password, fullName, role);
+      const result = await signUp(email, password, fullName, role);
+      
+      // If this was an invitation signup, accept the invitation
+      if (invitationId && invitationDetails && result?.user?.uid) {
+        await acceptInvitation(result.user.uid);
+      }
       
       toast({
         title: 'Sign Up Successful!',
@@ -124,6 +180,13 @@ export default function SignUpPage() {
               <CardTitle className="font-headline text-3xl font-semibold text-gray-900 mb-2">
                 Create Account
               </CardTitle>
+              {invitationDetails && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                  <p className="text-sm text-blue-800">
+                    🎉 You've been invited to join <strong>{invitationDetails.roomName}</strong>!
+                  </p>
+                </div>
+              )}
               <CardDescription className="text-gray-600 text-base">
                 Join Lankford Capital today
               </CardDescription>

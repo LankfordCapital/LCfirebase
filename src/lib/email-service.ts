@@ -1,12 +1,14 @@
 
 'use server';
 
+'use server';
+
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from './firebase-client';
 
 interface MailPayload {
     to: string[];
-    from?: string; // Add from field
+    from?: string;
     cc?: string[];
     bcc?: string[];
     subject: string;

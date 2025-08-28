@@ -64,6 +64,8 @@ export default function CommunicationsPage() {
     const [inviteName, setInviteName] = useState('');
     const [inviteEmail, setInviteEmail] = useState('');
     const [isInviting, setIsInviting] = useState(false);
+    
+
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -125,20 +127,58 @@ export default function CommunicationsPage() {
         }));
         toast({ title: 'Member Removed', description: 'The user has been removed from the channel.' });
     };
-
+    
     const handleInviteUser = async () => {
         if(!inviteName || !inviteEmail) {
             toast({ variant: 'destructive', title: 'Missing fields', description: 'Please provide name and email.' });
             return;
         }
         setIsInviting(true);
-        // Simulate sending invite
-        await new Promise(res => setTimeout(res, 1000));
-        toast({ title: 'Invite Sent', description: `Invitation sent to ${inviteEmail}.`});
-        setInviteName('');
-        setInviteEmail('');
-        setIsInviting(false);
+        
+        try {
+            const response = await fetch('/api/invitations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    fullName: inviteName,
+                    email: inviteEmail,
+                    roomId: selectedRoomId,
+                    roomName: selectedRoomName,
+                    invitedBy: user?.fullName || user?.email || 'Unknown User'
+                }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                toast({ 
+                    title: 'Invite Sent', 
+                    description: `Invitation sent to ${inviteEmail}. They will receive an email with signup/signin instructions.` 
+                });
+                setInviteName('');
+                setInviteEmail('');
+            } else {
+                toast({ 
+                    variant: 'destructive', 
+                    title: 'Failed to send invite', 
+                    description: result.error || 'An error occurred while sending the invitation.' 
+                });
+            }
+        } catch (error) {
+            console.error('Error sending invitation:', error);
+            toast({ 
+                variant: 'destructive', 
+                title: 'Error', 
+                description: 'Failed to send invitation. Please try again.' 
+            });
+        } finally {
+            setIsInviting(false);
+        }
     }
+
+
 
 
     const renderChannelList = (title: string, items: {id: string, name: string, icon: React.ReactNode}[]) => (
@@ -181,7 +221,7 @@ export default function CommunicationsPage() {
                                 <DialogHeader>
                                 <DialogTitle>Create New Channel</DialogTitle>
                                 <DialogDescription>
-                                    Create a new team channel for discussions.
+                                    Create a new team channel for discussions. This will be visible to all team members.
                                 </DialogDescription>
                                 </DialogHeader>
                                 <div className="py-4">
@@ -219,6 +259,9 @@ export default function CommunicationsPage() {
                              <DialogContent className="sm:max-w-[525px]">
                                 <DialogHeader>
                                     <DialogTitle>Manage Members in #{selectedRoomName}</DialogTitle>
+                                    <DialogDescription>
+                                        Add or remove members from this chat room. You can also invite new users who aren't on the platform yet.
+                                    </DialogDescription>
                                 </DialogHeader>
                                 <Tabs defaultValue="add-existing" className="mt-4">
                                     <TabsList className="grid w-full grid-cols-3">
@@ -255,20 +298,39 @@ export default function CommunicationsPage() {
                                             {availableUsersToAdd.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">All users are in this channel.</p>}
                                         </div>
                                     </TabsContent>
-                                     <TabsContent value="invite-new" className="mt-4">
+                                    
+                                    <TabsContent value="invite-new" className="mt-4">
                                         <div className="space-y-4">
                                             <p className="text-sm text-muted-foreground">Send an invitation to someone who is not on the platform yet.</p>
                                             <div className="space-y-2">
                                                 <Label htmlFor="invite-name">Full Name</Label>
-                                                <Input id="invite-name" value={inviteName} onChange={e => setInviteName(e.target.value)} />
+                                                <Input 
+                                                    id="invite-name" 
+                                                    value={inviteName} 
+                                                    onChange={e => setInviteName(e.target.value)}
+                                                    placeholder="Enter full name"
+                                                />
                                             </div>
                                             <div className="space-y-2">
                                                 <Label htmlFor="invite-email">Email Address</Label>
-                                                <Input id="invite-email" type="email" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} />
+                                                <Input 
+                                                    id="invite-email" 
+                                                    type="email" 
+                                                    value={inviteEmail} 
+                                                    onChange={e => setInviteEmail(e.target.value)}
+                                                    placeholder="Enter email address"
+                                                />
                                             </div>
-                                            <Button className="w-full" onClick={handleInviteUser} disabled={isInviting}>Send Invite</Button>
+                                            <Button 
+                                                className="w-full" 
+                                                onClick={handleInviteUser} 
+                                                disabled={isInviting}
+                                            >
+                                                {isInviting ? 'Sending Invite...' : 'Send Invite'}
+                                            </Button>
                                         </div>
                                     </TabsContent>
+
                                 </Tabs>
                             </DialogContent>
                         </Dialog>
