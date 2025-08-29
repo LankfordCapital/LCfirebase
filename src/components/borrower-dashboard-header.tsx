@@ -81,7 +81,7 @@ export default function BorrowerDashboardHeader() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/dashboard" className="flex items-center gap-2">
+                    <Link href="/broker-office" className="flex items-center gap-2">
                       <Briefcase className="h-4 w-4" />
                       <span>Broker Office</span>
                     </Link>

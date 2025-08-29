@@ -169,7 +169,7 @@ export default function WorkforceOfficeHeader() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/dashboard">
+                    <Link href="/broker-office">
                       <Briefcase className="mr-2 h-4 w-4" />
                       <span>Broker Office</span>
                     </Link>
