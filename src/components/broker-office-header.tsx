@@ -8,9 +8,20 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { LogOut, User as UserIcon, Users, Building2, Briefcase } from 'lucide-react';
 import { Logo } from './logo';
+import { usePathname } from 'next/navigation';
+import { useUI } from '@/contexts/ui-context';
+import { cn } from '@/lib/utils';
 
 export default function BrokerOfficeHeader() {
   const { user, userProfile, logOut, isAdmin } = useAuth();
+  const { openAssistant } = useUI();
+  const pathname = usePathname();
+
+  const navLinks = [
+      { href: '/broker-office', label: 'Dashboard' },
+      { href: '/broker-office/documents', label: 'New Application' },
+      { href: '/broker-office/loan-actions', label: 'Loan Actions' },
+  ];
   
   // Don't render anything until the user profile is loaded to prevent flicker
   if (!user || !userProfile) {
@@ -22,6 +33,23 @@ export default function BrokerOfficeHeader() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-6">
           <Logo href="/broker-office" />
+           <nav className="hidden items-center gap-4 md:flex">
+            {navLinks.map(link => (
+                <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                      'text-sm font-medium transition-colors',
+                      pathname === link.href ? 'text-primary' : 'text-muted-foreground hover:text-primary'
+                    )}
+                >
+                    {link.label}
+                </Link>
+            ))}
+             <Button variant="ghost" onClick={() => openAssistant()} className="text-sm font-medium text-muted-foreground hover:text-primary">
+                Chat
+            </Button>
+          </nav>
         </div>
         
         <div className="flex items-center gap-4">
