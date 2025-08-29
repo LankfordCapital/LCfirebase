@@ -107,21 +107,7 @@ export default function BrokerOfficePageClient() {
                     </Button>
                 </CardFooter>
             </Card>
-            
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <MessageSquare className="h-5 w-5 text-primary" />
-                        Communications
-                    </CardTitle>
-                    <CardDescription>Chat directly with our team.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <ChatClient roomId={`broker-${user?.uid}`} />
-                </CardContent>
-            </Card>
-        </div>
-        <div className="lg:col-span-1 space-y-6">
+
             <Card>
                 <CardHeader>
                     <CardTitle>Broker Documents</CardTitle>
@@ -132,6 +118,20 @@ export default function BrokerOfficePageClient() {
                      <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 h-4 w-4" /> Wiring Instructions (Broker)</Button>
                      <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 h-4 w-4" /> ID/Driver's License (Broker)</Button>
                      <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 h-4 w-4" /> Signed Broker Agreement</Button>
+                </CardContent>
+            </Card>
+        </div>
+        <div className="lg:col-span-1 space-y-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <MessageSquare className="h-5 w-5 text-primary" />
+                        Communications
+                    </CardTitle>
+                    <CardDescription>Chat directly with our team.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ChatClient roomId={`broker-${user?.uid}`} />
                 </CardContent>
             </Card>
              <Card>

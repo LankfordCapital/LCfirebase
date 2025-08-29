@@ -125,7 +125,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, [handleAuthRedirect]);
+  }, [handleAuthRedirect, router]);
 
   const signUp = async (email: string, pass: string, fullName: string, role: string) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
@@ -199,7 +199,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logOut = async () => {
     setIsLoggingOut(true);
     await signOut(auth);
+    setUser(null);
+    setUserProfile(null);
     router.push('/auth/signin');
+    setIsLoggingOut(false);
   };
 
   const checkEmailExists = async (email: string) => {

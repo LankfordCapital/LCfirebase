@@ -13,7 +13,7 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, allowedRoles, redirectTo = '/auth/signin' }: ProtectedRouteProps) {
-  const { user, loading, userProfile, isAdmin } = useAuth();
+  const { user, loading, userProfile, isAdmin, getRedirectPath } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -26,19 +26,20 @@ export function ProtectedRoute({ children, allowedRoles, redirectTo = '/auth/sig
       return;
     }
 
-    // An admin can access any page
+    // An admin can access any page, so no need to redirect.
     if (isAdmin) {
       return;
     }
 
-    // For non-admins, check if their role is in the allowed list
+    // For non-admins, check if their role is in the allowed list.
     if (userProfile && !allowedRoles.includes(userProfile.role)) {
-      router.push('/auth/signin'); // Or a generic 'unauthorized' page
+      // If the role is not allowed, redirect to the correct default page for their role.
+      const path = getRedirectPath(userProfile);
+      router.push(path);
     }
-  }, [user, loading, userProfile, isAdmin, allowedRoles, redirectTo, router]);
+  }, [user, loading, userProfile, isAdmin, allowedRoles, redirectTo, router, getRedirectPath]);
 
-  // If loading, or if the user is present but the profile isn't yet, show loader.
-  // Also covers the case where a non-admin is about to be redirected.
+  // While loading, or if the user is present but the profile isn't yet, show loader.
   if (loading || !userProfile) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -52,7 +53,7 @@ export function ProtectedRoute({ children, allowedRoles, redirectTo = '/auth/sig
     return <>{children}</>;
   }
 
-  // Fallback loader while redirecting unauthorized users
+  // Fallback loader while redirecting unauthorized users.
   return (
     <div className="flex min-h-screen items-center justify-center">
       <CustomLoader className="h-10 w-10" />
