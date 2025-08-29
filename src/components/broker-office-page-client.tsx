@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { ChatClient } from "../chat-client";
+import { ChatClient } from "@/components/chat-client";
 
 
 const summaryCards = [
