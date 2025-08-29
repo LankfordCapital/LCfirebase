@@ -88,10 +88,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 
   const handleAuthRedirect = useCallback((profile: UserProfile) => {
-    const authPages = ['/auth/signin', '/auth/signup', '/auth/forgot-password', '/auth/reset-password', '/auth/workforce-signin'];
-    if (authPages.includes(pathname)) {
-        const path = getRedirectPath(profile);
-        router.push(path);
+    // Only redirect if the user is on a generic auth page or the homepage
+    // and not on a specific auth page like workforce-signin when they are a workforce user.
+    const genericAuthPages = ['/auth/signin', '/auth/signup'];
+    const isGenericAuthPage = genericAuthPages.includes(pathname);
+    const isHomePage = pathname === '/';
+
+    if ((isGenericAuthPage || isHomePage) && profile) {
+      const path = getRedirectPath(profile);
+      router.push(path);
     }
   }, [pathname, router, getRedirectPath]);
 
