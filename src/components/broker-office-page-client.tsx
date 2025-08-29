@@ -1,14 +1,16 @@
 
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { PlusCircle, Users, DollarSign, BarChart, Calendar, Upload, MessageSquare } from "lucide-react";
+import { PlusCircle, Users, DollarSign, BarChart, Calendar, Upload, MessageSquare, ArrowRight } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { ChatClient } from "@/components/chat-client";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 
 const summaryCards = [
@@ -22,6 +24,12 @@ const workforceMembers = [
     { uid: 'workforce-user-1', name: 'Alex Johnson', title: 'Senior Loan Officer' },
     { uid: 'workforce-user-2', name: 'Maria Garcia', title: 'Underwriting Manager' },
     { uid: 'workforce-user-3', name: 'Chris Lee', title: 'Closing Coordinator' },
+];
+
+const pipelinePreview = [
+    { id: "LL-00125", borrower: "John Doe", property: "123 Main St", status: "Underwriting"},
+    { id: "LL-00130", borrower: "Emily White", property: "345 Maple Dr", status: "Approved" },
+    { id: "LL-00133", borrower: "Sarah Green", property: "987 Cedar Ave", status: "Initial Review" },
 ];
 
 export default function BrokerOfficePageClient() {
@@ -59,8 +67,47 @@ export default function BrokerOfficePageClient() {
         ))}
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Borrower Pipeline Preview</CardTitle>
+                    <CardDescription>A quick look at your most recent loan applications.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Borrower</TableHead>
+                                <TableHead>Property</TableHead>
+                                <TableHead>Status</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {pipelinePreview.map((loan) => (
+                                <TableRow key={loan.id}>
+                                    <TableCell className="font-medium">{loan.borrower}</TableCell>
+                                    <TableCell>{loan.property}</TableCell>
+                                    <TableCell>
+                                        <Badge variant={loan.status === 'Approved' ? 'default' : loan.status === 'Missing Docs' ? 'destructive' : 'secondary'}
+                                            className={loan.status === 'Approved' ? 'bg-green-500 hover:bg-green-600' : ''}>
+                                            {loan.status}
+                                        </Badge>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+                <CardFooter>
+                     <Button asChild variant="outline" size="sm" className="ml-auto">
+                        <Link href="/broker-office/borrower-pipeline">
+                            View Full Pipeline <ArrowRight className="ml-2 h-4 w-4" />
+                        </Link>
+                    </Button>
+                </CardFooter>
+            </Card>
+
             <Card>
                 <CardHeader>
                     <CardTitle>Broker Documents</CardTitle>
@@ -73,7 +120,21 @@ export default function BrokerOfficePageClient() {
                      <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 h-4 w-4" /> Signed Broker Agreement</Button>
                 </CardContent>
             </Card>
+        </div>
+        <div className="lg:col-span-1 space-y-6">
             <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <MessageSquare className="h-5 w-5 text-primary" />
+                        Communications
+                    </CardTitle>
+                    <CardDescription>Chat directly with our team.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ChatClient roomId={`broker-${user?.uid}`} />
+                </CardContent>
+            </Card>
+             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Calendar className="h-5 w-5 text-primary" />
@@ -99,20 +160,6 @@ export default function BrokerOfficePageClient() {
                            </Button>
                        </div>
                    ))}
-                </CardContent>
-            </Card>
-        </div>
-        <div>
-             <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <MessageSquare className="h-5 w-5 text-primary" />
-                        Communications
-                    </CardTitle>
-                    <CardDescription>Chat directly with our team.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <ChatClient roomId={`broker-${user?.uid}`} />
                 </CardContent>
             </Card>
         </div>
