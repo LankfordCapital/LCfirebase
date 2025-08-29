@@ -7,12 +7,13 @@ import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { PlusCircle, Users, DollarSign, BarChart, MoreHorizontal, Calendar, Mail, Upload, FileWarning } from "lucide-react";
+import { PlusCircle, Users, DollarSign, BarChart, MoreHorizontal, Calendar, Mail, Upload, FileWarning, MessageSquare } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
+import { ChatClient } from "../chat-client";
 
 
 const summaryCards = [
@@ -161,6 +162,18 @@ export default function BrokerOfficePageClient() {
                             )}
                         </DialogContent>
                     </Dialog>
+                </CardContent>
+            </Card>
+             <Card className="mt-6">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <MessageSquare className="h-5 w-5 text-primary" />
+                        Communications
+                    </CardTitle>
+                    <CardDescription>Chat directly with our team.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ChatClient roomId={`broker-${user?.uid}`} />
                 </CardContent>
             </Card>
         </div>

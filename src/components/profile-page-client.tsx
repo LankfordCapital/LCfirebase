@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Upload, PlusCircle, Trash2, ScanLine, Landmark, FileText, Calendar as CalendarIcon, Download, Save, User, Building, CreditCard, Phone, Mail, AlertTriangle } from "lucide-react";
+import { Upload, PlusCircle, Trash2, ScanLine, Landmark, FileText, Calendar as CalendarIcon, Download, Save, User, Building, CreditCard, Phone, Mail, AlertTriangle, MessageSquare } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { scanCreditReport, type ScanCreditReportOutput } from '@/ai/flows/credit-score-scanner';
@@ -29,6 +29,7 @@ import { CustomLoader } from './ui/custom-loader';
 import { Separator } from '@/components/ui/separator';
 import { useBorrowerProfile } from '@/hooks/use-borrower-profile';
 import { ProfileCompletionIndicator } from '@/components/profile-completion-indicator';
+import { ChatClient } from './chat-client';
 
 type Company = {
   id: string;
@@ -729,55 +730,51 @@ export default function ProfilePage() {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Contact Information */}
-            <Card ref={contactRef} className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-              <CardHeader className="border-b border-gray-200">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-orange-100 rounded-lg">
-                      <Phone className="h-5 w-5 text-orange-600" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-xl">Contact Information</CardTitle>
-                      <CardDescription>Your primary contact details</CardDescription>
-                    </div>
-                  </div>
-                  <Button variant="outline" size="icon" onClick={() => handleExportPdf(contactRef.current, 'contact-information')}>
-                    <Download className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6 space-y-6">
-                <div className="space-y-3">
-                  <Label htmlFor="email" className="text-sm font-medium flex items-center gap-2">
-                    <Mail className="h-4 w-4" />
-                    Email Address
-                  </Label>
-                  <Input id="email" type="email" value={user?.email || ''} readOnly className="h-11 bg-gray-50" />
-                </div>
-                <div className="space-y-3">
-                  <Label htmlFor="phone" className="text-sm font-medium flex items-center gap-2">
-                    <Phone className="h-4 w-4" />
-                    Phone Number
-                  </Label>
-                  <Input id="phone" type="tel" placeholder="(123) 456-7890" value={phone} onChange={e => setPhone(e.target.value)} className="h-11" />
-                </div>
-                
-                <div className="flex justify-end pt-4">
-                  <Button onClick={handleSaveContactInfo} disabled={isSavingContact} className="gap-2">
-                    {isSavingContact ? <CustomLoader className="h-4 w-4" /> : <Save className="h-4 w-4" />}
-                    Save Contact Information
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-           
+            
             <DealHistory />
           </div>
 
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-8">
+            <Card ref={contactRef} className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+                <CardHeader className="border-b border-gray-200">
+                    <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-orange-100 rounded-lg">
+                        <Phone className="h-5 w-5 text-orange-600" />
+                        </div>
+                        <div>
+                        <CardTitle className="text-xl">Contact Information</CardTitle>
+                        <CardDescription>Your primary contact details</CardDescription>
+                        </div>
+                    </div>
+                    </div>
+                </CardHeader>
+                <CardContent className="p-6 space-y-6">
+                    <div className="space-y-3">
+                    <Label htmlFor="email" className="text-sm font-medium flex items-center gap-2">
+                        <Mail className="h-4 w-4" />
+                        Email Address
+                    </Label>
+                    <Input id="email" type="email" value={user?.email || ''} readOnly className="h-11 bg-gray-50" />
+                    </div>
+                    <div className="space-y-3">
+                    <Label htmlFor="phone" className="text-sm font-medium flex items-center gap-2">
+                        <Phone className="h-4 w-4" />
+                        Phone Number
+                    </Label>
+                    <Input id="phone" type="tel" placeholder="(123) 456-7890" value={phone} onChange={e => setPhone(e.target.value)} className="h-11" />
+                    </div>
+                    
+                    <div className="flex justify-end pt-4">
+                    <Button onClick={handleSaveContactInfo} disabled={isSavingContact} className="gap-2">
+                        {isSavingContact ? <CustomLoader className="h-4 w-4" /> : <Save className="h-4 w-4" />}
+                        Save Contact Information
+                    </Button>
+                    </div>
+                </CardContent>
+            </Card>
+
             {companies.map((company, index) => (
               <Card key={company.id} ref={el => { if (el) companyRefs.current[index] = el; }} className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
                 <CardHeader className="border-b border-gray-200">
@@ -860,6 +857,18 @@ export default function ProfilePage() {
               <PlusCircle className="h-4 w-4" />
               Add Another Company
             </Button>
+             <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <MessageSquare className="h-5 w-5 text-primary" />
+                        Communications
+                    </CardTitle>
+                    <CardDescription>Chat with our team about your profile or loans.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ChatClient roomId={`user-${user?.uid}`} />
+                </CardContent>
+            </Card>
           </div>
         </div>
       </div>
