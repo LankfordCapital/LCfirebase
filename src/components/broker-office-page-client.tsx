@@ -107,21 +107,7 @@ export default function BrokerOfficePageClient() {
                     </Button>
                 </CardFooter>
             </Card>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>Broker Documents</CardTitle>
-                    <CardDescription>Upload your compliance documents here.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                     <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 h-4 w-4" /> W-9 (Broker)</Button>
-                     <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 h-4 w-4" /> Wiring Instructions (Broker)</Button>
-                     <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 h-4 w-4" /> ID/Driver's License (Broker)</Button>
-                     <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 h-4 w-4" /> Signed Broker Agreement</Button>
-                </CardContent>
-            </Card>
-        </div>
-        <div className="lg:col-span-1 space-y-6">
+            
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -132,6 +118,20 @@ export default function BrokerOfficePageClient() {
                 </CardHeader>
                 <CardContent>
                     <ChatClient roomId={`broker-${user?.uid}`} />
+                </CardContent>
+            </Card>
+        </div>
+        <div className="lg:col-span-1 space-y-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Broker Documents</CardTitle>
+                    <CardDescription>Upload your compliance documents here.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                     <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 h-4 w-4" /> W-9 (Broker)</Button>
+                     <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 h-4 w-4" /> Wiring Instructions (Broker)</Button>
+                     <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 h-4 w-4" /> ID/Driver's License (Broker)</Button>
+                     <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 h-4 w-4" /> Signed Broker Agreement</Button>
                 </CardContent>
             </Card>
              <Card>
