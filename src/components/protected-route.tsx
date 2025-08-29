@@ -17,24 +17,20 @@ export function ProtectedRoute({ children, allowedRoles, redirectTo = '/auth/sig
   const router = useRouter();
 
   useEffect(() => {
-    // If auth state is still loading, do nothing yet.
     if (loading) {
       return; 
     }
 
-    // If there's no user, redirect to the sign-in page.
     if (!user) {
       router.push(redirectTo);
       return;
     }
 
-    // If there is a user but their profile hasn't loaded yet, do nothing.
-    // This prevents premature redirects.
     if (!userProfile) {
+        // Still waiting for profile to load, can happen briefly after login
         return;
     }
 
-    // If the user's role is not in the allowed list, redirect them to their default page.
     if (!allowedRoles.includes(userProfile.role)) {
         const defaultPath = getRedirectPath(userProfile);
         router.push(defaultPath);
@@ -42,8 +38,7 @@ export function ProtectedRoute({ children, allowedRoles, redirectTo = '/auth/sig
 
   }, [user, userProfile, loading, allowedRoles, redirectTo, router, getRedirectPath]);
   
-  // While loading auth state or the user profile, show a loader.
-  if (loading || !userProfile) {
+  if (loading || !user || !userProfile) {
     return (
       <div className="flex min-h-[calc(100vh-200px)] items-center justify-center">
         <CustomLoader className="h-10 w-10" />
@@ -51,7 +46,6 @@ export function ProtectedRoute({ children, allowedRoles, redirectTo = '/auth/sig
     );
   }
   
-  // If the user's role is not allowed for this route, show a loader while redirecting.
   if (!allowedRoles.includes(userProfile.role)) {
        return (
           <div className="flex min-h-[calc(100vh-200px)] items-center justify-center">
@@ -60,6 +54,5 @@ export function ProtectedRoute({ children, allowedRoles, redirectTo = '/auth/sig
         );
   }
 
-  // If everything is fine, render the protected content.
   return <>{children}</>;
 }

@@ -32,9 +32,6 @@ export default function WorkforceSignInPage() {
     if (user && userProfile) {
         if (userProfile.role === 'workforce' || userProfile.role === 'admin') {
             router.push('/workforce-office');
-        } else {
-            // Redirect non-workforce users away
-            router.push('/dashboard');
         }
     }
   }, [user, userProfile, router]);
@@ -46,7 +43,7 @@ export default function WorkforceSignInPage() {
     
     try {
       await signIn(email, password);
-      // The useEffect will handle the redirect on successful login
+      // The auth context will handle the redirect on successful login
     } catch (error: any) {
       toast({
         variant: 'destructive',

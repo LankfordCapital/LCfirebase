@@ -88,13 +88,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 
   const handleAuthRedirect = useCallback((profile: UserProfile) => {
-    // Only redirect if the user is on a generic auth page or the homepage
-    // and not on a specific auth page like workforce-signin when they are a workforce user.
-    const genericAuthPages = ['/auth/signin', '/auth/signup'];
-    const isGenericAuthPage = genericAuthPages.includes(pathname);
-    const isHomePage = pathname === '/';
+    const isAuthPage = pathname.startsWith('/auth');
 
-    if ((isGenericAuthPage || isHomePage) && profile) {
+    if (isAuthPage && profile) {
       const path = getRedirectPath(profile);
       router.push(path);
     }
@@ -103,7 +99,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (userAuth) => {
       if (userAuth) {
-        // We have a user from Firebase Auth, now let's get our custom profile
         const userDocRef = doc(db, 'users', userAuth.uid);
         const userDoc = await getDoc(userDocRef);
         
@@ -114,7 +109,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setUserProfile(profile);
           handleAuthRedirect(profile);
         } else {
-            // This can happen briefly during signup
             setUserProfile(null);
         }
       } else {
