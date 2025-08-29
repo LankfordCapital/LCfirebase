@@ -23,19 +23,10 @@ function AppContent({ children }: { children: React.ReactNode }) {
   const isAuthPage = pathname.startsWith('/auth');
   const isDashboard = pathname.startsWith('/dashboard') || pathname.startsWith('/broker-office') || pathname.startsWith('/workforce-office');
 
-  // While loading auth state for dashboard pages, don't render any header to prevent flicker
-  if (loading && !isAuthPage && isDashboard) {
+  // While loading or on a dashboard page without a confirmed user profile, show a full-screen loader.
+  // This is the key fix to prevent rendering the wrong layout before the user's role is known.
+  if (loading || (isDashboard && user && !userProfile)) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center">
-        <CustomLoader className="h-12 w-12" />
-      </div>
-    );
-  }
-
-  // If we're on a dashboard page but don't have the profile yet, keep showing the loader.
-  // This is the key change to prevent rendering the page before the role is known.
-  if (isDashboard && user && !userProfile) {
-     return (
       <div className="flex h-screen w-screen items-center justify-center">
         <CustomLoader className="h-12 w-12" />
       </div>
