@@ -90,7 +90,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const handleAuthRedirect = useCallback((profile: UserProfile) => {
     const isAuthPage = pathname.startsWith('/auth');
 
-    if (isAuthPage && profile?.role) { // Ensure role is loaded before redirecting from auth pages
+    // Only redirect from an auth page.
+    if (isAuthPage && profile?.role) {
         const path = getRedirectPath(profile);
         router.push(path);
     }

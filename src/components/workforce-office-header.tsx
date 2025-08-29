@@ -87,6 +87,8 @@ export default function WorkforceOfficeHeader() {
                             <ListItem href="/workforce-office/document-generator" title="Document Generator">Generate custom documents from templates.</ListItem>
                             <ListItem href="/workforce-office/construction-feasibility" title="Construction Feasibility">Analyze construction budgets and plans.</ListItem>
                             <ListItem href="/workforce-office/comparable-property-report" title="Comparable Property Report">AI-powered appraisal and market analysis.</ListItem>
+                             <ListItem href="/workforce-office/title-escrow-instructions" title="Title & Escrow Instructions">Generate instructions for closing agents.</ListItem>
+                             <ListItem href="/workforce-office/insurance-instructions" title="Insurance Instructions">Generate coverage requirements for the insurance agent.</ListItem>
                         </ul>
                     </NavigationMenuContent>
                 </NavigationMenuItem>
@@ -125,12 +127,14 @@ export default function WorkforceOfficeHeader() {
                         <Link href="/workforce-office/reports" className={cn(navigationMenuTriggerStyle(), { 'bg-accent': pathname === '/workforce-office/reports' })}>Reports</Link>
                     </NavigationMenuLink>
                 </NavigationMenuItem>
-
-                 <NavigationMenuItem>
-                    <NavigationMenuLink asChild>
-                        <Link href="/workforce-office/user-management" className={cn(navigationMenuTriggerStyle(), { 'bg-accent': pathname === '/workforce-office/user-management' })}>User Management</Link>
-                    </NavigationMenuLink>
-                </NavigationMenuItem>
+                
+                {isAdmin && (
+                  <NavigationMenuItem>
+                      <NavigationMenuLink asChild>
+                          <Link href="/workforce-office/user-management" className={cn(navigationMenuTriggerStyle(), { 'bg-accent': pathname === '/workforce-office/user-management' })}>User Management</Link>
+                      </NavigationMenuLink>
+                  </NavigationMenuItem>
+                )}
                 
             </NavigationMenuList>
           </NavigationMenu>
