@@ -6,12 +6,14 @@ import { useAuth } from '@/contexts/auth-context';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { LayoutDashboard, LogOut, User as UserIcon, Users, Building2, Briefcase } from 'lucide-react';
+import { LayoutDashboard, LogOut, User as UserIcon, Users, Building2, Briefcase, MessageSquare } from 'lucide-react';
 import { Logo } from './logo';
 import { usePathname } from 'next/navigation';
+import { useUI } from '@/contexts/ui-context';
 
 export default function BorrowerDashboardHeader() {
   const { user, userProfile, logOut, isAdmin } = useAuth();
+  const { openAssistant } = useUI();
   const pathname = usePathname();
 
   const navLinks = [
@@ -41,6 +43,9 @@ export default function BorrowerDashboardHeader() {
                     {link.label}
                 </Link>
             ))}
+             <Button variant="ghost" onClick={() => openAssistant()} className="text-sm font-medium text-muted-foreground hover:text-primary">
+                Chat
+            </Button>
           </nav>
         </div>
         
@@ -69,6 +74,10 @@ export default function BorrowerDashboardHeader() {
               </DropdownMenuItem>
                <DropdownMenuItem asChild>
                 <Link href="/dashboard"><LayoutDashboard className="mr-2 h-4 w-4" />Dashboard</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => openAssistant()}>
+                <MessageSquare className="mr-2 h-4 w-4" />
+                <span>Chat</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               {isAdmin && (
