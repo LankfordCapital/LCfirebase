@@ -17,20 +17,22 @@ export function ProtectedRoute({ children, allowedRoles, redirectTo = '/auth/sig
   const router = useRouter();
 
   useEffect(() => {
-    // If auth is not loading and there's no user, redirect.
-    if (!loading && !user) {
-      router.push(redirectTo);
+    if (loading) {
+      return; // Do nothing while auth state is loading
     }
     
-    // If auth is not loading and we have a user and profile, but the role is not allowed, redirect.
-    if (!loading && user && userProfile && !allowedRoles.includes(userProfile.role)) {
+    if (!user) {
+      router.push(redirectTo);
+      return;
+    }
+    
+    if (userProfile && !allowedRoles.includes(userProfile.role)) {
        const path = getRedirectPath(userProfile);
        router.push(path);
     }
   }, [loading, user, userProfile, allowedRoles, redirectTo, router, getRedirectPath]);
 
   // While loading or if the user/profile is not yet available, show a loader.
-  // This also covers the brief moment before the redirect effect runs.
   if (loading || !user || !userProfile) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -44,7 +46,7 @@ export function ProtectedRoute({ children, allowedRoles, redirectTo = '/auth/sig
     return <>{children}</>;
   }
 
-  // Otherwise, render a loader while the redirect effect is triggered.
+  // Fallback loader while the redirect effect is being processed.
   return (
     <div className="flex min-h-screen items-center justify-center">
       <CustomLoader className="h-10 w-10" />

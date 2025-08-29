@@ -114,6 +114,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             // It could happen if the Firestore document creation failed during signup.
             // We set profile to null and stop loading. The ProtectedRoute will handle the redirect.
             setUserProfile(null);
+            router.push('/auth/signin');
         }
       } else {
         setUser(null);
