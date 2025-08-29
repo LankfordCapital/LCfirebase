@@ -164,18 +164,6 @@ export default function DashboardPage() {
           <p className="text-muted-foreground">Lankford Lending Solutions</p>
         </div>
         <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              onClick={() => {
-                toast({
-                  title: "Example Toast",
-                  description: "This is how you display a toast notification!",
-                  duration: 5000,
-                });
-              }}
-            >
-              Show Toast
-            </Button>
             <Button variant="outline" asChild>
                 <Link href="/dashboard/applications">View Programs</Link>
             </Button>
