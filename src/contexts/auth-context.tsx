@@ -90,18 +90,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const handleAuthRedirect = useCallback((profile: UserProfile) => {
     const isAuthPage = pathname.startsWith('/auth');
 
-    if (isAuthPage && profile) {
-      // Do not redirect if we are on a specific sign-in page like workforce-signin
-      // as the page itself might handle redirection based on role.
-      if (pathname === '/auth/signin' || pathname === '/auth/signup') {
+    if (isAuthPage && profile?.role) { // Ensure role is loaded before redirecting from auth pages
         const path = getRedirectPath(profile);
         router.push(path);
-      }
     }
   }, [pathname, router, getRedirectPath]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (userAuth) => {
+      setLoading(true); // Ensure loading is true until profile is fetched
       if (userAuth) {
         const userDocRef = doc(db, 'users', userAuth.uid);
         const userDoc = await getDoc(userDocRef);
@@ -113,13 +110,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setUserProfile(profile);
           handleAuthRedirect(profile);
         } else {
+            // This case handles a user that exists in Firebase Auth but not in Firestore.
+            // It could happen if the Firestore document creation failed during signup.
+            // We set profile to null and stop loading. The ProtectedRoute will handle the redirect.
             setUserProfile(null);
         }
       } else {
         setUser(null);
         setUserProfile(null);
       }
-      setLoading(false);
+      setLoading(false); // Set loading to false only after all checks are done
     });
 
     return () => unsubscribe();
