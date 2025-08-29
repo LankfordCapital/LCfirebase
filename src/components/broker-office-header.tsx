@@ -21,7 +21,7 @@ export default function BrokerOfficeHeader() {
       { href: '/broker-office', label: 'Dashboard' },
       { href: '/broker-office/documents', label: 'New Application' },
       { href: '/broker-office/loan-actions', label: 'Loan Actions' },
-      { href: '/broker-office', label: 'Loan Pipeline' },
+      { href: '/broker-office', label: 'Borrower Pipeline' },
   ];
   
   // Don't render anything until the user profile is loaded to prevent flicker
