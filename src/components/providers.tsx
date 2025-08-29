@@ -17,16 +17,25 @@ const AIAssistant = dynamic(() => import('./ai-assistant').then(mod => ({ defaul
 });
 
 function AppContent({ children }: { children: React.ReactNode }) {
-  const { loading, user } = useAuth();
+  const { loading, user, userProfile } = useAuth();
   const pathname = usePathname();
 
   const isAuthPage = pathname.startsWith('/auth');
   const isDashboard = pathname.startsWith('/dashboard') || pathname.startsWith('/broker-office') || pathname.startsWith('/workforce-office');
 
-  // Show a full-page loader while auth state is resolving,
-  // but not on public pages or auth pages to prevent layout shifts.
+  // While loading auth state for dashboard pages, don't render any header to prevent flicker
   if (loading && !isAuthPage && isDashboard) {
     return (
+      <div className="flex h-screen w-screen items-center justify-center">
+        <CustomLoader className="h-12 w-12" />
+      </div>
+    );
+  }
+
+  // If we're on a dashboard page but don't have the profile yet, keep showing the loader.
+  // This is the key change to prevent rendering the page before the role is known.
+  if (isDashboard && user && !userProfile) {
+     return (
       <div className="flex h-screen w-screen items-center justify-center">
         <CustomLoader className="h-12 w-12" />
       </div>
