@@ -91,8 +91,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const isAuthPage = pathname.startsWith('/auth');
 
     if (isAuthPage && profile) {
-      const path = getRedirectPath(profile);
-      router.push(path);
+      // Do not redirect if we are on a specific sign-in page like workforce-signin
+      // as the page itself might handle redirection based on role.
+      if (pathname === '/auth/signin' || pathname === '/auth/signup') {
+        const path = getRedirectPath(profile);
+        router.push(path);
+      }
     }
   }, [pathname, router, getRedirectPath]);
 
@@ -109,8 +113,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setUserProfile(profile);
           handleAuthRedirect(profile);
         } else {
-            // If user exists in auth but not firestore, they might be mid-signup.
-            // We set profile to null and let other logic handle it.
             setUserProfile(null);
         }
       } else {
@@ -139,7 +141,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
     await setDoc(doc(db, "users", userCredential.user.uid), newProfile);
     
-    // Set profile immediately to trigger redirect
     setUserProfile(newProfile);
     return userCredential;
   };
@@ -148,7 +149,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return signInWithEmailAndPassword(auth, email, pass);
   };
   
-  const signInWithGoogle = async (role: string = 'borrower') => {
+  const signUpWithGoogle = async (role: string = 'borrower') => {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
     const userDocRef = doc(db, 'users', user.uid);
@@ -173,7 +174,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return result;
   };
 
-  const signUpWithGoogle = signInWithGoogle;
+  const signInWithGoogle = signUpWithGoogle;
 
   const addPasswordToGoogleAccount = async (password: string) => {
     if (!user || !user.email) {

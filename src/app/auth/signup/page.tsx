@@ -138,7 +138,6 @@ export default function SignUpPage() {
         title: 'Google Sign Up Failed',
         description: error.message || 'Failed to sign up with Google',
       });
-    } finally {
       setIsGoogleLoading(false);
     }
   };

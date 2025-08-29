@@ -116,7 +116,8 @@ export default function SignInPage() {
         title: 'Google Sign In Failed',
         description: error.message || 'An unexpected error occurred',
       });
-      setIsGoogleLoading(false);
+    } finally {
+        setIsGoogleLoading(false);
     }
   };
 
@@ -226,5 +227,3 @@ export default function SignInPage() {
     </div>
   );
 }
-
-    
