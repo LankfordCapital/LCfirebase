@@ -17,15 +17,21 @@ export function ProtectedRoute({ children, allowedRoles, redirectTo = '/auth/sig
   const router = useRouter();
 
   useEffect(() => {
-    // If authentication is finished and there's no user, redirect to the sign-in page.
+    // If auth is not loading and there's no user, redirect.
     if (!loading && !user) {
       router.push(redirectTo);
     }
-  }, [loading, user, redirectTo, router]);
+    
+    // If auth is not loading and we have a user and profile, but the role is not allowed, redirect.
+    if (!loading && user && userProfile && !allowedRoles.includes(userProfile.role)) {
+       const path = getRedirectPath(userProfile);
+       router.push(path);
+    }
+  }, [loading, user, userProfile, allowedRoles, redirectTo, router, getRedirectPath]);
 
-  // While auth state is loading, or if we have a user but are still fetching their profile,
-  // show a full-screen loader. This is the key to preventing premature rendering.
-  if (loading || !userProfile) {
+  // While loading or if the user/profile is not yet available, show a loader.
+  // This also covers the brief moment before the redirect effect runs.
+  if (loading || !user || !userProfile) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <CustomLoader className="h-10 w-10" />
@@ -33,19 +39,15 @@ export function ProtectedRoute({ children, allowedRoles, redirectTo = '/auth/sig
     );
   }
 
-  // Once the profile is loaded, check the role.
+  // If the user's role is allowed, render the page content.
   if (allowedRoles.includes(userProfile.role)) {
-    // If the role is allowed, render the children components (the correct page).
     return <>{children}</>;
-  } else {
-    // If the role is not allowed, redirect to the correct default page for their role.
-    const path = getRedirectPath(userProfile);
-    router.push(path);
-    // Render a loader while the redirect happens.
-    return (
-        <div className="flex min-h-screen items-center justify-center">
-            <CustomLoader className="h-10 w-10" />
-        </div>
-    );
   }
+
+  // Otherwise, render a loader while the redirect effect is triggered.
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <CustomLoader className="h-10 w-10" />
+    </div>
+  );
 }
