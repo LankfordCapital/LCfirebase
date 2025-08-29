@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Upload, PlusCircle, Trash2, ScanLine, Landmark, FileText, Calendar as CalendarIcon, Download, Save, User, Building, CreditCard, Phone, Mail, AlertTriangle, MessageSquare } from "lucide-react";
+import { Upload, PlusCircle, Trash2, ScanLine, Landmark, FileText, Calendar as CalendarIcon, Download, Save, User, Building, CreditCard, Phone, Mail, AlertTriangle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { scanCreditReport, type ScanCreditReportOutput } from '@/ai/flows/credit-score-scanner';
@@ -29,7 +29,6 @@ import { CustomLoader } from './ui/custom-loader';
 import { Separator } from '@/components/ui/separator';
 import { useBorrowerProfile } from '@/hooks/use-borrower-profile';
 import { ProfileCompletionIndicator } from '@/components/profile-completion-indicator';
-import { ChatClient } from './chat-client';
 
 type Company = {
   id: string;
@@ -857,18 +856,6 @@ export default function ProfilePage() {
               <PlusCircle className="h-4 w-4" />
               Add Another Company
             </Button>
-             <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <MessageSquare className="h-5 w-5 text-primary" />
-                        Communications
-                    </CardTitle>
-                    <CardDescription>Chat with our team about your profile or loans.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <ChatClient roomId={`user-${user?.uid}`} />
-                </CardContent>
-            </Card>
           </div>
         </div>
       </div>
