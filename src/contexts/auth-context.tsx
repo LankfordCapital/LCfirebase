@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const isAdmin = userProfile?.role === 'admin';
   
-  const getRedirectPath = useCallback((profile: UserProfile | null = userProfile) => {
+  const getRedirectPath = useCallback((profile: UserProfile | null) => {
     if (!profile) return '/auth/signin';
     switch (profile.role) {
       case 'admin':
@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       default:
         return '/dashboard';
     }
-  }, [userProfile]);
+  }, []);
 
 
   const handleAuthRedirect = useCallback((profile: UserProfile) => {
@@ -109,6 +109,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setUserProfile(profile);
           handleAuthRedirect(profile);
         } else {
+            // If user exists in auth but not firestore, they might be mid-signup.
+            // We set profile to null and let other logic handle it.
             setUserProfile(null);
         }
       } else {
@@ -137,6 +139,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
     await setDoc(doc(db, "users", userCredential.user.uid), newProfile);
     
+    // Set profile immediately to trigger redirect
     setUserProfile(newProfile);
     return userCredential;
   };
@@ -164,7 +167,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await setDoc(userDocRef, newProfile);
         setUserProfile(newProfile);
     } else {
-        setUserProfile(userDoc.data() as UserProfile);
+        const profile = userDoc.data() as UserProfile;
+        setUserProfile(profile);
     }
     return result;
   };
@@ -192,7 +196,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logOut = async () => {
     setIsLoggingOut(true);
     await signOut(auth);
-    router.push('/');
+    router.push('/auth/signin');
   };
 
   const checkEmailExists = async (email: string) => {

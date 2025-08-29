@@ -17,42 +17,50 @@ export function ProtectedRoute({ children, allowedRoles, redirectTo = '/auth/sig
   const router = useRouter();
 
   useEffect(() => {
+    // We should not do anything while the authentication state is loading.
+    // The component will just render the loader.
     if (loading) {
       return; 
     }
 
+    // If loading is finished and there's no user, redirect to the sign-in page.
     if (!user) {
       router.push(redirectTo);
       return;
     }
 
+    // If we have a user but are waiting for their profile data from Firestore,
+    // continue showing the loader. This prevents trying to check roles prematurely.
     if (!userProfile) {
-        // Still waiting for profile to load, can happen briefly after login
         return;
     }
 
+    // If the user's role is not in the list of allowed roles, redirect them.
     if (!allowedRoles.includes(userProfile.role)) {
-        const defaultPath = getRedirectPath(userProfile);
-        router.push(defaultPath);
+        const defaultPathForRole = getRedirectPath(userProfile);
+        router.push(defaultPathForRole);
     }
 
   }, [user, userProfile, loading, allowedRoles, redirectTo, router, getRedirectPath]);
   
+  // Render a loader while auth state is being determined or profile is being fetched.
   if (loading || !user || !userProfile) {
     return (
-      <div className="flex min-h-[calc(100vh-200px)] items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <CustomLoader className="h-10 w-10" />
       </div>
     );
   }
   
+  // If the user's role is not allowed, render a loader while redirecting.
   if (!allowedRoles.includes(userProfile.role)) {
        return (
-          <div className="flex min-h-[calc(100vh-200px)] items-center justify-center">
+          <div className="flex min-h-screen items-center justify-center">
             <CustomLoader className="h-10 w-10" />
           </div>
         );
   }
 
+  // If all checks pass, render the protected content.
   return <>{children}</>;
 }

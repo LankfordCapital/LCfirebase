@@ -28,15 +28,6 @@ export default function WorkforceSignInPage() {
   const { toast } = useToast();
   const router = useRouter();
 
-  useEffect(() => {
-    if (user && userProfile) {
-        if (userProfile.role === 'workforce' || userProfile.role === 'admin') {
-            router.push('/workforce-office');
-        }
-    }
-  }, [user, userProfile, router]);
-
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -44,6 +35,7 @@ export default function WorkforceSignInPage() {
     try {
       await signIn(email, password);
       // The auth context will handle the redirect on successful login
+      // No need for manual routing here
     } catch (error: any) {
       toast({
         variant: 'destructive',
