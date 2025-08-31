@@ -1,10 +1,10 @@
 
 'use server';
 
-'use server';
+import { Resend } from 'resend';
 
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from './firebase-client';
+// Initialize Resend with your API key
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 interface MailPayload {
     to: string[];
@@ -13,25 +13,60 @@ interface MailPayload {
     bcc?: string[];
     subject: string;
     html: string;
+    text?: string;
 }
 
 /**
- * Sends an email by adding a document to the 'mail' collection in Firestore.
- * This relies on the "Trigger Email" Firebase Extension to be installed.
+ * Sends an email using Resend service.
+ * Much simpler than Firebase extensions and more reliable.
  * @param payload The email payload.
- * @returns The ID of the document created in the 'mail' collection.
+ * @returns The result from Resend API.
  */
-export async function sendEmail(payload: MailPayload): Promise<string> {
+export async function sendEmail(payload: MailPayload): Promise<any> {
     try {
-        const mailCollection = collection(db, 'mail');
-        const docRef = await addDoc(mailCollection, {
-            ...payload,
-            createdAt: serverTimestamp(),
+        const result = await resend.emails.send({
+            from: payload.from || 'Lankford Lending <onboarding@resend.dev>',
+            to: payload.to,
+            cc: payload.cc,
+            bcc: payload.bcc,
+            subject: payload.subject,
+            html: payload.html,
+            text: payload.text,
         });
-        console.log('Email document written with ID: ', docRef.id);
-        return docRef.id;
+
+        console.log('Email sent successfully:', result);
+        return result;
     } catch (error) {
-        console.error('Error adding email document to Firestore:', error);
-        throw new Error('Failed to queue email for sending.');
+        console.error('Error sending email with Resend:', error);
+        throw new Error('Failed to send email.');
     }
+}
+
+/**
+ * Sends a simple text email
+ */
+export async function sendSimpleEmail(to: string, subject: string, text: string): Promise<any> {
+    return sendEmail({
+        to: [to],
+        subject,
+        html: `<p>${text}</p>`,
+        text,
+    });
+}
+
+/**
+ * Sends an HTML email with a template
+ */
+export async function sendTemplateEmail(to: string, subject: string, template: string, data: Record<string, any>): Promise<any> {
+    // Simple template replacement
+    let html = template;
+    Object.entries(data).forEach(([key, value]) => {
+        html = html.replace(new RegExp(`{{${key}}}`, 'g'), value);
+    });
+
+    return sendEmail({
+        to: [to],
+        subject,
+        html,
+    });
 }

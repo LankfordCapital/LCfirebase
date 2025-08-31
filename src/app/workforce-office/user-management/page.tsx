@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Check, X, Hourglass, MoreHorizontal, Shield, User, Building, CreditCard, Search, Filter, UserPlus } from 'lucide-react';
+import { Check, X, Hourglass, MoreHorizontal, Shield, User, Building, CreditCard, Search, Filter, UserPlus, RefreshCw } from 'lucide-react';
 import { CustomLoader } from '@/components/ui/custom-loader';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -119,10 +119,56 @@ export default function UserManagementPage() {
         setIsLoading(true);
         try {
             const usersData = await getAllUsers();
-            setUsers(usersData);
+            console.log('Fetched users:', usersData); // Debug log
+            console.log('User data structure check:', usersData.map(u => ({ 
+                uid: u.uid, 
+                role: u.role, 
+                status: u.status,
+                hasRole: !!u.role,
+                hasStatus: !!u.status,
+                roleType: typeof u.role,
+                statusType: typeof u.status
+            })));
+            
+            // Validate user data structure
+            const invalidUsers = usersData.filter(user => 
+                !user || 
+                !user.uid || 
+                !user.fullName || 
+                !user.email || 
+                !user.role || 
+                !user.status
+            );
+            
+            const validUsers = usersData.filter(user => 
+                user && 
+                user.uid && 
+                user.fullName && 
+                user.email && 
+                user.role && 
+                user.status
+            );
+            
+            if (validUsers.length !== usersData.length) {
+                console.warn(`Filtered out ${usersData.length - validUsers.length} invalid user records:`, invalidUsers);
+                console.log('Invalid user data details:', invalidUsers.map(user => ({
+                    uid: user?.uid || 'missing',
+                    fullName: user?.fullName || 'missing',
+                    email: user?.email || 'missing',
+                    role: user?.role || 'missing',
+                    status: user?.status || 'missing',
+                    rawData: user
+                })));
+            }
+            
+            setUsers(validUsers);
         } catch (error) {
             console.error("Error fetching users:", error);
-            toast({ variant: 'destructive', title: 'Error', description: 'Could not fetch user data.' });
+            toast({ 
+                variant: 'destructive', 
+                title: 'Failed to Load Users', 
+                description: error instanceof Error ? error.message : 'Could not fetch user data. Please try refreshing the page.' 
+            });
         } finally {
             setIsLoading(false);
         }
@@ -161,14 +207,23 @@ export default function UserManagementPage() {
             return;
         }
 
+        // Optimistic update
+        const originalUsers = [...users];
+        setUsers(users.map(u => u.uid === uid ? { ...u, role: newRole } : u));
         setIsUpdating(uid);
+
         try {
             await updateUserRole(uid, newRole);
-            setUsers(users.map(u => u.uid === uid ? { ...u, role: newRole } : u));
             toast({ title: 'Role Updated', description: `User role has been updated to ${newRole}.` });
         } catch (error) {
             console.error("Error updating user role:", error);
-            toast({ variant: 'destructive', title: 'Error', description: 'Could not update user role.' });
+            // Revert optimistic update on error
+            setUsers(originalUsers);
+            toast({ 
+                variant: 'destructive', 
+                title: 'Failed to Update Role', 
+                description: error instanceof Error ? error.message : 'Could not update user role. Please try again.' 
+            });
         } finally {
             setIsUpdating(null);
         }
@@ -180,14 +235,23 @@ export default function UserManagementPage() {
             return;
         }
 
+        // Optimistic update
+        const originalUsers = [...users];
+        setUsers(users.map(u => u.uid === uid ? { ...u, status: newStatus } : u));
         setIsUpdating(uid);
+
         try {
             await updateUserStatus(uid, newStatus);
-            setUsers(users.map(u => u.uid === uid ? { ...u, status: newStatus } : u));
             toast({ title: 'Status Updated', description: `User status has been updated to ${newStatus}.` });
         } catch (error) {
             console.error("Error updating user status:", error);
-            toast({ variant: 'destructive', title: 'Error', description: 'Could not update user status.' });
+            // Revert optimistic update on error
+            setUsers(originalUsers);
+            toast({ 
+                variant: 'destructive', 
+                title: 'Failed to Update Status', 
+                description: error instanceof Error ? error.message : 'Could not update user status. Please try again.' 
+            });
         } finally {
             setIsUpdating(null);
         }
@@ -201,6 +265,15 @@ export default function UserManagementPage() {
             borrower: { color: 'bg-purple-100 text-purple-800', icon: CreditCard },
         };
         const config = roleConfig[role];
+        if (!config) {
+            console.warn(`Unknown role: ${role}`);
+            return (
+                <Badge className="bg-gray-100 text-gray-800 flex items-center gap-1">
+                    <User className="h-3 w-3" />
+                    {role || 'Unknown'}
+                </Badge>
+            );
+        }
         const Icon = config.icon;
         return (
             <Badge className={`${config.color} flex items-center gap-1`}>
@@ -217,6 +290,15 @@ export default function UserManagementPage() {
             rejected: { color: 'bg-red-100 text-red-800', icon: X },
         };
         const config = statusConfig[status];
+        if (!config) {
+            console.warn(`Unknown status: ${status}`);
+            return (
+                <Badge className="bg-gray-100 text-gray-800 flex items-center gap-1">
+                    <Hourglass className="h-3 w-3" />
+                    {status || 'Unknown'}
+                </Badge>
+            );
+        }
         const Icon = config.icon;
         return (
             <Badge className={`${config.color} flex items-center gap-1`}>
@@ -251,7 +333,22 @@ export default function UserManagementPage() {
                     <h1 className="font-headline text-3xl font-bold">User Management</h1>
                     <p className="text-muted-foreground">Manage user roles, approval statuses, and account permissions.</p>
                 </div>
-                <InviteUserDialog onInviteSent={fetchUsers} />
+                <div className="flex gap-2">
+                    <Button 
+                        variant="outline" 
+                        onClick={fetchUsers} 
+                        disabled={isLoading}
+                        className="flex items-center gap-2"
+                    >
+                        {isLoading ? (
+                            <CustomLoader className="h-4 w-4" />
+                        ) : (
+                            <RefreshCw className="h-4 w-4" />
+                        )}
+                        Refresh
+                    </Button>
+                    <InviteUserDialog onInviteSent={fetchUsers} />
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -346,18 +443,55 @@ export default function UserManagementPage() {
                                                 <TableCell><p className="text-sm text-muted-foreground">{userProfile.createdAt?.toDate ? format(userProfile.createdAt.toDate(), 'MMM dd, yyyy') : 'N/A'}</p></TableCell>
                                                 <TableCell>
                                                     <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" disabled={isUpdating === userProfile.uid}>{isUpdating === userProfile.uid ? <CustomLoader className="h-4 w-4" /> : <MoreHorizontal className="h-4 w-4" />}</Button></DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end" className="w-48">
-                                                            <DropdownMenuItem disabled><span className="font-medium">Update Role</span></DropdownMenuItem>
-                                                            {['borrower', 'broker', 'workforce', 'admin'].map((role) => (
-                                                                <DropdownMenuItem key={role} onClick={() => handleUpdateRole(userProfile.uid, role as UserProfile['role'])} disabled={userProfile.role === role || userProfile.uid === user?.uid} className={userProfile.role === role ? 'bg-muted' : ''}>
-                                                                    <RoleBadge role={role as UserProfile['role']} />
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button 
+                                                                variant="ghost" 
+                                                                size="icon" 
+                                                                disabled={isUpdating === userProfile.uid}
+                                                                className="h-8 w-8"
+                                                            >
+                                                                {isUpdating === userProfile.uid ? (
+                                                                    <CustomLoader className="h-4 w-4" />
+                                                                ) : (
+                                                                    <MoreHorizontal className="h-4 w-4" />
+                                                                )}
+                                                                <span className="sr-only">Open menu</span>
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end" className="w-56">
+                                                            <DropdownMenuItem disabled>
+                                                                <span className="font-medium text-muted-foreground">Update Role</span>
+                                                            </DropdownMenuItem>
+                                                            {(['borrower', 'broker', 'workforce', 'admin'] as const).map((role) => (
+                                                                <DropdownMenuItem 
+                                                                    key={role} 
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        e.stopPropagation();
+                                                                        handleUpdateRole(userProfile.uid, role);
+                                                                    }}
+                                                                    disabled={userProfile.role === role || userProfile.uid === user?.uid || isUpdating === userProfile.uid} 
+                                                                    className={`cursor-pointer ${userProfile.role === role ? 'bg-muted' : ''}`}
+                                                                >
+                                                                    <RoleBadge role={role} />
                                                                 </DropdownMenuItem>
                                                             ))}
-                                                            <DropdownMenuItem disabled className="mt-2"><span className="font-medium">Update Status</span></DropdownMenuItem>
-                                                            {['pending', 'approved', 'rejected'].map((status) => (
-                                                                <DropdownMenuItem key={status} onClick={() => handleUpdateStatus(userProfile.uid, status as UserProfile['status'])} disabled={userProfile.status === status || userProfile.uid === user?.uid} className={userProfile.status === status ? 'bg-muted' : ''}>
-                                                                    <StatusBadge status={status as UserProfile['status']} />
+                                                            <div className="border-t my-1" />
+                                                            <DropdownMenuItem disabled>
+                                                                <span className="font-medium text-muted-foreground">Update Status</span>
+                                                            </DropdownMenuItem>
+                                                            {(['pending', 'approved', 'rejected'] as const).map((status) => (
+                                                                <DropdownMenuItem 
+                                                                    key={status} 
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        e.stopPropagation();
+                                                                        handleUpdateStatus(userProfile.uid, status);
+                                                                    }}
+                                                                    disabled={userProfile.status === status || userProfile.uid === user?.uid || isUpdating === userProfile.uid} 
+                                                                    className={`cursor-pointer ${userProfile.status === status ? 'bg-muted' : ''}`}
+                                                                >
+                                                                    <StatusBadge status={status} />
                                                                 </DropdownMenuItem>
                                                             ))}
                                                         </DropdownMenuContent>

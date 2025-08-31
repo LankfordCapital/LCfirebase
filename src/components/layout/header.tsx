@@ -72,11 +72,14 @@ ListItem.displayName = 'ListItem';
 
 export default function Header() {
   const pathname = usePathname();
+  const isDevelopment = process.env.NODE_ENV === 'development';
 
   const navLinks = [
     { href: '/about', label: 'About Us' },
     { href: '/contact', label: 'Contact Us' },
     { href: '/broker', label: 'Brokers' },
+    // Add test link only in development
+    ...(isDevelopment ? [{ href: '/test-chat-invitation', label: 'Test Invitations' }] : []),
   ];
 
   return (

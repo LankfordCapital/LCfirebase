@@ -1,30 +1,20 @@
 import { 
-  userService, 
-  loanApplicationService, 
-  documentService, 
-  appointmentService, 
-  workforceMemberService,
-  comparablePropertyService,
-  marketAnalysisService,
-  BatchService,
+  userAdminService, 
+  loanApplicationAdminService, 
   type FirestoreUser,
-  type LoanApplication,
-  type Document,
-  type Appointment,
-  type WorkforceMember,
-  type ComparableProperty,
-  type MarketAnalysis
-} from './firestore-services';
+  type LoanApplication
+} from './firestore-admin-services';
 
 // API Response types
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T> {
   success: boolean;
   data?: T;
   error?: string;
   message?: string;
 }
 
-export interface PaginatedResponse<T> extends ApiResponse<T[]> {
+export interface PaginatedResponse<T> {
+  data: T[];
   pagination: {
     page: number;
     limit: number;
@@ -33,30 +23,27 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
   };
 }
 
-// User API Services
+// User API Service
 export class UserApiService {
-  // Get all users with pagination and filtering
   static async getAllUsers(
     page: number = 1,
     limit: number = 20,
-    filters?: {
-      role?: FirestoreUser['role'];
-      status?: FirestoreUser['status'];
-      search?: string;
-    }
+    search?: string,
+    role?: FirestoreUser['role'],
+    status?: FirestoreUser['status']
   ): Promise<PaginatedResponse<FirestoreUser>> {
     try {
-      let allUsers = await userService.getAll();
+      let allUsers = await userAdminService.getAll();
       
       // Apply filters
-      if (filters?.role) {
-        allUsers = allUsers.filter(user => user.role === filters.role);
+      if (role) {
+        allUsers = allUsers.filter(user => user.role === role);
       }
-      if (filters?.status) {
-        allUsers = allUsers.filter(user => user.status === filters.status);
+      if (status) {
+        allUsers = allUsers.filter(user => user.status === status);
       }
-      if (filters?.search) {
-        const searchLower = filters.search.toLowerCase();
+      if (search) {
+        const searchLower = search.toLowerCase();
         allUsers = allUsers.filter(user => 
           user.fullName.toLowerCase().includes(searchLower) ||
           user.email.toLowerCase().includes(searchLower)
@@ -64,499 +51,278 @@ export class UserApiService {
       }
       
       // Apply pagination
+      const total = allUsers.length;
       const startIndex = (page - 1) * limit;
       const endIndex = startIndex + limit;
       const paginatedUsers = allUsers.slice(startIndex, endIndex);
       
       return {
-        success: true,
         data: paginatedUsers,
         pagination: {
           page,
           limit,
-          total: allUsers.length,
-          hasMore: endIndex < allUsers.length
+          total,
+          hasMore: endIndex < total
         }
       };
     } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch users'
-      };
+      console.error('Error getting users:', error);
+      throw new Error('Failed to get users');
     }
   }
 
-  // Get user by ID
   static async getUserById(uid: string): Promise<ApiResponse<FirestoreUser>> {
     try {
-      const user = await userService.getById(uid);
+      const user = await userAdminService.getById(uid);
       if (!user) {
-        return {
-          success: false,
-          error: 'User not found'
-        };
+        return { success: false, error: 'User not found' };
       }
-      
-      return {
-        success: true,
-        data: user
-      };
+      return { success: true, data: user };
     } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch user'
-      };
+      console.error('Error getting user:', error);
+      return { success: false, error: 'Failed to get user' };
     }
   }
 
-  // Update user role
-  static async updateUserRole(uid: string, newRole: FirestoreUser['role']): Promise<ApiResponse<void>> {
+  static async createUser(userData: Omit<FirestoreUser, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<string>> {
     try {
-      await userService.updateUserRole(uid, newRole);
-      return {
-        success: true,
-        message: 'User role updated successfully'
-      };
+      const userId = await userAdminService.create(userData as Omit<FirestoreUser, 'id'>);
+      return { success: true, data: userId, message: 'User created successfully' };
     } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to update user role'
-      };
+      console.error('Error creating user:', error);
+      return { success: false, error: 'Failed to create user' };
     }
   }
 
-  // Update user status
-  static async updateUserStatus(uid: string, newStatus: FirestoreUser['status']): Promise<ApiResponse<void>> {
+  static async updateUser(uid: string, userData: Partial<FirestoreUser>): Promise<ApiResponse<void>> {
     try {
-      await userService.updateUserStatus(uid, newStatus);
-      return {
-        success: true,
-        message: 'User status updated successfully'
-      };
+      await userAdminService.update(uid, userData);
+      return { success: true, message: 'User updated successfully' };
     } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to update user status'
-      };
+      console.error('Error updating user:', error);
+      return { success: false, error: 'Failed to update user' };
     }
   }
 
-  // Get users by role
+  static async deleteUser(uid: string): Promise<ApiResponse<void>> {
+    try {
+      await userAdminService.delete(uid);
+      return { success: true, message: 'User deleted successfully' };
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      return { success: false, error: 'Failed to delete user' };
+    }
+  }
+
   static async getUsersByRole(role: FirestoreUser['role']): Promise<ApiResponse<FirestoreUser[]>> {
     try {
-      const users = await userService.getUsersByRole(role);
-      return {
-        success: true,
-        data: users
-      };
+      const users = await userAdminService.getUsersByRole(role);
+      return { success: true, data: users };
     } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch users by role'
-      };
+      console.error('Error getting users by role:', error);
+      return { success: false, error: 'Failed to get users by role' };
+    }
+  }
+
+  static async getUsersByStatus(status: FirestoreUser['status']): Promise<ApiResponse<FirestoreUser[]>> {
+    try {
+      const users = await userAdminService.getUsersByStatus(status);
+      return { success: true, data: users };
+    } catch (error) {
+      console.error('Error getting users by status:', error);
+      return { success: false, error: 'Failed to get users by status' };
+    }
+  }
+
+  static async updateUserStatus(uid: string, status: FirestoreUser['status']): Promise<ApiResponse<void>> {
+    try {
+      await userAdminService.updateUserStatus(uid, status);
+      return { success: true, message: 'User status updated successfully' };
+    } catch (error) {
+      console.error('Error updating user status:', error);
+      return { success: false, error: 'Failed to update user status' };
+    }
+  }
+
+  static async updateUserRole(uid: string, role: FirestoreUser['role']): Promise<ApiResponse<void>> {
+    try {
+      await userAdminService.updateUserRole(uid, role);
+      return { success: true, message: 'User role updated successfully' };
+    } catch (error) {
+      console.error('Error updating user role:', error);
+      return { success: false, error: 'Failed to update user role' };
     }
   }
 }
 
-// Loan Application API Services
+// Loan Application API Service
 export class LoanApplicationApiService {
-  // Get all applications with pagination and filtering
   static async getAllApplications(
     page: number = 1,
     limit: number = 20,
-    filters?: {
-      status?: LoanApplication['status'];
-      program?: string;
-      userId?: string;
-      assignedTo?: string;
-    }
+    status?: LoanApplication['status'],
+    program?: string,
+    brokerId?: string,
+    userId?: string
   ): Promise<PaginatedResponse<LoanApplication>> {
     try {
-      let allApplications = await loanApplicationService.getAll();
+      let allApplications = await loanApplicationAdminService.getAll();
       
       // Apply filters
-      if (filters?.status) {
-        allApplications = allApplications.filter(app => app.status === filters.status);
+      if (status) {
+        allApplications = allApplications.filter(app => app.status === status);
       }
-      if (filters?.program) {
-        allApplications = allApplications.filter(app => app.program === filters.program);
+      if (program) {
+        allApplications = allApplications.filter(app => app.program === program);
       }
-      if (filters?.userId) {
-        allApplications = allApplications.filter(app => app.userId === filters.userId);
+      if (brokerId) {
+        allApplications = allApplications.filter(app => app.brokerId === brokerId);
       }
-      if (filters?.assignedTo) {
-        allApplications = allApplications.filter(app => app.assignedTo === filters.assignedTo);
+      if (userId) {
+        allApplications = allApplications.filter(app => app.userId === userId);
       }
       
       // Apply pagination
+      const total = allApplications.length;
       const startIndex = (page - 1) * limit;
       const endIndex = startIndex + limit;
       const paginatedApplications = allApplications.slice(startIndex, endIndex);
       
       return {
-        success: true,
         data: paginatedApplications,
         pagination: {
           page,
           limit,
-          total: allApplications.length,
-          hasMore: endIndex < allApplications.length
+          total,
+          hasMore: endIndex < total
         }
       };
     } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch applications'
-      };
+      console.error('Error getting applications:', error);
+      throw new Error('Failed to get applications');
     }
   }
 
-  // Get application by ID
   static async getApplicationById(id: string): Promise<ApiResponse<LoanApplication>> {
     try {
-      const application = await loanApplicationService.getById(id);
+      const application = await loanApplicationAdminService.getById(id);
       if (!application) {
-        return {
-          success: false,
-          error: 'Application not found'
-        };
+        return { success: false, error: 'Application not found' };
       }
-      
-      return {
-        success: true,
-        data: application
-      };
+      return { success: true, data: application };
     } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch application'
-      };
+      console.error('Error getting application:', error);
+      return { success: false, error: 'Failed to get application' };
     }
   }
 
-  // Create new application
   static async createApplication(applicationData: Omit<LoanApplication, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<string>> {
     try {
-      const applicationId = await loanApplicationService.create(applicationData);
-      return {
-        success: true,
-        data: applicationId,
-        message: 'Application created successfully'
-      };
+      const applicationId = await loanApplicationAdminService.create(applicationData as Omit<LoanApplication, 'id'>);
+      return { success: true, data: applicationId, message: 'Application created successfully' };
     } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to create application'
-      };
+      console.error('Error creating application:', error);
+      return { success: false, error: 'Failed to create application' };
     }
   }
 
-  // Submit application
   static async submitApplication(applicationId: string): Promise<ApiResponse<void>> {
     try {
-      await loanApplicationService.submitApplication(applicationId);
-      return {
-        success: true,
-        message: 'Application submitted successfully'
-      };
+      await loanApplicationAdminService.submitApplication(applicationId);
+      return { success: true, message: 'Application submitted successfully' };
     } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to submit application'
-      };
+      console.error('Error submitting application:', error);
+      return { success: false, error: 'Failed to submit application' };
     }
   }
 
-  // Assign application to workforce member
   static async assignApplication(applicationId: string, workforceMemberId: string): Promise<ApiResponse<void>> {
     try {
-      await loanApplicationService.assignToWorkforce(applicationId, workforceMemberId);
-      return {
-        success: true,
-        message: 'Application assigned successfully'
-      };
+      await loanApplicationAdminService.assignToWorkforce(applicationId, workforceMemberId);
+      return { success: true, message: 'Application assigned successfully' };
     } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to assign application'
-      };
+      console.error('Error assigning application:', error);
+      return { success: false, error: 'Failed to assign application' };
     }
   }
-}
 
-// Document API Services
-export class DocumentApiService {
-  // Get all documents with pagination and filtering
-  static async getAllDocuments(
-    page: number = 1,
-    limit: number = 20,
-    filters?: {
-      type?: Document['type'];
-      status?: Document['status'];
-      userId?: string;
-      applicationId?: string;
-    }
-  ): Promise<PaginatedResponse<Document>> {
+  // New broker-specific methods
+  static async getApplicationsByBroker(brokerId: string): Promise<ApiResponse<LoanApplication[]>> {
     try {
-      let allDocuments = await documentService.getAll();
-      
-      // Apply filters
-      if (filters?.type) {
-        allDocuments = allDocuments.filter(doc => doc.type === filters.type);
-      }
-      if (filters?.status) {
-        allDocuments = allDocuments.filter(doc => doc.status === filters.status);
-      }
-      if (filters?.userId) {
-        allDocuments = allDocuments.filter(doc => doc.userId === filters.userId);
-      }
-      if (filters?.applicationId) {
-        allDocuments = allDocuments.filter(doc => doc.applicationId === filters.applicationId);
-      }
-      
-      // Apply pagination
-      const startIndex = (page - 1) * limit;
-      const endIndex = startIndex + limit;
-      const paginatedDocuments = allDocuments.slice(startIndex, endIndex);
-      
-      return {
-        success: true,
-        data: paginatedDocuments,
-        pagination: {
-          page,
-          limit,
-          total: allDocuments.length,
-          hasMore: endIndex < allDocuments.length
-        }
-      };
+      const applications = await loanApplicationAdminService.getApplicationsByBroker(brokerId);
+      return { success: true, data: applications };
     } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch documents'
-      };
+      console.error('Error getting broker applications:', error);
+      return { success: false, error: 'Failed to get broker applications' };
     }
   }
 
-  // Update document status
-  static async updateDocumentStatus(
-    documentId: string, 
-    status: Document['status'], 
-    reviewedBy?: string
+  static async createInitialApplication(
+    brokerId: string,
+    loanType: LoanApplication['loanType'],
+    borrowerInfo: LoanApplication['borrowerInfo'],
+    program: string
+  ): Promise<ApiResponse<string>> {
+    try {
+      const applicationId = await loanApplicationAdminService.createInitialApplication(
+        brokerId,
+        loanType,
+        borrowerInfo,
+        program
+      );
+      return { 
+        success: true, 
+        data: applicationId, 
+        message: 'Initial application created successfully. Borrower account will be linked when created.' 
+      };
+    } catch (error) {
+      console.error('Error creating initial application:', error);
+      return { success: false, error: 'Failed to create initial application' };
+    }
+  }
+
+  static async linkToBorrower(applicationId: string, borrowerUserId: string): Promise<ApiResponse<void>> {
+    try {
+      await loanApplicationAdminService.linkToBorrower(applicationId, borrowerUserId);
+      return { success: true, message: 'Application linked to borrower successfully' };
+    } catch (error) {
+      console.error('Error linking application to borrower:', error);
+      return { success: false, error: 'Failed to link application to borrower' };
+    }
+  }
+
+  static async calculateProgress(applicationId: string): Promise<ApiResponse<number>> {
+    try {
+      const progress = await loanApplicationAdminService.calculateProgress(applicationId);
+      return { success: true, data: progress, message: 'Progress calculated successfully' };
+    } catch (error) {
+      console.error('Error calculating progress:', error);
+      return { success: false, error: 'Failed to calculate progress' };
+    }
+  }
+
+  static async uploadDocument(
+    applicationId: string,
+    documentType: keyof LoanApplication['documents'],
+    documentData: {
+      name: string;
+      fileUrl: string;
+      fileSize: number;
+      mimeType: string;
+      uploadedBy: string;
+      category?: string;
+    }
   ): Promise<ApiResponse<void>> {
     try {
-      await documentService.updateDocumentStatus(documentId, status, reviewedBy);
-      return {
-        success: true,
-        message: 'Document status updated successfully'
-      };
+      await loanApplicationAdminService.uploadDocument(
+        applicationId,
+        documentType,
+        documentData
+      );
+      return { success: true, message: 'Document uploaded successfully' };
     } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to update document status'
-      };
-    }
-  }
-}
-
-// Appointment API Services
-export class AppointmentApiService {
-  // Get all appointments with pagination and filtering
-  static async getAllAppointments(
-    page: number = 1,
-    limit: number = 20,
-    filters?: {
-      status?: Appointment['status'];
-      type?: Appointment['type'];
-      userId?: string;
-      workforceMemberId?: string;
-      date?: Date;
-    }
-  ): Promise<PaginatedResponse<Appointment>> {
-    try {
-      let allAppointments = await appointmentService.getAll();
-      
-      // Apply filters
-      if (filters?.status) {
-        allAppointments = allAppointments.filter(apt => apt.status === filters.status);
-      }
-      if (filters?.type) {
-        allAppointments = allAppointments.filter(apt => apt.type === filters.type);
-      }
-      if (filters?.userId) {
-        allAppointments = allAppointments.filter(apt => apt.userId === filters.userId);
-      }
-      if (filters?.workforceMemberId) {
-        allAppointments = allAppointments.filter(apt => apt.workforceMemberId === filters.workforceMemberId);
-      }
-      if (filters?.date) {
-        allAppointments = allAppointments.filter(apt => {
-          const aptDate = apt.date.toDate();
-          return aptDate.toDateString() === filters.date!.toDateString();
-        });
-      }
-      
-      // Apply pagination
-      const startIndex = (page - 1) * limit;
-      const endIndex = startIndex + limit;
-      const paginatedAppointments = allAppointments.slice(startIndex, endIndex);
-      
-      return {
-        success: true,
-        data: paginatedAppointments,
-        pagination: {
-          page,
-          limit,
-          total: allAppointments.length,
-          hasMore: endIndex < allAppointments.length
-        }
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch appointments'
-      };
-    }
-  }
-
-  // Get available time slots for a workforce member on a specific date
-  static async getAvailableSlots(workforceMemberId: string, date: Date): Promise<ApiResponse<Date[]>> {
-    try {
-      const availableSlots = await appointmentService.getAvailableSlots(workforceMemberId, date);
-      return {
-        success: true,
-        data: availableSlots
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to get available slots'
-      };
-    }
-  }
-
-  // Create new appointment
-  static async createAppointment(appointmentData: Omit<Appointment, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<string>> {
-    try {
-      const appointmentId = await appointmentService.create(appointmentData);
-      return {
-        success: true,
-        data: appointmentId,
-        message: 'Appointment created successfully'
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to create appointment'
-      };
-    }
-  }
-}
-
-// Workforce Member API Services
-export class WorkforceMemberApiService {
-  // Get all active workforce members
-  static async getActiveMembers(): Promise<ApiResponse<WorkforceMember[]>> {
-    try {
-      const members = await workforceMemberService.getActiveMembers();
-      return {
-        success: true,
-        data: members
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch active members'
-      };
-    }
-  }
-
-  // Get members by specialty
-  static async getMembersBySpecialty(specialty: string): Promise<ApiResponse<WorkforceMember[]>> {
-    try {
-      const members = await workforceMemberService.getMembersBySpecialty(specialty);
-      return {
-        success: true,
-        data: members
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch members by specialty'
-      };
-    }
-  }
-}
-
-// Comparable Property API Services
-export class ComparablePropertyApiService {
-  // Get comparable properties by location
-  static async getComparablesByLocation(
-    city: string, 
-    state: string, 
-    zipCode?: string
-  ): Promise<ApiResponse<ComparableProperty[]>> {
-    try {
-      const comparables = await comparablePropertyService.getComparablesByLocation(city, state, zipCode);
-      return {
-        success: true,
-        data: comparables
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch comparable properties'
-      };
-    }
-  }
-
-  // Get recent sales
-  static async getRecentSales(days: number = 90): Promise<ApiResponse<ComparableProperty[]>> {
-    try {
-      const sales = await comparablePropertyService.getRecentSales(days);
-      return {
-        success: true,
-        data: sales
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch recent sales'
-      };
-    }
-  }
-}
-
-// Market Analysis API Services
-export class MarketAnalysisApiService {
-  // Get market analysis by location
-  static async getAnalysisByLocation(city: string, state: string): Promise<ApiResponse<MarketAnalysis[]>> {
-    try {
-      const analyses = await marketAnalysisService.getAnalysisByLocation(city, state);
-      return {
-        success: true,
-        data: analyses
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch market analysis'
-      };
-    }
-  }
-
-  // Get recent market analyses
-  static async getRecentAnalyses(days: number = 30): Promise<ApiResponse<MarketAnalysis[]>> {
-    try {
-      const analyses = await marketAnalysisService.getRecentAnalyses(days);
-      return {
-        success: true,
-        data: analyses
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch recent analyses'
-      };
+      console.error('Error uploading document:', error);
+      return { success: false, error: 'Failed to upload document' };
     }
   }
 }

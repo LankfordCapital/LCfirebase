@@ -67,12 +67,14 @@ export async function POST(request: NextRequest) {
             Lankford Lending Team
         `;
 
-        await sendEmail(
-            email,
-            `You've been invited to join ${roomName} chat room`,
-            emailHtml,
-            emailText
-        );
+        // Send email using the new Resend-based service
+        await sendEmail({
+            to: [email],
+            subject: `You've been invited to join ${roomName} chat room`,
+            html: emailHtml,
+            text: emailText,
+            from: 'Lankford Lending <onboarding@resend.dev>'
+        });
 
         return NextResponse.json({
             success: true,

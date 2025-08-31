@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
       success: true,
       message: 'Firebase connection successful',
       testDocExists: testDoc.exists,
-      projectId: adminDb.app.options.projectId
+      projectId: 'lankford-lending'
     });
 
   } catch (error) {

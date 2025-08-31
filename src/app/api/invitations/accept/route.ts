@@ -14,8 +14,8 @@ export async function POST(request: NextRequest) {
         }
 
         // Get the invitation
-        const invitationRef = doc(db, 'invitations', invitationId);
-        const invitationSnap = await getDoc(invitationRef);
+        const invitationRef = adminDb.collection('invitations').doc(invitationId);
+        const invitationSnap = await invitationRef.get();
 
         if (!invitationSnap.exists) {
             return NextResponse.json(
@@ -43,14 +43,14 @@ export async function POST(request: NextRequest) {
         }
 
         // Add user to the chat room
-        const chatRoomRef = doc(db, 'chatRooms', invitation.roomId);
-        await updateDoc(chatRoomRef, {
-            members: arrayUnion(userId),
+        const chatRoomRef = adminDb.collection('chatRooms').doc(invitation.roomId);
+        await chatRoomRef.update({
+            members: adminDb.FieldValue.arrayUnion(userId),
             updatedAt: new Date()
         });
 
         // Update invitation status
-        await updateDoc(invitationRef, {
+        await invitationRef.update({
             status: 'accepted',
             acceptedAt: new Date(),
             acceptedBy: userId

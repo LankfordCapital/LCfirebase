@@ -13,6 +13,7 @@ export function CustomLoader({ className }: { className?: string }) {
           width={16} 
           height={16}
           className="h-4 w-4"
+          style={{ width: 'auto', height: 'auto' }}
         />
       </div>
     </div>

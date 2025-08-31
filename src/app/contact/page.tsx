@@ -67,6 +67,7 @@ export default function ContactPage() {
                     width={48}
                     height={48}
                     className="absolute top-4 right-4"
+                    style={{ width: 'auto', height: 'auto' }}
                 />
                 <CardHeader>
                   <CardTitle className="font-headline text-2xl">Send Us a Message</CardTitle>

@@ -16,8 +16,8 @@ export async function GET(
         }
 
         // Get the invitation
-        const invitationRef = doc(db, 'invitations', invitationId);
-        const invitationSnap = await getDoc(invitationRef);
+        const invitationRef = adminDb.collection('invitations').doc(invitationId);
+        const invitationSnap = await invitationRef.get();
 
         if (!invitationSnap.exists) {
             return NextResponse.json(
