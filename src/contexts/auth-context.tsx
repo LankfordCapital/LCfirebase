@@ -88,11 +88,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 
   const handleAuthRedirect = useCallback((profile: UserProfile) => {
-    const isAuthPage = pathname.startsWith('/auth');
-
-    // Only redirect from an auth page.
-    if (isAuthPage && profile?.role) {
-        const path = getRedirectPath(profile);
+    const authPages = ['/auth/signin', '/auth/signup', '/auth/forgot-password', '/auth/reset-password'];
+    if (authPages.includes(pathname)) {
+        const path = getRedirectPath();
         router.push(path);
     }
   }, [pathname, router, getRedirectPath]);
@@ -222,20 +220,80 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Admin functions - Use API routes instead of direct Firestore calls to avoid CORS issues
   const getAllUsers = async (): Promise<UserProfile[]> => {
     if (!isAdmin) throw new Error("Unauthorized");
-    const querySnapshot = await getDocs(collection(db, "users"));
-    return querySnapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() } as UserProfile));
+    
+    try {
+      const response = await fetch('/api/users', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.error('Error fetching users via API:', error);
+      throw error;
+    }
   };
 
   const updateUserRole = async (uid: string, newRole: UserProfile['role']) => {
     if (!isAdmin) throw new Error("Unauthorized");
-    await updateDoc(doc(db, "users", uid), { role: newRole });
+    
+    try {
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'updateRole',
+          uid,
+          newRole
+        }),
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || `HTTP error! status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error updating user role via API:', error);
+      throw error;
+    }
   };
 
   const updateUserStatus = async (uid: string, newStatus: UserProfile['status']) => {
     if (!isAdmin) throw new Error("Unauthorized");
-    await updateDoc(doc(db, "users", uid), { status: newStatus });
+    
+    try {
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'updateStatus',
+          uid,
+          newStatus
+        }),
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || `HTTP error! status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error updating user status via API:', error);
+      throw error;
+    }
   };
 
   return (

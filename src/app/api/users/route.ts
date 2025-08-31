@@ -5,23 +5,12 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
+    const limit = parseInt(searchParams.get('limit') || '1000'); // Get all users for admin purposes
     const role = searchParams.get('role') as any;
     const status = searchParams.get('status') as any;
     const search = searchParams.get('search') || undefined;
 
-    const result = await UserApiService.getAllUsers(page, limit, {
-      role,
-      status,
-      search
-    });
-
-    if (!result.success) {
-      return NextResponse.json(
-        { error: result.error },
-        { status: 400 }
-      );
-    }
+    const result = await UserApiService.getAllUsers(page, limit, search, role, status);
 
     return NextResponse.json(result);
   } catch (error) {

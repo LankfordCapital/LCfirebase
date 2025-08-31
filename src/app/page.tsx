@@ -123,6 +123,7 @@ export default function Home() {
             width={64}
             height={64}
             className="absolute bottom-4 right-4 z-20"
+            style={{ width: 'auto', height: 'auto' }}
         />
       </section>
 
