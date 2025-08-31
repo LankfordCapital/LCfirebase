@@ -90,7 +90,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const handleAuthRedirect = useCallback((profile: UserProfile) => {
     const authPages = ['/auth/signin', '/auth/signup', '/auth/forgot-password', '/auth/reset-password'];
     if (authPages.includes(pathname)) {
-        const path = getRedirectPath();
+        const path = getRedirectPath(profile);
         router.push(path);
     }
   }, [pathname, router, getRedirectPath]);
