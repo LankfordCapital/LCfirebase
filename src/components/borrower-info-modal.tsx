@@ -21,10 +21,14 @@ interface BorrowerInfo {
 interface BorrowerInfoModalProps {
   trigger?: React.ReactNode;
   onBorrowerAdded?: (borrowerInfo: BorrowerInfo) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function BorrowerInfoModal({ trigger, onBorrowerAdded }: BorrowerInfoModalProps) {
-  const [open, setOpen] = useState(false);
+export function BorrowerInfoModal({ trigger, onBorrowerAdded, open: externalOpen, onOpenChange }: BorrowerInfoModalProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = externalOpen !== undefined ? externalOpen : internalOpen;
+  const setOpen = onOpenChange || setInternalOpen;
   const [borrowerInfo, setBorrowerInfo] = useState<BorrowerInfo>({
     fullName: '',
     phoneNumber: '',
@@ -70,8 +74,8 @@ export function BorrowerInfoModal({ trigger, onBorrowerAdded }: BorrowerInfoModa
     setIsSubmitting(true);
 
     try {
-      // Save borrower info to database
-      const response = await fetch('/api/borrowers', {
+      // First, save borrower info to database
+      const borrowerResponse = await fetch('/api/borrowers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -82,18 +86,23 @@ export function BorrowerInfoModal({ trigger, onBorrowerAdded }: BorrowerInfoModa
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!borrowerResponse.ok) {
+        const errorData = await borrowerResponse.json();
         throw new Error(errorData.error || 'Failed to save borrower');
       }
 
-      const result = await response.json();
+      const borrowerResult = await borrowerResponse.json();
 
+      // Then create initial loan application (this will be done by the parent component)
+      // Store borrower ID in sessionStorage for the application flow
+      sessionStorage.setItem('currentBorrowerId', borrowerResult.borrowerId);
+      
       // Call the callback if provided with the full result including the borrower ID
       if (onBorrowerAdded) {
         onBorrowerAdded({
           ...borrowerInfo,
-          id: result.borrowerId
+          id: borrowerResult.borrowerId,
+          borrowerData: borrowerResult.borrower
         });
       }
 
@@ -105,10 +114,8 @@ export function BorrowerInfoModal({ trigger, onBorrowerAdded }: BorrowerInfoModa
       // Close the modal
       setOpen(false);
 
-      // Don't navigate automatically - let the parent component handle navigation
-      // The parent will pass the borrower ID to the specific loan program page
-
     } catch (error) {
+      console.error('Error adding borrower:', error);
       toast({
         variant: 'destructive',
         title: 'Error',

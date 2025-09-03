@@ -2,13 +2,15 @@
 
 'use client';
 
-import { useState, useId } from 'react';
+import { useState, useId, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, ArrowRight, Home, PlusCircle, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Home, PlusCircle, Trash2, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { getOfficeContextFromUrl, getOfficeBasePath } from '@/lib/office-routing';
 import { Label } from './ui/label';
 import { Input } from './ui/input';
+import { useLoanApplication } from '@/hooks/use-loan-application';
 
 type Unit = {
   id: string;
@@ -17,28 +19,92 @@ type Unit = {
   projectedRent: string;
 };
 
-export function LoanApplicationClientPage3({ loanProgram }: { loanProgram: string}) {
+export function LoanApplicationClientPage3({ 
+  loanProgram, 
+  officeContext = 'borrower',
+  applicationId 
+}: { 
+  loanProgram: string, 
+  officeContext?: 'borrower' | 'broker' | 'workforce',
+  applicationId?: string 
+}) {
   const router = useRouter();
+  
+  // Use the loan application hook for auto-save functionality
+  const { 
+    application, 
+    loading, 
+    saving, 
+    updateField, 
+    updateFields 
+  } = useLoanApplication(applicationId);
+  
   const initialId = useId();
   const [units, setUnits] = useState<Unit[]>(() => [
     { id: initialId, unitDescription: '', sqFt: '', projectedRent: '' },
   ]);
   
+  // Load saved data when component mounts or applicationId changes
+  useEffect(() => {
+    if (applicationId && application && application.propertyInfo?.units) {
+      setUnits(application.propertyInfo.units);
+    }
+  }, [applicationId, application]);
+  
   const handleUnitChange = (id: string, field: keyof Omit<Unit, 'id'>, value: string) => {
-    setUnits(units.map(unit => (unit.id === id ? { ...unit, [field]: value } : unit)));
+    const updatedUnits = units.map(unit => (unit.id === id ? { ...unit, [field]: value } : unit));
+    setUnits(updatedUnits);
+    
+    // Auto-save to database
+    if (applicationId) {
+      updateField('propertyInfo.units', updatedUnits);
+    }
   }
 
   const handleAddUnit = () => {
-    setUnits([...units, { id: `unit-${Date.now()}`, unitDescription: '', sqFt: '', projectedRent: '' }]);
+    const newUnits = [...units, { id: `unit-${Date.now()}`, unitDescription: '', sqFt: '', projectedRent: '' }];
+    setUnits(newUnits);
+    
+    // Auto-save to database
+    if (applicationId) {
+      updateField('propertyInfo.units', newUnits);
+    }
   }
   
   const handleRemoveUnit = (id: string) => {
-    setUnits(units.filter(unit => unit.id !== id));
+    const newUnits = units.filter(unit => unit.id !== id);
+    setUnits(newUnits);
+    
+    // Auto-save to database
+    if (applicationId) {
+      updateField('propertyInfo.units', newUnits);
+    }
   }
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
+    if (applicationId) {
+      try {
+        // Save all form data to database immediately before navigation
+        await updateFields({
+          'propertyInfo.units': units
+        }, true); // Set immediate flag to true for immediate saving
+
+        console.log('Unit information saved successfully');
+      } catch (error) {
+        console.error('Error saving data:', error);
+        return; // Don't navigate if save fails
+      }
+    }
+
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
-    router.push(`/dashboard/application/${programSlug}/page-4`);
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramString = urlParams.toString();
+    
+    // Get the current office context from the URL
+    const currentOfficeContext = getOfficeContextFromUrl();
+    const basePath = getOfficeBasePath(currentOfficeContext);
+    
+    router.push(`${basePath}/${programSlug}/page-4${paramString ? `?${paramString}` : ''}`);
   };
 
   return (

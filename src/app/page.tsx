@@ -157,6 +157,7 @@ export default function Home() {
                     alt="Lankford Capital Icon"
                     width={40}
                     height={40}
+                    style={{ height: 'auto' }}
                     className="absolute bottom-4 right-4 opacity-50 group-hover:opacity-100 transition-opacity"
                 />
               </Card>
@@ -190,7 +191,7 @@ export default function Home() {
                     src="https://firebasestorage.googleapis.com/v0/b/lankford-lending.firebasestorage.app/o/shutterstock_2021639264.jpg?alt=media&token=45a49432-6ac0-4c30-9988-2c5cdb0c482b"
                     alt="Financial district cityscape"
                     fill
-                    sizes="100vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className="object-cover"
                     data-ai-hint="financial district"
                 />
@@ -217,6 +218,7 @@ export default function Home() {
                     alt="Lankford Capital Icon"
                     width={40}
                     height={40}
+                    style={{ height: 'auto' }}
                     className="absolute top-4 right-4"
                 />
                 <CardHeader>

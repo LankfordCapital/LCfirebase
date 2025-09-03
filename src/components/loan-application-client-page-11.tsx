@@ -7,16 +7,20 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, ArrowRight, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { getOfficeContextFromUrl, getOfficeBasePath } from '@/lib/office-routing';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 
-export function LoanApplicationClientPage11({ loanProgram }: { loanProgram: string}) {
+export function LoanApplicationClientPage11({ loanProgram, officeContext = 'borrower' }: { loanProgram: string, officeContext?: 'borrower' | 'broker' | 'workforce' }) {
   const router = useRouter();
   const [otherDetails, setOtherDetails] = useState('');
   
   const handleContinue = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
-    router.push(`/dashboard/application/${programSlug}/page-12`);
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramString = urlParams.toString();
+    router.push(`${getOfficeBasePath(officeContext)}/${programSlug}/page-12${paramString ? `?${paramString}` : ''}`);
+  
   };
 
   return (

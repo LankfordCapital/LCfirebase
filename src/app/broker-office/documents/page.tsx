@@ -9,7 +9,7 @@ export default function DocumentsPage() {
           <p className="text-muted-foreground">Select a loan program to begin.</p>
         </div>
 
-        <AIPReUnderwriterClient />
+        <AIPReUnderwriterClient officeContext="broker" />
     </div>
   )
 }

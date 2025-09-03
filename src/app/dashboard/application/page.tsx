@@ -9,7 +9,7 @@ export default function NewApplicationPage() {
           <p className="text-muted-foreground">Select a loan program to begin.</p>
         </div>
 
-        <AIPReUnderwriterClient />
+        <AIPReUnderwriterClient officeContext="borrower" />
     </div>
   )
 }

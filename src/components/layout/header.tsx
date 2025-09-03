@@ -78,8 +78,6 @@ export default function Header() {
     { href: '/about', label: 'About Us' },
     { href: '/contact', label: 'Contact Us' },
     { href: '/broker', label: 'Brokers' },
-    // Add test link only in development
-    ...(isDevelopment ? [{ href: '/test-chat-invitation', label: 'Test Invitations' }] : []),
   ];
 
   return (

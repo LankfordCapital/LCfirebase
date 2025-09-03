@@ -10,9 +10,10 @@ import { Label } from '@/components/ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
 import { ArrowLeft, ArrowRight, FileText, FileUp, Building, Wallet } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { getOfficeContextFromUrl, getOfficeBasePath } from '@/lib/office-routing';
 import { Separator } from '@/components/ui/separator';
 
-export default function LoanApplicationClientPage8({ loanProgram }: { loanProgram: string}) {
+export function LoanApplicationClientPage8({ loanProgram, officeContext = 'borrower' }: { loanProgram: string, officeContext?: 'borrower' | 'broker' | 'workforce' }) {
   const { documents, addDocument } = useDocumentContext();
   const router = useRouter();
 
@@ -46,7 +47,10 @@ export default function LoanApplicationClientPage8({ loanProgram }: { loanProgra
   
   const handleContinue = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&g/, 'and');
-    router.push(`/dashboard/application/${programSlug}/page-9`);
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramString = urlParams.toString();
+    router.push(`${getOfficeBasePath(officeContext)}/${programSlug}/page-9${paramString ? `?${paramString}` : ''}`);
+  
   };
 
   const handleGoBack = () => {
@@ -89,7 +93,7 @@ export default function LoanApplicationClientPage8({ loanProgram }: { loanProgra
         
         <div className="flex justify-between items-center">
             <Button variant="outline" onClick={handleGoBack}>
-               <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
+               <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 7
             </Button>
             <Button onClick={handleContinue}>
                 Continue to Page 9 <ArrowRight className="ml-2 h-4 w-4" />

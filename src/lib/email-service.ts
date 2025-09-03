@@ -25,7 +25,7 @@ interface MailPayload {
 export async function sendEmail(payload: MailPayload): Promise<any> {
     try {
         const result = await resend.emails.send({
-            from: payload.from || 'Lankford Lending <onboarding@resend.dev>',
+            from: payload.from || 'Lankford Lending <noreply@lankfordcapital.com>',
             to: payload.to,
             cc: payload.cc,
             bcc: payload.bcc,

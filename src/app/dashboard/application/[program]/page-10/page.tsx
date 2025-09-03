@@ -17,8 +17,9 @@ function ApplicationSkeleton() {
     )
 }
 
-export default function LoanApplicationPage10({ params }: { params: { program: string } }) {
-    const loanProgram = decodeURIComponent(params.program.replace(/-/g, ' ').replace(/\band\b/g, '&'))
+export default async function LoanApplicationPage10({ params }: { params: Promise<{ program: string }> }) {
+    const { program } = await params;
+    const loanProgram = decodeURIComponent(program.replace(/-/g, ' ').replace(/\band\b/g, '&'))
         .replace(/(^\w|\s\w)/g, m => m.toUpperCase())
         .replace(/Noo/g, 'NOO')
         .replace(/Dscr/g, 'DSCR');

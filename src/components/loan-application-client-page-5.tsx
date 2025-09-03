@@ -10,9 +10,10 @@ import { Label } from '@/components/ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
 import { ArrowLeft, ArrowRight, Briefcase, FileText, FileUp, Building, BookText, DollarSign, Shield, BookUser } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { getOfficeContextFromUrl, getOfficeBasePath } from '@/lib/office-routing';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
-export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: string}) {
+export function LoanApplicationClientPage5({ loanProgram, officeContext = 'borrower' }: { loanProgram: string, officeContext?: 'borrower' | 'broker' | 'workforce' }) {
   const [managementType, setManagementType] = useState('self');
   const [managementCompanyName, setManagementCompanyName] = useState('');
   const [managementCompanyPhone, setManagementCompanyPhone] = useState('');
@@ -69,9 +70,14 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
     const isConstructionOrRehab = loanProgram.toLowerCase().includes('construction') || loanProgram.toLowerCase().includes('rehab');
 
     if (isConstructionOrRehab) {
-      router.push(`/dashboard/application/${programSlug}/page-6`);
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramString = urlParams.toString();
+      router.push(`${getOfficeBasePath(officeContext)}/${programSlug}/page-6${paramString ? `?${paramString}` : ''}`);
     } else {
-      router.push(`/dashboard/application/${programSlug}/page-8`);
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramString = urlParams.toString();
+      router.push(`${getOfficeBasePath(officeContext)}/${programSlug}/page-8${paramString ? `?${paramString}` : ''}`);
+    
     }
   }
 
@@ -225,7 +231,7 @@ export function LoanApplicationClientPage5({ loanProgram }: { loanProgram: strin
                <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 4
             </Button>
             <Button onClick={handleNextPage}>
-                Continue <ArrowRight className="ml-2 h-4 w-4" />
+                Continue to Next Page <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
         </div>
     </div>

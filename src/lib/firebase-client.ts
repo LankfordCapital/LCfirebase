@@ -16,11 +16,29 @@ const firebaseConfig = {
   measurementId: ""
 };
 
-const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
+let app: FirebaseApp;
 
-const auth: Auth = getAuth(app);
-const db: Firestore = getFirestore(app);
-const storage: FirebaseStorage = getStorage(app);
+try {
+  app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+  console.log('Firebase app initialized successfully');
+} catch (error) {
+  console.error('Error initializing Firebase app:', error);
+  throw error;
+}
+
+let auth: Auth;
+let db: Firestore;
+let storage: FirebaseStorage;
+
+try {
+  auth = getAuth(app);
+  db = getFirestore(app);
+  storage = getStorage(app);
+  console.log('Firebase services initialized successfully');
+} catch (error) {
+  console.error('Error initializing Firebase services:', error);
+  throw error;
+}
 
 // Initialize Google Auth Provider
 const googleProvider = new GoogleAuthProvider();

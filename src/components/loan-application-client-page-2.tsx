@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, ArrowRight, DollarSign, TrendingDown, TrendingUp, Scale } from 'lucide-react';
+import { Loader2, ArrowLeft, ArrowRight, Home, PlusCircle, Trash2, Scale, TrendingUp, TrendingDown } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { getOfficeContextFromUrl, getOfficeBasePath } from '@/lib/office-routing';
 
 // Helper component for individual expense inputs
 const PnLInput = ({ label, value, onValueChange, placeholder }: { label: string, value: string, onValueChange: (value: string) => void, placeholder?: string }) => {
@@ -30,7 +31,7 @@ const PnLInput = ({ label, value, onValueChange, placeholder }: { label: string,
     );
 };
 
-export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: string}) {
+export function LoanApplicationClientPage2({ loanProgram, officeContext = 'borrower' }: { loanProgram: string, officeContext?: 'borrower' | 'broker' | 'workforce' }) {
   const router = useRouter();
 
   // P&L State
@@ -74,10 +75,14 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
     const isEquipmentFinancing = loanProgram.toLowerCase().includes('equipment financing');
 
+    // Get the current office context from the URL
+    const currentOfficeContext = getOfficeContextFromUrl();
+    const basePath = getOfficeBasePath(currentOfficeContext);
+
     if (isEquipmentFinancing) {
-        router.push(`/dashboard/application/${programSlug}/page-4`);
+        router.push(`${basePath}/${programSlug}/page-4`);
     } else {
-        router.push(`/dashboard/application/${programSlug}/page-3`);
+        router.push(`${basePath}/${programSlug}/page-3`);
     }
   }
   
@@ -140,7 +145,7 @@ export function LoanApplicationClientPage2({ loanProgram }: { loanProgram: strin
                <ArrowLeft className="mr-2 h-4 w-4" /> Go Back to Page 1
             </Button>
             <Button onClick={handleNextPage}>
-                Continue <ArrowRight className="ml-2 h-4 w-4" />
+                Continue to Next Page <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
         </div>
     </div>

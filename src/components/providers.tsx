@@ -9,11 +9,18 @@ import { usePathname } from 'next/navigation';
 import { CustomLoader } from './ui/custom-loader';
 import HeaderWrapper from './layout/header-wrapper';
 import Footer from './layout/footer';
+import ErrorBoundary from './error-boundary';
+import { AIAssistantFallback } from './ai-assistant-fallback';
+import { ChunkErrorHandler } from './chunk-error-handler';
 
 // Lazy load the AI assistant to improve initial page load performance
 const AIAssistant = dynamic(() => import('./ai-assistant').then(mod => ({ default: mod.AIAssistant })), {
   ssr: false,
   loading: () => null,
+  timeout: 10000, // Add timeout to prevent chunk loading errors
+  onError: (error) => {
+    console.error('Failed to load AI Assistant:', error);
+  },
 });
 
 function AppContent({ children }: { children: React.ReactNode }) {
@@ -35,10 +42,13 @@ function AppContent({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      <ChunkErrorHandler />
       <HeaderWrapper />
       <main className="flex-1">{children}</main>
       <Footer />
-      <AIAssistant />
+      <ErrorBoundary fallback={AIAssistantFallback}>
+        <AIAssistant />
+      </ErrorBoundary>
     </>
   );
 }

@@ -88,7 +88,10 @@ export function AIAssistant() {
 
     try {
       // Dynamically import AI functionality only when needed
-      const { answerVisitorQuestion } = await import('@/ai/flows/ai-assistant');
+      const { answerVisitorQuestion } = await import('@/ai/flows/ai-assistant').catch(error => {
+        console.error('Failed to load AI assistant:', error);
+        throw new Error('AI assistant is temporarily unavailable. Please try again later.');
+      });
       const result = await answerVisitorQuestion({
         question: inputValue,
       });

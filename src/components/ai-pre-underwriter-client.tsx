@@ -13,10 +13,11 @@ import { ArrowRight, CheckCircle, FileText } from 'lucide-react';
 import { getDocumentChecklist, type GetDocumentChecklistOutput } from '@/ai/flows/document-checklist-flow';
 import { CustomLoader } from './ui/custom-loader';
 import { BorrowerInfoModal } from './borrower-info-modal';
+import { getOfficeBasePath } from '@/lib/office-routing';
 
 type Checklist = GetDocumentChecklistOutput['documentRequestList'];
 
-export function AIPReUnderwriterClient() {
+export function AIPReUnderwriterClient({ officeContext = 'borrower' }: { officeContext?: 'borrower' | 'broker' | 'workforce' }) {
   const [loanProgram, setLoanProgram] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [checklist, setChecklist] = useState<Checklist | null>(null);
@@ -65,10 +66,55 @@ export function AIPReUnderwriterClient() {
     // The borrower modal will handle the navigation after borrower info is collected
   };
 
-  const handleBorrowerAdded = (borrowerInfo: any) => {
-    // Navigate to the loan application page with the selected program
-    const programSlug = encodeURIComponent(loanProgram.toLowerCase().replace(/\s-\s/g, '-').replace(/ /g, '-').replace(/&/g, 'and'));
-    router.push(`/dashboard/application/${programSlug}?borrowerId=${borrowerInfo.id}`);
+  const handleBorrowerAdded = async (borrowerInfo: any) => {
+    try {
+      setIsLoading(true);
+      
+      // Create initial loan application
+      const response = await fetch('/api/enhanced-loan-applications', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'create',
+          userId: borrowerInfo.id,
+          brokerId: borrowerInfo.id, // Use same ID as broker for now
+          loanProgram: loanProgram
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create loan application');
+      }
+
+      const result = await response.json();
+      
+      toast({
+        title: 'Loan Application Created',
+        description: `Loan application created for ${borrowerInfo.fullName}.`,
+      });
+
+      // Navigate to the loan application page with the application ID
+      const programSlug = encodeURIComponent(loanProgram.toLowerCase().replace(/\s-\s/g, '-').replace(/ /g, '-').replace(/&/g, 'and'));
+      const basePath = getOfficeBasePath(officeContext);
+      router.push(`${basePath}/${programSlug}?borrowerId=${borrowerInfo.id}&applicationId=${result.data.applicationId}`);
+      
+    } catch (error) {
+      console.error('Error creating loan application:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to create loan application. Please try again.',
+      });
+      
+      // Still navigate to the application page as fallback
+      const programSlug = encodeURIComponent(loanProgram.toLowerCase().replace(/\s-\s/g, '-').replace(/ /g, '-').replace(/&/g, 'and'));
+      const basePath = getOfficeBasePath(officeContext);
+      router.push(`${basePath}/${programSlug}?borrowerId=${borrowerInfo.id}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
 

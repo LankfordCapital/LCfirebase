@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { useDocumentContext } from '@/contexts/document-context';
 import { CheckCircle, ArrowLeft, ArrowRight, User, Briefcase, FileText, FileUp, Check, AlertTriangle, Landmark } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { getOfficeContextFromUrl, getOfficeBasePath } from '@/lib/office-routing';
 import { getDocumentChecklist } from '@/ai/flows/document-checklist-flow';
 import { useAuth } from '@/contexts/auth-context';
 import { DealHistory } from '@/components/deal-history';
@@ -36,7 +37,7 @@ type AssetScanState = {
     isScanning: boolean;
 };
 
-export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: string}) {
+export function LoanApplicationClientPage4({ loanProgram, officeContext = 'borrower' }: { loanProgram: string, officeContext?: 'borrower' | 'broker' | 'workforce' }) {
   const [checklist, setChecklist] = useState<CategorizedDocuments | null>(null);
   const [isLoadingChecklist, setIsLoadingChecklist] = useState(true);
   const [numberOfSponsors, setNumberOfSponsors] = useState(1);
@@ -188,7 +189,10 @@ export function LoanApplicationClientPage4({ loanProgram }: { loanProgram: strin
 
   const handleNextPage = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&g/, 'and');
-    router.push(`/dashboard/application/${programSlug}/page-5`);
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramString = urlParams.toString();
+    router.push(`${getOfficeBasePath(officeContext)}/${programSlug}/page-5${paramString ? `?${paramString}` : ''}`);
+  
   }
 
   const DocumentUploadInput = ({ name }: { name: string }) => {

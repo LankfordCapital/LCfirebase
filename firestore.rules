@@ -9,6 +9,28 @@ service cloud.firestore {
       allow read, write: if false;
     }
     
+    // Allow connection test documents
+    match /_test/{document} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Allow Firebase test collection for debugging
+    match /firebase-test/{document} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Allow users to read and write their own residential NOO ground up construction applications
+    match /residential-noo-ground-up-construction-applications/{applicationId} {
+      allow read, write, create, update, delete: if request.auth != null && (
+        // Users can access their own applications
+        resource.data.userId == request.auth.uid ||
+        // Brokers can access applications they created
+        resource.data.brokerId == request.auth.uid ||
+        // Allow creation of new applications (no resource.data yet)
+        request.method == 'create'
+      );
+    }
+    
     // Allow users to read and write their own documents
     // Allow admin users to read and update all user documents
     match /users/{userId} {
@@ -57,6 +79,38 @@ service cloud.firestore {
       allow read, write, create, delete: if request.auth != null;
     }
 
+    // Allow users to manage their own borrower profiles
+    match /borrower-profiles/{profileId} {
+      allow read, write, create: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        // Brokers can access borrower profiles they created
+        resource.data.createdBy == request.auth.uid ||
+        // Workforce members can read all borrower profiles
+        request.auth.uid != null
+      );
+    }
+
+    // Allow users to manage their own borrowers
+    match /borrowers/{borrowerId} {
+      allow read, write, create: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        // Brokers can access borrowers they created
+        resource.data.createdBy == request.auth.uid ||
+        // Workforce members can read all borrowers
+        request.auth.uid != null
+      );
+    }
+
+    // Allow workforce members and admins to manage workforce members
+    match /workforce-members/{memberId} {
+      allow read, write, create, delete: if request.auth != null;
+    }
+
+    // Allow workforce members and admins to manage comparable properties
+    match /comparable-properties/{propertyId} {
+      allow read, write, create, delete: if request.auth != null;
+    }
+
     // Allow authenticated users to manage invitations
     match /invitations/{invitationId} {
       allow read, write, create, update: if request.auth != null;
@@ -91,6 +145,25 @@ service cloud.firestore {
     // Allow users to manage chat messages (alternative collection structure)
     match /chatMessages/{messageId} {
       allow read, write, create, update, delete: if request.auth != null;
+    }
+
+    // Allow workforce members and admins to manage market analyses
+    match /market-analyses/{analysisId} {
+      allow read, write, create, delete: if request.auth != null;
+    }
+
+    // Allow users to manage their own enhanced loan applications
+    match /enhancedLoanApplications/{applicationId} {
+      allow read, write, create, update, delete: if request.auth != null;
+    }
+    
+    // Allow collection initialization documents
+    match /{collection}/{document} {
+      allow read, write: if request.auth != null && 
+        document == '_init' && 
+        (collection == 'enhancedLoanApplications' || 
+         collection == 'users' || 
+         collection == 'borrower-profiles');
     }
   }
 }

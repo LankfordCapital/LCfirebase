@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Loader2, ArrowRight, Calendar as CalendarIcon, Building2, Briefcase, FileUp, FileText, Layers, DollarSign, Truck, PlusCircle, Trash2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { useDocumentContext } from '@/contexts/document-context';
 import { useRouter } from 'next/navigation';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -18,6 +19,8 @@ import { format } from 'date-fns';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Textarea } from './ui/textarea';
+import { getOfficeContextFromUrl, getOfficeBasePath } from '@/lib/office-routing';
+import { useLoanApplication } from '@/hooks/use-loan-application';
 
 type Dealer = {
   id: string;
@@ -34,7 +37,27 @@ type Quote = {
 };
 
 
-export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
+export function LoanApplicationClient({ 
+  loanProgram, 
+  officeContext = 'borrower',
+  applicationId,
+  borrowerId
+}: { 
+  loanProgram: string, 
+  officeContext?: 'borrower' | 'broker' | 'workforce',
+  applicationId?: string,
+  borrowerId?: string
+}) {
+  // Enhanced loan application hook
+  const { 
+    application, 
+    loading, 
+    saving, 
+    updateField, 
+    updateFields,
+    createApplication 
+  } = useLoanApplication(applicationId);
+  // Property Information
   const [propertyAddress, setPropertyAddress] = useState('');
   const [propertyApn, setPropertyApn] = useState('');
   const [propertyTaxes, setPropertyTaxes] = useState('');
@@ -82,9 +105,18 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const { documents, addDocument } = useDocumentContext();
   const router = useRouter();
   
+
+  
   const handleContinue = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
-    router.push(`/dashboard/application/${programSlug}/page-2`);
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramString = urlParams.toString();
+    
+    // Get the current office context from the URL
+    const currentOfficeContext = getOfficeContextFromUrl();
+    const basePath = getOfficeBasePath(currentOfficeContext);
+    
+    router.push(`${basePath}/${programSlug}/page-2${paramString ? `?${paramString}` : ''}`);
   };
   
   const handleFileChange = useCallback(async (itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
@@ -145,13 +177,115 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
   const isEquipmentFinancing = loanProgram.toLowerCase().includes('equipment financing');
 
 
+  // Load existing application data when component mounts
+  useEffect(() => {
+    if (application && applicationId) {
+      console.log('Application loaded successfully:', application.id);
+      
+      // Load property information
+      if (application.propertyInfo) {
+        // Comment out for now due to type mismatch - need to fix PropertyInformation interface
+        // setPropertyAddress(application.propertyInfo.propertyAddress?.street || '');
+        // setPropertyApn(application.propertyInfo.propertyAddress?.city || '');
+        setPropertyTaxes(application.propertyInfo.propertyTaxes?.toString() || '');
+        setPropertyType(application.propertyInfo.propertyType || '');
+        setPropertySqFt(application.propertyInfo.squareFootage?.toString() || '');
+        setLotSize(application.propertyInfo.lotSize?.toString() || '');
+        // setPurchasePrice(application.propertyInfo.purchasePrice?.toString() || '');
+        // setAsIsValue(application.propertyInfo.currentValue?.toString() || '');
+        // setAfterRepairValue(application.propertyInfo.afterRepairValue?.toString() || '');
+      }
+
+      // Load loan details
+      if (application.loanDetails) {
+        setLoanAmount(application.loanDetails.loanAmount?.toString() || '');
+        setTransactionType(application.loanDetails.loanPurpose || 'purchase');
+        setPropertyType(application.loanDetails.propertyType || '');
+      }
+
+      // Load business information
+      if (application.businessInfo) {
+        setCompanyName(application.businessInfo.businessName || '');
+        setCompanyEin(application.businessInfo.ein || '');
+      }
+    } else if (applicationId && !application) {
+      console.log('Application ID provided but no application loaded:', applicationId);
+    } else if (!applicationId) {
+      console.log('No application ID provided - this is a new application');
+    }
+  }, [application, applicationId]);
+
+
+  // Handle field updates with auto-save
+  const handleFieldUpdate = (field: string, value: any) => {
+    if (applicationId) {
+      updateField(field, value);
+    }
+  };
+
   return (
     <div className="space-y-6">
-        <div>
-            <h1 className="font-headline text-3xl font-bold">Loan Application - Page 1 of 12</h1>
-            <p className="text-muted-foreground">{loanProgram.replace(/Dscr/g, 'DSCR')}</p>
+        {/* Application Header */}
+        <div className="space-y-4">
+            <div>
+                <h1 className="font-headline text-3xl font-bold">Loan Application - Page 1 of 12</h1>
+                <p className="text-muted-foreground">{loanProgram.replace(/Dscr/g, 'DSCR')}</p>
+            </div>
+            
+            {/* Loading State */}
+            {applicationId && loading && (
+                <Card className="bg-muted/50">
+                    <CardContent className="pt-6">
+                        <div className="flex items-center justify-center py-4">
+                            <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                            <span>Loading your application...</span>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+            
+            {/* Application Status and Progress */}
+            {applicationId && application && !loading && (
+                <Card className="bg-muted/50">
+                    <CardContent className="pt-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <h3 className="font-semibold text-sm text-muted-foreground">Application ID</h3>
+                                <p className="text-lg font-mono">{application.id}</p>
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-sm text-muted-foreground">Status</h3>
+                                <Badge variant={application.status === 'approved' ? 'default' : 'secondary'}>
+                                    {application.status?.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                                </Badge>
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-sm text-muted-foreground">Progress</h3>
+                                <div className="flex items-center gap-2">
+                                    <Progress value={application.progress?.overallProgress || 0} className="flex-1" />
+                                    <span className="text-sm font-medium">{application.progress?.overallProgress || 0}%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+            
+            {/* Save Status Indicator */}
+            {applicationId && saving && (
+                <Card className="bg-blue-50 border-blue-200">
+                    <CardContent className="pt-6">
+                        <div className="flex items-center justify-center py-2">
+                            <Loader2 className="h-4 w-4 animate-spin mr-2 text-blue-600" />
+                            <span className="text-blue-700 text-sm">Saving your progress...</span>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
         </div>
         
+
+
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2"><Building2 className="h-5 w-5 text-primary" /> Loan & {isMobilization ? 'Project' : isEquipmentFinancing ? 'Equipment' : 'Property'} Details</CardTitle>
@@ -268,7 +402,15 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
                 <>
                 <div className="space-y-2">
                     <Label htmlFor="propertyAddress">Subject Property Address</Label>
-                    <Input id="propertyAddress" placeholder="123 Main St, Anytown, USA" value={propertyAddress} onChange={e => setPropertyAddress(e.target.value)} />
+                    <Input 
+                        id="propertyAddress" 
+                        placeholder="123 Main St, Anytown, USA" 
+                        value={propertyAddress} 
+                        onChange={e => {
+                            setPropertyAddress(e.target.value);
+                            handleFieldUpdate('propertyInfo.propertyAddress.street', e.target.value);
+                        }} 
+                    />
                 </div>
                  <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -320,7 +462,16 @@ export function LoanApplicationClient({ loanProgram }: { loanProgram: string}) {
 
                 <div className="space-y-2">
                     <Label htmlFor="loanAmount">{isMezzanine ? "Mezzanine Loan Amount Requested" : "Loan Amount Requested"}</Label>
-                    <Input id="loanAmount" type="number" placeholder="e.g., 300000" value={loanAmount} onChange={e => setLoanAmount(e.target.value)} />
+                    <Input 
+                        id="loanAmount" 
+                        type="number" 
+                        placeholder="e.g., 300000" 
+                        value={loanAmount} 
+                        onChange={e => {
+                            setLoanAmount(e.target.value);
+                            handleFieldUpdate('loanDetails.loanAmount', parseFloat(e.target.value) || 0);
+                        }} 
+                    />
                 </div>
                 
                 <div className="space-y-4 pt-4 border-t">

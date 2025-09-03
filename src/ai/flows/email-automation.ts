@@ -12,7 +12,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import { loanProgramDocumentLists } from '@/lib/document-lists';
-import { sendEmail } from '@/lib/email-service';
+import { sendEmail } from '@/lib/mailgun-service';
 
 const UserProfileSchema = z.object({
   userId: z.string().describe('Unique identifier for the user.'),

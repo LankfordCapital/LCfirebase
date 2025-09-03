@@ -22,6 +22,32 @@ const nextConfig: NextConfig = {
       test: /\.handlebars$/,
       use: 'handlebars-loader',
     });
+
+    // Suppress webpack warnings for handlebars
+    config.ignoreWarnings = [
+      ...(config.ignoreWarnings || []),
+      {
+        module: /node_modules\/handlebars/,
+        message: /require\.extensions is not supported by webpack/,
+      },
+    ];
+
+    // Improve chunk loading reliability
+    config.optimization = {
+      ...config.optimization,
+      splitChunks: {
+        ...config.optimization.splitChunks,
+        chunks: 'all',
+        cacheGroups: {
+          ...config.optimization.splitChunks?.cacheGroups,
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+        },
+      },
+    };
     
     return config;
   },

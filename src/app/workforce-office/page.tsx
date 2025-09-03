@@ -117,7 +117,7 @@ export default function WorkforceOfficePage() {
            </div>
            <InviteUserDialog />
             <Button asChild>
-                <Link href="/dashboard/application"><PlusCircle className="mr-2 h-4 w-4"/> New Application</Link>
+                <Link href="/workforce-office/applications"><PlusCircle className="mr-2 h-4 w-4"/> New Application</Link>
             </Button>
         </div>
       </div>

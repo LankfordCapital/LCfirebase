@@ -5,7 +5,18 @@
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "**/src/**",
+      "**/public/**",
+      "**/scripts/**",
+      "**/docs/**",
+      "**/*.md",
+      "**/tsconfig.json",
+      "**/tailwind.config.ts",
+      "**/postcss.config.mjs",
+      "**/components.json",
+      "**/next-env.d.ts",
+      "**/tsconfig.tsbuildinfo"
     ],
     "frameworksBackend": {
       "region": "us-central1"
@@ -13,5 +24,18 @@
   },
   "firestore": {
     "rules": "firestore.rules"
+  },
+  "apphosting": {
+    "backend": {
+      "source": ".",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**",
+        "**/docs/**",
+        "**/*.md",
+        "**/scripts/**"
+      ]
+    }
   }
 }

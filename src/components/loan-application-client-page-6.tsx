@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, ArrowRight, DollarSign, PlusCircle, Trash2, Calculator } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { getOfficeContextFromUrl, getOfficeBasePath } from '@/lib/office-routing';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { Label } from './ui/label';
 import { Input } from './ui/input';
@@ -99,7 +100,7 @@ const BudgetInputRow = ({
 };
 
 
-export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: string}) {
+export function LoanApplicationClientPage6({ loanProgram, officeContext = 'borrower' }: { loanProgram: string, officeContext?: 'borrower' | 'broker' | 'workforce' }) {
   const router = useRouter();
 
   const [budgetStructure, setBudgetStructure] = useState(initialBudgetStructure);
@@ -179,7 +180,10 @@ export function LoanApplicationClientPage6({ loanProgram }: { loanProgram: strin
 
   const handleContinue = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&g/, 'and');
-    router.push(`/dashboard/application/${programSlug}/page-7`);
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramString = urlParams.toString();
+    router.push(`${getOfficeBasePath(officeContext)}/${programSlug}/page-7${paramString ? `?${paramString}` : ''}`);
+  
   };
 
   return (

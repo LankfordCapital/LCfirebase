@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, ArrowRight, DollarSign, FileUp, FileText, ScanLine, PlusCircle, Trash2, Calculator } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { getOfficeContextFromUrl, getOfficeBasePath } from '@/lib/office-routing';
 import { useDocumentContext } from '@/contexts/document-context';
 import { Label } from './ui/label';
 import { Input } from './ui/input';
@@ -22,7 +23,7 @@ type WorkSunkItem = {
   dateCompleted: string;
 };
 
-export function LoanApplicationClientPage9({ loanProgram }: { loanProgram: string}) {
+export function LoanApplicationClientPage9({ loanProgram, officeContext = 'borrower' }: { loanProgram: string, officeContext?: 'borrower' | 'broker' | 'workforce' }) {
   const router = useRouter();
   const { documents, addDocument } = useDocumentContext();
   const { toast } = useToast();
@@ -107,7 +108,10 @@ export function LoanApplicationClientPage9({ loanProgram }: { loanProgram: strin
 
   const handleContinue = () => {
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&g/, 'and');
-    router.push(`/dashboard/application/${programSlug}/page-10`);
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramString = urlParams.toString();
+    router.push(`${getOfficeBasePath(officeContext)}/${programSlug}/page-10${paramString ? `?${paramString}` : ''}`);
+  
   };
 
   return (

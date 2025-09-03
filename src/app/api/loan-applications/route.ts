@@ -43,8 +43,69 @@ export async function POST(request: NextRequest) {
             { status: 400 }
           );
         }
-        const applicationId = await LoanApplicationApiService.createApplication(data);
-        return NextResponse.json(applicationId);
+        // Create a basic loan application structure
+        const applicationData = {
+          userId: data.userId,
+          brokerId: data.brokerId || 'default-broker', // TODO: Get from auth context
+          loanType: 'residential' as const, // Default type
+          program: data.program,
+          status: 'draft' as const,
+          borrowerInfo: {
+            fullName: '',
+            email: '',
+            phone: '',
+            dateOfBirth: '',
+            ssn: '',
+            maritalStatus: 'single' as const,
+            dependents: 0,
+            currentAddress: {
+              street: '',
+              city: '',
+              state: '',
+              zipCode: '',
+              yearsAtAddress: 0,
+              rentOrOwn: 'rent' as const
+            },
+            previousAddresses: [],
+            employmentStatus: 'employed' as const,
+            annualIncome: 0,
+            citizenship: 'us_citizen' as const
+          },
+          loanDetails: {
+            loanAmount: 0,
+            loanPurpose: '',
+            term: 0,
+            propertyType: '',
+            downPayment: 0,
+            downPaymentPercentage: 0
+          },
+          documents: {
+            additionalDocuments: []
+          },
+          progress: {
+            borrowerInfoCompleted: false,
+            businessInfoCompleted: false,
+            loanDetailsCompleted: false,
+            financialInfoCompleted: false,
+            propertyInfoCompleted: false,
+            employmentInfoCompleted: false,
+            documentsUploaded: false,
+            overallProgress: 0,
+            sectionsCompleted: 0,
+            totalSections: 6,
+            documentsRequired: 0,
+            documentsApproved: 0,
+            documentsRejected: 0,
+            applicationStarted: new Date(),
+            lastUpdated: new Date()
+          },
+          history: [],
+          notes: {
+            noteHistory: []
+          }
+        };
+        const result = await LoanApplicationApiService.createApplication(applicationData);
+        return NextResponse.json(result);
 
       case 'submit':
         if (!data.applicationId) {
@@ -53,8 +114,8 @@ export async function POST(request: NextRequest) {
             { status: 400 }
           );
         }
-        await LoanApplicationApiService.submitApplication(data.applicationId);
-        return NextResponse.json({ success: true, message: 'Application submitted successfully' });
+        const submitResult = await LoanApplicationApiService.submitApplication(data.applicationId);
+        return NextResponse.json(submitResult);
 
       case 'assign':
         if (!data.applicationId || !data.workforceMemberId) {
@@ -75,6 +136,7 @@ export async function POST(request: NextRequest) {
         }
         const initialAppId = await LoanApplicationApiService.createInitialApplication(
           data.brokerId,
+          data.loanType || 'residential',
           data.borrowerInfo,
           data.program
         );

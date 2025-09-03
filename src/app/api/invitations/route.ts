@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
             subject: `You've been invited to join ${roomName} chat room`,
             html: emailHtml,
             text: emailText,
-            from: 'Lankford Lending <onboarding@resend.dev>'
+            from: 'Lankford Lending <noreply@lankfordcapital.com>'
         });
 
         return NextResponse.json({

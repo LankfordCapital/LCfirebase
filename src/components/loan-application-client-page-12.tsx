@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Check, Shield } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { getOfficeContextFromUrl, getOfficeBasePath, getOfficeReturnPath } from '@/lib/office-routing';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Checkbox } from './ui/checkbox';
@@ -51,17 +52,258 @@ const ESignatureSection = ({ sponsorIndex }: { sponsorIndex: number }) => {
 }
 
 
-export function LoanApplicationClientPage12({ loanProgram }: { loanProgram: string}) {
+export function LoanApplicationClientPage12({ loanProgram, officeContext = 'borrower' }: { loanProgram: string, officeContext?: 'borrower' | 'broker' | 'workforce' }) {
   const router = useRouter();
   const { toast } = useToast();
   const [numberOfSponsors, setNumberOfSponsors] = useState(1);
   
-  const handleSubmitApplication = () => {
-    toast({
+  const handleSubmitApplication = async () => {
+    try {
+      // Get both borrowerId and applicationId from URL params
+      const urlParams = new URLSearchParams(window.location.search);
+      const borrowerId = urlParams.get('borrowerId');
+      const applicationId = urlParams.get('applicationId');
+      
+      if (!borrowerId && !applicationId) {
+        // Try to get borrower info from sessionStorage as fallback
+        const storedBorrowerId = sessionStorage.getItem('currentBorrowerId');
+        const storedBorrowerInfo = sessionStorage.getItem('currentBorrowerInfo');
+        
+        if (storedBorrowerId) {
+          // Use stored borrower ID
+          const createResponse = await fetch('/api/enhanced-loan-applications', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              action: 'create',
+              userId: storedBorrowerId,
+              brokerId: storedBorrowerId, // Use same ID as broker for now
+              loanProgram: loanProgram
+            }),
+          });
+
+          if (!createResponse.ok) {
+            const errorData = await createResponse.json();
+            throw new Error(errorData.error || 'Failed to create application');
+          }
+
+          const createResult = await createResponse.json();
+          if (!createResult.success) {
+            throw new Error(createResult.error || 'Failed to create application');
+          }
+          
+          // Submit the application
+          const response = await fetch('/api/enhanced-loan-applications', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              action: 'submit',
+              applicationId: createResult.data.applicationId
+            }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to submit application');
+          }
+
+          const submitResult = await response.json();
+          if (!submitResult.success) {
+            throw new Error(submitResult.error || 'Failed to submit application');
+          }
+
+          toast({
+            title: "Application Submitted!",
+            description: "Thank you. Your loan application has been received and is under review.",
+          });
+          
+          // Route back to the correct office context
+          const currentOfficeContext = getOfficeContextFromUrl();
+          const returnPath = getOfficeReturnPath(currentOfficeContext);
+          router.push(returnPath);
+          return;
+        }
+        
+        // If no borrower ID but we have borrower info, create a new borrower first
+        if (storedBorrowerInfo) {
+          try {
+            const borrowerData = JSON.parse(storedBorrowerInfo);
+            
+            // Create borrower first
+            const borrowerResponse = await fetch('/api/borrowers', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                fullName: borrowerData.name,
+                email: borrowerData.email,
+                phoneNumber: borrowerData.phone,
+                companyName: borrowerData.company,
+                propertyAddress: '',
+                createdBy: 'broker'
+              }),
+            });
+
+            if (!borrowerResponse.ok) {
+              const errorData = await borrowerResponse.json();
+              throw new Error(errorData.error || 'Failed to create borrower');
+            }
+
+            const borrowerResult = await borrowerResponse.json();
+            
+            // Now create and submit the application
+            const createResponse = await fetch('/api/enhanced-loan-applications', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                action: 'create',
+                userId: borrowerResult.borrowerId,
+                brokerId: borrowerResult.borrowerId, // Use same ID as broker for now
+                loanProgram: loanProgram
+              }),
+            });
+
+            if (!createResponse.ok) {
+              const errorData = await createResponse.json();
+              throw new Error(errorData.error || 'Failed to create application');
+            }
+
+            const createResult = await createResponse.json();
+            if (!createResult.success) {
+              throw new Error(createResult.error || 'Failed to create application');
+            }
+            
+            // Submit the application
+            const response = await fetch('/api/enhanced-loan-applications', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                action: 'submit',
+                applicationId: createResult.data.applicationId
+              }),
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.error || 'Failed to submit application');
+            }
+
+            const submitResult = await response.json();
+            if (!submitResult.success) {
+              throw new Error(submitResult.error || 'Failed to submit application');
+            }
+
+            toast({
+              title: "Application Submitted!",
+              description: "Thank you. Your loan application has been received and is under review.",
+            });
+            
+            // Route back to the correct office context
+            const currentOfficeContext = getOfficeContextFromUrl();
+            const returnPath = getOfficeReturnPath(currentOfficeContext);
+            router.push(returnPath);
+            return;
+          } catch (error) {
+            console.error('Error creating borrower and application:', error);
+            toast({
+              variant: 'destructive',
+              title: "Submission Failed",
+              description: "There was an error creating the borrower and application. Please try again.",
+            });
+            return;
+          }
+        }
+        
+        toast({
+          variant: 'destructive',
+          title: "Error",
+          description: "No borrower or application information found. Please restart the application.",
+        });
+        return;
+      }
+
+      // If we have an applicationId, submit it; otherwise create a new application and submit
+      let finalApplicationId = applicationId;
+      
+      if (!applicationId && borrowerId) {
+        // Create a new loan application first
+        const createResponse = await fetch('/api/enhanced-loan-applications', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'create',
+            userId: borrowerId,
+            brokerId: borrowerId, // Use same ID as broker for now
+            loanProgram: loanProgram
+          }),
+        });
+
+        if (!createResponse.ok) {
+          const errorData = await createResponse.json();
+          throw new Error(errorData.error || 'Failed to create application');
+        }
+
+        const createResult = await createResponse.json();
+        if (!createResult.success) {
+          throw new Error(createResult.error || 'Failed to create application');
+        }
+        finalApplicationId = createResult.data.applicationId;
+      }
+
+      if (!finalApplicationId) {
+        throw new Error('Could not determine application ID');
+      }
+
+      // Submit the loan application
+      const response = await fetch('/api/enhanced-loan-applications', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'submit',
+          applicationId: finalApplicationId
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to submit application');
+      }
+
+      const submitResult = await response.json();
+      if (!submitResult.success) {
+        throw new Error(submitResult.error || 'Failed to submit application');
+      }
+
+      toast({
         title: "Application Submitted!",
-        description: "Thank you. Your loan application has been received.",
-    });
-    router.push('/dashboard');
+        description: "Thank you. Your loan application has been received and is under review.",
+      });
+      
+      // Route back to the correct office context
+      const currentOfficeContext = getOfficeContextFromUrl();
+      const returnPath = getOfficeReturnPath(currentOfficeContext);
+      router.push(returnPath);
+    } catch (error) {
+      console.error('Error submitting application:', error);
+      toast({
+        variant: 'destructive',
+        title: "Submission Failed",
+        description: "There was an error submitting your application. Please try again.",
+      });
+    }
   };
   
   const formattedLoanProgram = loanProgram

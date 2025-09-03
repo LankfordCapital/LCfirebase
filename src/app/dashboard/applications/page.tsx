@@ -18,6 +18,7 @@ import {
   CheckCircle
 } from "lucide-react";
 
+
 interface LoanProgram {
   id: string;
   name: string;
@@ -31,6 +32,7 @@ interface LoanProgram {
 }
 
 export default function ApplicationsPage() {
+
   const loanPrograms: LoanProgram[] = [
     // Residential NOO Programs
     {
@@ -379,6 +381,8 @@ export default function ApplicationsPage() {
           </div>
         </CardContent>
       </Card>
+      
+
     </div>
   );
 }

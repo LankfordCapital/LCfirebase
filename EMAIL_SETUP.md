@@ -1,21 +1,22 @@
 # Email Service Setup Guide
 
 ## Overview
-We've replaced the complex Firebase extension email system with a simple Resend-based email service. This is much more reliable and easier to set up.
+We've replaced the complex Firebase extension email system with a simple Mailgun-based email service. This is much more reliable and easier to set up.
 
 ## Setup Steps
 
-### 1. Get Resend API Key
-1. Go to [https://resend.com](https://resend.com)
-2. Sign up for a free account (100 emails/day free)
+### 1. Get Mailgun API Key
+1. Go to [https://www.mailgun.com](https://www.mailgun.com)
+2. Sign up for a free account (10,000 emails/month free)
 3. Go to API Keys section
-4. Create a new API key
-5. Copy the API key
+4. Copy your Private API Key
+5. Note your Mailgun domain (e.g., `sandbox-123.mailgun.org` for testing)
 
-### 2. Add Environment Variable
+### 2. Add Environment Variables
 Create a `.env.local` file in your project root and add:
 ```bash
-RESEND_API_KEY=your_actual_api_key_here
+MAILGUN_API_KEY=your_private_api_key_here
+MAILGUN_DOMAIN=your_mailgun_domain_here
 ```
 
 ### 3. Verify Setup
@@ -23,12 +24,35 @@ The email service is now ready to use! You can test it by calling the API endpoi
 
 ```bash
 # Test the email service
-curl -X POST http://localhost:3000/api/test-email \
+curl -X POST http://localhost:3000/api/test-mailgun \
   -H "Content-Type: application/json" \
   -d '{
     "to": "your-email@example.com",
-    "subject": "Test Email",
-    "message": "Hello from Lankford Lending!"
+    "subject": "Test Email from Mailgun",
+    "message": "Hello from Lankford Lending via Mailgun!",
+    "testType": "simple"
+  }'
+```
+
+Or test different email types:
+```bash
+# Test template email
+curl -X POST http://localhost:3000/api/test-mailgun \
+  -H "Content-Type: application/json" \
+  -d '{
+    "to": "your-email@example.com",
+    "subject": "Template Test",
+    "testType": "template"
+  }'
+
+# Test full email with all features
+curl -X POST http://localhost:3000/api/test-mailgun \
+  -H "Content-Type: application/json" \
+  -d '{
+    "to": "your-email@example.com",
+    "subject": "Full Test",
+    "message": "Testing all Mailgun features",
+    "testType": "full"
   }'
 ```
 

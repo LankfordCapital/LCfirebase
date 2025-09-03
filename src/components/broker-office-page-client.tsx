@@ -49,7 +49,7 @@ export default function BrokerOfficePageClient() {
             </div>
         </div>
         <Button asChild>
-            <Link href="/dashboard/application"><PlusCircle className="mr-2 h-4 w-4"/> Start New Application</Link>
+            <Link href="/broker-office/applications"><PlusCircle className="mr-2 h-4 w-4"/> Start New Application</Link>
         </Button>
       </div>
 
