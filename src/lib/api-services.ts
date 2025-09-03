@@ -327,4 +327,64 @@ export class LoanApplicationApiService {
   }
 }
 
+// Appointment API Service
+export class AppointmentApiService {
+  static async getAllAppointments(
+    page: number = 1,
+    limit: number = 20,
+    filters?: {
+      status?: string;
+      type?: string;
+      userId?: string;
+      workforceMemberId?: string;
+      date?: Date;
+    }
+  ): Promise<ApiResponse<any>> {
+    try {
+      // TODO: Implement appointment service logic
+      // This is a placeholder implementation
+      return {
+        success: true,
+        data: {
+          appointments: [],
+          pagination: {
+            page,
+            limit,
+            total: 0,
+            hasMore: false
+          }
+        }
+      };
+    } catch (error) {
+      console.error('Error getting appointments:', error);
+      return { success: false, error: 'Failed to get appointments' };
+    }
+  }
+
+  static async createAppointment(appointmentData: any): Promise<ApiResponse<string>> {
+    try {
+      // TODO: Implement appointment creation logic
+      return { success: true, data: 'appointment-id', message: 'Appointment created successfully' };
+    } catch (error) {
+      console.error('Error creating appointment:', error);
+      return { success: false, error: 'Failed to create appointment' };
+    }
+  }
+
+  static async getAvailableSlots(workforceMemberId: string, date: Date): Promise<ApiResponse<any>> {
+    try {
+      // TODO: Implement available slots logic
+      return {
+        success: true,
+        data: {
+          slots: []
+        }
+      };
+    } catch (error) {
+      console.error('Error getting available slots:', error);
+      return { success: false, error: 'Failed to get available slots' };
+    }
+  }
+}
+
 

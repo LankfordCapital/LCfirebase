@@ -21,6 +21,7 @@ import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Textarea } from './ui/textarea';
 import { getOfficeContextFromUrl, getOfficeBasePath } from '@/lib/office-routing';
 import { useLoanApplication } from '@/hooks/use-loan-application';
+import { useResidentialNOOGroundUpConstructionState } from '@/hooks/use-residential-noo-ground-up-construction-state';
 
 type Dealer = {
   id: string;
@@ -57,6 +58,393 @@ export function LoanApplicationClient({
     updateFields,
     createApplication 
   } = useLoanApplication(applicationId);
+
+  // Check if this is a Ground Up Construction loan
+  const isGroundUpConstruction = loanProgram.toLowerCase().includes('ground up construction');
+  
+  // Ground Up Construction state management
+  const groundUpConstructionState = useResidentialNOOGroundUpConstructionState(
+    application?.userId || 'QpEPcl01X4Moc1vZdhNcB3dtnQ22', // Use actual user ID from logs
+    application?.brokerId || 'QpEPcl01X4Moc1vZdhNcB3dtnQ22' // Use actual broker ID from logs
+  );
+
+  // Populate form fields from Ground Up Construction state when available
+  useEffect(() => {
+    if (isGroundUpConstruction && groundUpConstructionState.application) {
+      const app = groundUpConstructionState.application;
+      console.log(`🏗️ [Ground Up Construction] ===== FORM POPULATION DEBUG START =====`);
+      console.log(`🏗️ [Ground Up Construction] Full application state:`, app);
+      console.log(`🏗️ [Ground Up Construction] Property Info:`, app.propertyInfo);
+      console.log(`🏗️ [Ground Up Construction] Loan Details:`, app.loanDetails);
+      console.log(`🏗️ [Ground Up Construction] Business Info:`, app.businessInfo);
+      console.log(`🏗️ [Ground Up Construction] Property Address specifically:`, app.propertyInfo?.propertyAddress);
+      console.log(`🏗️ [Ground Up Construction] Loan Amount specifically:`, app.loanDetails?.loanAmount);
+      console.log(`🏗️ [Ground Up Construction] Company Name specifically:`, app.businessInfo?.companyName);
+      
+      // Always populate form fields from saved state
+      console.log(`🏗️ [Ground Up Construction] --- POPULATING PROPERTY INFO ---`);
+      if (app.propertyInfo?.propertyAddress) {
+        console.log(`🏗️ [Ground Up Construction] Setting propertyAddress:`, app.propertyInfo.propertyAddress);
+        setPropertyAddress(app.propertyInfo.propertyAddress);
+      } else {
+        console.log(`🏗️ [Ground Up Construction] No propertyAddress found in state`);
+      }
+      
+      if (app.propertyInfo?.propertyApn) {
+        console.log(`🏗️ [Ground Up Construction] Setting propertyApn:`, app.propertyInfo.propertyApn);
+        setPropertyApn(app.propertyInfo.propertyApn);
+      } else {
+        console.log(`🏗️ [Ground Up Construction] No propertyApn found in state`);
+      }
+      
+      if (app.propertyInfo?.annualPropertyTaxes) {
+        console.log(`🏗️ [Ground Up Construction] Setting propertyTaxes:`, app.propertyInfo.annualPropertyTaxes);
+        setPropertyTaxes(app.propertyInfo.annualPropertyTaxes.toString());
+      } else {
+        console.log(`🏗️ [Ground Up Construction] No annualPropertyTaxes found in state`);
+      }
+      
+      if (app.propertyInfo?.propertyType) {
+        console.log(`🏗️ [Ground Up Construction] Setting propertyType:`, app.propertyInfo.propertyType);
+        setPropertyType(app.propertyInfo.propertyType);
+      } else {
+        console.log(`🏗️ [Ground Up Construction] No propertyType found in state`);
+      }
+      
+      if (app.propertyInfo?.asIsValue) {
+        console.log(`🏗️ [Ground Up Construction] Setting asIsValue:`, app.propertyInfo.asIsValue);
+        setAsIsValue(app.propertyInfo.asIsValue.toString());
+      } else {
+        console.log(`🏗️ [Ground Up Construction] No asIsValue found in state`);
+      }
+      
+      if (app.propertyInfo?.afterConstructedValue) {
+        console.log(`🏗️ [Ground Up Construction] Setting afterConstructedValue:`, app.propertyInfo.afterConstructedValue);
+        setAfterConstructedValue(app.propertyInfo.afterConstructedValue.toString());
+      } else {
+        console.log(`🏗️ [Ground Up Construction] No afterConstructedValue found in state`);
+      }
+      
+      if (app.propertyInfo?.stabilizedValue) {
+        console.log(`🏗️ [Ground Up Construction] Setting stabilizedValue:`, app.propertyInfo.stabilizedValue);
+        setStabilizedValue(app.propertyInfo.stabilizedValue.toString());
+      } else {
+        console.log(`🏗️ [Ground Up Construction] No stabilizedValue found in state`);
+      }
+      
+      if (app.propertyInfo?.propertySquareFootage) {
+        console.log(`🏗️ [Ground Up Construction] Setting propertySqFt:`, app.propertyInfo.propertySquareFootage);
+        setPropertySqFt(app.propertyInfo.propertySquareFootage.toString());
+      } else {
+        console.log(`🏗️ [Ground Up Construction] No propertySquareFootage found in state`);
+      }
+      
+      if (app.propertyInfo?.lotSize) {
+        console.log(`🏗️ [Ground Up Construction] Setting lotSize:`, app.propertyInfo.lotSize);
+        setLotSize(app.propertyInfo.lotSize);
+      } else {
+        console.log(`🏗️ [Ground Up Construction] No lotSize found in state`);
+      }
+      
+      if (app.propertyInfo?.constructionTime) {
+        console.log(`🏗️ [Ground Up Construction] Setting constructionTime:`, app.propertyInfo.constructionTime);
+        setConstructionTime(app.propertyInfo.constructionTime.toString());
+      } else {
+        console.log(`🏗️ [Ground Up Construction] No constructionTime found in state`);
+      }
+      
+      if (app.propertyInfo?.requestedClosingDate) {
+        const date = app.propertyInfo.requestedClosingDate;
+        console.log(`🏗️ [Ground Up Construction] Setting requestedClosingDate:`, date);
+        setRequestedClosingDate(date instanceof Date ? date : date.toDate());
+      } else {
+        console.log(`🏗️ [Ground Up Construction] No requestedClosingDate found in state`);
+      }
+      
+      // Populate loan details
+      console.log(`🏗️ [Ground Up Construction] --- POPULATING LOAN DETAILS ---`);
+      if (app.loanDetails?.loanAmount) {
+        console.log(`🏗️ [Ground Up Construction] Setting loanAmount:`, app.loanDetails.loanAmount);
+        setLoanAmount(app.loanDetails.loanAmount.toString());
+      } else {
+        console.log(`🏗️ [Ground Up Construction] No loanAmount found in state`);
+      }
+      
+      if (app.loanDetails?.transactionType) {
+        console.log(`🏗️ [Ground Up Construction] Setting transactionType:`, app.loanDetails.transactionType);
+        setTransactionType(app.loanDetails.transactionType);
+      } else {
+        console.log(`🏗️ [Ground Up Construction] No transactionType found in state`);
+      }
+      
+      // Populate business info
+      console.log(`🏗️ [Ground Up Construction] --- POPULATING BUSINESS INFO ---`);
+      if (app.businessInfo?.companyName) {
+        console.log(`🏗️ [Ground Up Construction] Setting companyName:`, app.businessInfo.companyName);
+        setCompanyName(app.businessInfo.companyName);
+      } else {
+        console.log(`🏗️ [Ground Up Construction] No companyName found in state`);
+      }
+      
+      if (app.businessInfo?.companyEin) {
+        console.log(`🏗️ [Ground Up Construction] Setting companyEin:`, app.businessInfo.companyEin);
+        setCompanyEin(app.businessInfo.companyEin);
+      } else {
+        console.log(`🏗️ [Ground Up Construction] No companyEin found in state`);
+      }
+      
+      console.log(`🏗️ [Ground Up Construction] ===== FORM POPULATION DEBUG END =====`);
+      
+      // Debug: Check form field values after setting them
+      setTimeout(() => {
+        console.log(`🔍 [Ground Up Construction] Form field values after initial population:`);
+        console.log(`  propertyAddress:`, propertyAddress);
+        console.log(`  propertyApn:`, propertyApn);
+        console.log(`  loanAmount:`, loanAmount);
+        console.log(`  asIsValue:`, asIsValue);
+        console.log(`  companyName:`, companyName);
+      }, 100);
+    }
+  }, [isGroundUpConstruction]); // Remove groundUpConstructionState.application from dependencies to prevent infinite loop
+
+  // Trigger form population when Ground Up Construction state changes (for navigation back)
+  useEffect(() => {
+    if (isGroundUpConstruction && groundUpConstructionState.application) {
+      console.log(`🔄 [Ground Up Construction] ===== STATE CHANGE DEBUG START =====`);
+      console.log(`🔄 [Ground Up Construction] State changed, refreshing form fields...`);
+      const app = groundUpConstructionState.application;
+      console.log(`🔄 [Ground Up Construction] Updated application state:`, app);
+      console.log(`🔄 [Ground Up Construction] Property Info:`, app.propertyInfo);
+      console.log(`🔄 [Ground Up Construction] Loan Details:`, app.loanDetails);
+      console.log(`🔄 [Ground Up Construction] Business Info:`, app.businessInfo);
+      console.log(`🔄 [Ground Up Construction] Property Address specifically:`, app.propertyInfo?.propertyAddress);
+      console.log(`🔄 [Ground Up Construction] Loan Amount specifically:`, app.loanDetails?.loanAmount);
+      console.log(`🔄 [Ground Up Construction] Company Name specifically:`, app.businessInfo?.companyName);
+      
+      // Always populate form fields from saved state
+      console.log(`🔄 [Ground Up Construction] --- REFRESHING FORM FIELDS ---`);
+      if (app.propertyInfo?.propertyAddress) {
+        console.log(`🔄 [Ground Up Construction] Refreshing propertyAddress:`, app.propertyInfo.propertyAddress);
+        setPropertyAddress(app.propertyInfo.propertyAddress);
+      }
+      if (app.propertyInfo?.propertyApn) {
+        console.log(`🔄 [Ground Up Construction] Refreshing propertyApn:`, app.propertyInfo.propertyApn);
+        setPropertyApn(app.propertyInfo.propertyApn);
+      }
+      if (app.propertyInfo?.annualPropertyTaxes) {
+        console.log(`🔄 [Ground Up Construction] Refreshing propertyTaxes:`, app.propertyInfo.annualPropertyTaxes);
+        setPropertyTaxes(app.propertyInfo.annualPropertyTaxes.toString());
+      }
+      if (app.propertyInfo?.propertyType) {
+        console.log(`🔄 [Ground Up Construction] Refreshing propertyType:`, app.propertyInfo.propertyType);
+        setPropertyType(app.propertyInfo.propertyType);
+      }
+      if (app.propertyInfo?.asIsValue) {
+        console.log(`🔄 [Ground Up Construction] Refreshing asIsValue:`, app.propertyInfo.asIsValue);
+        setAsIsValue(app.propertyInfo.asIsValue.toString());
+      }
+      if (app.propertyInfo?.afterConstructedValue) {
+        console.log(`🔄 [Ground Up Construction] Refreshing afterConstructedValue:`, app.propertyInfo.afterConstructedValue);
+        setAfterConstructedValue(app.propertyInfo.afterConstructedValue.toString());
+      }
+      if (app.propertyInfo?.stabilizedValue) {
+        console.log(`🔄 [Ground Up Construction] Refreshing stabilizedValue:`, app.propertyInfo.stabilizedValue);
+        setStabilizedValue(app.propertyInfo.stabilizedValue.toString());
+      }
+      if (app.propertyInfo?.propertySquareFootage) {
+        console.log(`🔄 [Ground Up Construction] Refreshing propertySqFt:`, app.propertyInfo.propertySquareFootage);
+        setPropertySqFt(app.propertyInfo.propertySquareFootage.toString());
+      }
+      if (app.propertyInfo?.lotSize) {
+        console.log(`🔄 [Ground Up Construction] Refreshing lotSize:`, app.propertyInfo.lotSize);
+        setLotSize(app.propertyInfo.lotSize);
+      }
+      if (app.propertyInfo?.constructionTime) {
+        console.log(`🔄 [Ground Up Construction] Refreshing constructionTime:`, app.propertyInfo.constructionTime);
+        setConstructionTime(app.propertyInfo.constructionTime.toString());
+      }
+      if (app.propertyInfo?.requestedClosingDate) {
+        const date = app.propertyInfo.requestedClosingDate;
+        console.log(`🔄 [Ground Up Construction] Refreshing requestedClosingDate:`, date);
+        setRequestedClosingDate(date instanceof Date ? date : date.toDate());
+      }
+      if (app.loanDetails?.loanAmount) {
+        console.log(`🔄 [Ground Up Construction] Refreshing loanAmount:`, app.loanDetails.loanAmount);
+        setLoanAmount(app.loanDetails.loanAmount.toString());
+      }
+      if (app.loanDetails?.transactionType) {
+        console.log(`🔄 [Ground Up Construction] Refreshing transactionType:`, app.loanDetails.transactionType);
+        setTransactionType(app.loanDetails.transactionType);
+      }
+      if (app.businessInfo?.companyName) {
+        console.log(`🔄 [Ground Up Construction] Refreshing companyName:`, app.businessInfo.companyName);
+        setCompanyName(app.businessInfo.companyName);
+      }
+      if (app.businessInfo?.companyEin) {
+        console.log(`🔄 [Ground Up Construction] Refreshing companyEin:`, app.businessInfo.companyEin);
+        setCompanyEin(app.businessInfo.companyEin);
+      }
+      
+      console.log(`🔄 [Ground Up Construction] ===== STATE CHANGE DEBUG END =====`);
+      
+      // Debug: Check form field values after setting them
+      setTimeout(() => {
+        console.log(`🔍 [Ground Up Construction] Form field values after population:`);
+        console.log(`  propertyAddress:`, propertyAddress);
+        console.log(`  propertyApn:`, propertyApn);
+        console.log(`  loanAmount:`, loanAmount);
+        console.log(`  asIsValue:`, asIsValue);
+        console.log(`  companyName:`, companyName);
+      }, 100);
+    }
+  }, [isGroundUpConstruction, groundUpConstructionState.application?.updatedAt]); // Only trigger when state actually changes
+
+  // Initialize Ground Up Construction state with existing application data
+  useEffect(() => {
+    if (isGroundUpConstruction && application && groundUpConstructionState.application) {
+      console.log(`🏗️ [Ground Up Construction] Initializing state with existing application data...`);
+      
+      // Only initialize if the Ground Up Construction state is empty
+      const currentState = groundUpConstructionState.application;
+      if (!currentState.propertyInfo?.propertyAddress && application.propertyInfo?.propertyAddress) {
+        groundUpConstructionState.updateField('propertyInfo.propertyAddress', application.propertyInfo.propertyAddress);
+      }
+      if (!currentState.propertyInfo?.propertyApn && application.propertyInfo?.propertyApn) {
+        groundUpConstructionState.updateField('propertyInfo.propertyApn', application.propertyInfo.propertyApn);
+      }
+      if (!currentState.propertyInfo?.annualPropertyTaxes && application.propertyInfo?.annualPropertyTaxes) {
+        groundUpConstructionState.updateField('propertyInfo.annualPropertyTaxes', application.propertyInfo.annualPropertyTaxes);
+      }
+      if (!currentState.loanDetails?.loanAmount && application.loanDetails?.loanAmount) {
+        groundUpConstructionState.updateField('loanDetails.loanAmount', application.loanDetails.loanAmount);
+      }
+      if (!currentState.businessInfo?.companyName && application.businessInfo?.companyName) {
+        groundUpConstructionState.updateField('businessInfo.companyName', application.businessInfo.companyName);
+      }
+      if (!currentState.businessInfo?.companyEin && application.businessInfo?.companyEin) {
+        groundUpConstructionState.updateField('businessInfo.companyEin', application.businessInfo.companyEin);
+      }
+      
+      console.log(`✅ [Ground Up Construction] State initialized with existing data!`);
+    }
+  }, [isGroundUpConstruction, application?.id]); // Only run when application ID changes
+
+  // Function to manually refresh form fields from Ground Up Construction state
+  const refreshFormFromTypedState = useCallback(() => {
+    if (isGroundUpConstruction && groundUpConstructionState.application) {
+      console.log(`🔄 [Ground Up Construction] ===== MANUAL REFRESH DEBUG START =====`);
+      console.log(`🔄 [Ground Up Construction] Manually refreshing form fields...`);
+      groundUpConstructionState.logCurrentState();
+      
+      const app = groundUpConstructionState.application;
+      console.log(`🔄 [Ground Up Construction] Manual refresh - Full application state:`, app);
+      console.log(`🔄 [Ground Up Construction] Manual refresh - Property Info:`, app.propertyInfo);
+      console.log(`🔄 [Ground Up Construction] Manual refresh - Loan Details:`, app.loanDetails);
+      console.log(`🔄 [Ground Up Construction] Manual refresh - Business Info:`, app.businessInfo);
+      
+      // Always populate form fields from saved state
+      console.log(`🔄 [Ground Up Construction] --- MANUAL REFRESH FORM FIELDS ---`);
+      if (app.propertyInfo?.propertyAddress) {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - Setting propertyAddress:`, app.propertyInfo.propertyAddress);
+        setPropertyAddress(app.propertyInfo.propertyAddress);
+      } else {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - No propertyAddress found`);
+      }
+      if (app.propertyInfo?.propertyApn) {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - Setting propertyApn:`, app.propertyInfo.propertyApn);
+        setPropertyApn(app.propertyInfo.propertyApn);
+      } else {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - No propertyApn found`);
+      }
+      if (app.propertyInfo?.annualPropertyTaxes) {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - Setting propertyTaxes:`, app.propertyInfo.annualPropertyTaxes);
+        setPropertyTaxes(app.propertyInfo.annualPropertyTaxes.toString());
+      } else {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - No annualPropertyTaxes found`);
+      }
+      if (app.propertyInfo?.propertyType) {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - Setting propertyType:`, app.propertyInfo.propertyType);
+        setPropertyType(app.propertyInfo.propertyType);
+      } else {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - No propertyType found`);
+      }
+      if (app.propertyInfo?.asIsValue) {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - Setting asIsValue:`, app.propertyInfo.asIsValue);
+        setAsIsValue(app.propertyInfo.asIsValue.toString());
+      } else {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - No asIsValue found`);
+      }
+      if (app.propertyInfo?.afterConstructedValue) {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - Setting afterConstructedValue:`, app.propertyInfo.afterConstructedValue);
+        setAfterConstructedValue(app.propertyInfo.afterConstructedValue.toString());
+      } else {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - No afterConstructedValue found`);
+      }
+      if (app.propertyInfo?.stabilizedValue) {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - Setting stabilizedValue:`, app.propertyInfo.stabilizedValue);
+        setStabilizedValue(app.propertyInfo.stabilizedValue.toString());
+      } else {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - No stabilizedValue found`);
+      }
+      if (app.propertyInfo?.propertySquareFootage) {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - Setting propertySqFt:`, app.propertyInfo.propertySquareFootage);
+        setPropertySqFt(app.propertyInfo.propertySquareFootage.toString());
+      } else {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - No propertySquareFootage found`);
+      }
+      if (app.propertyInfo?.lotSize) {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - Setting lotSize:`, app.propertyInfo.lotSize);
+        setLotSize(app.propertyInfo.lotSize);
+      } else {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - No lotSize found`);
+      }
+      if (app.propertyInfo?.constructionTime) {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - Setting constructionTime:`, app.propertyInfo.constructionTime);
+        setConstructionTime(app.propertyInfo.constructionTime.toString());
+      } else {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - No constructionTime found`);
+      }
+      if (app.propertyInfo?.requestedClosingDate) {
+        const date = app.propertyInfo.requestedClosingDate;
+        console.log(`🔄 [Ground Up Construction] Manual refresh - Setting requestedClosingDate:`, date);
+        setRequestedClosingDate(date instanceof Date ? date : date.toDate());
+      } else {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - No requestedClosingDate found`);
+      }
+      
+      // Populate loan details
+      console.log(`🔄 [Ground Up Construction] --- MANUAL REFRESH LOAN DETAILS ---`);
+      if (app.loanDetails?.loanAmount) {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - Setting loanAmount:`, app.loanDetails.loanAmount);
+        setLoanAmount(app.loanDetails.loanAmount.toString());
+      } else {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - No loanAmount found`);
+      }
+      if (app.loanDetails?.transactionType) {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - Setting transactionType:`, app.loanDetails.transactionType);
+        setTransactionType(app.loanDetails.transactionType);
+      } else {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - No transactionType found`);
+      }
+      
+      // Populate business info
+      console.log(`🔄 [Ground Up Construction] --- MANUAL REFRESH BUSINESS INFO ---`);
+      if (app.businessInfo?.companyName) {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - Setting companyName:`, app.businessInfo.companyName);
+        setCompanyName(app.businessInfo.companyName);
+      } else {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - No companyName found`);
+      }
+      if (app.businessInfo?.companyEin) {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - Setting companyEin:`, app.businessInfo.companyEin);
+        setCompanyEin(app.businessInfo.companyEin);
+      } else {
+        console.log(`🔄 [Ground Up Construction] Manual refresh - No companyEin found`);
+      }
+      
+      console.log(`🔄 [Ground Up Construction] ===== MANUAL REFRESH DEBUG END =====`);
+    }
+  }, [isGroundUpConstruction, groundUpConstructionState]);
   // Property Information
   const [propertyAddress, setPropertyAddress] = useState('');
   const [propertyApn, setPropertyApn] = useState('');
@@ -108,6 +496,49 @@ export function LoanApplicationClient({
 
   
   const handleContinue = () => {
+    // If this is a Ground Up Construction loan, save all form data to typed state
+    if (isGroundUpConstruction) {
+      console.log(`🏗️ [Ground Up Construction] ===== SAVING DATA DEBUG START =====`);
+      console.log(`🏗️ [Ground Up Construction] Current form field values:`);
+      console.log(`  propertyAddress:`, propertyAddress);
+      console.log(`  propertyApn:`, propertyApn);
+      console.log(`  propertyTaxes:`, propertyTaxes);
+      console.log(`  propertyType:`, propertyType);
+      console.log(`  asIsValue:`, asIsValue);
+      console.log(`  afterConstructedValue:`, afterConstructedValue);
+      console.log(`  stabilizedValue:`, stabilizedValue);
+      console.log(`  propertySqFt:`, propertySqFt);
+      console.log(`  lotSize:`, lotSize);
+      console.log(`  constructionTime:`, constructionTime);
+      console.log(`  requestedClosingDate:`, requestedClosingDate);
+      console.log(`  loanAmount:`, loanAmount);
+      console.log(`  transactionType:`, transactionType);
+      console.log(`  companyName:`, companyName);
+      console.log(`  companyEin:`, companyEin);
+      
+      const page1Data = {
+        'propertyInfo.propertyAddress': propertyAddress,
+        'propertyInfo.propertyApn': propertyApn,
+        'propertyInfo.annualPropertyTaxes': parseFloat(propertyTaxes) || 0,
+        'propertyInfo.propertyType': propertyType || 'multi-family',
+        'propertyInfo.asIsValue': parseFloat(asIsValue) || 0,
+        'propertyInfo.afterConstructedValue': parseFloat(afterConstructedValue) || 0,
+        'propertyInfo.stabilizedValue': parseFloat(stabilizedValue) || 0,
+        'propertyInfo.propertySquareFootage': parseFloat(propertySqFt) || 0,
+        'propertyInfo.lotSize': lotSize,
+        'propertyInfo.constructionTime': parseFloat(constructionTime) || 0,
+        'propertyInfo.requestedClosingDate': requestedClosingDate ? new Date(requestedClosingDate) : new Date(),
+        'loanDetails.loanAmount': parseFloat(loanAmount) || 0,
+        'loanDetails.transactionType': transactionType,
+        'businessInfo.companyName': companyName,
+        'businessInfo.companyEin': companyEin,
+      };
+      
+      console.log(`🏗️ [Ground Up Construction] Data being saved to typed state:`, page1Data);
+      groundUpConstructionState.updateMultipleFields(page1Data);
+      console.log(`🏗️ [Ground Up Construction] ===== SAVING DATA DEBUG END =====`);
+    }
+    
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
     const urlParams = new URLSearchParams(window.location.search);
     const paramString = urlParams.toString();
@@ -216,8 +647,14 @@ export function LoanApplicationClient({
   }, [application, applicationId]);
 
 
-  // Handle field updates with auto-save
+  // Handle field updates (no auto-save, only save on navigation)
   const handleFieldUpdate = (field: string, value: any) => {
+    // For Ground Up Construction loans, completely bypass the generic system
+    if (isGroundUpConstruction) {
+      console.log(`🏗️ [Ground Up Construction] Field update bypassed for generic system: ${field} = ${value}`);
+      return; // Don't call the generic updateField at all
+    }
+    
     if (applicationId) {
       updateField(field, value);
     }
@@ -408,24 +845,33 @@ export function LoanApplicationClient({
                         value={propertyAddress} 
                         onChange={e => {
                             setPropertyAddress(e.target.value);
-                            handleFieldUpdate('propertyInfo.propertyAddress.street', e.target.value);
+                            handleFieldUpdate('propertyInfo.propertyAddress', e.target.value);
                         }} 
                     />
                 </div>
                  <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="propertyApn">Property APN</Label>
-                        <Input id="propertyApn" placeholder="e.g., 123-456-789" value={propertyApn} onChange={e => setPropertyApn(e.target.value)} />
+                        <Input id="propertyApn" placeholder="e.g., 123-456-789" value={propertyApn} onChange={e => {
+                            setPropertyApn(e.target.value);
+                            handleFieldUpdate('propertyInfo.propertyApn', e.target.value);
+                        }} />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="propertyTaxes">Annual Property Taxes</Label>
-                        <Input id="propertyTaxes" type="number" placeholder="e.g., 5000" value={propertyTaxes} onChange={e => setPropertyTaxes(e.target.value)} />
+                        <Input id="propertyTaxes" type="number" placeholder="e.g., 5000" value={propertyTaxes} onChange={e => {
+                            setPropertyTaxes(e.target.value);
+                            handleFieldUpdate('propertyInfo.annualPropertyTaxes', parseFloat(e.target.value) || 0);
+                        }} />
                     </div>
                 </div>
 
                 {!isLandAcquisition && <div className="space-y-2">
                   <Label htmlFor="propertyType">Property Type</Label>
-                  <Select onValueChange={setPropertyType} value={propertyType}>
+                  <Select onValueChange={(value) => {
+                    setPropertyType(value);
+                    handleFieldUpdate('propertyInfo.propertyType', value);
+                  }} value={propertyType}>
                     <SelectTrigger id="propertyType">
                       <SelectValue placeholder="Select a property type" />
                     </SelectTrigger>
@@ -542,7 +988,10 @@ export function LoanApplicationClient({
                 <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="asIsValue">As Is Value</Label>
-                        <Input id="asIsValue" type="number" placeholder="e.g., 350000" value={asIsValue} onChange={e => setAsIsValue(e.target.value)} />
+                        <Input id="asIsValue" type="number" placeholder="e.g., 350000" value={asIsValue} onChange={e => {
+                            setAsIsValue(e.target.value);
+                            handleFieldUpdate('propertyInfo.asIsValue', parseFloat(e.target.value) || 0);
+                        }} />
                     </div>
                 </div>
 
@@ -591,11 +1040,17 @@ export function LoanApplicationClient({
                         <div className="grid md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="afterConstructedValue">After Constructed Value</Label>
-                                <Input id="afterConstructedValue" type="number" placeholder="e.g., 1000000" value={afterConstructedValue} onChange={e => setAfterConstructedValue(e.target.value)} />
+                                <Input id="afterConstructedValue" type="number" placeholder="e.g., 1000000" value={afterConstructedValue} onChange={e => {
+                                    setAfterConstructedValue(e.target.value);
+                                    handleFieldUpdate('propertyInfo.afterConstructedValue', parseFloat(e.target.value) || 0);
+                                }} />
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="stabilizedValue">Stabilized Value</Label>
-                                <Input id="stabilizedValue" type="number" placeholder="e.g., 1200000" value={stabilizedValue} onChange={e => setStabilizedValue(e.target.value)} />
+                                <Input id="stabilizedValue" type="number" placeholder="e.g., 1200000" value={stabilizedValue} onChange={e => {
+                                    setStabilizedValue(e.target.value);
+                                    handleFieldUpdate('propertyInfo.stabilizedValue', parseFloat(e.target.value) || 0);
+                                }} />
                             </div>
                         </div>
                     </>
@@ -604,18 +1059,27 @@ export function LoanApplicationClient({
                  <div className="grid md:grid-cols-2 gap-4">
                     {!isLandAcquisition && <div className="space-y-2">
                         <Label htmlFor="propertySqFt">Subject Property Square Footage</Label>
-                        <Input id="propertySqFt" type="number" placeholder="e.g., 2000" value={propertySqFt} onChange={e => setPropertySqFt(e.target.value)} />
+                        <Input id="propertySqFt" type="number" placeholder="e.g., 2000" value={propertySqFt} onChange={e => {
+                            setPropertySqFt(e.target.value);
+                            handleFieldUpdate('propertyInfo.propertySquareFootage', parseFloat(e.target.value) || 0);
+                        }} />
                     </div>}
                     <div className="space-y-2">
                         <Label htmlFor="lotSize">Lot Size (in sq. ft. or acres)</Label>
-                        <Input id="lotSize" placeholder="e.g., 10,000 sq. ft. or 0.23 acres" value={lotSize} onChange={e => setLotSize(e.target.value)} />
+                        <Input id="lotSize" placeholder="e.g., 10,000 sq. ft. or 0.23 acres" value={lotSize} onChange={e => {
+                            setLotSize(e.target.value);
+                            handleFieldUpdate('propertyInfo.lotSize', e.target.value);
+                        }} />
                     </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                     {!isLandAcquisition && <div className="space-y-2">
                         <Label htmlFor="constructionTime">Estimated Time to Construct (in months)</Label>
-                        <Input id="constructionTime" type="number" placeholder="e.g., 6" value={constructionTime} onChange={e => setConstructionTime(e.target.value)} />
+                        <Input id="constructionTime" type="number" placeholder="e.g., 6" value={constructionTime} onChange={e => {
+                            setConstructionTime(e.target.value);
+                            handleFieldUpdate('propertyInfo.constructionTime', parseFloat(e.target.value) || 0);
+                        }} />
                     </div>}
                      <div className="space-y-2">
                         <Label htmlFor="closingDate">Requested Closing Date</Label>
@@ -657,11 +1121,17 @@ export function LoanApplicationClient({
                 <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="companyName">Company Name</Label>
-                        <Input id="companyName" placeholder="e.g., Real Estate Holdings LLC" value={companyName} onChange={e => setCompanyName(e.target.value)} />
+                        <Input id="companyName" placeholder="e.g., Real Estate Holdings LLC" value={companyName} onChange={e => {
+                            setCompanyName(e.target.value);
+                            handleFieldUpdate('businessInfo.companyName', e.target.value);
+                        }} />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="companyEin">Company EIN</Label>
-                        <Input id="companyEin" placeholder="e.g., 12-3456789" value={companyEin} onChange={e => setCompanyEin(e.target.value)} />
+                        <Input id="companyEin" placeholder="e.g., 12-3456789" value={companyEin} onChange={e => {
+                            setCompanyEin(e.target.value);
+                            handleFieldUpdate('businessInfo.companyEin', e.target.value);
+                        }} />
                     </div>
                 </div>
                 <div className="space-y-3 pt-2">
@@ -676,7 +1146,16 @@ export function LoanApplicationClient({
         </Card>
 
 
-        <div className="flex justify-end items-center">
+        <div className="flex justify-between items-center">
+            {isGroundUpConstruction && (
+                <Button 
+                    variant="outline" 
+                    onClick={refreshFormFromTypedState}
+                    className="text-xs"
+                >
+                    🔄 Refresh from Typed State
+                </Button>
+            )}
             <Button onClick={handleContinue}>
                 Continue to Page 2 <ArrowRight className="ml-2 h-4 w-4" />
             </Button>

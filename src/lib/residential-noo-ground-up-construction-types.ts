@@ -419,7 +419,7 @@ export interface BusinessInformationExtended {
   // Business Financials
   annualRevenue: number;
   annualProfit: number;
-  businessPlan?: string;             // URL to uploaded business plan
+  businessPlan?: ApplicationDocument;  // Business plan document
   
   // Business Licenses and Certifications
   businessLicense: string;
@@ -457,12 +457,12 @@ export interface PropertyDetailsExtended {
   environmentalIssues: {
     hasIssues: boolean;
     issues?: string[];
-    reports?: string[];              // Array of file URLs
+    reports?: ApplicationDocument[];  // Array of environmental reports
   };
   
   // Property Photos and Documents
-  propertyPhotos: string[];          // Array of file URLs
-  propertyDocuments: string[];       // Array of file URLs
+  propertyPhotos: ApplicationDocument[];     // Array of property photos
+  propertyDocuments: ApplicationDocument[];  // Array of property documents
   
   // HOA Information
   hoaContact?: {
@@ -479,11 +479,11 @@ export interface PropertyDetailsExtended {
 
 export interface ConstructionPlans {
   // Plan Documents
-  architecturalPlans?: string;       // File URL
-  structuralPlans?: string;          // File URL
-  mechanicalPlans?: string;          // File URL
-  electricalPlans?: string;          // File URL
-  sitePlans?: string;                // File URL
+  architecturalPlans?: ApplicationDocument;
+  structuralPlans?: ApplicationDocument;
+  mechanicalPlans?: ApplicationDocument;
+  electricalPlans?: ApplicationDocument;
+  sitePlans?: ApplicationDocument;
   
   // Plan Details
   planRevision: string;              // "Rev A", "Rev B", etc.

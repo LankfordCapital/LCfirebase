@@ -4,7 +4,8 @@
 import { Resend } from 'resend';
 
 // Initialize Resend with your API key
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resendApiKey = process.env.RESEND_API_KEY;
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 interface MailPayload {
     to: string[];
@@ -24,6 +25,11 @@ interface MailPayload {
  */
 export async function sendEmail(payload: MailPayload): Promise<any> {
     try {
+        if (!resend) {
+            console.warn('Resend API key not configured. Email not sent:', payload);
+            return { success: false, message: 'Email service not configured' };
+        }
+
         const result = await resend.emails.send({
             from: payload.from || 'Lankford Lending <noreply@lankfordcapital.com>',
             to: payload.to,

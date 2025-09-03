@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { getOfficeContextFromUrl, getOfficeBasePath } from '@/lib/office-routing';
 import { Separator } from '@/components/ui/separator';
 
-export function LoanApplicationClientPage8({ loanProgram, officeContext = 'borrower' }: { loanProgram: string, officeContext?: 'borrower' | 'broker' | 'workforce' }) {
+function LoanApplicationClientPage8({ loanProgram, officeContext = 'borrower' }: { loanProgram: string, officeContext?: 'borrower' | 'broker' | 'workforce' }) {
   const { documents, addDocument } = useDocumentContext();
   const router = useRouter();
 
@@ -23,7 +23,6 @@ export function LoanApplicationClientPage8({ loanProgram, officeContext = 'borro
         await addDocument({
             name: itemName,
             file,
-            status: 'uploaded',
         });
     }
   }, [addDocument]);
@@ -102,3 +101,5 @@ export function LoanApplicationClientPage8({ loanProgram, officeContext = 'borro
     </div>
   );
 }
+
+export default LoanApplicationClientPage8;
