@@ -6,6 +6,21 @@ export default {
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/hooks/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/lib/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  safelist: [
+    'w-[600px]',
+    'min-w-[600px]',
+    'loan-program-select',
+    'loan-program-dropdown',
+    'blinking-gold',
+    {
+      pattern: /^(bg|text|border)-(primary|secondary|accent|muted|destructive|card|popover|foreground|background)(-\d+)?$/,
+    },
+    {
+      pattern: /^(w|h|min-w|min-h|max-w|max-h)-\[.*\]$/,
+    },
   ],
   theme: {
     container: {
