@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     keywords: "real estate financing, investment property loans, private lending, hard money lender, commercial real estate loans, residential investment loans, non-owner occupied loans, fix and flip loans, DSCR loans, ground up construction loans, bridge loans, commercial bridge loans, industrial property financing, land development loans, mezzanine financing, equipment financing, mobilization funding, capital for real estate investors, broker loan programs, Lankford Capital, Lankford Lending",
       icons: {
     icon: [
-      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon.ico?v=4', sizes: 'any' },
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
       { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
     ],
@@ -50,7 +50,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn(fontBody.variable, fontHeadline.variable, "h-full")}>
               <head>
-            <link rel="icon" href="/favicon.ico" />
+            <link rel="icon" href="/favicon.ico?v=4" />
             <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
             <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
             <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
