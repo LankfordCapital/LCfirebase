@@ -5,21 +5,34 @@ runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
   maxInstances: 3
-  # Make the Gemini API Key available to the app.
-  # The secret must be created in Google Secret Manager.
+  # Make secrets available to the app.
+  # The secrets must be created in Google Secret Manager.
   secrets:
-    - GEMINI_API_KEY
-    - FIREBASE_SERVICE_ACCOUNT_KEY
-    - RESEND_API_KEY
-    - PANGEA_API_TOKEN
-    - MAILGUN_API_KEY
-    - MAILGUN_DOMAIN
+    - variable: GEMINI_API_KEY
+      secret: projects/lankford-lending/secrets/GEMINI_API_KEY
+    - variable: FIREBASE_SERVICE_ACCOUNT_KEY
+      secret: projects/lankford-lending/secrets/FIREBASE_SERVICE_ACCOUNT_KEY
+    - variable: RESEND_API_KEY
+      secret: projects/lankford-lending/secrets/RESEND_API_KEY
+    - variable: PANGEA_API_TOKEN
+      secret: projects/lankford-lending/secrets/PANGEA_API_TOKEN
+    - variable: MAILGUN_API_KEY
+      secret: projects/lankford-lending/secrets/MAILGUN_API_KEY
+    - variable: MAILGUN_DOMAIN
+      secret: projects/lankford-lending/secrets/MAILGUN_DOMAIN
   # Environment variables for the app
   env:
-    - NODE_ENV=production
-    - NEXT_PUBLIC_FIREBASE_PROJECT_ID=lankford-lending
-    - NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyCu0RxaSo1IKfWQ-as3xOLx8mSMm4CzrpI
-    - NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=lankford-lending.firebaseapp.com
-    - NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=lankford-lending.firebasestorage.app
-    - NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=940157326397
-    - NEXT_PUBLIC_BASE_URL=https://lankfordcapital.com
+    - variable: NODE_ENV
+      value: production
+    - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+      value: lankford-lending
+    - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+      value: AIzaSyCu0RxaSo1IKfWQ-as3xOLx8mSMm4CzrpI
+    - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+      value: lankford-lending.firebaseapp.com
+    - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+      value: lankford-lending.firebasestorage.app
+    - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+      value: "940157326397"
+    - variable: NEXT_PUBLIC_BASE_URL
+      value: https://lankfordcapital.com
