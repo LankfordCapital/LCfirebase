@@ -256,3 +256,4 @@ For questions or issues:
 5. **Return to the pipeline** to see updated progress
 
 The system is designed to be intuitive and seamless - you should be able to continue working on loan applications exactly where you left off, with all your data automatically saved and progress tracked in real-time.
+
