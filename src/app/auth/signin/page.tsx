@@ -131,7 +131,7 @@ export default function SignInPage() {
             alt="Lankford Capital Logo"
             width={160}
             height={160}
-            className="hover:scale-105 transition-transform duration-200"
+            className="w-40 h-40 object-contain hover:scale-105 transition-transform duration-200"
           />
         </Link>
       </div>

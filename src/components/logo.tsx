@@ -12,7 +12,7 @@ export function Logo({ className, href }: { className?: string, href?: string })
           alt="Lankford Capital Icon"
           width={40}
           height={40}
-          style={{ height: 'auto' }}
+          className="w-10 h-10 object-contain"
         />
       <div className="flex items-baseline text-2xl">
         <span className="text-primary font-bold">Lankford</span>

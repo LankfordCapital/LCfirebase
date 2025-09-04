@@ -15,11 +15,17 @@ export default {
     'loan-program-select',
     'loan-program-dropdown',
     'blinking-gold',
+    // Image sizing classes
+    'w-10', 'h-10', 'w-12', 'h-12', 'w-16', 'h-16', 'w-40', 'h-40',
+    'object-contain', 'object-cover', 'object-fill',
     {
       pattern: /^(bg|text|border)-(primary|secondary|accent|muted|destructive|card|popover|foreground|background)(-\d+)?$/,
     },
     {
       pattern: /^(w|h|min-w|min-h|max-w|max-h)-\[.*\]$/,
+    },
+    {
+      pattern: /^(w|h)-(\d+)$/,
     },
   ],
   theme: {

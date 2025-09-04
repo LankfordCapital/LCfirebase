@@ -29,7 +29,7 @@ export default function ContactPage() {
             alt="Lankford Capital Icon"
             width={64}
             height={64}
-            className="absolute bottom-4 right-4 z-20"
+            className="absolute bottom-4 right-4 z-20 w-16 h-16 object-contain"
         />
       </section>
 
@@ -66,8 +66,7 @@ export default function ContactPage() {
                     alt="Lankford Capital Icon"
                     width={48}
                     height={48}
-                    className="absolute top-4 right-4"
-                    style={{ width: 'auto', height: 'auto' }}
+                    className="absolute top-4 right-4 w-12 h-12 object-contain"
                 />
                 <CardHeader>
                   <CardTitle className="font-headline text-2xl">Send Us a Message</CardTitle>
