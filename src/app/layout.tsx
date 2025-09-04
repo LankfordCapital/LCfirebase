@@ -10,11 +10,13 @@ import '@/lib/db-init'; // Initialize database collections
 const fontBody = Inter({
   subsets: ['latin'],
   variable: '--font-body',
+  display: 'swap',
 });
 
 const fontHeadline = Space_Grotesk({
   subsets: ['latin'],
   variable: '--font-headline',
+  display: 'swap',
 });
 
 
