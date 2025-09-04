@@ -24,6 +24,21 @@ export const metadata: Metadata = {
     title: "Lankford Capital - Your Partner in Financial Growth",
     description: "Lankford Capital offers a wide range of loan products including residential, commercial, and industrial loans. We provide tailored financing solutions for construction, acquisition, and development projects. Your trusted partner for real estate and business financing.",
     keywords: "real estate financing, investment property loans, private lending, hard money lender, commercial real estate loans, residential investment loans, non-owner occupied loans, fix and flip loans, DSCR loans, ground up construction loans, bridge loans, commercial bridge loans, industrial property financing, land development loans, mezzanine financing, equipment financing, mobilization funding, capital for real estate investors, broker loan programs, Lankford Capital, Lankford Lending",
+    icons: {
+        icon: [
+            { url: '/favicon.ico', sizes: 'any' },
+            { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+            { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+        ],
+        apple: [
+            { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+        ],
+        other: [
+            { url: '/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+            { url: '/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
+        ],
+    },
+    manifest: '/site.webmanifest',
 };
 
 
