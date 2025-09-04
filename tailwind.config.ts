@@ -18,6 +18,8 @@ export default {
     // Image sizing classes
     'w-10', 'h-10', 'w-12', 'h-12', 'w-16', 'h-16', 'w-40', 'h-40',
     'object-contain', 'object-cover', 'object-fill',
+    // Fixed logo size classes
+    'logo-fixed-size', 'logo-fixed-size-48', 'logo-fixed-size-64', 'logo-fixed-size-160',
     {
       pattern: /^(bg|text|border)-(primary|secondary|accent|muted|destructive|card|popover|foreground|background)(-\d+)?$/,
     },

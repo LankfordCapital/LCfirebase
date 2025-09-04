@@ -218,7 +218,7 @@ export default function Home() {
                     alt="Lankford Capital Icon"
                     width={40}
                     height={40}
-                    className="absolute top-4 right-4 w-10 h-10 object-contain"
+                    className="absolute top-4 right-4 logo-fixed-size"
                 />
                 <CardHeader>
                   <CardTitle className="font-headline text-2xl">Submit an Inquiry</CardTitle>

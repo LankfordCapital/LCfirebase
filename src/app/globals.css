@@ -191,4 +191,29 @@
     min-width: 500px !important;
     width: auto !important;
   }
+  
+  /* Fix logo image sizing to override Next.js inline styles */
+  .logo-fixed-size {
+    width: 40px !important;
+    height: 40px !important;
+    object-fit: contain !important;
+  }
+  
+  .logo-fixed-size-48 {
+    width: 48px !important;
+    height: 48px !important;
+    object-fit: contain !important;
+  }
+  
+  .logo-fixed-size-64 {
+    width: 64px !important;
+    height: 64px !important;
+    object-fit: contain !important;
+  }
+  
+  .logo-fixed-size-160 {
+    width: 160px !important;
+    height: 160px !important;
+    object-fit: contain !important;
+  }
 }
