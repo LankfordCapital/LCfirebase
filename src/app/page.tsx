@@ -122,8 +122,8 @@ export default function Home() {
             alt="Lankford Capital Icon"
             width={64}
             height={64}
-            className="absolute bottom-4 right-4 z-20"
-            style={{ width: 'auto', height: 'auto' }}
+            className="absolute bottom-4 right-4 z-20 logo-fixed-size-64"
+            unoptimized
         />
       </section>
 
@@ -157,8 +157,8 @@ export default function Home() {
                     alt="Lankford Capital Icon"
                     width={40}
                     height={40}
-                    style={{ height: 'auto' }}
-                    className="absolute bottom-4 right-4 opacity-50 group-hover:opacity-100 transition-opacity"
+                    className="absolute bottom-4 right-4 opacity-50 group-hover:opacity-100 transition-opacity logo-fixed-size"
+                    unoptimized
                 />
               </Card>
             ))}
