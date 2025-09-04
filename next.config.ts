@@ -9,9 +9,6 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  experimental: {
-    optimizeCss: true,
-  },
   webpack: (config, { isServer }) => {
     // Handle optional AI dependencies
     config.resolve.fallback = {
