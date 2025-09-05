@@ -48,15 +48,35 @@ export function InquiryForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log(values);
-    setIsSubmitting(false);
-    form.reset();
-    toast({
-      title: 'Inquiry Submitted!',
-      description: "Thank you for your interest. We'll be in touch shortly.",
-    });
+    
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (response.ok) {
+        form.reset();
+        toast({
+          title: 'Message Sent Successfully!',
+          description: "Thank you for your interest. We'll be in touch within 24 hours.",
+        });
+      } else {
+        throw new Error('Failed to send message');
+      }
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to send message. Please try again or call us directly.',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
