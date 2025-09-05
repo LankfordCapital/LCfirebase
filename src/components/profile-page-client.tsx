@@ -19,8 +19,6 @@ import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { BusinessDebtSchedule } from '@/components/business-debt-schedule';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import { useDocumentContext } from '@/contexts/document-context';
 import { useAuth } from '@/contexts/auth-context';
 import { updateProfile } from 'firebase/auth';
@@ -196,33 +194,9 @@ export default function ProfilePage() {
     if (!element) return;
     
     toast({
-        title: 'Generating PDF',
-        description: 'Please wait while we generate your PDF...',
+        title: 'PDF Export Disabled',
+        description: 'PDF export functionality has been temporarily disabled.',
     });
-    
-    try {
-        const canvas = await html2canvas(element);
-        const data = canvas.toDataURL('image/png');
-
-        const pdf = new jsPDF();
-        const imgProperties = pdf.getImageProperties(data);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProperties.height * pdfWidth) / imgProperties.width;
-
-        pdf.addImage(data, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save(`${fileName}.pdf`);
-        
-        toast({
-            title: 'PDF Generated',
-            description: `${fileName}.pdf has been downloaded.`,
-        });
-    } catch (error) {
-        toast({
-            variant: 'destructive',
-            title: 'PDF Generation Failed',
-            description: 'There was an error generating the PDF. Please try again.',
-        });
-    }
   };
 
   const handleAddCompany = () => {

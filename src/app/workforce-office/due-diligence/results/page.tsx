@@ -7,8 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Download, Map, History, Shield, BookCopy, AlertTriangle, CheckCircle, ArrowLeft } from 'lucide-react';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
 import type { GenerateMarketAnalysisOutput } from '@/ai/flows/market-analysis-flow';
@@ -56,24 +54,10 @@ export default function DueDiligenceResultsPage() {
     const handleExportPdf = async () => {
         if (!reportContainerRef.current) return;
         
-        toast({ title: 'Generating PDF...' });
-
-        const canvas = await html2canvas(reportContainerRef.current, { scale: 2 });
-        const imgData = canvas.toDataURL('image/png');
-
-        const pdf = new jsPDF({
-            orientation: 'p',
-            unit: 'px',
-            format: 'a4',
+        toast({ 
+            title: 'PDF Export Disabled',
+            description: 'PDF export functionality has been temporarily disabled.'
         });
-        
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save(`due-diligence-report-${data?.address.replace(/\s/g, '-')}.pdf`);
-
-        toast({ title: 'PDF Exported Successfully' });
     };
 
     const renderReportContent = (content: string | undefined) => {
