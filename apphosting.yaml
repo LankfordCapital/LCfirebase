@@ -13,7 +13,7 @@ runConfig:
     - variable: FIREBASE_SERVICE_ACCOUNT_KEY
       secret: projects/lankford-lending/secrets/FIREBASE_SERVICE_ACCOUNT_KEY
     - variable: RESEND_API_KEY
-      secret: projects/lankford-lending/secrets/RESEND_API_KEY
+      secret: projects/940157326397/secrets/RESEND_API_KEY
     - variable: PANGEA_API_TOKEN
       secret: projects/lankford-lending/secrets/PANGEA_API_TOKEN
     - variable: MAILGUN_API_KEY
