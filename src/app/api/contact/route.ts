@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
 
         // Send email to Lankford Capital team
         await sendEmail({
-            to: ['info@lankfordcapital.com'],
+            to: ['tech@lankfordcapital.com'],
             subject: `New Contact Form Submission from ${name}`,
             html: teamEmailHtml,
             text: teamEmailText,
