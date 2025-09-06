@@ -34,7 +34,7 @@ export default function BrokerOfficeHeader() {
     <header className="sticky top-0 z-50 w-full border-b bg-background">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-6">
-          <Logo href="/broker-office" />
+          <Logo href="/" />
            <nav className="hidden items-center gap-4 md:flex">
             {navLinks.map(link => (
                 <Link

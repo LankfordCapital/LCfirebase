@@ -67,7 +67,7 @@ export default function WorkforceOfficeHeader() {
     <header className="sticky top-0 z-50 w-full border-b bg-background">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-6">
-          <Logo href="/workforce-office"/>
+          <Logo href="/"/>
           <NavigationMenu className="hidden lg:flex">
             <NavigationMenuList>
                 <NavigationMenuItem>
