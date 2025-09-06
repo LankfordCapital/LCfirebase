@@ -11,9 +11,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { CustomLoader } from '@/components/ui/custom-loader';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Building, Mail, Phone, Upload, Save, BarChart, DollarSign, X, Camera } from 'lucide-react';
+import { User, Building, Mail, Phone, Upload, Save, BarChart, DollarSign, X, Camera, FileText, CheckCircle, AlertCircle, Trash2, Download } from 'lucide-react';
 import { updateProfile } from 'firebase/auth';
 import { PhotoUploadService } from '@/lib/photo-upload-service';
+import { BrokerDocument } from '@/lib/broker-document-service';
 
 export default function BrokerProfilePage() {
   const { user, userProfile } = useAuth();
@@ -35,6 +36,11 @@ export default function BrokerProfilePage() {
   const [zipCode, setZipCode] = useState(userProfile?.zipCode || '');
   const [photoURL, setPhotoURL] = useState(userProfile?.photoURL || user?.photoURL || '');
 
+  // Document management
+  const [documents, setDocuments] = useState<BrokerDocument[]>([]);
+  const [isLoadingDocuments, setIsLoadingDocuments] = useState(false);
+  const [uploadingDocuments, setUploadingDocuments] = useState<Set<string>>(new Set());
+
   useEffect(() => {
       setFullName(userProfile?.fullName || '');
       setCompanyName(userProfile?.company || '');
@@ -46,6 +52,33 @@ export default function BrokerProfilePage() {
       setZipCode(userProfile?.zipCode || '');
       setPhotoURL(userProfile?.photoURL || user?.photoURL || '');
   }, [userProfile, user]);
+
+  // Load documents when component mounts
+  useEffect(() => {
+    if (user?.uid) {
+      loadDocuments();
+    }
+  }, [user?.uid]);
+
+  const loadDocuments = async () => {
+    if (!user?.uid) return;
+    
+    setIsLoadingDocuments(true);
+    try {
+      const response = await fetch(`/api/broker-documents?brokerId=${user.uid}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setDocuments(data.documents || []);
+      } else {
+        console.error('Failed to load documents:', data.error);
+      }
+    } catch (error) {
+      console.error('Error loading documents:', error);
+    } finally {
+      setIsLoadingDocuments(false);
+    }
+  };
 
   const handleSaveChanges = async () => {
     if (!user) return;
@@ -177,6 +210,109 @@ export default function BrokerProfilePage() {
         setPhotoURL(userProfile?.photoURL || user?.photoURL || '');
     }
     setIsEditing(!isEditing);
+  };
+
+  const handleDocumentUpload = async (documentType: string, documentName: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user?.uid) return;
+
+    const documentKey = `${documentType}-${documentName}`;
+    setUploadingDocuments(prev => new Set(prev).add(documentKey));
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('brokerId', user.uid);
+      formData.append('documentType', documentType);
+      formData.append('documentName', documentName);
+
+      const response = await fetch('/api/broker-documents/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: 'Document Uploaded',
+          description: `${documentName} has been uploaded successfully.`,
+        });
+        // Reload documents
+        await loadDocuments();
+      } else {
+        throw new Error(data.error || 'Upload failed');
+      }
+    } catch (error) {
+      console.error('Error uploading document:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Upload Failed',
+        description: 'There was an error uploading your document.',
+      });
+    } finally {
+      setUploadingDocuments(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(documentKey);
+        return newSet;
+      });
+    }
+  };
+
+  const handleDocumentDelete = async (documentId: string, filePath: string, documentName: string) => {
+    if (!confirm(`Are you sure you want to delete ${documentName}?`)) return;
+
+    try {
+      const response = await fetch(`/api/broker-documents?documentId=${documentId}&filePath=${encodeURIComponent(filePath)}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: 'Document Deleted',
+          description: `${documentName} has been deleted.`,
+        });
+        // Reload documents
+        await loadDocuments();
+      } else {
+        throw new Error(data.error || 'Delete failed');
+      }
+    } catch (error) {
+      console.error('Error deleting document:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Delete Failed',
+        description: 'There was an error deleting your document.',
+      });
+    }
+  };
+
+  const getDocumentStatusIcon = (status: BrokerDocument['status']) => {
+    switch (status) {
+      case 'approved':
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'rejected':
+        return <AlertCircle className="h-4 w-4 text-red-500" />;
+      default:
+        return <AlertCircle className="h-4 w-4 text-yellow-500" />;
+    }
+  };
+
+  const getDocumentStatusText = (status: BrokerDocument['status']) => {
+    switch (status) {
+      case 'approved':
+        return 'Approved';
+      case 'rejected':
+        return 'Rejected';
+      default:
+        return 'Pending Review';
+    }
+  };
+
+  const getDocumentByType = (type: string) => {
+    return documents.find(doc => doc.type === type);
   };
 
   if (!user || !userProfile) {
@@ -377,11 +513,251 @@ export default function BrokerProfilePage() {
                         <CardTitle className="flex items-center gap-2"><Building className="h-5 w-5 text-primary"/> Broker Documents</CardTitle>
                         <CardDescription>Keep your compliance documents up to date.</CardDescription>
                     </CardHeader>
-                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                         <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 h-4 w-4" /> W-9 (Broker)</Button>
-                         <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 h-4 w-4" /> Wiring Instructions (Broker)</Button>
-                         <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 h-4 w-4" /> ID/Driver's License (Broker)</Button>
-                         <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 h-4 w-4" /> Signed Broker Agreement</Button>
+                    <CardContent className="space-y-4">
+                        {isLoadingDocuments ? (
+                            <div className="flex items-center justify-center py-8">
+                                <CustomLoader className="h-6 w-6" />
+                                <span className="ml-2">Loading documents...</span>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* W-9 Document */}
+                                {(() => {
+                                    const w9Doc = getDocumentByType('w9');
+                                    const isUploading = uploadingDocuments.has('w9-W-9 (Broker)');
+                                    return (
+                                        <div className="space-y-2">
+                                            <Label className="text-sm font-medium">W-9 (Broker)</Label>
+                                            {w9Doc ? (
+                                                <div className="flex items-center justify-between p-3 border rounded-lg">
+                                                    <div className="flex items-center gap-2">
+                                                        <FileText className="h-4 w-4" />
+                                                        <span className="text-sm truncate">{w9Doc.fileName}</span>
+                                                        {getDocumentStatusIcon(w9Doc.status)}
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => window.open(w9Doc.fileUrl, '_blank')}
+                                                        >
+                                                            <Download className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => handleDocumentDelete(w9Doc.id!, w9Doc.filePath, w9Doc.name)}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-2">
+                                                    <input
+                                                        type="file"
+                                                        id="w9-upload"
+                                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                        onChange={(e) => handleDocumentUpload('w9', 'W-9 (Broker)', e)}
+                                                        className="hidden"
+                                                    />
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-full justify-start"
+                                                        onClick={() => document.getElementById('w9-upload')?.click()}
+                                                        disabled={isUploading}
+                                                    >
+                                                        {isUploading ? (
+                                                            <CustomLoader className="mr-2 h-4 w-4" />
+                                                        ) : (
+                                                            <Upload className="mr-2 h-4 w-4" />
+                                                        )}
+                                                        {isUploading ? 'Uploading...' : 'Upload W-9'}
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })()}
+                                
+                                {/* Wiring Instructions Document */}
+                                {(() => {
+                                    const wiringDoc = getDocumentByType('wiring_instructions');
+                                    const isUploading = uploadingDocuments.has('wiring_instructions-Wiring Instructions (Broker)');
+                                    return (
+                                        <div className="space-y-2">
+                                            <Label className="text-sm font-medium">Wiring Instructions (Broker)</Label>
+                                            {wiringDoc ? (
+                                                <div className="flex items-center justify-between p-3 border rounded-lg">
+                                                    <div className="flex items-center gap-2">
+                                                        <FileText className="h-4 w-4" />
+                                                        <span className="text-sm truncate">{wiringDoc.fileName}</span>
+                                                        {getDocumentStatusIcon(wiringDoc.status)}
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => window.open(wiringDoc.fileUrl, '_blank')}
+                                                        >
+                                                            <Download className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => handleDocumentDelete(wiringDoc.id!, wiringDoc.filePath, wiringDoc.name)}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-2">
+                                                    <input
+                                                        type="file"
+                                                        id="wiring-upload"
+                                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                        onChange={(e) => handleDocumentUpload('wiring_instructions', 'Wiring Instructions (Broker)', e)}
+                                                        className="hidden"
+                                                    />
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-full justify-start"
+                                                        onClick={() => document.getElementById('wiring-upload')?.click()}
+                                                        disabled={isUploading}
+                                                    >
+                                                        {isUploading ? (
+                                                            <CustomLoader className="mr-2 h-4 w-4" />
+                                                        ) : (
+                                                            <Upload className="mr-2 h-4 w-4" />
+                                                        )}
+                                                        {isUploading ? 'Uploading...' : 'Upload Wiring Instructions'}
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })()}
+                                
+                                {/* ID/Driver's License Document */}
+                                {(() => {
+                                    const idDoc = getDocumentByType('id_license');
+                                    const isUploading = uploadingDocuments.has('id_license-ID/Driver\'s License (Broker)');
+                                    return (
+                                        <div className="space-y-2">
+                                            <Label className="text-sm font-medium">ID/Driver's License (Broker)</Label>
+                                            {idDoc ? (
+                                                <div className="flex items-center justify-between p-3 border rounded-lg">
+                                                    <div className="flex items-center gap-2">
+                                                        <FileText className="h-4 w-4" />
+                                                        <span className="text-sm truncate">{idDoc.fileName}</span>
+                                                        {getDocumentStatusIcon(idDoc.status)}
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => window.open(idDoc.fileUrl, '_blank')}
+                                                        >
+                                                            <Download className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => handleDocumentDelete(idDoc.id!, idDoc.filePath, idDoc.name)}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-2">
+                                                    <input
+                                                        type="file"
+                                                        id="id-upload"
+                                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                        onChange={(e) => handleDocumentUpload('id_license', 'ID/Driver\'s License (Broker)', e)}
+                                                        className="hidden"
+                                                    />
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-full justify-start"
+                                                        onClick={() => document.getElementById('id-upload')?.click()}
+                                                        disabled={isUploading}
+                                                    >
+                                                        {isUploading ? (
+                                                            <CustomLoader className="mr-2 h-4 w-4" />
+                                                        ) : (
+                                                            <Upload className="mr-2 h-4 w-4" />
+                                                        )}
+                                                        {isUploading ? 'Uploading...' : 'Upload ID/License'}
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })()}
+                                
+                                {/* Broker Agreement Document */}
+                                {(() => {
+                                    const agreementDoc = getDocumentByType('broker_agreement');
+                                    const isUploading = uploadingDocuments.has('broker_agreement-Signed Broker Agreement');
+                                    return (
+                                        <div className="space-y-2">
+                                            <Label className="text-sm font-medium">Signed Broker Agreement</Label>
+                                            {agreementDoc ? (
+                                                <div className="flex items-center justify-between p-3 border rounded-lg">
+                                                    <div className="flex items-center gap-2">
+                                                        <FileText className="h-4 w-4" />
+                                                        <span className="text-sm truncate">{agreementDoc.fileName}</span>
+                                                        {getDocumentStatusIcon(agreementDoc.status)}
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => window.open(agreementDoc.fileUrl, '_blank')}
+                                                        >
+                                                            <Download className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => handleDocumentDelete(agreementDoc.id!, agreementDoc.filePath, agreementDoc.name)}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-2">
+                                                    <input
+                                                        type="file"
+                                                        id="agreement-upload"
+                                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                        onChange={(e) => handleDocumentUpload('broker_agreement', 'Signed Broker Agreement', e)}
+                                                        className="hidden"
+                                                    />
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-full justify-start"
+                                                        onClick={() => document.getElementById('agreement-upload')?.click()}
+                                                        disabled={isUploading}
+                                                    >
+                                                        {isUploading ? (
+                                                            <CustomLoader className="mr-2 h-4 w-4" />
+                                                        ) : (
+                                                            <Upload className="mr-2 h-4 w-4" />
+                                                        )}
+                                                        {isUploading ? 'Uploading...' : 'Upload Agreement'}
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })()}
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>
