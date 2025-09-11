@@ -95,7 +95,7 @@ export function useWorkforceData() {
           property: app.propertyAddress || 'Property address not set',
           type: app.loanProgram || 'Unknown Program',
           status: app.status || 'Draft',
-          progress: app.progress || 0,
+          progress: typeof app.progress === 'object' && app.progress?.overallProgress ? app.progress.overallProgress : (typeof app.progress === 'number' ? app.progress : 0),
           missingDocuments: app.missingDocuments || [],
           loanAmount: app.loanAmount || 0,
           ltv: app.ltv || 0,
