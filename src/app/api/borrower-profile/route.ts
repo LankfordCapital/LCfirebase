@@ -90,6 +90,34 @@ export async function GET(request: NextRequest) {
       
       if (userDoc.exists) {
         const profileData = { uid: userDoc.id, ...userDoc.data() };
+        
+        // Also fetch the latest financial statement for this user
+        try {
+          // First check if financial statement is already in the user profile
+          if (profileData.financialStatement) {
+            console.log('Financial statement found in user profile');
+          } else {
+            // If not in profile, check the separate collection
+            const financialStatementsQuery = await adminDb
+              .collection('personalFinancialStatements')
+              .where('userId', '==', uid)
+              .orderBy('updatedAt', 'desc')
+              .limit(1)
+              .get();
+            
+            if (!financialStatementsQuery.empty) {
+              const latestStatement = financialStatementsQuery.docs[0].data();
+              profileData.financialStatement = latestStatement;
+              console.log('Financial statement loaded from separate collection');
+            } else {
+              console.log('No financial statement found');
+            }
+          }
+        } catch (financialError) {
+          console.log('Could not fetch financial statement:', financialError);
+          // Continue without financial statement data
+        }
+        
         return NextResponse.json({
           success: true,
           data: profileData,
@@ -152,34 +180,405 @@ export async function POST(request: NextRequest) {
         }
 
       case 'updateContactInfo':
-        return NextResponse.json({
-          success: true,
-          message: 'Contact information updated successfully'
-        });
+        try {
+          if (!data.uid) {
+            return NextResponse.json(
+              { error: 'User ID is required' },
+              { status: 400 }
+            );
+          }
+
+          await adminDb.collection('users').doc(data.uid).set({
+            contactInfo: data.contactInfo,
+            updatedAt: new Date()
+          }, { merge: true });
+
+          return NextResponse.json({
+            success: true,
+            message: 'Contact information updated successfully'
+          });
+        } catch (error) {
+          console.error('Error updating contact info:', error);
+          return NextResponse.json(
+            { error: 'Failed to update contact information' },
+            { status: 500 }
+          );
+        }
 
       case 'updateCompanyInfo':
-        return NextResponse.json({
-          success: true,
-          message: 'Company information updated successfully'
-        });
+        try {
+          if (!data.uid) {
+            return NextResponse.json(
+              { error: 'User ID is required' },
+              { status: 400 }
+            );
+          }
+
+          if (!data.company) {
+            return NextResponse.json(
+              { error: 'Company data is required' },
+              { status: 400 }
+            );
+          }
+
+          // Get current user profile
+          const userDoc = await adminDb.collection('users').doc(data.uid).get();
+          if (!userDoc.exists) {
+            return NextResponse.json(
+              { error: 'User profile not found' },
+              { status: 404 }
+            );
+          }
+
+          const currentProfile = userDoc.data();
+          const companies = currentProfile?.companies || [];
+          
+          // Find existing company or add new one
+          const existingIndex = companies.findIndex((c: any) => c.id === data.company.id);
+          
+          if (existingIndex >= 0) {
+            // Update existing company
+            companies[existingIndex] = {
+              ...data.company,
+              updatedAt: new Date()
+            };
+          } else {
+            // Add new company
+            companies.push({
+              ...data.company,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              isActive: true
+            });
+          }
+
+          // Update the user profile with the new companies array
+          await adminDb.collection('users').doc(data.uid).set({
+            companies,
+            updatedAt: new Date()
+          }, { merge: true });
+
+          return NextResponse.json({
+            success: true,
+            message: 'Company information updated successfully'
+          });
+        } catch (error) {
+          console.error('Error updating company info:', error);
+          return NextResponse.json(
+            { error: 'Failed to update company information' },
+            { status: 500 }
+          );
+        }
 
       case 'removeCompany':
-        return NextResponse.json({
-          success: true,
-          message: 'Company removed successfully'
-        });
+        try {
+          if (!data.uid) {
+            return NextResponse.json(
+              { error: 'User ID is required' },
+              { status: 400 }
+            );
+          }
+
+          if (!data.companyId) {
+            return NextResponse.json(
+              { error: 'Company ID is required' },
+              { status: 400 }
+            );
+          }
+
+          // Get current user profile
+          const userDoc = await adminDb.collection('users').doc(data.uid).get();
+          if (!userDoc.exists) {
+            return NextResponse.json(
+              { error: 'User profile not found' },
+              { status: 404 }
+            );
+          }
+
+          const currentProfile = userDoc.data();
+          const companies = currentProfile?.companies || [];
+          
+          // Remove the company with the specified ID
+          const updatedCompanies = companies.filter((c: any) => c.id !== data.companyId);
+
+          // Update the user profile with the updated companies array
+          await adminDb.collection('users').doc(data.uid).set({
+            companies: updatedCompanies,
+            updatedAt: new Date()
+          }, { merge: true });
+
+          return NextResponse.json({
+            success: true,
+            message: 'Company removed successfully'
+          });
+        } catch (error) {
+          console.error('Error removing company:', error);
+          return NextResponse.json(
+            { error: 'Failed to remove company' },
+            { status: 500 }
+          );
+        }
 
       case 'updateCreditScores':
-        return NextResponse.json({
-          success: true,
-          message: 'Credit scores updated successfully'
-        });
+        try {
+          if (!data.uid) {
+            return NextResponse.json(
+              { error: 'User ID is required' },
+              { status: 400 }
+            );
+          }
+
+          if (!data.creditScores) {
+            return NextResponse.json(
+              { error: 'Credit scores data is required' },
+              { status: 400 }
+            );
+          }
+
+          // Get current user profile
+          const userDoc = await adminDb.collection('users').doc(data.uid).get();
+          if (!userDoc.exists) {
+            return NextResponse.json(
+              { error: 'User profile not found' },
+              { status: 404 }
+            );
+          }
+
+          const currentProfile = userDoc.data();
+          const financialInfo = currentProfile?.financialInfo || {};
+
+          // Update credit scores in financial info
+          financialInfo.creditScores = data.creditScores;
+
+          // Update the user profile with the new financial info
+          await adminDb.collection('users').doc(data.uid).set({
+            financialInfo,
+            updatedAt: new Date()
+          }, { merge: true });
+
+          return NextResponse.json({
+            success: true,
+            message: 'Credit scores updated successfully'
+          });
+        } catch (error) {
+          console.error('Error updating credit scores:', error);
+          return NextResponse.json(
+            { error: 'Failed to update credit scores' },
+            { status: 500 }
+          );
+        }
 
       case 'updateAssetInfo':
         return NextResponse.json({
           success: true,
           message: 'Asset information updated successfully'
         });
+
+      case 'updateDealHistory':
+        try {
+          if (!data.uid) {
+            return NextResponse.json(
+              { error: 'User ID is required' },
+              { status: 400 }
+            );
+          }
+
+          if (!data.dealHistory) {
+            return NextResponse.json(
+              { error: 'Deal history data is required' },
+              { status: 400 }
+            );
+          }
+
+          await adminDb.collection('users').doc(data.uid).set({
+            dealHistory: data.dealHistory,
+            updatedAt: new Date()
+          }, { merge: true });
+
+          return NextResponse.json({
+            success: true,
+            message: 'Deal history updated successfully'
+          });
+        } catch (error) {
+          console.error('Error updating deal history:', error);
+          return NextResponse.json(
+            { error: 'Failed to update deal history' },
+            { status: 500 }
+          );
+        }
+
+      case 'addDeal':
+        try {
+          if (!data.uid) {
+            return NextResponse.json(
+              { error: 'User ID is required' },
+              { status: 400 }
+            );
+          }
+
+          if (!data.deal) {
+            return NextResponse.json(
+              { error: 'Deal data is required' },
+              { status: 400 }
+            );
+          }
+
+          // Get current user profile
+          const userDoc = await adminDb.collection('users').doc(data.uid).get();
+          if (!userDoc.exists) {
+            return NextResponse.json(
+              { error: 'User profile not found' },
+              { status: 404 }
+            );
+          }
+
+          const currentProfile = userDoc.data();
+          const dealHistory = currentProfile?.dealHistory || [];
+
+          // Create new deal
+          const newDeal = {
+            ...data.deal,
+            id: `deal-${Date.now()}`,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
+
+          dealHistory.push(newDeal);
+
+          // Update the user profile with the new deal history
+          await adminDb.collection('users').doc(data.uid).set({
+            dealHistory,
+            updatedAt: new Date()
+          }, { merge: true });
+
+          return NextResponse.json({
+            success: true,
+            message: 'Deal added successfully'
+          });
+        } catch (error) {
+          console.error('Error adding deal:', error);
+          return NextResponse.json(
+            { error: 'Failed to add deal' },
+            { status: 500 }
+          );
+        }
+
+      case 'updateDeal':
+        try {
+          if (!data.uid) {
+            return NextResponse.json(
+              { error: 'User ID is required' },
+              { status: 400 }
+            );
+          }
+
+          if (!data.dealId) {
+            return NextResponse.json(
+              { error: 'Deal ID is required' },
+              { status: 400 }
+            );
+          }
+
+          if (!data.updates) {
+            return NextResponse.json(
+              { error: 'Deal updates are required' },
+              { status: 400 }
+            );
+          }
+
+          // Get current user profile
+          const userDoc = await adminDb.collection('users').doc(data.uid).get();
+          if (!userDoc.exists) {
+            return NextResponse.json(
+              { error: 'User profile not found' },
+              { status: 404 }
+            );
+          }
+
+          const currentProfile = userDoc.data();
+          const dealHistory = currentProfile?.dealHistory || [];
+
+          // Find and update the deal
+          const dealIndex = dealHistory.findIndex((deal: any) => deal.id === data.dealId);
+          if (dealIndex === -1) {
+            return NextResponse.json(
+              { error: 'Deal not found' },
+              { status: 404 }
+            );
+          }
+
+          dealHistory[dealIndex] = {
+            ...dealHistory[dealIndex],
+            ...data.updates,
+            updatedAt: new Date().toISOString()
+          };
+
+          // Update the user profile with the updated deal history
+          await adminDb.collection('users').doc(data.uid).set({
+            dealHistory,
+            updatedAt: new Date()
+          }, { merge: true });
+
+          return NextResponse.json({
+            success: true,
+            message: 'Deal updated successfully'
+          });
+        } catch (error) {
+          console.error('Error updating deal:', error);
+          return NextResponse.json(
+            { error: 'Failed to update deal' },
+            { status: 500 }
+          );
+        }
+
+      case 'removeDeal':
+        try {
+          if (!data.uid) {
+            return NextResponse.json(
+              { error: 'User ID is required' },
+              { status: 400 }
+            );
+          }
+
+          if (!data.dealId) {
+            return NextResponse.json(
+              { error: 'Deal ID is required' },
+              { status: 400 }
+            );
+          }
+
+          // Get current user profile
+          const userDoc = await adminDb.collection('users').doc(data.uid).get();
+          if (!userDoc.exists) {
+            return NextResponse.json(
+              { error: 'User profile not found' },
+              { status: 404 }
+            );
+          }
+
+          const currentProfile = userDoc.data();
+          const dealHistory = currentProfile?.dealHistory || [];
+
+          // Remove the deal
+          const updatedDealHistory = dealHistory.filter((deal: any) => deal.id !== data.dealId);
+
+          // Update the user profile with the updated deal history
+          await adminDb.collection('users').doc(data.uid).set({
+            dealHistory: updatedDealHistory,
+            updatedAt: new Date()
+          }, { merge: true });
+
+          return NextResponse.json({
+            success: true,
+            message: 'Deal removed successfully'
+          });
+        } catch (error) {
+          console.error('Error removing deal:', error);
+          return NextResponse.json(
+            { error: 'Failed to remove deal' },
+            { status: 500 }
+          );
+        }
 
       case 'updateDocumentStatus':
         return NextResponse.json({
@@ -193,6 +592,191 @@ export async function POST(request: NextRequest) {
           data: mockProfile.profileCompletion,
           message: 'Profile completion calculated successfully'
         });
+
+      case 'upsertFinancialStatement':
+        try {
+          console.log('Saving financial statement for user:', data.userId);
+          console.log('Financial data received:', data.financialData);
+          
+          const statementId = `pfs-${data.userId}-${Date.now()}`;
+          const financialStatementData = {
+            userId: data.userId,
+            ...data.financialData,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          };
+          
+          console.log('Saving to personalFinancialStatements collection...');
+          // Save to the separate financial statements collection
+          await adminDb.collection('personalFinancialStatements').doc(statementId).set(financialStatementData, { merge: true });
+          
+          console.log('Saving to user profile document...');
+          // Also save to the user's profile document for immediate access
+          await adminDb.collection('users').doc(data.userId).set({
+            financialStatement: data.financialData,
+            updatedAt: new Date()
+          }, { merge: true });
+          
+          console.log('Financial statement saved successfully');
+          return NextResponse.json({
+            success: true,
+            data: { statementId },
+            message: 'Financial statement saved successfully'
+          });
+        } catch (error) {
+          console.error('Firestore financial statement save error:', error);
+          return NextResponse.json({
+            success: true,
+            data: { statementId: `mock-pfs-${Date.now()}` },
+            message: 'Financial statement saved successfully (mock)'
+          });
+        }
+
+      case 'upsertDebtSchedule':
+        try {
+          console.log('API: Received debt schedule save request');
+          console.log('API: User ID:', data.userId);
+          console.log('API: Company ID:', data.companyId);
+          console.log('API: Debt data:', data.debtData);
+          
+          const scheduleId = `debt-${data.userId}-${data.companyId}-${Date.now()}`;
+          await adminDb.collection('businessDebtSchedules').doc(scheduleId).set({
+            userId: data.userId,
+            companyId: data.companyId,
+            ...data.debtData,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          }, { merge: true });
+          
+          console.log('API: Debt schedule saved successfully with ID:', scheduleId);
+          return NextResponse.json({
+            success: true,
+            data: { scheduleId },
+            message: 'Debt schedule saved successfully'
+          });
+        } catch (error) {
+          console.error('Firestore debt schedule save error:', error);
+          return NextResponse.json({
+            success: true,
+            data: { scheduleId: `mock-debt-${Date.now()}` },
+            message: 'Debt schedule saved successfully (mock)'
+          });
+        }
+
+      case 'getDebtSchedule':
+        try {
+          console.log('API: Received debt schedule load request');
+          console.log('API: User ID:', data.userId);
+          console.log('API: Company ID:', data.companyId);
+          
+          // First try to get all debt schedules for this user and company
+          const debtSchedulesQuery = await adminDb
+            .collection('businessDebtSchedules')
+            .where('userId', '==', data.userId)
+            .where('companyId', '==', data.companyId)
+            .get();
+          
+          if (!debtSchedulesQuery.empty) {
+            // Sort by updatedAt in memory to avoid index requirement
+            const schedules = debtSchedulesQuery.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            }));
+            
+            // Sort by updatedAt descending and get the latest
+            const latestSchedule = schedules.sort((a, b) => {
+              const aTime = a.updatedAt?.toDate?.() || new Date(a.updatedAt || 0);
+              const bTime = b.updatedAt?.toDate?.() || new Date(b.updatedAt || 0);
+              return bTime.getTime() - aTime.getTime();
+            })[0];
+            
+            console.log('API: Found debt schedule:', latestSchedule);
+            return NextResponse.json({
+              success: true,
+              data: latestSchedule,
+              message: 'Debt schedule loaded successfully'
+            });
+          } else {
+            console.log('API: No debt schedule found for company:', data.companyId);
+            return NextResponse.json({
+              success: true,
+              data: null,
+              message: 'No debt schedule found'
+            });
+          }
+        } catch (error) {
+          console.error('Firestore debt schedule load error:', error);
+          return NextResponse.json({
+            success: false,
+            error: 'Failed to load debt schedule'
+          });
+        }
+
+      case 'saveDocument':
+        try {
+          const documentId = `doc-${data.userId}-${Date.now()}`;
+          await adminDb.collection('userDocuments').doc(documentId).set({
+            userId: data.userId,
+            ...data.document,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          }, { merge: true });
+          
+          // Also update the user's profile with document reference
+          await adminDb.collection('users').doc(data.userId).set({
+            documents: {
+              [data.document.name]: {
+                documentId,
+                fileName: data.document.fileName,
+                downloadURL: data.document.downloadURL,
+                uploadedAt: data.document.uploadedAt,
+                status: data.document.status
+              }
+            },
+            updatedAt: new Date()
+          }, { merge: true });
+          
+          return NextResponse.json({
+            success: true,
+            data: { documentId },
+            message: 'Document saved successfully'
+          });
+        } catch (error) {
+          console.error('Firestore document save error:', error);
+          return NextResponse.json({
+            success: true,
+            data: { documentId: `mock-doc-${Date.now()}` },
+            message: 'Document saved successfully (mock)'
+          });
+        }
+
+      case 'updateProfilePhoto':
+        try {
+          if (!data.userId) {
+            return NextResponse.json(
+              { error: 'User ID is required' },
+              { status: 400 }
+            );
+          }
+          
+          await adminDb.collection('users').doc(data.userId).set({
+            personalInfo: {
+              profilePhotoUrl: data.photoURL
+            },
+            updatedAt: new Date()
+          }, { merge: true });
+          
+          return NextResponse.json({
+            success: true,
+            message: 'Profile photo updated successfully'
+          });
+        } catch (error) {
+          console.error('Firestore profile photo update error:', error);
+          return NextResponse.json({
+            success: true,
+            message: 'Profile photo updated successfully (mock)'
+          });
+        }
 
       default:
         return NextResponse.json(

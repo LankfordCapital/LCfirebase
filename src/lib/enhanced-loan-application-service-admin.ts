@@ -226,6 +226,29 @@ class EnhancedLoanApplicationServiceAdmin {
   }
 
   // ============================================================================
+  // GET ALL LOAN APPLICATIONS
+  // ============================================================================
+
+  async getAllLoanApplications(): Promise<LoanApplication[]> {
+    try {
+      console.log('Getting all loan applications');
+      
+      const querySnapshot = await adminDb.collection(this.collectionName).get();
+      const applications: LoanApplication[] = [];
+      
+      querySnapshot.forEach((doc) => {
+        applications.push({ id: doc.id, ...doc.data() } as LoanApplication);
+      });
+      
+      console.log(`Found ${applications.length} total applications`);
+      return applications;
+    } catch (error) {
+      console.error('Error getting all loan applications:', error);
+      throw new Error(`Failed to get all loan applications: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  // ============================================================================
   // GET LOAN APPLICATIONS BY USER
   // ============================================================================
 

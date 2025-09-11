@@ -27,6 +27,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: true, data: applications });
     }
 
+    if (action === 'getAll') {
+      console.log('Getting all applications');
+      const applications = await enhancedLoanApplicationServiceAdmin.getAllLoanApplications();
+      console.log(`Found ${applications.length} total applications`);
+      return NextResponse.json({ success: true, applications });
+    }
+
     if (applicationId) {
       console.log('Getting application by ID:', applicationId);
       const application = await enhancedLoanApplicationServiceAdmin.getLoanApplication(applicationId);

@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { PlusCircle, Users, BarChart, DollarSign, MoreHorizontal, FileWarning, Search, Briefcase, UserPlus, Home, Mail, Phone, ArrowRight, Percent, Construction, MessageSquare } from "lucide-react";
+import { PlusCircle, Users, BarChart, DollarSign, MoreHorizontal, FileWarning, Search, Briefcase, UserPlus, Home, Mail, Phone, ArrowRight, Percent, Construction, MessageSquare, RefreshCw } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -18,28 +18,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
+import { useWorkforceData } from "@/hooks/use-workforce-data";
 
 
-const summaryCards = [
-    { title: "Active Clients", value: "12", icon: <Users className="h-4 w-4 text-muted-foreground" /> },
-    { title: "Loans in Underwriting", value: "8", icon: <BarChart className="h-4 w-4 text-muted-foreground" /> },
-    { title: "Total Funded (YTD)", value: "$5.8M", icon: <DollarSign className="h-4 w-4 text-muted-foreground" /> },
-];
-
-const clientLoans = [
-    { id: "LL-00125", borrower: { name: "John Doe", email: "john.d@example.com", phone: "555-123-4567" }, broker: { name: "Alice Johnson", company: "Creative Capital", email: "alice.j@cc.com", phone: "555-987-6543"}, property: "123 Main St", type: "Fix and Flip", status: "Underwriting", progress: 60, missingDocuments: ["Proof of Insurance"], loanAmount: 350000, ltv: 75, arv: 500000, interestRate: 9.5, term: 12 },
-    { id: "LL-00126", borrower: { name: "Jane Smith", email: "jane.s@example.com", phone: "555-234-5678" }, broker: { name: "Direct" }, property: "456 Oak Ave", type: "DSCR", status: "Approved", progress: 100, missingDocuments: [], loanAmount: 450000, ltv: 70, arv: 600000, interestRate: 6.5, term: 360 },
-    { id: "LL-00127", borrower: { name: "Sam Wilson", email: "sam.w@example.com", phone: "555-345-6789" }, broker: { name: "Bob Williams", company: "Mortgage Pro", email: "bob.w@mp.com", phone: "555-876-5432" }, property: "789 Pine Ln", type: "Ground Up", status: "Missing Docs", progress: 25, missingDocuments: ["Approved Plans", "Builder's Risk Insurance"], loanAmount: 1200000, ltv: 65, arv: 2000000, interestRate: 8.0, term: 18 },
-    { id: "LL-00128", borrower: { name: "Alpha Corp", email: "contact@alphacorp.com", phone: "555-456-7890" }, broker: { name: "Direct" }, property: "101 Factory Rd", type: "Industrial Rehab", status: "Initial Review", progress: 15, missingDocuments: ["Business Financials (3 years)"], loanAmount: 2500000, ltv: 60, arv: 4000000, interestRate: 7.5, term: 24 },
-    { id: "LL-00129", borrower: { name: "Bridge Holdings", email: "deals@bridgeholdings.com", phone: "555-567-8901" }, broker: { name: "Diana Prince", company: "Capital Partners", email: "diana.p@cp.com", phone: "555-765-4321" }, property: "210 Commerce St", type: "Commercial Bridge", status: "Funded", progress: 100, missingDocuments: [], loanAmount: 800000, ltv: 70, arv: 1100000, interestRate: 9.0, term: 12 },
-];
-
-const brokerPipeline = [
-    { id: "BRK-001", name: "Alice Johnson", company: "Creative Capital", activeLoans: 5, totalVolume: "$2.1M", status: "Approved" },
-    { id: "BRK-002", name: "Bob Williams", company: "Mortgage Pro", activeLoans: 8, totalVolume: "$3.5M", status: "Approved" },
-    { id: "BRK-003", name: "Charlie Brown", company: "Prestige Lending", activeLoans: 2, totalVolume: "$850K", status: "Approved" },
-    { id: "BRK-004", name: "Diana Prince", company: "Capital Partners", activeLoans: 12, totalVolume: "$7.2M", status: "Approved" },
-];
 
 function InviteUserDialog() {
     const { toast } = useToast();
@@ -101,7 +82,52 @@ function InviteUserDialog() {
 }
 
 export default function WorkforceOfficePage() {
-    const [selectedLoan, setSelectedLoan] = useState<(typeof clientLoans)[0] | null>(null);
+    const { data, loading, error, refreshData } = useWorkforceData();
+    const [selectedLoan, setSelectedLoan] = useState<any>(null);
+
+    const formatCurrency = (amount: number) => {
+        if (amount >= 1000000) {
+            return `$${(amount / 1000000).toFixed(1)}M`;
+        } else if (amount >= 1000) {
+            return `$${(amount / 1000).toFixed(0)}K`;
+        }
+        return `$${amount.toLocaleString()}`;
+    };
+
+    if (loading) {
+        return (
+            <div className="space-y-6">
+                <div className="flex items-center justify-center h-64">
+                    <div className="text-center">
+                        <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4" />
+                        <p className="text-muted-foreground">Loading workforce data...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="space-y-6">
+                <div className="flex items-center justify-center h-64">
+                    <div className="text-center">
+                        <p className="text-destructive mb-4">{error}</p>
+                        <Button onClick={refreshData} variant="outline">
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                            Try Again
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    const summaryCards = [
+        { title: "Active Clients", value: data.summary.activeClients.toString(), icon: <Users className="h-4 w-4 text-muted-foreground" /> },
+        { title: "Loans in Underwriting", value: data.summary.loansInUnderwriting.toString(), icon: <BarChart className="h-4 w-4 text-muted-foreground" /> },
+        { title: "Total Funded (YTD)", value: formatCurrency(data.summary.totalFundedYTD), icon: <DollarSign className="h-4 w-4 text-muted-foreground" /> },
+    ];
 
   return (
     <div className="space-y-6">
@@ -115,6 +141,10 @@ export default function WorkforceOfficePage() {
              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
              <Input placeholder="Search clients or loans..." className="pl-8 w-full md:w-64" />
            </div>
+           <Button onClick={refreshData} variant="outline" size="sm">
+               <RefreshCw className="h-4 w-4 mr-2" />
+               Refresh
+           </Button>
            <InviteUserDialog />
             <Button asChild>
                 <Link href="/workforce-office/applications"><PlusCircle className="mr-2 h-4 w-4"/> New Application</Link>
@@ -162,50 +192,58 @@ export default function WorkforceOfficePage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {clientLoans.map(loan => (
-                                    <TableRow key={loan.id} className="hover:bg-muted/50">
-                                        <TableCell className="font-medium">{loan.borrower.name}</TableCell>
-                                        <TableCell>{loan.broker.name}</TableCell>
-                                        <TableCell>{loan.id}</TableCell>
-                                        <TableCell>{loan.type}</TableCell>
-                                        <TableCell>
-                                            <Badge 
-                                            variant={loan.status === 'Approved' ? 'default' : loan.status === 'Missing Docs' ? 'destructive' : loan.status === 'Funded' ? 'default' : 'secondary'}
-                                            className={loan.status === 'Approved' || loan.status === 'Funded' ? 'bg-green-500 hover:bg-green-600' : ''}
-                                            >
-                                            {loan.status}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center gap-2">
-                                            <Progress value={loan.progress} className="w-full md:w-32" />
-                                            <span className="text-xs text-muted-foreground">{loan.progress}%</span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                                    <span className="sr-only">Open menu</span>
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DialogTrigger asChild>
-                                                    <DropdownMenuItem onSelect={() => setSelectedLoan(loan)}>View Details</DropdownMenuItem>
-                                                </DialogTrigger>
-                                                <DropdownMenuItem asChild>
-                                                    <Link href={`/workforce-office/loan-documents/${loan.id}`}>Manage Documents</Link>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem asChild>
-                                                    <Link href="/workforce-office/due-diligence">Due Diligence</Link>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem>Send Reminder</DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                {data.loanApplications.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                                            No loan applications found
                                         </TableCell>
                                     </TableRow>
-                                ))}
+                                ) : (
+                                    data.loanApplications.map(loan => (
+                                        <TableRow key={loan.id} className="hover:bg-muted/50">
+                                            <TableCell className="font-medium">{loan.borrower.name}</TableCell>
+                                            <TableCell>{loan.broker.name}</TableCell>
+                                            <TableCell>{loan.id}</TableCell>
+                                            <TableCell>{loan.type}</TableCell>
+                                            <TableCell>
+                                                <Badge 
+                                                variant={loan.status === 'Approved' ? 'default' : loan.status === 'Missing Docs' ? 'destructive' : loan.status === 'Funded' ? 'default' : 'secondary'}
+                                                className={loan.status === 'Approved' || loan.status === 'Funded' ? 'bg-green-500 hover:bg-green-600' : ''}
+                                                >
+                                                {loan.status}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex items-center gap-2">
+                                                <Progress value={loan.progress} className="w-full md:w-32" />
+                                                <span className="text-xs text-muted-foreground">{loan.progress}%</span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" className="h-8 w-8 p-0">
+                                                        <span className="sr-only">Open menu</span>
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DialogTrigger asChild>
+                                                        <DropdownMenuItem onSelect={() => setSelectedLoan(loan)}>View Details</DropdownMenuItem>
+                                                    </DialogTrigger>
+                                                    <DropdownMenuItem asChild>
+                                                        <Link href={`/workforce-office/loan-documents/${loan.id}`}>Manage Documents</Link>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem asChild>
+                                                        <Link href="/workforce-office/due-diligence">Due Diligence</Link>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem>Send Reminder</DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
                             </TableBody>
                         </Table>
                          <DialogContent className="sm:max-w-[625px]">
@@ -335,38 +373,46 @@ export default function WorkforceOfficePage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {brokerPipeline.map(broker => (
-                                <TableRow key={broker.id} className="hover:bg-muted/50">
-                                    <TableCell className="font-medium">{broker.name}</TableCell>
-                                    <TableCell>{broker.company}</TableCell>
-                                    <TableCell>{broker.activeLoans}</TableCell>
-                                    <TableCell>{broker.totalVolume}</TableCell>
-                                    <TableCell>
-                                        <Badge className="bg-green-500 hover:bg-green-600">{broker.status}</Badge>
-                                    </TableCell>
-                                    <TableCell>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                                <span className="sr-only">Open menu</span>
-                                                <MoreHorizontal className="h-4 w-4" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem asChild>
-                                                <Link href={`/workforce-office/broker-pipeline/${broker.id}`}>View Pipeline</Link>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem asChild>
-                                                <Link href={`/workforce-office/manage-broker/${broker.id}`}>Manage Broker</Link>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem asChild>
-                                                <Link href={`/workforce-office/communications?roomId=${broker.id}`}>Send Communication</Link>
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                            {data.brokers.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                                        No brokers found
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            ) : (
+                                data.brokers.map(broker => (
+                                    <TableRow key={broker.id} className="hover:bg-muted/50">
+                                        <TableCell className="font-medium">{broker.name}</TableCell>
+                                        <TableCell>{broker.company}</TableCell>
+                                        <TableCell>{broker.activeLoans}</TableCell>
+                                        <TableCell>{formatCurrency(broker.totalVolume)}</TableCell>
+                                        <TableCell>
+                                            <Badge className="bg-green-500 hover:bg-green-600">{broker.status}</Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                                    <span className="sr-only">Open menu</span>
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem asChild>
+                                                    <Link href={`/workforce-office/broker-pipeline/${broker.id}`}>View Pipeline</Link>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem asChild>
+                                                    <Link href={`/workforce-office/manage-broker/${broker.id}`}>Manage Broker</Link>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem asChild>
+                                                    <Link href={`/workforce-office/communications?roomId=${broker.id}`}>Send Communication</Link>
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
                         </TableBody>
                     </Table>
                 </CardContent>

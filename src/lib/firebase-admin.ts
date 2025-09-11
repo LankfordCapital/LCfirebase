@@ -53,13 +53,15 @@ if (getApps().length === 0) {
             if (credentialConfig) {
                 app = initializeApp({
                     projectId: 'lankford-lending',
+                    storageBucket: 'lankford-lending.firebasestorage.app',
                     credential: credentialConfig
                 });
                 console.log('Firebase Admin initialized with credentials');
             } else {
                 // Fallback for development/cloud environments
                 app = initializeApp({
-                    projectId: 'lankford-lending'
+                    projectId: 'lankford-lending',
+                    storageBucket: 'lankford-lending.firebasestorage.app'
                 });
                 console.log('Firebase Admin initialized with default configuration');
             }
@@ -67,7 +69,8 @@ if (getApps().length === 0) {
             console.error('Error during Firebase Admin initialization:', initError);
             // Force fallback to basic initialization
             app = initializeApp({
-                projectId: 'lankford-lending'
+                projectId: 'lankford-lending',
+                storageBucket: 'lankford-lending.firebasestorage.app'
             });
             console.log('Firebase Admin initialized with basic fallback after error');
         }
@@ -77,7 +80,8 @@ if (getApps().length === 0) {
         // Last resort: try basic initialization
         try {
             app = initializeApp({
-                projectId: 'lankford-lending'
+                projectId: 'lankford-lending',
+                storageBucket: 'lankford-lending.firebasestorage.app'
             });
             console.log('Firebase Admin initialized with basic fallback config');
         } catch (fallbackError) {

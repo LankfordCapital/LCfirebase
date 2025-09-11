@@ -278,6 +278,23 @@ export interface BorrowerProfile extends FirestoreUser {
     };
   };
   
+  // Financial Statement (direct access)
+  financialStatement?: PersonalFinancialStatement;
+  
+  // Uploaded Documents
+  documents?: {
+    [documentName: string]: {
+      documentId: string;
+      fileName: string;
+      downloadURL: string;
+      uploadedAt: string;
+      status: string;
+    };
+  };
+  
+  // Deal History
+  dealHistory?: DealHistory[];
+  
   // Profile Completion
   profileCompletion?: {
     personalInfo: number; // Percentage complete
@@ -285,6 +302,7 @@ export interface BorrowerProfile extends FirestoreUser {
     companies: number;
     documents: number;
     financialInfo: number;
+    dealHistory: number;
     overall: number;
   };
 }
@@ -320,57 +338,61 @@ export interface BorrowerDocument extends Document {
 export interface PersonalFinancialStatement {
   id?: string;
   userId: string;
-  completed: boolean;
-  lastUpdated: any;
+  completed?: boolean;
+  lastUpdated?: string;
   
   // Assets
-  assets: {
-    cashAndEquivalents: number;
-    accountsReceivable: number;
-    inventory: number;
-    realEstate: number;
-    vehicles: number;
-    investments: number;
-    otherAssets: number;
-    totalAssets: number;
-  };
+  cashInBank?: number;
+  savingsAccounts?: number;
+  ira?: number;
+  accountsReceivable?: number;
+  lifeInsurance?: number;
+  stocksBonds?: number;
+  realEstateDescription?: string;
+  realEstateValue?: number;
+  automobiles?: string;
+  automobilesValue?: number;
+  otherPersonalProperty?: number;
+  otherAssets?: number;
+  totalAssets?: number;
   
   // Liabilities
-  liabilities: {
-    accountsPayable: number;
-    creditCards: number;
-    autoLoans: number;
-    mortgages: number;
-    studentLoans: number;
-    otherLiabilities: number;
-    totalLiabilities: number;
-  };
+  accountsPayable?: number;
+  notesPayable?: number;
+  autoLoan?: number;
+  otherLoans?: number;
+  loanOnLifeInsurance?: number;
+  mortgageOnRealEstate?: number;
+  unpaidTaxes?: number;
+  otherLiabilities?: number;
+  totalLiabilities?: number;
+  netWorth?: number;
   
   // Income
-  income: {
-    salary: number;
-    businessIncome: number;
-    investmentIncome: number;
-    rentalIncome: number;
-    otherIncome: number;
-    totalIncome: number;
-  };
+  salary?: number;
+  netInvestmentIncome?: number;
+  realEstateIncome?: number;
+  otherIncome?: number;
+  totalAnnualIncome?: number;
   
-  // Expenses
-  expenses: {
-    housing: number;
-    utilities: number;
-    food: number;
-    transportation: number;
-    insurance: number;
-    healthcare: number;
-    entertainment: number;
-    otherExpenses: number;
-    totalExpenses: number;
-  };
-  
-  netWorth: number;
-  monthlyCashFlow: number;
+  // Additional Information
+  contingentLiabilities?: string;
+  taxesPayable?: string;
+  stocksForeignAccounts?: string;
+}
+
+// Deal History interface
+export interface DealHistory {
+  id: string;
+  address: string;
+  purchasePrice: number;
+  rehabAmount: number;
+  salePrice: number;
+  daysOnMarket: number;
+  purchaseHud1DocumentId?: string;
+  dispositionHud1DocumentId?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Business Debt Schedule interface
@@ -969,19 +991,85 @@ export class BorrowerProfileService extends FirestoreService<BorrowerProfile> {
       completion.financialInfo = (completedFields.length / financialFields.length) * 100;
     }
 
+    // Calculate deal history completion
+    if (profile.dealHistory && profile.dealHistory.length > 0) {
+      const dealFields = ['address', 'purchasePrice', 'salePrice'];
+      let totalDealCompletion = 0;
+      
+      profile.dealHistory.forEach(deal => {
+        const completedFields = dealFields.filter(field => 
+          deal[field as keyof DealHistory] && deal[field as keyof DealHistory] !== ''
+        );
+        totalDealCompletion += (completedFields.length / dealFields.length) * 100;
+      });
+      
+      completion.dealHistory = totalDealCompletion / profile.dealHistory.length;
+    }
+
     // Calculate overall completion
     completion.overall = (
       completion.personalInfo + 
       completion.contactInfo + 
       completion.companies + 
       completion.documents + 
-      completion.financialInfo
-    ) / 5;
+      completion.financialInfo +
+      completion.dealHistory
+    ) / 6;
 
     // Update the profile with completion data
     await this.update(uid, { profileCompletion: completion });
 
     return completion;
+  }
+
+  // Deal History methods
+  async updateDealHistory(uid: string, dealHistory: DealHistory[]): Promise<void> {
+    await this.update(uid, { dealHistory });
+  }
+
+  async addDeal(uid: string, deal: Omit<DealHistory, 'id' | 'createdAt' | 'updatedAt'>): Promise<void> {
+    const profile = await this.getById(uid);
+    if (!profile) throw new Error('User profile not found');
+
+    const newDeal: DealHistory = {
+      ...deal,
+      id: `deal-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    const dealHistory = profile.dealHistory || [];
+    dealHistory.push(newDeal);
+
+    await this.update(uid, { dealHistory });
+  }
+
+  async updateDeal(uid: string, dealId: string, updates: Partial<Omit<DealHistory, 'id' | 'createdAt'>>): Promise<void> {
+    const profile = await this.getById(uid);
+    if (!profile) throw new Error('User profile not found');
+
+    const dealHistory = profile.dealHistory || [];
+    const dealIndex = dealHistory.findIndex(deal => deal.id === dealId);
+    
+    if (dealIndex === -1) throw new Error('Deal not found');
+
+    dealHistory[dealIndex] = {
+      ...dealHistory[dealIndex],
+      ...updates,
+      updatedAt: new Date().toISOString()
+    };
+
+    await this.update(uid, { dealHistory });
+  }
+
+  async removeDeal(uid: string, dealId: string): Promise<void> {
+    const profile = await this.getById(uid);
+    if (!profile) throw new Error('User profile not found');
+
+    const dealHistory = profile.dealHistory || [];
+    const updatedDealHistory = dealHistory.filter(deal => deal.id !== dealId);
+
+    await this.update(uid, { dealHistory: updatedDealHistory });
   }
 }
 

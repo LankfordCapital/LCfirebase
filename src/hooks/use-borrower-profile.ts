@@ -575,6 +575,9 @@ export function useBorrowerProfile() {
     if (!user?.uid) return;
 
     try {
+      console.log('Hook: Saving financial statement for user:', user.uid);
+      console.log('Hook: Financial data:', financialData);
+      
       const response = await fetch('/api/borrower-profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -588,6 +591,9 @@ export function useBorrowerProfile() {
       const result = await response.json();
 
       if (result.success) {
+        // Reload profile to get updated data
+        await loadProfile();
+        
         toast({
           title: 'Success',
           description: 'Financial statement saved successfully',
@@ -617,6 +623,10 @@ export function useBorrowerProfile() {
     if (!user?.uid) return;
 
     try {
+      console.log('Hook: Saving debt schedule for user:', user.uid);
+      console.log('Hook: Company ID:', companyId);
+      console.log('Hook: Debt data:', debtData);
+      
       const response = await fetch('/api/borrower-profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -652,12 +662,215 @@ export function useBorrowerProfile() {
     }
   }, [user?.uid, toast]);
 
+  // Load business debt schedule
+  const loadDebtSchedule = useCallback(async (companyId: string) => {
+    if (!user?.uid) return null;
+
+    try {
+      console.log('Hook: Loading debt schedule for user:', user.uid);
+      console.log('Hook: Company ID:', companyId);
+      
+      const response = await fetch('/api/borrower-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'getDebtSchedule',
+          userId: user.uid,
+          companyId
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        console.log('Hook: Loaded debt schedule:', result.data);
+        return result.data;
+      } else {
+        console.log('Hook: No debt schedule found for company:', companyId);
+        return null;
+      }
+    } catch (error) {
+      console.error('Hook: Error loading debt schedule:', error);
+      return null;
+    }
+  }, [user?.uid]);
+
   // Load profile on mount
   useEffect(() => {
     if (user?.uid) {
       loadProfile();
     }
   }, [user?.uid, loadProfile]);
+
+  // Deal History functions
+  const updateDealHistory = useCallback(async (dealHistory: any[]) => {
+    if (!user?.uid) return;
+
+    setState(prev => ({ ...prev, loading: true, error: null }));
+
+    try {
+      const response = await fetch('/api/borrower-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'updateDealHistory',
+          uid: user.uid,
+          dealHistory
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Update local state
+        setState(prev => ({
+          ...prev,
+          profile: prev.profile ? { ...prev.profile, dealHistory } : null,
+          loading: false
+        }));
+
+        toast({
+          title: 'Deal History Updated',
+          description: 'Your deal history has been saved successfully.',
+        });
+      } else {
+        throw new Error(result.error || 'Failed to update deal history');
+      }
+    } catch (error) {
+      console.error('Error updating deal history:', error);
+      setState(prev => ({ ...prev, loading: false, error: error instanceof Error ? error.message : 'Failed to update deal history' }));
+      
+      toast({
+        variant: 'destructive',
+        title: 'Update Failed',
+        description: 'Failed to update deal history. Please try again.',
+      });
+    }
+  }, [user?.uid, toast]);
+
+  const addDeal = useCallback(async (deal: any) => {
+    if (!user?.uid) return;
+
+    setState(prev => ({ ...prev, loading: true, error: null }));
+
+    try {
+      const response = await fetch('/api/borrower-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'addDeal',
+          uid: user.uid,
+          deal
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Reload profile to get updated deal history
+        await loadProfile();
+        
+        toast({
+          title: 'Deal Added',
+          description: 'Your deal has been added successfully.',
+        });
+      } else {
+        throw new Error(result.error || 'Failed to add deal');
+      }
+    } catch (error) {
+      console.error('Error adding deal:', error);
+      setState(prev => ({ ...prev, loading: false, error: error instanceof Error ? error.message : 'Failed to add deal' }));
+      
+      toast({
+        variant: 'destructive',
+        title: 'Add Failed',
+        description: 'Failed to add deal. Please try again.',
+      });
+    }
+  }, [user?.uid, toast, loadProfile]);
+
+  const updateDeal = useCallback(async (dealId: string, updates: any) => {
+    if (!user?.uid) return;
+
+    setState(prev => ({ ...prev, loading: true, error: null }));
+
+    try {
+      const response = await fetch('/api/borrower-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'updateDeal',
+          uid: user.uid,
+          dealId,
+          updates
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Reload profile to get updated deal history
+        await loadProfile();
+        
+        toast({
+          title: 'Deal Updated',
+          description: 'Your deal has been updated successfully.',
+        });
+      } else {
+        throw new Error(result.error || 'Failed to update deal');
+      }
+    } catch (error) {
+      console.error('Error updating deal:', error);
+      setState(prev => ({ ...prev, loading: false, error: error instanceof Error ? error.message : 'Failed to update deal' }));
+      
+      toast({
+        variant: 'destructive',
+        title: 'Update Failed',
+        description: 'Failed to update deal. Please try again.',
+      });
+    }
+  }, [user?.uid, toast, loadProfile]);
+
+  const removeDeal = useCallback(async (dealId: string) => {
+    if (!user?.uid) return;
+
+    setState(prev => ({ ...prev, loading: true, error: null }));
+
+    try {
+      const response = await fetch('/api/borrower-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'removeDeal',
+          uid: user.uid,
+          dealId
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Reload profile to get updated deal history
+        await loadProfile();
+        
+        toast({
+          title: 'Deal Removed',
+          description: 'Your deal has been removed successfully.',
+        });
+      } else {
+        throw new Error(result.error || 'Failed to remove deal');
+      }
+    } catch (error) {
+      console.error('Error removing deal:', error);
+      setState(prev => ({ ...prev, loading: false, error: error instanceof Error ? error.message : 'Failed to remove deal' }));
+      
+      toast({
+        variant: 'destructive',
+        title: 'Remove Failed',
+        description: 'Failed to remove deal. Please try again.',
+      });
+    }
+  }, [user?.uid, toast, loadProfile]);
 
   return {
     // State
@@ -678,6 +891,11 @@ export function useBorrowerProfile() {
     calculateProfileCompletion,
     saveFinancialStatement,
     saveDebtSchedule,
+    loadDebtSchedule,
+    updateDealHistory,
+    addDeal,
+    updateDeal,
+    removeDeal,
     
     // Utility
     hasProfile: !!state.profile,

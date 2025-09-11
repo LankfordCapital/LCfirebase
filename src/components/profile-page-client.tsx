@@ -26,7 +26,8 @@ import { DealHistory } from '@/components/deal-history';
 import { CustomLoader } from './ui/custom-loader';
 import { Separator } from '@/components/ui/separator';
 import { useBorrowerProfile } from '@/hooks/use-borrower-profile';
-import { ProfileCompletionIndicator } from '@/components/profile-completion-indicator';
+import { PhotoUploadService } from '@/lib/photo-upload-service';
+import { borrowerDocumentService, type BorrowerDocument } from '@/lib/borrower-document-service';
 
 type Company = {
   id: string;
@@ -55,7 +56,8 @@ export default function ProfilePage() {
     updateAssetInfo,
     updateDocumentStatus,
     saveFinancialStatement,
-    saveDebtSchedule
+    saveDebtSchedule,
+    loadProfile
   } = useBorrowerProfile();
 
   const companyId = useId();
@@ -83,6 +85,46 @@ export default function ProfilePage() {
 
   const [isSavingPersonal, setIsSavingPersonal] = useState(false);
   const [isSavingContact, setIsSavingContact] = useState(false);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
+  
+  // Document management
+  const [borrowerDocuments, setBorrowerDocuments] = useState<BorrowerDocument[]>([]);
+  const [isLoadingDocuments, setIsLoadingDocuments] = useState(false);
+  const [uploadingDocuments, setUploadingDocuments] = useState<Set<string>>(new Set());
+
+  // Helper function to safely find documents
+  const findDocument = (predicate: (doc: BorrowerDocument) => boolean) => {
+    return Array.isArray(borrowerDocuments) ? borrowerDocuments.find(predicate) : undefined;
+  };
+
+  // Load documents when component mounts
+  useEffect(() => {
+    if (user?.uid) {
+      loadDocuments();
+    }
+  }, [user?.uid]);
+
+  const loadDocuments = async () => {
+    if (!user?.uid) return;
+    
+    setIsLoadingDocuments(true);
+    try {
+      const result = await borrowerDocumentService.getBorrowerDocuments(user.uid);
+      if (result.success && Array.isArray(result.documents)) {
+        setBorrowerDocuments(result.documents);
+      } else {
+        // Reset to empty array if documents is not an array or if the call failed
+        setBorrowerDocuments([]);
+      }
+    } catch (error) {
+      console.error('Error loading documents:', error);
+      // Reset to empty array on error
+      setBorrowerDocuments([]);
+    } finally {
+      setIsLoadingDocuments(false);
+    }
+  };
 
   // Sync local state with backend data when profile loads
   useEffect(() => {
@@ -94,6 +136,9 @@ export default function ProfilePage() {
         setSsn(profile.personalInfo.ssn || '');
         if (profile.personalInfo.dateOfBirth) {
           setDateOfBirth(new Date(profile.personalInfo.dateOfBirth));
+        }
+        if (profile.personalInfo.profilePhotoUrl) {
+          setProfilePhotoUrl(profile.personalInfo.profilePhotoUrl);
         }
       }
 
@@ -159,34 +204,179 @@ export default function ProfilePage() {
   const contactRef = useRef<HTMLDivElement>(null);
   const companyRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const handleDocumentUpload = async (docName: string, event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-        const file = event.target.files[0];
-        addDocument({
-            name: docName,
-            file,
-        });
-        
-        // Update document status in backend
-        try {
-          if (docName.includes('(Borrower)')) {
-            // Personal document
-            await updateDocumentStatus(docName.replace(' (Borrower)', '').toLowerCase().replace(/\s+/g, ''), true);
-          } else if (docName.includes('(Company)')) {
-            // Company document - update for first company for now
-            const companyId = companies[0]?.id;
-            if (companyId) {
-              await updateDocumentStatus(docName.replace(' (Company)', '').toLowerCase().replace(/\s+/g, ''), true, companyId);
-            }
-          }
-        } catch (error) {
-          console.error('Failed to update document status:', error);
-        }
-        
+  // Handle profile photo upload
+  const handleProfilePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    // Validate file
+    const validation = PhotoUploadService.validateFile(file);
+    if (!validation.valid) {
         toast({
-            title: 'Document Uploaded',
-            description: `${docName} has been uploaded successfully.`,
+            variant: 'destructive',
+            title: 'Invalid File',
+            description: validation.error,
         });
+        return;
+    }
+
+    setIsUploadingPhoto(true);
+    
+    try {
+        const result = await PhotoUploadService.uploadProfilePhoto(file, user.uid);
+        
+        if (result.success && result.url) {
+            setProfilePhotoUrl(result.url);
+            
+            // Update Firebase Auth profile
+            await updateProfile(user, { photoURL: result.url });
+            
+            // Save to backend
+            await saveProfilePhotoToBackend(result.url);
+            
+            // Reload profile to get updated data
+            await loadProfile();
+            
+            toast({
+                title: 'Photo Uploaded',
+                description: 'Your profile photo has been updated.',
+            });
+        } else {
+            throw new Error(result.error || 'Upload failed');
+        }
+    } catch (error) {
+        console.error('Error uploading photo:', error);
+        toast({
+            variant: 'destructive',
+            title: 'Upload Failed',
+            description: 'There was an error uploading your photo.',
+        });
+    } finally {
+        setIsUploadingPhoto(false);
+    }
+  };
+
+  // Save profile photo URL to backend
+  const saveProfilePhotoToBackend = async (photoURL: string) => {
+    if (!user?.uid) return;
+    
+    try {
+      const response = await fetch('/api/borrower-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'updateProfilePhoto',
+          uid: user.uid,
+          photoURL: photoURL
+        })
+      });
+
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to save profile photo');
+      }
+    } catch (error) {
+      console.error('Failed to save profile photo to backend:', error);
+      throw error;
+    }
+  };
+
+  // Save document metadata to backend
+  const saveDocumentToBackend = async (docName: string, file: File, downloadURL?: string) => {
+    if (!user?.uid) return;
+    
+    try {
+      const response = await fetch('/api/borrower-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'saveDocument',
+          uid: user.uid,
+          document: {
+            name: docName,
+            fileName: file.name,
+            fileSize: file.size,
+            mimeType: file.type,
+            downloadURL: downloadURL,
+            uploadedAt: new Date().toISOString(),
+            status: 'uploaded'
+          }
+        })
+      });
+
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to save document metadata');
+      }
+    } catch (error) {
+      console.error('Failed to save document to backend:', error);
+      throw error;
+    }
+  };
+
+  const handleDocumentUpload = async (documentType: string, documentName: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user?.uid) return;
+
+    // Validate file
+    const validation = borrowerDocumentService.validateFile(file);
+    if (!validation.valid) {
+        toast({
+            variant: 'destructive',
+            title: 'Invalid File',
+            description: validation.error,
+        });
+        return;
+    }
+
+    const documentKey = `${documentType}-${documentName}`;
+    setUploadingDocuments(prev => new Set(prev).add(documentKey));
+
+    try {
+      // Upload file to storage
+      const uploadResult = await borrowerDocumentService.uploadDocument(file, user.uid, documentType);
+      
+      if (!uploadResult.success || !uploadResult.url) {
+        throw new Error(uploadResult.error || 'Upload failed');
+      }
+
+      // Add document to Firestore
+      const documentData: Omit<BorrowerDocument, 'id' | 'uploadedAt'> = {
+        borrowerId: user.uid,
+        type: documentType as BorrowerDocument['type'],
+        name: documentName,
+        fileName: file.name,
+        fileUrl: uploadResult.url,
+        fileSize: file.size,
+        mimeType: file.type,
+        status: 'pending'
+      };
+
+      const addResult = await borrowerDocumentService.addDocument(documentData);
+      
+      if (addResult.success) {
+        toast({
+          title: 'Document Uploaded',
+          description: `${documentName} has been uploaded successfully.`,
+        });
+        // Reload documents
+        await loadDocuments();
+      } else {
+        throw new Error(addResult.error || 'Failed to save document');
+      }
+    } catch (error) {
+      console.error('Error uploading document:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Upload Failed',
+        description: 'There was an error uploading your document.',
+      });
+    } finally {
+      setUploadingDocuments(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(documentKey);
+        return newSet;
+      });
     }
   };
 
@@ -228,31 +418,46 @@ export default function ProfilePage() {
     }
   };
 
-  const handleCompanyChange = async (id: string, field: keyof Omit<Company, 'id'>, value: string) => {
+  const handleCompanyChange = (id: string, field: keyof Omit<Company, 'id'>, value: string) => {
     const updatedCompanies = companies.map(company => 
       company.id === id ? { ...company, [field]: value } : company
     );
     setCompanies(updatedCompanies);
-    
-    // Find the updated company and save to backend
-    const updatedCompany = updatedCompanies.find(c => c.id === id);
-    if (updatedCompany) {
-      try {
-        await updateCompanyInfo({
-          ...updatedCompany,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          isActive: true
-        });
-      } catch (error) {
-        console.error('Failed to update company:', error);
-      }
+  };
+
+  const handleSaveCompanyInfo = async (companyId: string) => {
+    const company = companies.find(c => c.id === companyId);
+    if (!company) return;
+
+    try {
+      await updateCompanyInfo({
+        ...company,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        isActive: true
+      });
+      
+      toast({
+        title: 'Company Information Saved',
+        description: 'Your company information has been saved successfully.',
+      });
+    } catch (error) {
+      console.error('Failed to update company:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Save Failed',
+        description: 'Failed to save company information. Please try again.',
+      });
     }
   };
 
   const handleScanCreditReport = async () => {
-    const creditReport = documents['Credit Report (Borrower)'];
-    if (!creditReport?.dataUri) {
+    // Find the credit report document in borrower documents
+    const creditReportDoc = Array.isArray(borrowerDocuments) ? borrowerDocuments.find(doc => 
+      doc.name === 'Credit Report (Borrower)' && doc.type === 'Credit Report (Borrower)'
+    ) : undefined;
+    
+    if (!creditReportDoc?.fileUrl) {
       toast({
         variant: 'destructive',
         title: 'No file selected',
@@ -265,10 +470,18 @@ export default function ProfilePage() {
     setCreditScores(null);
 
     try {
-      const dataUri = creditReport.dataUri;
-      if (!dataUri) {
-        throw new Error('File data not available for scanning.');
-      }
+      // Fetch the file from the URL and convert to data URI for AI scanning
+      const response = await fetch(creditReportDoc.fileUrl);
+      const blob = await response.blob();
+      
+      // Convert blob to data URI
+      const dataUri = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+
       const result = await scanCreditReport({ creditReportDataUri: dataUri });
       setCreditScores(result);
       
@@ -298,9 +511,13 @@ export default function ProfilePage() {
   
   const handleScanAssetStatement = async (type: 'personal' | 'company') => {
     const docName = type === 'personal' ? 'Personal Asset Statement (Borrower)' : 'Company Asset Statement (Company)';
-    const assetStatement = documents[docName];
+    
+    // Find the asset statement document in borrower documents
+    const assetStatementDoc = Array.isArray(borrowerDocuments) ? borrowerDocuments.find(doc => 
+      doc.name === docName && doc.type === docName
+    ) : undefined;
 
-    if (!assetStatement?.dataUri) {
+    if (!assetStatementDoc?.fileUrl) {
       toast({
         variant: 'destructive',
         title: 'No file selected',
@@ -318,10 +535,18 @@ export default function ProfilePage() {
     }
     
     try {
-        const dataUri = assetStatement.dataUri;
-        if (!dataUri) {
-          throw new Error('File data not available for scanning.');
-        }
+        // Fetch the file from the URL and convert to data URI for AI scanning
+        const response = await fetch(assetStatementDoc.fileUrl);
+        const blob = await response.blob();
+        
+        // Convert blob to data URI
+        const dataUri = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+
         const result = await scanAssetStatement({ statementDataUri: dataUri });
         if(type === 'personal') {
             setPersonalAssetBalance(result);
@@ -418,27 +643,72 @@ export default function ProfilePage() {
 
   const UploadButton = ({ docName }: { docName: string }) => {
     const fileInputId = `upload-${docName.replace(/\s+/g, '-')}`;
-    const doc = documents[docName];
+    const documentType = 'id_license'; // Default type for ID/Driver's License
+    const documentKey = `${documentType}-${docName}`;
     
-    // Check if document is marked as uploaded in backend
-    const isUploaded = doc || (profile?.requiredDocuments?.personal && 
-      (profile.requiredDocuments.personal as any)[docName.replace(' (Borrower)', '').toLowerCase().replace(/\s+/g, '')]);
+    // Find uploaded document
+    const uploadedDoc = Array.isArray(borrowerDocuments) ? borrowerDocuments.find(doc => doc.name === docName) : undefined;
+    const isUploaded = !!uploadedDoc;
+    const isUploading = uploadingDocuments.has(documentKey);
+    
+    const handleViewDocument = () => {
+      if (uploadedDoc?.fileUrl) {
+        window.open(uploadedDoc.fileUrl, '_blank');
+      }
+    };
     
     return (
-        <div className="relative">
-            <Button variant="outline" className="w-full justify-start" asChild>
-                <Label htmlFor={fileInputId} className="cursor-pointer flex items-center">
-                    <Upload className="mr-2 h-4 w-4" /> 
-                    <span className="truncate">{docName}</span>
-                    {isUploaded && <span className="text-green-500 ml-2 whitespace-nowrap">✓</span>}
-                </Label>
-            </Button>
-            <Input 
-                id={fileInputId} 
-                type="file" 
-                className="sr-only" 
-                onChange={(e) => handleDocumentUpload(docName, e)} 
-            />
+        <div className="space-y-2">
+            <div className="relative">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  disabled={isUploading}
+                  asChild
+                >
+                    <Label htmlFor={fileInputId} className="cursor-pointer flex items-center">
+                        {isUploading ? (
+                          <>
+                            <CustomLoader className="mr-2 h-4 w-4" />
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="mr-2 h-4 w-4" /> 
+                            <span className="truncate">{docName}</span>
+                            {isUploaded && <span className="text-green-500 ml-2 whitespace-nowrap">✓</span>}
+                          </>
+                        )}
+                    </Label>
+                </Button>
+                <Input 
+                    id={fileInputId} 
+                    type="file" 
+                    accept=".jpg,.jpeg,.png,.pdf"
+                    className="sr-only" 
+                    onChange={(e) => handleDocumentUpload(documentType, docName, e)} 
+                    disabled={isUploading}
+                />
+            </div>
+            
+            {isUploaded && uploadedDoc && (
+                <div className="flex items-center justify-between p-2 bg-green-50 rounded-md border border-green-200">
+                    <div className="flex items-center gap-2">
+                        <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                        <span className="text-sm text-green-700">
+                            {uploadedDoc.fileName}
+                        </span>
+                    </div>
+                    <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={handleViewDocument}
+                        className="text-green-700 hover:text-green-800 hover:bg-green-100"
+                    >
+                        View
+                    </Button>
+                </div>
+            )}
         </div>
     );
   };
@@ -477,8 +747,6 @@ export default function ProfilePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Profile Completion Indicator */}
-            <ProfileCompletionIndicator completion={profileCompletion || null} />
             
             {/* Personal Information */}
             <Card ref={profileRef} className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
@@ -503,15 +771,41 @@ export default function ProfilePage() {
               <CardContent className="p-6 space-y-6">
                 <div className="flex items-center gap-6">
                   <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
-                    <AvatarImage src={user?.photoURL || "https://placehold.co/96x96.png"} />
+                    <AvatarImage src={profilePhotoUrl || user?.photoURL || "https://placehold.co/96x96.png"} />
                     <AvatarFallback className="text-lg font-semibold">{firstName.charAt(0)}{lastName.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="space-y-2">
-                    <Button variant="outline" className="gap-2">
-                      <Upload className="h-4 w-4" />
-                      Change Photo
-                    </Button>
-                    <p className="text-sm text-gray-500">Upload a professional headshot</p>
+                    <div className="relative">
+                      <Button 
+                        variant="outline" 
+                        className="gap-2" 
+                        disabled={isUploadingPhoto}
+                        asChild
+                      >
+                        <Label htmlFor="profile-photo-upload" className="cursor-pointer flex items-center">
+                          {isUploadingPhoto ? (
+                            <>
+                              <CustomLoader className="h-4 w-4" />
+                              Uploading...
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="h-4 w-4" />
+                              Change Photo
+                            </>
+                          )}
+                        </Label>
+                      </Button>
+                      <Input 
+                        id="profile-photo-upload" 
+                        type="file" 
+                        accept=".jpg,.jpeg,.png"
+                        className="sr-only" 
+                        onChange={handleProfilePhotoUpload}
+                        disabled={isUploadingPhoto}
+                      />
+                    </div>
+                    <p className="text-sm text-gray-500">Upload a professional headshot (JPEG/PNG, max 5MB)</p>
                   </div>
                 </div>
                 
@@ -610,13 +904,41 @@ export default function ProfilePage() {
                 <div className="space-y-3">
                   <Label htmlFor="credit-report-upload" className="text-sm font-medium">Upload Tri-Merged Credit Report</Label>
                   <div className="flex gap-3">
-                    <Input id="credit-report-upload" type="file" onChange={(e) => handleDocumentUpload('Credit Report (Borrower)', e)} className="flex-1" />
-                    <Button onClick={handleScanCreditReport} disabled={isScanningCredit || !documents['Credit Report (Borrower)']} className="gap-2">
+                    <Input id="credit-report-upload" type="file" onChange={(e) => handleDocumentUpload('Credit Report (Borrower)', 'Credit Report (Borrower)', e)} className="flex-1" />
+                    <Button onClick={handleScanCreditReport} disabled={isScanningCredit || !findDocument(doc => doc.name === 'Credit Report (Borrower)' && doc.type === 'Credit Report (Borrower)')} className="gap-2">
                       {isScanningCredit ? <CustomLoader className="h-4 w-4" /> : <ScanLine className="h-4 w-4" />}
                       <span className="hidden sm:inline">Scan Report</span>
                     </Button>
                   </div>
                 </div>
+
+                {/* Display uploaded credit report */}
+                {findDocument(doc => doc.name === 'Credit Report (Borrower)' && doc.type === 'Credit Report (Borrower)') && (
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium">Uploaded Credit Report</Label>
+                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-md border border-green-200">
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                        <span className="text-sm text-green-700">
+                          {findDocument(doc => doc.name === 'Credit Report (Borrower)' && doc.type === 'Credit Report (Borrower)')?.fileName}
+                        </span>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const doc = findDocument(doc => doc.name === 'Credit Report (Borrower)' && doc.type === 'Credit Report (Borrower)');
+                          if (doc?.fileUrl) {
+                            window.open(doc.fileUrl, '_blank');
+                          }
+                        }}
+                        className="h-8"
+                      >
+                        View
+                      </Button>
+                    </div>
+                  </div>
+                )}
 
                 {creditScores && (
                   <div className="grid grid-cols-3 gap-4 rounded-lg border bg-gradient-to-r from-blue-50 to-green-50 p-6">
@@ -664,13 +986,42 @@ export default function ProfilePage() {
                   <div className="space-y-3">
                     <Label htmlFor="personal-asset-upload" className="text-sm font-medium">Upload Latest Personal Asset Statement</Label>
                     <div className="flex gap-3">
-                      <Input id="personal-asset-upload" type="file" onChange={(e) => handleDocumentUpload('Personal Asset Statement (Borrower)', e)} className="flex-1" />
-                      <Button onClick={() => handleScanAssetStatement('personal')} disabled={isScanningPersonalAsset || !documents['Personal Asset Statement (Borrower)']} className="gap-2">
+                      <Input id="personal-asset-upload" type="file" onChange={(e) => handleDocumentUpload('Personal Asset Statement (Borrower)', 'Personal Asset Statement (Borrower)', e)} className="flex-1" />
+                      <Button onClick={() => handleScanAssetStatement('personal')} disabled={isScanningPersonalAsset || !findDocument(doc => doc.name === 'Personal Asset Statement (Borrower)' && doc.type === 'Personal Asset Statement (Borrower)')} className="gap-2">
                         {isScanningPersonalAsset ? <CustomLoader className="h-4 w-4" /> : <Landmark className="h-4 w-4" />}
                         <span className="hidden sm:inline">Scan</span>
                       </Button>
                     </div>
                   </div>
+
+                  {/* Display uploaded personal asset statement */}
+                  {findDocument(doc => doc.name === 'Personal Asset Statement (Borrower)' && doc.type === 'Personal Asset Statement (Borrower)') && (
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Uploaded Personal Asset Statement</Label>
+                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-md border border-green-200">
+                        <div className="flex items-center gap-2">
+                          <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                          <span className="text-sm text-green-700">
+                            {findDocument(doc => doc.name === 'Personal Asset Statement (Borrower)' && doc.type === 'Personal Asset Statement (Borrower)')?.fileName}
+                          </span>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const doc = findDocument(doc => doc.name === 'Personal Asset Statement (Borrower)' && doc.type === 'Personal Asset Statement (Borrower)');
+                            if (doc?.fileUrl) {
+                              window.open(doc.fileUrl, '_blank');
+                            }
+                          }}
+                          className="h-8"
+                        >
+                          View
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
                   {personalAssetBalance && (
                     <div className="bg-white rounded-lg p-4 border">
                       <p className="text-sm font-medium text-gray-600">Most Recent Balance</p>
@@ -687,13 +1038,42 @@ export default function ProfilePage() {
                   <div className="space-y-3">
                     <Label htmlFor="company-asset-upload" className="text-sm font-medium">Upload Latest Company Asset Statement</Label>
                     <div className="flex gap-3">
-                      <Input id="company-asset-upload" type="file" onChange={(e) => handleDocumentUpload('Company Asset Statement (Company)', e)} className="flex-1" />
-                      <Button onClick={() => handleScanAssetStatement('company')} disabled={isScanningCompanyAsset || !documents['Company Asset Statement (Company)']} className="gap-2">
+                      <Input id="company-asset-upload" type="file" onChange={(e) => handleDocumentUpload('Company Asset Statement (Company)', 'Company Asset Statement (Company)', e)} className="flex-1" />
+                      <Button onClick={() => handleScanAssetStatement('company')} disabled={isScanningCompanyAsset || !findDocument(doc => doc.name === 'Company Asset Statement (Company)' && doc.type === 'Company Asset Statement (Company)')} className="gap-2">
                         {isScanningCompanyAsset ? <CustomLoader className="h-4 w-4" /> : <Landmark className="h-4 w-4" />}
                         <span className="hidden sm:inline">Scan</span>
                       </Button>
                     </div>
                   </div>
+
+                  {/* Display uploaded company asset statement */}
+                  {findDocument(doc => doc.name === 'Company Asset Statement (Company)' && doc.type === 'Company Asset Statement (Company)') && (
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Uploaded Company Asset Statement</Label>
+                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-md border border-green-200">
+                        <div className="flex items-center gap-2">
+                          <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                          <span className="text-sm text-green-700">
+                            {findDocument(doc => doc.name === 'Company Asset Statement (Company)' && doc.type === 'Company Asset Statement (Company)')?.fileName}
+                          </span>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const doc = findDocument(doc => doc.name === 'Company Asset Statement (Company)' && doc.type === 'Company Asset Statement (Company)');
+                            if (doc?.fileUrl) {
+                              window.open(doc.fileUrl, '_blank');
+                            }
+                          }}
+                          className="h-8"
+                        >
+                          View
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
                   {companyAssetBalance && (
                     <div className="bg-white rounded-lg p-4 border">
                       <p className="text-sm font-medium text-gray-600">Most Recent Balance</p>
@@ -818,10 +1198,17 @@ export default function ProfilePage() {
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <div className="py-4">
-                        <BusinessDebtSchedule />
+                        <BusinessDebtSchedule companyId={company.id} />
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
+                  
+                  <div className="flex justify-end pt-4">
+                    <Button onClick={() => handleSaveCompanyInfo(company.id)} className="gap-2">
+                      <Save className="h-4 w-4" />
+                      Save Company Information
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}

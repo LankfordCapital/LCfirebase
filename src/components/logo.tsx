@@ -13,6 +13,7 @@ export function Logo({ className, href }: { className?: string, href?: string })
           width={40}
           height={40}
           className="logo-fixed-size"
+          style={{ width: 'auto', height: 'auto' }}
         />
       <div className="flex items-baseline text-2xl">
         <span className="text-primary font-bold">Lankford</span>

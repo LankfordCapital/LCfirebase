@@ -9,7 +9,16 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { addAppointment, getAppointments, type Appointment } from '@/ai/flows/appointment-scheduler-flow';
+// Define Appointment type locally
+interface Appointment {
+  id: string;
+  title: string;
+  start: string;
+  end?: string;
+  type: 'appointment' | 'task';
+  description?: string;
+  workforceMemberId: string;
+}
 import { Plus, Calendar as CalendarIcon, ClipboardCheck, Trash2, Edit } from 'lucide-react';
 import {
   Dialog,
@@ -39,9 +48,16 @@ export function SchedulerClient() {
         if (!user) return;
         setIsLoading(true);
         try {
-            const fetchedEvents = await getAppointments({ workforceMemberId: user.uid });
-            setEvents(fetchedEvents);
+            const response = await fetch(`/api/appointments?workforceMemberId=${user.uid}`);
+            const data = await response.json();
+            
+            if (response.ok) {
+                setEvents(data.appointments || []);
+            } else {
+                throw new Error(data.error || 'Failed to fetch events');
+            }
         } catch (error) {
+            console.error('Error fetching events:', error);
             toast({ variant: 'destructive', title: 'Error', description: 'Could not fetch events.'})
         }
         setIsLoading(false);
@@ -60,17 +76,28 @@ export function SchedulerClient() {
             ...currentEvent,
             workforceMemberId: user.uid,
         };
-        // In a real app, you'd have an `updateAppointment` flow as well.
-        // For simplicity, we are only adding new ones.
-        await addAppointment(eventToSave as any);
 
-        // This is a mock update for the UI. In a real app, you'd re-fetch or update state more robustly.
-        setEvents(prev => [...prev, {id: Date.now().toString(), ...eventToSave} as Appointment]);
+        const response = await fetch('/api/appointments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(eventToSave),
+        });
 
-        toast({ title: 'Success', description: 'Event saved successfully.' });
-        setIsDialogOpen(false);
-        setCurrentEvent({});
+        const data = await response.json();
+
+        if (response.ok) {
+            // Add the new event to the local state
+            setEvents(prev => [...prev, {id: data.id, ...eventToSave} as Appointment]);
+            toast({ title: 'Success', description: 'Event saved successfully.' });
+            setIsDialogOpen(false);
+            setCurrentEvent({});
+        } else {
+            throw new Error(data.error || 'Failed to save event');
+        }
     } catch (error) {
+        console.error('Error saving event:', error);
         toast({ variant: 'destructive', title: 'Error', description: 'Could not save the event.'});
     }
     setIsSubmitting(false);

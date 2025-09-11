@@ -156,6 +156,86 @@ service cloud.firestore {
     match /enhancedLoanApplications/{applicationId} {
       allow read, write, create, update, delete: if request.auth != null;
     }
+
+    // Allow users to manage their own borrower documents
+    match /borrower-documents/{documentId} {
+      allow read, write, create, update, delete: if request.auth != null && (
+        resource.data.borrowerId == request.auth.uid ||
+        // Allow creation of new documents (no resource.data yet)
+        request.method == 'create'
+      );
+    }
+
+    // Allow users to manage their own personal financial statements
+    match /personalFinancialStatements/{statementId} {
+      allow read, write, create, update, delete: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        // Allow creation of new statements (no resource.data yet)
+        request.method == 'create'
+      );
+    }
+
+    // Allow users to manage their own business debt schedules
+    match /businessDebtSchedules/{scheduleId} {
+      allow read, write, create, update, delete: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        // Allow creation of new schedules (no resource.data yet)
+        request.method == 'create'
+      );
+    }
+
+    // Allow users to manage their own broker documents
+    match /broker-documents/{documentId} {
+      allow read, write, create, update, delete: if request.auth != null && (
+        resource.data.brokerId == request.auth.uid ||
+        // Allow creation of new documents (no resource.data yet)
+        request.method == 'create'
+      );
+    }
+
+    // Allow workforce members and admins to manage lenders database
+    match /lenders/{lenderId} {
+      allow read, write, create, update, delete: if request.auth != null;
+    }
+
+    // Allow workforce members and admins to manage lender profiles
+    match /lender-profiles/{profileId} {
+      allow read, write, create, update, delete: if request.auth != null;
+    }
+
+    // Allow workforce members and admins to manage lender matches
+    match /lender-matches/{matchId} {
+      allow read, write, create, update, delete: if request.auth != null;
+    }
+
+    // Allow workforce members and admins to manage market data
+    match /market-data/{dataId} {
+      allow read, write, create, update, delete: if request.auth != null;
+    }
+
+    // Allow workforce members and admins to manage deal analysis
+    match /deal-analysis/{analysisId} {
+      allow read, write, create, update, delete: if request.auth != null;
+    }
+
+    // Allow workforce members and admins to manage AMC database
+    match /amcs/{amcId} {
+      allow read, write, create, update, delete: if request.auth != null;
+    }
+
+    // Allow workforce members and admins to manage AMC profiles
+    match /amc-profiles/{profileId} {
+      allow read, write, create, update, delete: if request.auth != null;
+    }
+
+    // Allow workforce members to manage their own appointments
+    match /appointments/{appointmentId} {
+      allow read, write, create, update, delete: if request.auth != null && (
+        resource.data.workforceMemberId == request.auth.uid ||
+        // Allow creation of new appointments (no resource.data yet)
+        request.method == 'create'
+      );
+    }
     
     // Allow collection initialization documents
     match /{collection}/{document} {
@@ -163,7 +243,18 @@ service cloud.firestore {
         document == '_init' && 
         (collection == 'enhancedLoanApplications' || 
          collection == 'users' || 
-         collection == 'borrower-profiles');
+         collection == 'borrower-profiles' ||
+         collection == 'borrower-documents' ||
+         collection == 'personalFinancialStatements' ||
+         collection == 'businessDebtSchedules' ||
+         collection == 'broker-documents' ||
+         collection == 'lenders' ||
+         collection == 'lender-profiles' ||
+         collection == 'lender-matches' ||
+         collection == 'market-data' ||
+         collection == 'deal-analysis' ||
+         collection == 'amcs' ||
+         collection == 'amc-profiles');
     }
   }
 }

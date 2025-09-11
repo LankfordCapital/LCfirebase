@@ -111,11 +111,15 @@ export default function SignInPage() {
        // AuthProvider will handle the redirect on successful sign-in
     } catch (error: any) {
       console.error('Google sign-in error in component:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Google Sign In Failed',
-        description: error.message || 'An unexpected error occurred',
-      });
+      
+      // Don't show error toast if user closed the popup
+      if (error.code !== 'auth/popup-closed-by-user') {
+        toast({
+          variant: 'destructive',
+          title: 'Google Sign In Failed',
+          description: error.message || 'An unexpected error occurred',
+        });
+      }
     } finally {
         setIsGoogleLoading(false);
     }

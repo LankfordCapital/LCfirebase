@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { DollarSign, FileCheck, FileClock, PlusCircle, AlertCircle, Calendar, Briefcase, UserCheck, ArrowRight, FileText } from "lucide-react";
+import { DollarSign, FileCheck, FileClock, PlusCircle, AlertCircle, Calendar, Briefcase, UserCheck, ArrowRight, FileText, RefreshCw } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/auth-context";
@@ -16,118 +16,42 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { BorrowerInfoModal } from "@/components/borrower-info-modal";
 import { useRouter } from "next/navigation";
-
-interface LoanApplication {
-  id: string;
-  property: string;
-  type: string;
-  status: string;
-  progress: number;
-  userId: string;
-  createdAt: any;
-}
-
-interface Document {
-  id: string;
-  name: string;
-  status: string;
-  userId: string;
-  createdAt: any;
-}
+import { useDashboardData } from "@/hooks/use-dashboard-data";
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const { data, loading, error, refreshData } = useDashboardData();
 
-  useEffect(() => {
-    // Debug logging
-    console.log('Dashboard page - User:', user);
-    console.log('Dashboard page - User UID:', user?.uid);
-    console.log('Dashboard page - User displayName:', user?.displayName);
-    
-    // Force load after a short delay, regardless of auth state
-    const timer = setTimeout(() => {
-      console.log('Dashboard loading timeout - forcing load');
-      setLoading(false);
-    }, 1500); // 1.5 second timeout
-
-    return () => clearTimeout(timer);
-  }, [user]); // Add user to dependency array
-
-  // Demo data
-  const loanApplications: LoanApplication[] = [
-    {
-      id: 'LL-00124',
-      property: '123 Main St, Anytown, CA',
-      type: 'Fix and Flip',
-      status: 'Underwriting',
-      progress: 60,
-      userId: user?.uid || 'demo-user',
-      createdAt: new Date()
-    },
-    {
-      id: 'LL-00119',
-      property: '456 Oak Ave, Somecity, TX',
-      type: 'DSCR',
-      status: 'Approved',
-      progress: 100,
-      userId: user?.uid || 'demo-user',
-      createdAt: new Date()
-    }
-  ];
-
-  const documents: Document[] = [
-    {
-      id: 'doc1',
-      name: '2023 Personal Tax Returns',
-      status: 'submitted',
-      userId: user?.uid || 'demo-user',
-      createdAt: new Date()
-    },
-    {
-      id: 'doc2',
-      name: 'Bank Statement Q1',
-      status: 'approved',
-      userId: user?.uid || 'demo-user',
-      createdAt: new Date()
-    },
-    {
-      id: 'doc3',
-      name: 'Signed Purchase Agreement',
-      status: 'pending',
-      userId: user?.uid || 'demo-user',
-      createdAt: new Date()
-    },
-    {
-      id: 'doc4',
-      name: 'Driver\'s License',
-      status: 'requested',
-      userId: user?.uid || 'demo-user',
-      createdAt: new Date()
-    }
-  ];
-
-  const activeLoans = loanApplications.filter(loan => loan.status !== 'Completed' && loan.status !== 'Cancelled');
-  const submittedDocuments = documents.filter(doc => doc.status === 'submitted' || doc.status === 'approved');
-  const pendingDocuments = documents.filter(doc => doc.status === 'pending' || doc.status === 'requested');
+  // Use real data from the hook
+  const { loanApplications, documents, recentActivity, workforceMembers, summary } = data;
+  
+  const activeLoans = loanApplications.filter(loan => 
+    loan.status !== 'Completed' && loan.status !== 'Cancelled' && loan.status !== 'Draft'
+  );
+  const submittedDocuments = documents.filter(doc => 
+    doc.status === 'submitted' || doc.status === 'approved'
+  );
+  const pendingDocuments = documents.filter(doc => 
+    doc.status === 'pending' || doc.status === 'requested'
+  );
 
   const summaryCards = [
     { 
       title: "Available Programs", 
-      value: "18", 
+      value: summary.availablePrograms.toString(), 
       icon: <FileText className="h-4 w-4 text-muted-foreground" />,
       cta: { href: "/dashboard/applications", text: "View All"}
     },
     { 
       title: "Active Loans", 
-      value: activeLoans.length.toString(), 
+      value: summary.activeLoans.toString(), 
       icon: <DollarSign className="h-4 w-4 text-muted-foreground" /> 
     },
     { 
       title: "Documents Submitted", 
-      value: submittedDocuments.length.toString(), 
+      value: summary.documentsSubmitted.toString(), 
       icon: <FileCheck className="h-4 w-4 text-muted-foreground" /> 
     },
   ];
@@ -156,6 +80,22 @@ export default function DashboardPage() {
     );
   }
 
+  // If there's an error, show it with a refresh button
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Error Loading Dashboard</h2>
+          <p className="text-muted-foreground mb-4">{error}</p>
+          <Button onClick={refreshData} variant="outline">
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 p-4 md:p-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -164,6 +104,10 @@ export default function DashboardPage() {
           <p className="text-muted-foreground">Lankford Lending Solutions</p>
         </div>
         <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={refreshData} disabled={loading}>
+              <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
             <Button variant="outline" asChild>
                 <Link href="/dashboard/applications">View Programs</Link>
             </Button>
@@ -276,19 +220,21 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                     <ul className="space-y-4">
-                        {/* Recent activity data would be fetched here if available */}
-                        <li className="flex items-start gap-4">
-                            <span className="text-xs text-muted-foreground w-24 flex-shrink-0">2 days ago</span>
-                            <p className="text-sm">Document 'Bank Statement Q1' was approved.</p>
-                        </li>
-                        <li className="flex items-start gap-4">
-                            <span className="text-xs text-muted-foreground w-24 flex-shrink-0">3 days ago</span>
-                            <p className="text-sm">You uploaded 'Signed Purchase Agreement'.</p>
-                        </li>
-                        <li className="flex items-start gap-4">
-                            <span className="text-xs text-muted-foreground w-24 flex-shrink-0">5 days ago</span>
-                            <p className="text-sm">Loan officer requested 'Proof of Insurance'.</p>
-                        </li>
+                        {recentActivity.length > 0 ? (
+                          recentActivity.map((activity) => (
+                            <li key={activity.id} className="flex items-start gap-4">
+                              <span className="text-xs text-muted-foreground w-24 flex-shrink-0">
+                                {new Date(activity.timestamp).toLocaleDateString()}
+                              </span>
+                              <p className="text-sm">{activity.message}</p>
+                            </li>
+                          ))
+                        ) : (
+                          <li className="flex items-start gap-4">
+                            <span className="text-xs text-muted-foreground w-24 flex-shrink-0">No recent activity</span>
+                            <p className="text-sm text-muted-foreground">No recent activity to display.</p>
+                          </li>
+                        )}
                     </ul>
                 </CardContent>
             </Card>
@@ -303,52 +249,27 @@ export default function DashboardPage() {
                     <CardDescription>Need to talk? Book a time with one of our team members.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                   {/* Workforce members data would be fetched here if available */}
-                   <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
+                   {workforceMembers.map((member) => (
+                     <div key={member.id} className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
                        <div className="flex items-center gap-3">
                            <Avatar className="h-10 w-10">
-                               <AvatarImage src={`https://i.pravatar.cc/40?u=workforce-user-1`} />
-                               <AvatarFallback>AJ</AvatarFallback>
+                               <AvatarImage src={member.avatar} />
+                               <AvatarFallback>
+                                 {member.name.split(' ').map(n => n[0]).join('')}
+                               </AvatarFallback>
                            </Avatar>
                            <div>
-                               <p className="font-semibold">Alex Johnson</p>
-                               <p className="text-xs text-muted-foreground">Senior Loan Officer</p>
+                               <p className="font-semibold">{member.name}</p>
+                               <p className="text-xs text-muted-foreground">{member.title}</p>
                            </div>
                        </div>
-                       <Button asChild variant="outline" size="sm">
-                           <Link href={`/book-appointment/workforce-user-1`} target="_blank">Book Now</Link>
+                       <Button asChild variant="outline" size="sm" disabled={!member.isAvailable}>
+                           <Link href={`/book-appointment/${member.id}`} target="_blank">
+                             {member.isAvailable ? 'Book Now' : 'Unavailable'}
+                           </Link>
                        </Button>
-                   </div>
-                   <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
-                       <div className="flex items-center gap-3">
-                           <Avatar className="h-10 w-10">
-                               <AvatarImage src={`https://i.pravatar.cc/40?u=workforce-user-2`} />
-                               <AvatarFallback>MG</AvatarFallback>
-                           </Avatar>
-                           <div>
-                               <p className="font-semibold">Maria Garcia</p>
-                               <p className="text-xs text-muted-foreground">Underwriting Manager</p>
-                           </div>
-                       </div>
-                       <Button asChild variant="outline" size="sm">
-                           <Link href={`/book-appointment/workforce-user-2`} target="_blank">Book Now</Link>
-                       </Button>
-                   </div>
-                   <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
-                       <div className="flex items-center gap-3">
-                           <Avatar className="h-10 w-10">
-                               <AvatarImage src={`https://i.pravatar.cc/40?u=workforce-user-3`} />
-                               <AvatarFallback>CC</AvatarFallback>
-                           </Avatar>
-                           <div>
-                               <p className="font-semibold">Closing Coordinator</p>
-                               <p className="text-xs text-muted-foreground">Workforce Member</p>
-                           </div>
-                       </div>
-                       <Button asChild variant="outline" size="sm">
-                           <Link href={`/book-appointment/workforce-user-3`} target="_blank">Book Now</Link>
-                       </Button>
-                   </div>
+                     </div>
+                   ))}
                 </CardContent>
             </Card>
         </div>
