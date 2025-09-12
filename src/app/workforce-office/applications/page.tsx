@@ -77,7 +77,6 @@ export default function WorkforceApplicationsPage() {
       requirements: ['Purchase contract', 'Exit strategy', 'Property value', 'Credit score 650+'],
       estimatedProcessing: '7-14 days'
     },
-
     // Commercial Programs
     {
       id: 'commercial-ground-up-construction',
@@ -98,73 +97,124 @@ export default function WorkforceApplicationsPage() {
       icon: <Building2 className="h-6 w-6" />,
       features: ['Renovation financing', 'Existing properties', 'Value-add strategy', 'Quick funding'],
       typicalTerms: '12-24 months',
-      requirements: ['Property purchase', 'Renovation budget', 'Market analysis', 'Exit strategy'],
-      estimatedProcessing: '10-15 days'
+      requirements: ['Property purchase', 'Renovation plans', 'After-repair value', 'Exit strategy'],
+      estimatedProcessing: '10-14 days'
     },
     {
-      id: 'commercial-bridge',
-      name: 'Commercial - Bridge',
+      id: 'commercial-acquisition-bridge',
+      name: 'Commercial - Acquisition & Bridge',
       category: 'Commercial',
-      description: 'Short-term financing for commercial property acquisitions and refinancing',
+      description: 'Short-term financing for acquiring commercial properties with plans for long-term financing',
       icon: <Building2 className="h-6 w-6" />,
-      features: ['Quick funding', 'Flexible terms', 'No prepayment penalty', 'Bridge to permanent'],
+      features: ['Quick acquisition', 'Bridge financing', 'Flexible terms', 'No prepayment penalty'],
       typicalTerms: '6-24 months',
-      requirements: ['Property purchase', 'Exit strategy', 'Property value', 'Credit score 650+'],
+      requirements: ['Purchase contract', 'Exit strategy', 'Property value', 'Credit score 650+'],
       estimatedProcessing: '7-14 days'
     },
-
-    // Construction Programs
     {
-      id: 'construction-ground-up',
-      name: 'Construction - Ground Up',
-      category: 'Construction',
-      description: 'New construction financing for various property types',
-      icon: <Layers className="h-6 w-6" />,
-      features: ['New construction', 'Multiple property types', 'Draw-based funding', 'Project management'],
-      typicalTerms: '12-36 months',
-      requirements: ['Construction plans', 'Builder credentials', 'Market analysis', 'Exit strategy'],
+      id: 'commercial-conventional-long-term-debt',
+      name: 'Commercial - Conventional Long Term Debt',
+      category: 'Commercial',
+      description: 'Traditional long-term financing for stabilized commercial properties',
+      icon: <Building2 className="h-6 w-6" />,
+      features: ['Long-term financing', 'Stabilized properties', 'Competitive rates', 'Amortization'],
+      typicalTerms: '10-25 years',
+      requirements: ['Property cash flow', 'Credit score 700+', 'Property appraisal', 'Business plan'],
+      estimatedProcessing: '21-30 days'
+    },
+    // Industrial Programs
+    {
+      id: 'industrial-ground-up-construction',
+      name: 'Industrial - Ground Up Construction',
+      category: 'Industrial',
+      description: 'Construction financing for industrial properties including warehouses, manufacturing, and distribution',
+      icon: <Factory className="h-6 w-6" />,
+      features: ['New construction', 'Industrial properties', 'Flexible terms', 'Project management'],
+      typicalTerms: '18-36 months',
+      requirements: ['Construction plans', 'Builder credentials', 'Market analysis', 'Tenant commitments'],
       estimatedProcessing: '14-21 days'
     },
     {
-      id: 'construction-rehab',
-      name: 'Construction - Rehab',
-      category: 'Construction',
-      description: 'Renovation and improvement financing for existing properties',
-      icon: <Layers className="h-6 w-6" />,
-      features: ['Renovation financing', 'Existing properties', 'Value-add strategy', 'Draw-based funding'],
-      typicalTerms: '6-24 months',
-      requirements: ['Property purchase', 'Renovation budget', 'Market analysis', 'Exit strategy'],
-      estimatedProcessing: '10-15 days'
+      id: 'industrial-rehab-expansion-loans',
+      name: 'Industrial - Rehab & Expansion',
+      category: 'Industrial',
+      description: 'Financing for renovating and expanding existing industrial facilities',
+      icon: <Factory className="h-6 w-6" />,
+      features: ['Renovation financing', 'Expansion projects', 'Value-add strategy', 'Quick funding'],
+      typicalTerms: '12-24 months',
+      requirements: ['Property ownership', 'Renovation plans', 'After-repair value', 'Business plan'],
+      estimatedProcessing: '10-14 days'
     },
-
-    // Equipment Financing
+    {
+      id: 'industrial-acquisition-bridge',
+      name: 'Industrial - Acquisition & Bridge',
+      category: 'Industrial',
+      description: 'Short-term financing for acquiring industrial properties with plans for long-term financing',
+      icon: <Factory className="h-6 w-6" />,
+      features: ['Quick acquisition', 'Bridge financing', 'Flexible terms', 'No prepayment penalty'],
+      typicalTerms: '6-24 months',
+      requirements: ['Purchase contract', 'Exit strategy', 'Property value', 'Credit score 650+'],
+      estimatedProcessing: '7-14 days'
+    },
+    {
+      id: 'industrial-long-term-debt',
+      name: 'Industrial - Long Term Debt',
+      category: 'Industrial',
+      description: 'Long-term financing for stabilized industrial properties',
+      icon: <Factory className="h-6 w-6" />,
+      features: ['Long-term financing', 'Stabilized properties', 'Competitive rates', 'Amortization'],
+      typicalTerms: '10-25 years',
+      requirements: ['Property cash flow', 'Credit score 700+', 'Property appraisal', 'Business plan'],
+      estimatedProcessing: '21-30 days'
+    },
+    // Other Programs
+    {
+      id: 'land-acquisition',
+      name: 'Land Acquisition',
+      category: 'Land & Development',
+      description: 'Financing for purchasing land for future development or investment',
+      icon: <MapPin className="h-6 w-6" />,
+      features: ['Land purchase', 'Development potential', 'Flexible terms', 'Investment focus'],
+      typicalTerms: '12-36 months',
+      requirements: ['Land appraisal', 'Development plans', 'Zoning verification', 'Exit strategy'],
+      estimatedProcessing: '10-21 days'
+    },
+    {
+      id: 'mezzanine-loans',
+      name: 'Mezzanine Loans',
+      category: 'Structured Finance',
+      description: 'Subordinate financing that sits between senior debt and equity',
+      icon: <Layers className="h-6 w-6" />,
+      features: ['Subordinate financing', 'Higher leverage', 'Flexible terms', 'Quick funding'],
+      typicalTerms: '3-7 years',
+      requirements: ['Senior debt in place', 'Strong collateral', 'Business plan', 'Exit strategy'],
+      estimatedProcessing: '14-21 days'
+    },
+    {
+      id: 'mobilization-funding',
+      name: 'Mobilization Funding',
+      category: 'Construction',
+      description: 'Short-term financing for construction project startup costs',
+      icon: <Clock className="h-6 w-6" />,
+      features: ['Project startup', 'Quick funding', 'Flexible terms', 'Construction focus'],
+      typicalTerms: '3-12 months',
+      requirements: ['Construction contract', 'Project timeline', 'Budget breakdown', 'Exit strategy'],
+      estimatedProcessing: '5-10 days'
+    },
     {
       id: 'equipment-financing',
       name: 'Equipment Financing',
       category: 'Equipment',
-      description: 'Financing for business equipment and machinery',
+      description: 'Financing for purchasing business equipment and machinery',
       icon: <Truck className="h-6 w-6" />,
-      features: ['Equipment financing', 'Quick approval', 'Flexible terms', 'No real estate collateral'],
-      typicalTerms: '12-84 months',
-      requirements: ['Equipment quote', 'Business plan', 'Credit score 600+', 'Down payment'],
+      features: ['Equipment purchase', 'Flexible terms', 'Quick approval', 'No collateral'],
+      typicalTerms: '2-7 years',
+      requirements: ['Equipment quotes', 'Business plan', 'Credit score 650+', 'Down payment'],
       estimatedProcessing: '3-7 days'
-    },
-
-    // Land Development
-    {
-      id: 'land-development',
-      name: 'Land Development',
-      category: 'Land',
-      description: 'Financing for land acquisition and development projects',
-      icon: <MapPin className="h-6 w-6" />,
-      features: ['Land acquisition', 'Development financing', 'Infrastructure funding', 'Project management'],
-      typicalTerms: '12-36 months',
-      requirements: ['Land purchase', 'Development plans', 'Market analysis', 'Exit strategy'],
-      estimatedProcessing: '14-21 days'
     }
   ];
 
-  const categories = ['Residential NOO', 'Commercial', 'Construction', 'Equipment', 'Land'];
+  const categories = ['Residential NOO', 'Commercial', 'Industrial', 'Land & Development', 'Structured Finance', 'Construction', 'Equipment'];
 
   return (
     <div className="p-4 md:p-8 space-y-6">

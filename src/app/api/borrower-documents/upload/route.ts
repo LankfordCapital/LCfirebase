@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminStorage } from '@/lib/firebase-admin';
+import { getDownloadURL } from 'firebase-admin/storage';
 
 export async function POST(request: NextRequest) {
   try {
@@ -61,18 +62,13 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      console.log('File saved to storage, generating signed URL...');
+      console.log('File saved to storage, generating download URL...');
 
-      // Generate a signed URL that's valid for 1 year
-      const [signedUrl] = await fileUpload.getSignedUrl({
-        action: 'read',
-        expires: Date.now() + 365 * 24 * 60 * 60 * 1000, // 1 year from now
-      });
-
-      console.log('Upload successful, signed URL generated');
-
-      // Use the signed URL as the download URL
-      const downloadURL = signedUrl;
+      // With uniform bucket-level access, we need to use Firebase Storage's download URL
+      // This approach stores the file path and generates URLs on-demand from the client
+      const downloadURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(storagePath)}?alt=media`;
+      
+      console.log('Upload successful, Firebase Storage URL generated:', downloadURL);
 
       return NextResponse.json({
         success: true,

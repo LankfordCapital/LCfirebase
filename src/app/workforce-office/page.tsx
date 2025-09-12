@@ -27,13 +27,61 @@ function InviteUserDialog() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [role, setRole] = useState('borrower');
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleSendInvite = () => {
-        // Here you would typically call a backend service to send an email
-        toast({
-            title: "Invite Sent!",
-            description: `An invitation has been sent to ${name} at ${email}.`,
-        });
+    const handleSendInvite = async () => {
+        if (!name.trim() || !email.trim()) {
+            toast({
+                variant: 'destructive',
+                title: "Error",
+                description: "Please fill in all required fields.",
+            });
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const response = await fetch('/api/user-invitations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    fullName: name.trim(),
+                    email: email.trim(),
+                    role,
+                    invitedBy: 'Workforce Team', // You could get this from auth context
+                }),
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                toast({
+                    title: "Invite Sent!",
+                    description: `An invitation has been sent to ${name} at ${email} as a ${role}.`,
+                });
+                // Reset form
+                setName('');
+                setEmail('');
+                setRole('borrower');
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: "Error",
+                    description: result.error || 'Failed to send invitation.',
+                });
+            }
+        } catch (error) {
+            console.error('Error sending invitation:', error);
+            toast({
+                variant: 'destructive',
+                title: "Error",
+                description: 'Failed to send invitation. Please try again.',
+            });
+        } finally {
+            setIsLoading(false);
+        }
     }
     
     return (
@@ -70,10 +118,19 @@ function InviteUserDialog() {
                 </div>
                 <DialogFooter>
                     <DialogClose asChild>
-                        <Button type="button" variant="secondary">Cancel</Button>
+                        <Button type="button" variant="secondary" disabled={isLoading}>Cancel</Button>
                     </DialogClose>
                      <DialogClose asChild>
-                        <Button onClick={handleSendInvite}>Send Invite</Button>
+                        <Button onClick={handleSendInvite} disabled={isLoading}>
+                            {isLoading ? (
+                                <>
+                                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                                    Sending...
+                                </>
+                            ) : (
+                                'Send Invite'
+                            )}
+                        </Button>
                     </DialogClose>
                 </DialogFooter>
             </DialogContent>

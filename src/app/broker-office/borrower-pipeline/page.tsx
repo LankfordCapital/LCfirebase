@@ -193,7 +193,7 @@ export default function BorrowerPipelinePage() {
   }, [applications, searchTerm, statusFilter, programFilter]);
 
   const loadBrokerApplications = async () => {
-    if (!user || !userProfile || userProfile.role !== 'broker') {
+    if (!user || !userProfile || (userProfile.role !== 'broker' && userProfile.role !== 'admin')) {
       setLoading(false);
       return;
     }
@@ -247,7 +247,7 @@ export default function BorrowerPipelinePage() {
 
   // Load Residential NOO applications from the new database collection
   const loadResidentialNOOApplications = async () => {
-    if (!user || !userProfile || userProfile.role !== 'broker') {
+    if (!user || !userProfile || (userProfile.role !== 'broker' && userProfile.role !== 'admin')) {
       return;
     }
 
@@ -456,18 +456,18 @@ export default function BorrowerPipelinePage() {
     );
   }
 
-  if (userProfile.role !== 'broker') {
+  if (userProfile.role !== 'broker' && userProfile.role !== 'admin') {
     return (
       <div className="space-y-6">
         <Card>
           <CardHeader>
             <CardTitle>Access Denied</CardTitle>
-            <CardDescription>Only brokers can access the borrower pipeline.</CardDescription>
+            <CardDescription>Only brokers and admins can access the borrower pipeline.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-center py-8">
               <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Your account does not have broker privileges.</p>
+              <p className="text-muted-foreground">Your account does not have broker or admin privileges.</p>
               <Button asChild className="mt-4">
                 <Link href="/broker-office">Back to Dashboard</Link>
               </Button>

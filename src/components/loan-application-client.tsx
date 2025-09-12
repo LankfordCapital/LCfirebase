@@ -22,6 +22,7 @@ import { Textarea } from './ui/textarea';
 import { getOfficeContextFromUrl, getOfficeBasePath } from '@/lib/office-routing';
 import { useLoanApplication } from '@/hooks/use-loan-application';
 import { useResidentialNOOGroundUpConstructionState } from '@/hooks/use-residential-noo-ground-up-construction-state';
+import { useAuth } from '@/contexts/auth-context';
 
 type Dealer = {
   id: string;
@@ -49,6 +50,9 @@ export function LoanApplicationClient({
   applicationId?: string,
   borrowerId?: string
 }) {
+  // Get current user information
+  const { user, userProfile } = useAuth();
+  
   // Enhanced loan application hook
   const { 
     application, 
@@ -645,6 +649,45 @@ export function LoanApplicationClient({
       console.log('No application ID provided - this is a new application');
     }
   }, [application, applicationId]);
+
+  // Auto-create application with borrower information when officeContext is "borrower" and no applicationId
+  useEffect(() => {
+    if (officeContext === 'borrower' && user && userProfile && !applicationId && !application) {
+      console.log('Auto-creating application with borrower information from user profile:', {
+        displayName: user.displayName,
+        email: user.email,
+        userProfile: userProfile
+      });
+      
+      // Create borrower information from user profile
+      const borrowerInfo = {
+        fullName: user.displayName || userProfile.fullName || '',
+        email: user.email || userProfile.email || '',
+        phone: userProfile.phoneNumber || '',
+        address: {
+          street: userProfile.address?.street || '',
+          city: userProfile.address?.city || '',
+          state: userProfile.address?.state || '',
+          zipCode: userProfile.address?.zipCode || ''
+        }
+      };
+      
+      // Create application with borrower information pre-populated
+      createApplication(
+        user.uid, // userId
+        user.uid, // brokerId (for now, same as user)
+        loanProgram,
+        {
+          borrowerInfo: borrowerInfo
+        }
+      ).then((newApplicationId) => {
+        console.log('Application created with borrower information:', newApplicationId);
+        // The application will be loaded automatically by the hook
+      }).catch((error) => {
+        console.error('Failed to create application with borrower information:', error);
+      });
+    }
+  }, [officeContext, user, userProfile, applicationId, application, createApplication, loanProgram]);
 
 
   // Handle field updates (no auto-save, only save on navigation)

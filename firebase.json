@@ -20,7 +20,14 @@
     ],
     "frameworksBackend": {
       "region": "us-central1"
-    }
+    },
+    "redirects": [
+      {
+        "source": "https://www.lankfordcapital.com/**",
+        "destination": "https://lankfordcapital.com/:splat",
+        "type": 301
+      }
+    ]
   },
   "firestore": {
     "rules": "firestore.rules"

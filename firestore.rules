@@ -30,6 +30,18 @@ service cloud.firestore {
         request.method == 'create'
       );
     }
+
+    // Allow users to read and write their own residential NOO applications
+    match /residential-noo-applications/{applicationId} {
+      allow read, write, create, update, delete: if request.auth != null && (
+        // Users can access their own applications
+        resource.data.userId == request.auth.uid ||
+        // Brokers can access applications they created
+        resource.data.brokerId == request.auth.uid ||
+        // Allow creation of new applications (no resource.data yet)
+        request.method == 'create'
+      );
+    }
     
     // Allow users to read and write their own documents
     // Allow admin users to read and update all user documents
@@ -154,7 +166,14 @@ service cloud.firestore {
 
     // Allow users to manage their own enhanced loan applications
     match /enhancedLoanApplications/{applicationId} {
-      allow read, write, create, update, delete: if request.auth != null;
+      allow read, write, create, update, delete: if request.auth != null && (
+        // Users can access their own applications
+        resource.data.userId == request.auth.uid ||
+        // Brokers can access applications they created
+        resource.data.brokerId == request.auth.uid ||
+        // Allow creation of new applications (no resource.data yet)
+        request.method == 'create'
+      );
     }
 
     // Allow users to manage their own borrower documents

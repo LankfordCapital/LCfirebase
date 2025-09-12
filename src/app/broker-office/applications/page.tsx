@@ -89,33 +89,44 @@ export default function BrokerApplicationsPage() {
       id: 'commercial-ground-up-construction',
       name: 'Commercial - Ground Up Construction',
       category: 'Commercial',
-      description: 'New construction financing for commercial properties',
+      description: 'Construction financing for commercial properties including retail, office, and mixed-use',
       icon: <Building2 className="h-6 w-6" />,
-      features: ['New construction', 'Commercial properties', 'Flexible terms', 'Quick approval'],
+      features: ['New construction', 'Commercial properties', 'Flexible terms', 'Project management'],
       typicalTerms: '18-36 months',
-      requirements: ['Construction plans', 'Builder credentials', 'Market analysis', 'Exit strategy'],
+      requirements: ['Construction plans', 'Builder credentials', 'Market analysis', 'Pre-leasing'],
       estimatedProcessing: '14-21 days'
     },
     {
-      id: 'commercial-fix-and-flip',
-      name: 'Commercial - Fix and Flip',
+      id: 'commercial-rehab-loans',
+      name: 'Commercial - Rehab Loans',
       category: 'Commercial',
-      description: 'Short-term financing for purchasing, renovating, and selling commercial properties',
+      description: 'Financing for renovating and improving existing commercial properties',
       icon: <Building2 className="h-6 w-6" />,
-      features: ['Purchase + renovation', 'Quick funding', 'Flexible terms', 'No income verification'],
-      typicalTerms: '6-18 months',
-      requirements: ['Purchase contract', 'Renovation budget', 'After-repair value', 'Exit strategy'],
+      features: ['Renovation financing', 'Existing properties', 'Value-add strategy', 'Quick funding'],
+      typicalTerms: '12-24 months',
+      requirements: ['Property purchase', 'Renovation plans', 'After-repair value', 'Exit strategy'],
+      estimatedProcessing: '10-14 days'
+    },
+    {
+      id: 'commercial-acquisition-bridge',
+      name: 'Commercial - Acquisition & Bridge',
+      category: 'Commercial',
+      description: 'Short-term financing for acquiring commercial properties with plans for long-term financing',
+      icon: <Building2 className="h-6 w-6" />,
+      features: ['Quick acquisition', 'Bridge financing', 'Flexible terms', 'No prepayment penalty'],
+      typicalTerms: '6-24 months',
+      requirements: ['Purchase contract', 'Exit strategy', 'Property value', 'Credit score 650+'],
       estimatedProcessing: '7-14 days'
     },
     {
-      id: 'commercial-dscr',
-      name: 'Commercial - DSCR',
+      id: 'commercial-conventional-long-term-debt',
+      name: 'Commercial - Conventional Long Term Debt',
       category: 'Commercial',
-      description: 'Long-term financing based on property cash flow rather than personal income',
+      description: 'Traditional long-term financing for stabilized commercial properties',
       icon: <Building2 className="h-6 w-6" />,
-      features: ['Long-term financing', 'Cash flow based', 'No personal income verification', 'Investment focus'],
-      typicalTerms: '25-30 years',
-      requirements: ['Property cash flow', 'Credit score 680+', 'Property appraisal', 'Rental history'],
+      features: ['Long-term financing', 'Stabilized properties', 'Competitive rates', 'Amortization'],
+      typicalTerms: '10-25 years',
+      requirements: ['Property cash flow', 'Credit score 700+', 'Property appraisal', 'Business plan'],
       estimatedProcessing: '21-30 days'
     },
     // Industrial Programs
@@ -123,58 +134,89 @@ export default function BrokerApplicationsPage() {
       id: 'industrial-ground-up-construction',
       name: 'Industrial - Ground Up Construction',
       category: 'Industrial',
-      description: 'New construction financing for industrial properties',
+      description: 'Construction financing for industrial properties including warehouses, manufacturing, and distribution',
       icon: <Factory className="h-6 w-6" />,
-      features: ['New construction', 'Industrial properties', 'Flexible terms', 'Quick approval'],
+      features: ['New construction', 'Industrial properties', 'Flexible terms', 'Project management'],
       typicalTerms: '18-36 months',
-      requirements: ['Construction plans', 'Builder credentials', 'Market analysis', 'Exit strategy'],
+      requirements: ['Construction plans', 'Builder credentials', 'Market analysis', 'Tenant commitments'],
       estimatedProcessing: '14-21 days'
     },
     {
-      id: 'industrial-fix-and-flip',
-      name: 'Industrial - Fix and Flip',
+      id: 'industrial-rehab-expansion-loans',
+      name: 'Industrial - Rehab & Expansion',
       category: 'Industrial',
-      description: 'Short-term financing for purchasing, renovating, and selling industrial properties',
+      description: 'Financing for renovating and expanding existing industrial facilities',
       icon: <Factory className="h-6 w-6" />,
-      features: ['Purchase + renovation', 'Quick funding', 'Flexible terms', 'No income verification'],
-      typicalTerms: '6-18 months',
-      requirements: ['Purchase contract', 'Renovation budget', 'After-repair value', 'Exit strategy'],
+      features: ['Renovation financing', 'Expansion projects', 'Value-add strategy', 'Quick funding'],
+      typicalTerms: '12-24 months',
+      requirements: ['Property ownership', 'Renovation plans', 'After-repair value', 'Business plan'],
+      estimatedProcessing: '10-14 days'
+    },
+    {
+      id: 'industrial-acquisition-bridge',
+      name: 'Industrial - Acquisition & Bridge',
+      category: 'Industrial',
+      description: 'Short-term financing for acquiring industrial properties with plans for long-term financing',
+      icon: <Factory className="h-6 w-6" />,
+      features: ['Quick acquisition', 'Bridge financing', 'Flexible terms', 'No prepayment penalty'],
+      typicalTerms: '6-24 months',
+      requirements: ['Purchase contract', 'Exit strategy', 'Property value', 'Credit score 650+'],
       estimatedProcessing: '7-14 days'
     },
-    // Land Acquisition
+    {
+      id: 'industrial-long-term-debt',
+      name: 'Industrial - Long Term Debt',
+      category: 'Industrial',
+      description: 'Long-term financing for stabilized industrial properties',
+      icon: <Factory className="h-6 w-6" />,
+      features: ['Long-term financing', 'Stabilized properties', 'Competitive rates', 'Amortization'],
+      typicalTerms: '10-25 years',
+      requirements: ['Property cash flow', 'Credit score 700+', 'Property appraisal', 'Business plan'],
+      estimatedProcessing: '21-30 days'
+    },
+    // Other Programs
     {
       id: 'land-acquisition',
       name: 'Land Acquisition',
-      category: 'Land',
-      description: 'Financing for purchasing undeveloped land for future development',
+      category: 'Land & Development',
+      description: 'Financing for purchasing land for future development or investment',
       icon: <MapPin className="h-6 w-6" />,
-      features: ['Land purchase', 'Development planning', 'Flexible terms', 'Quick approval'],
+      features: ['Land purchase', 'Development potential', 'Flexible terms', 'Investment focus'],
       typicalTerms: '12-36 months',
-      requirements: ['Land purchase contract', 'Development plan', 'Market analysis', 'Exit strategy'],
-      estimatedProcessing: '7-14 days'
+      requirements: ['Land appraisal', 'Development plans', 'Zoning verification', 'Exit strategy'],
+      estimatedProcessing: '10-21 days'
     },
-    // Equipment Financing
+    {
+      id: 'mezzanine-loans',
+      name: 'Mezzanine Loans',
+      category: 'Structured Finance',
+      description: 'Subordinate financing that sits between senior debt and equity',
+      icon: <Layers className="h-6 w-6" />,
+      features: ['Subordinate financing', 'Higher leverage', 'Flexible terms', 'Quick funding'],
+      typicalTerms: '3-7 years',
+      requirements: ['Senior debt in place', 'Strong collateral', 'Business plan', 'Exit strategy'],
+      estimatedProcessing: '14-21 days'
+    },
+    {
+      id: 'mobilization-funding',
+      name: 'Mobilization Funding',
+      category: 'Construction',
+      description: 'Short-term financing for construction project startup costs',
+      icon: <Clock className="h-6 w-6" />,
+      features: ['Project startup', 'Quick funding', 'Flexible terms', 'Construction focus'],
+      typicalTerms: '3-12 months',
+      requirements: ['Construction contract', 'Project timeline', 'Budget breakdown', 'Exit strategy'],
+      estimatedProcessing: '5-10 days'
+    },
     {
       id: 'equipment-financing',
       name: 'Equipment Financing',
       category: 'Equipment',
       description: 'Financing for purchasing business equipment and machinery',
       icon: <Truck className="h-6 w-6" />,
-      features: ['Equipment purchase', 'Flexible terms', 'Quick approval', 'No income verification'],
-      typicalTerms: '12-60 months',
-      requirements: ['Equipment quote', 'Business plan', 'Credit score 650+', 'Down payment'],
-      estimatedProcessing: '5-10 days'
-    },
-    // Mobilization Funding
-    {
-      id: 'mobilization-funding',
-      name: 'Mobilization Funding',
-      category: 'Mobilization',
-      description: 'Short-term funding for project startup costs and mobilization',
-      icon: <Layers className="h-6 w-6" />,
-      features: ['Project startup', 'Quick funding', 'Flexible terms', 'No income verification'],
-      typicalTerms: '3-12 months',
-      requirements: ['Project contract', 'Use of funds plan', 'Exit strategy', 'Credit score 650+'],
+      features: ['Equipment purchase', 'Flexible terms', 'Quick approval', 'No collateral'],
+      typicalTerms: '2-7 years',
+      requirements: ['Equipment quotes', 'Business plan', 'Credit score 650+', 'Down payment'],
       estimatedProcessing: '3-7 days'
     }
   ];
@@ -190,11 +232,11 @@ export default function BrokerApplicationsPage() {
       return;
     }
 
-    if (userProfile.role !== 'broker') {
+    if (userProfile.role !== 'broker' && userProfile.role !== 'admin') {
       toast({
         variant: 'destructive',
         title: 'Access Denied',
-        description: 'Only brokers can start loan applications.',
+        description: 'Only brokers and admins can start loan applications.',
       });
       return;
     }
@@ -272,7 +314,7 @@ export default function BrokerApplicationsPage() {
   };
 
   // Group programs by category
-  const categories = [...new Set(loanPrograms.map(program => program.category))];
+  const categories = ['Residential NOO', 'Commercial', 'Industrial', 'Land & Development', 'Structured Finance', 'Construction', 'Equipment'];
 
   return (
     <div className="space-y-8">

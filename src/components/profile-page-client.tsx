@@ -39,7 +39,7 @@ type Company = {
 
 export default function ProfilePage() {
   const { addDocument, documents } = useDocumentContext();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   
   // New backend integration
@@ -207,7 +207,33 @@ export default function ProfilePage() {
   // Handle profile photo upload
   const handleProfilePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file || !user) return;
+    
+    // Check if auth is still loading
+    if (authLoading) {
+      console.log('Auth still loading, please wait...');
+      toast({
+        variant: 'destructive',
+        title: 'Please Wait',
+        description: 'Authentication is still loading. Please try again in a moment.',
+      });
+      return;
+    }
+    
+    // Check if user is available
+    if (!user || !user.uid) {
+      console.error('User not available for photo upload');
+      toast({
+        variant: 'destructive',
+        title: 'Authentication Error',
+        description: 'Please sign in to upload a profile photo.',
+      });
+      return;
+    }
+
+    if (!file) {
+      console.error('No file selected');
+      return;
+    }
 
     // Validate file
     const validation = PhotoUploadService.validateFile(file);
@@ -220,6 +246,7 @@ export default function ProfilePage() {
         return;
     }
 
+    console.log('Starting photo upload for user:', user.uid);
     setIsUploadingPhoto(true);
     
     try {
@@ -258,9 +285,13 @@ export default function ProfilePage() {
 
   // Save profile photo URL to backend
   const saveProfilePhotoToBackend = async (photoURL: string) => {
-    if (!user?.uid) return;
+    if (!user?.uid) {
+      console.error('User ID is required for saving profile photo');
+      throw new Error('User ID is required');
+    }
     
     try {
+      console.log('Saving profile photo to backend for user:', user.uid);
       const response = await fetch('/api/borrower-profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -275,6 +306,7 @@ export default function ProfilePage() {
       if (!result.success) {
         throw new Error(result.error || 'Failed to save profile photo');
       }
+      console.log('Profile photo saved to backend successfully');
     } catch (error) {
       console.error('Failed to save profile photo to backend:', error);
       throw error;

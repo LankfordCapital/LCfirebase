@@ -595,12 +595,20 @@ export async function POST(request: NextRequest) {
 
       case 'upsertFinancialStatement':
         try {
-          console.log('Saving financial statement for user:', data.userId);
+          const userId = data.userId || data.uid;
+          if (!userId) {
+            return NextResponse.json(
+              { error: 'User ID is required' },
+              { status: 400 }
+            );
+          }
+          
+          console.log('Saving financial statement for user:', userId);
           console.log('Financial data received:', data.financialData);
           
-          const statementId = `pfs-${data.userId}-${Date.now()}`;
+          const statementId = `pfs-${userId}-${Date.now()}`;
           const financialStatementData = {
-            userId: data.userId,
+            userId: userId,
             ...data.financialData,
             createdAt: new Date(),
             updatedAt: new Date()
@@ -612,7 +620,7 @@ export async function POST(request: NextRequest) {
           
           console.log('Saving to user profile document...');
           // Also save to the user's profile document for immediate access
-          await adminDb.collection('users').doc(data.userId).set({
+          await adminDb.collection('users').doc(userId).set({
             financialStatement: data.financialData,
             updatedAt: new Date()
           }, { merge: true });
@@ -634,14 +642,22 @@ export async function POST(request: NextRequest) {
 
       case 'upsertDebtSchedule':
         try {
+          const userId = data.userId || data.uid;
+          if (!userId) {
+            return NextResponse.json(
+              { error: 'User ID is required' },
+              { status: 400 }
+            );
+          }
+          
           console.log('API: Received debt schedule save request');
-          console.log('API: User ID:', data.userId);
+          console.log('API: User ID:', userId);
           console.log('API: Company ID:', data.companyId);
           console.log('API: Debt data:', data.debtData);
           
-          const scheduleId = `debt-${data.userId}-${data.companyId}-${Date.now()}`;
+          const scheduleId = `debt-${userId}-${data.companyId}-${Date.now()}`;
           await adminDb.collection('businessDebtSchedules').doc(scheduleId).set({
-            userId: data.userId,
+            userId: userId,
             companyId: data.companyId,
             ...data.debtData,
             createdAt: new Date(),
@@ -665,14 +681,22 @@ export async function POST(request: NextRequest) {
 
       case 'getDebtSchedule':
         try {
+          const userId = data.userId || data.uid;
+          if (!userId) {
+            return NextResponse.json(
+              { error: 'User ID is required' },
+              { status: 400 }
+            );
+          }
+          
           console.log('API: Received debt schedule load request');
-          console.log('API: User ID:', data.userId);
+          console.log('API: User ID:', userId);
           console.log('API: Company ID:', data.companyId);
           
           // First try to get all debt schedules for this user and company
           const debtSchedulesQuery = await adminDb
             .collection('businessDebtSchedules')
-            .where('userId', '==', data.userId)
+            .where('userId', '==', userId)
             .where('companyId', '==', data.companyId)
             .get();
           
@@ -714,16 +738,24 @@ export async function POST(request: NextRequest) {
 
       case 'saveDocument':
         try {
-          const documentId = `doc-${data.userId}-${Date.now()}`;
+          const userId = data.userId || data.uid;
+          if (!userId) {
+            return NextResponse.json(
+              { error: 'User ID is required' },
+              { status: 400 }
+            );
+          }
+          
+          const documentId = `doc-${userId}-${Date.now()}`;
           await adminDb.collection('userDocuments').doc(documentId).set({
-            userId: data.userId,
+            userId: userId,
             ...data.document,
             createdAt: new Date(),
             updatedAt: new Date()
           }, { merge: true });
           
           // Also update the user's profile with document reference
-          await adminDb.collection('users').doc(data.userId).set({
+          await adminDb.collection('users').doc(userId).set({
             documents: {
               [data.document.name]: {
                 documentId,
@@ -752,14 +784,15 @@ export async function POST(request: NextRequest) {
 
       case 'updateProfilePhoto':
         try {
-          if (!data.userId) {
+          const userId = data.userId || data.uid;
+          if (!userId) {
             return NextResponse.json(
               { error: 'User ID is required' },
               { status: 400 }
             );
           }
           
-          await adminDb.collection('users').doc(data.userId).set({
+          await adminDb.collection('users').doc(userId).set({
             personalInfo: {
               profilePhotoUrl: data.photoURL
             },

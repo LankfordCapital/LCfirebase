@@ -15,11 +15,13 @@ import { User, Building, Mail, Phone, Upload, Save, BarChart, DollarSign, X, Cam
 import { updateProfile } from 'firebase/auth';
 import { PhotoUploadService } from '@/lib/photo-upload-service';
 import { BrokerDocument } from '@/lib/broker-document-service';
+import { useBrokerStats } from '@/hooks/use-broker-stats';
 
 export default function BrokerProfilePage() {
   const { user, userProfile } = useAuth();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { activeBorrowers, loansInProgress, totalFundedVolume, loading: statsLoading, error: statsError } = useBrokerStats();
   
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -315,6 +317,87 @@ export default function BrokerProfilePage() {
     return documents.find(doc => doc.type === type);
   };
 
+  const UploadButton = ({ docName, documentType }: { docName: string; documentType: string }) => {
+    const fileInputId = `upload-${docName.replace(/\s+/g, '-')}`;
+    const documentKey = `${documentType}-${docName}`;
+    
+    // Find uploaded document
+    const uploadedDoc = documents.find(doc => doc.name === docName);
+    const isUploaded = !!uploadedDoc;
+    const isUploading = uploadingDocuments.has(documentKey);
+    
+    const handleViewDocument = () => {
+      if (uploadedDoc?.fileUrl) {
+        window.open(uploadedDoc.fileUrl, '_blank');
+      }
+    };
+    
+    return (
+        <div className="space-y-2">
+            <div className="relative">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  disabled={isUploading}
+                  asChild
+                >
+                    <Label htmlFor={fileInputId} className="cursor-pointer flex items-center">
+                        {isUploading ? (
+                          <>
+                            <CustomLoader className="mr-2 h-4 w-4" />
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="mr-2 h-4 w-4" /> 
+                            <span className="truncate">{docName}</span>
+                            {isUploaded && <span className="text-green-500 ml-2 whitespace-nowrap">✓</span>}
+                          </>
+                        )}
+                    </Label>
+                </Button>
+                <Input 
+                    id={fileInputId} 
+                    type="file" 
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                    className="sr-only" 
+                    onChange={(e) => handleDocumentUpload(documentType, docName, e)} 
+                    disabled={isUploading}
+                />
+            </div>
+            
+            {isUploaded && uploadedDoc && (
+                <div className="flex items-center justify-between p-2 bg-green-50 rounded-md border border-green-200">
+                    <div className="flex items-center gap-2">
+                        <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                        <span className="text-sm text-green-700">
+                            {uploadedDoc.fileName}
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={handleViewDocument}
+                            className="text-green-700 hover:text-green-800 hover:bg-green-100"
+                        >
+                            View
+                        </Button>
+                        <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleDocumentDelete(uploadedDoc.id!, uploadedDoc.filePath, uploadedDoc.name)}
+                            className="text-red-700 hover:text-red-800 hover:bg-red-100"
+                        >
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+  };
+
   if (!user || !userProfile) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -520,242 +603,12 @@ export default function BrokerProfilePage() {
                                 <span className="ml-2">Loading documents...</span>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* W-9 Document */}
-                                {(() => {
-                                    const w9Doc = getDocumentByType('w9');
-                                    const isUploading = uploadingDocuments.has('w9-W-9 (Broker)');
-                                    return (
-                                        <div className="space-y-2">
-                                            <Label className="text-sm font-medium">W-9 (Broker)</Label>
-                                            {w9Doc ? (
-                                                <div className="flex items-center justify-between p-3 border rounded-lg">
-                                                    <div className="flex items-center gap-2">
-                                                        <FileText className="h-4 w-4" />
-                                                        <span className="text-sm truncate">{w9Doc.fileName}</span>
-                                                        {getDocumentStatusIcon(w9Doc.status)}
-                                                    </div>
-                                                    <div className="flex items-center gap-1">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => window.open(w9Doc.fileUrl, '_blank')}
-                                                        >
-                                                            <Download className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => handleDocumentDelete(w9Doc.id!, w9Doc.filePath, w9Doc.name)}
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div className="space-y-2">
-                                                    <input
-                                                        type="file"
-                                                        id="w9-upload"
-                                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                                                        onChange={(e) => handleDocumentUpload('w9', 'W-9 (Broker)', e)}
-                                                        className="hidden"
-                                                    />
-                                                    <Button
-                                                        variant="outline"
-                                                        className="w-full justify-start"
-                                                        onClick={() => document.getElementById('w9-upload')?.click()}
-                                                        disabled={isUploading}
-                                                    >
-                                                        {isUploading ? (
-                                                            <CustomLoader className="mr-2 h-4 w-4" />
-                                                        ) : (
-                                                            <Upload className="mr-2 h-4 w-4" />
-                                                        )}
-                                                        {isUploading ? 'Uploading...' : 'Upload W-9'}
-                                                    </Button>
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })()}
-                                
-                                {/* Wiring Instructions Document */}
-                                {(() => {
-                                    const wiringDoc = getDocumentByType('wiring_instructions');
-                                    const isUploading = uploadingDocuments.has('wiring_instructions-Wiring Instructions (Broker)');
-                                    return (
-                                        <div className="space-y-2">
-                                            <Label className="text-sm font-medium">Wiring Instructions (Broker)</Label>
-                                            {wiringDoc ? (
-                                                <div className="flex items-center justify-between p-3 border rounded-lg">
-                                                    <div className="flex items-center gap-2">
-                                                        <FileText className="h-4 w-4" />
-                                                        <span className="text-sm truncate">{wiringDoc.fileName}</span>
-                                                        {getDocumentStatusIcon(wiringDoc.status)}
-                                                    </div>
-                                                    <div className="flex items-center gap-1">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => window.open(wiringDoc.fileUrl, '_blank')}
-                                                        >
-                                                            <Download className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => handleDocumentDelete(wiringDoc.id!, wiringDoc.filePath, wiringDoc.name)}
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div className="space-y-2">
-                                                    <input
-                                                        type="file"
-                                                        id="wiring-upload"
-                                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                                                        onChange={(e) => handleDocumentUpload('wiring_instructions', 'Wiring Instructions (Broker)', e)}
-                                                        className="hidden"
-                                                    />
-                                                    <Button
-                                                        variant="outline"
-                                                        className="w-full justify-start"
-                                                        onClick={() => document.getElementById('wiring-upload')?.click()}
-                                                        disabled={isUploading}
-                                                    >
-                                                        {isUploading ? (
-                                                            <CustomLoader className="mr-2 h-4 w-4" />
-                                                        ) : (
-                                                            <Upload className="mr-2 h-4 w-4" />
-                                                        )}
-                                                        {isUploading ? 'Uploading...' : 'Upload Wiring Instructions'}
-                                                    </Button>
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })()}
-                                
-                                {/* ID/Driver's License Document */}
-                                {(() => {
-                                    const idDoc = getDocumentByType('id_license');
-                                    const isUploading = uploadingDocuments.has('id_license-ID/Driver\'s License (Broker)');
-                                    return (
-                                        <div className="space-y-2">
-                                            <Label className="text-sm font-medium">ID/Driver's License (Broker)</Label>
-                                            {idDoc ? (
-                                                <div className="flex items-center justify-between p-3 border rounded-lg">
-                                                    <div className="flex items-center gap-2">
-                                                        <FileText className="h-4 w-4" />
-                                                        <span className="text-sm truncate">{idDoc.fileName}</span>
-                                                        {getDocumentStatusIcon(idDoc.status)}
-                                                    </div>
-                                                    <div className="flex items-center gap-1">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => window.open(idDoc.fileUrl, '_blank')}
-                                                        >
-                                                            <Download className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => handleDocumentDelete(idDoc.id!, idDoc.filePath, idDoc.name)}
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div className="space-y-2">
-                                                    <input
-                                                        type="file"
-                                                        id="id-upload"
-                                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                                                        onChange={(e) => handleDocumentUpload('id_license', 'ID/Driver\'s License (Broker)', e)}
-                                                        className="hidden"
-                                                    />
-                                                    <Button
-                                                        variant="outline"
-                                                        className="w-full justify-start"
-                                                        onClick={() => document.getElementById('id-upload')?.click()}
-                                                        disabled={isUploading}
-                                                    >
-                                                        {isUploading ? (
-                                                            <CustomLoader className="mr-2 h-4 w-4" />
-                                                        ) : (
-                                                            <Upload className="mr-2 h-4 w-4" />
-                                                        )}
-                                                        {isUploading ? 'Uploading...' : 'Upload ID/License'}
-                                                    </Button>
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })()}
-                                
-                                {/* Broker Agreement Document */}
-                                {(() => {
-                                    const agreementDoc = getDocumentByType('broker_agreement');
-                                    const isUploading = uploadingDocuments.has('broker_agreement-Signed Broker Agreement');
-                                    return (
-                                        <div className="space-y-2">
-                                            <Label className="text-sm font-medium">Signed Broker Agreement</Label>
-                                            {agreementDoc ? (
-                                                <div className="flex items-center justify-between p-3 border rounded-lg">
-                                                    <div className="flex items-center gap-2">
-                                                        <FileText className="h-4 w-4" />
-                                                        <span className="text-sm truncate">{agreementDoc.fileName}</span>
-                                                        {getDocumentStatusIcon(agreementDoc.status)}
-                                                    </div>
-                                                    <div className="flex items-center gap-1">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => window.open(agreementDoc.fileUrl, '_blank')}
-                                                        >
-                                                            <Download className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => handleDocumentDelete(agreementDoc.id!, agreementDoc.filePath, agreementDoc.name)}
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div className="space-y-2">
-                                                    <input
-                                                        type="file"
-                                                        id="agreement-upload"
-                                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                                                        onChange={(e) => handleDocumentUpload('broker_agreement', 'Signed Broker Agreement', e)}
-                                                        className="hidden"
-                                                    />
-                                                    <Button
-                                                        variant="outline"
-                                                        className="w-full justify-start"
-                                                        onClick={() => document.getElementById('agreement-upload')?.click()}
-                                                        disabled={isUploading}
-                                                    >
-                                                        {isUploading ? (
-                                                            <CustomLoader className="mr-2 h-4 w-4" />
-                                                        ) : (
-                                                            <Upload className="mr-2 h-4 w-4" />
-                                                        )}
-                                                        {isUploading ? 'Uploading...' : 'Upload Agreement'}
-                                                    </Button>
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })()}
+                            <div className="space-y-3">
+                                <Label className="text-sm font-medium">Required Documents</Label>
+                                <UploadButton docName="W-9 (Broker)" documentType="w9" />
+                                <UploadButton docName="Wiring Instructions (Broker)" documentType="wiring_instructions" />
+                                <UploadButton docName="ID/Driver's License (Broker)" documentType="id_license" />
+                                <UploadButton docName="Signed Broker Agreement" documentType="broker_agreement" />
                             </div>
                         )}
                     </CardContent>
@@ -769,15 +622,21 @@ export default function BrokerProfilePage() {
                     <CardContent className="space-y-4">
                         <div className="flex items-center justify-between p-3 bg-primary/5 rounded-lg">
                             <p className="font-medium">Total Funded Volume</p>
-                            <p className="font-bold text-lg">$1.2M</p>
+                            <p className="font-bold text-lg">
+                                {statsLoading ? '...' : statsError ? 'Error' : `$${(totalFundedVolume / 1000000).toFixed(1)}M`}
+                            </p>
                         </div>
                         <div className="flex items-center justify-between p-3 bg-primary/5 rounded-lg">
                             <p className="font-medium">Loans in Progress</p>
-                            <p className="font-bold text-lg">3</p>
+                            <p className="font-bold text-lg">
+                                {statsLoading ? '...' : statsError ? 'Error' : loansInProgress}
+                            </p>
                         </div>
                          <div className="flex items-center justify-between p-3 bg-primary/5 rounded-lg">
                             <p className="font-medium">Active Borrowers</p>
-                            <p className="font-bold text-lg">5</p>
+                            <p className="font-bold text-lg">
+                                {statsLoading ? '...' : statsError ? 'Error' : activeBorrowers}
+                            </p>
                         </div>
                     </CardContent>
                 </Card>

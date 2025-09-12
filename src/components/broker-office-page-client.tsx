@@ -12,20 +12,8 @@ import { ChatClient } from "@/components/chat-client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { BrokerDocument } from "@/lib/broker-document-service-admin";
-
-
-const summaryCards = [
-    { title: "Active Borrowers", value: "5", icon: <Users className="h-4 w-4 text-muted-foreground" /> },
-    { title: "Loans in Progress", value: "3", icon: <BarChart className="h-4 w-4 text-muted-foreground" /> },
-    { title: "Total Funded Volume", value: "$1.2M", icon: <DollarSign className="h-4 w-4 text-muted-foreground" /> },
-];
-
-// Mock data for workforce members. In a real app, this would come from a database.
-const workforceMembers = [
-    { uid: 'workforce-user-1', name: 'Alex Johnson', title: 'Senior Loan Officer' },
-    { uid: 'workforce-user-2', name: 'Maria Garcia', title: 'Underwriting Manager' },
-    { uid: 'workforce-user-3', name: 'Chris Lee', title: 'Closing Coordinator' },
-];
+import { useBrokerStats } from "@/hooks/use-broker-stats";
+import { useWorkforceMembers } from "@/hooks/use-workforce-members";
 
 // Pipeline data will be loaded from the database
 const pipelinePreview: any[] = [];
@@ -34,6 +22,8 @@ export default function BrokerOfficePageClient() {
     const { user, userProfile } = useAuth();
     const [documents, setDocuments] = useState<BrokerDocument[]>([]);
     const [isLoadingDocuments, setIsLoadingDocuments] = useState(false);
+    const { activeBorrowers, loansInProgress, totalFundedVolume, loading: statsLoading, error: statsError } = useBrokerStats();
+    const { workforceMembers, loading: workforceLoading, error: workforceError } = useWorkforceMembers();
 
     // Load documents when component mounts
     useEffect(() => {
@@ -107,17 +97,41 @@ export default function BrokerOfficePageClient() {
       </div>
 
        <div className="grid gap-4 md:grid-cols-3">
-        {summaryCards.map(card => (
-            <Card key={card.title}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
-                    {card.icon}
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">{card.value}</div>
-                </CardContent>
-            </Card>
-        ))}
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Active Borrowers</CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold">
+                    {statsLoading ? '...' : statsError ? 'Error' : activeBorrowers}
+                </div>
+            </CardContent>
+        </Card>
+        
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Loans in Progress</CardTitle>
+                <BarChart className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold">
+                    {statsLoading ? '...' : statsError ? 'Error' : loansInProgress}
+                </div>
+            </CardContent>
+        </Card>
+        
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Funded Volume</CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold">
+                    {statsLoading ? '...' : statsError ? 'Error' : `$${(totalFundedVolume / 1000000).toFixed(1)}M`}
+                </div>
+            </CardContent>
+        </Card>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -366,23 +380,40 @@ export default function BrokerOfficePageClient() {
                     <CardDescription>Book a time with a team member.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                   {workforceMembers.map(member => (
-                       <div key={member.uid} className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
-                           <div className="flex items-center gap-3">
-                               <Avatar className="h-10 w-10">
-                                   <AvatarImage src={`https://i.pravatar.cc/40?u=${member.uid}`} />
-                                   <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                               </Avatar>
-                               <div>
-                                   <p className="font-semibold">{member.name}</p>
-                                   <p className="text-xs text-muted-foreground">{member.title}</p>
-                               </div>
-                           </div>
-                           <Button asChild variant="outline" size="sm">
-                               <Link href={`/book-appointment/${member.uid}`} target="_blank">Book Now</Link>
-                           </Button>
-                       </div>
-                   ))}
+                    {workforceLoading ? (
+                        <div className="flex items-center justify-center py-8">
+                            <div className="text-center">
+                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
+                                <p className="text-sm text-muted-foreground">Loading team members...</p>
+                            </div>
+                        </div>
+                    ) : workforceError ? (
+                        <div className="text-center py-8">
+                            <p className="text-sm text-muted-foreground">Unable to load team members</p>
+                        </div>
+                    ) : workforceMembers.length === 0 ? (
+                        <div className="text-center py-8">
+                            <p className="text-sm text-muted-foreground">No team members available</p>
+                        </div>
+                    ) : (
+                        workforceMembers.map(member => (
+                            <div key={member.uid} className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
+                                <div className="flex items-center gap-3">
+                                    <Avatar className="h-10 w-10">
+                                        <AvatarImage src={member.avatar} />
+                                        <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <p className="font-semibold">{member.name}</p>
+                                        <p className="text-xs text-muted-foreground">{member.title}</p>
+                                    </div>
+                                </div>
+                                <Button asChild variant="outline" size="sm">
+                                    <Link href={`/book-appointment/${member.uid}`} target="_blank">Book Now</Link>
+                                </Button>
+                            </div>
+                        ))
+                    )}
                 </CardContent>
             </Card>
         </div>

@@ -73,24 +73,16 @@ export function useDashboardData() {
     if (!user?.uid) return [];
 
     try {
-      const response = await fetch('/api/enhanced-loan-applications', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'getByUserId',
-          data: { userId: user.uid }
-        })
-      });
-
+      const response = await fetch(`/api/enhanced-loan-applications?action=getByUser&userId=${user.uid}`);
       const result = await response.json();
       
-      if (result.success && Array.isArray(result.applications)) {
-        return result.applications.map((app: any) => ({
+      if (result.success && Array.isArray(result.data)) {
+        return result.data.map((app: any) => ({
           id: app.id,
           property: app.propertyAddress || 'Property Address Not Set',
           type: app.loanProgram || 'Unknown Program',
           status: app.status || 'Draft',
-          progress: app.progress || 0,
+          progress: typeof app.progress === 'object' ? app.progress.overallProgress || 0 : app.progress || 0,
           userId: app.userId,
           createdAt: app.createdAt,
           updatedAt: app.updatedAt
@@ -128,31 +120,24 @@ export function useDashboardData() {
   }, [user?.uid]);
 
   const loadWorkforceMembers = useCallback(async () => {
-    // For now, return hardcoded workforce members
-    // In the future, this could be fetched from a workforce API
-    return [
-      {
-        id: 'workforce-user-1',
-        name: 'Alex Johnson',
-        title: 'Senior Loan Officer',
-        avatar: 'https://i.pravatar.cc/40?u=workforce-user-1',
-        isAvailable: true
-      },
-      {
-        id: 'workforce-user-2',
-        name: 'Maria Garcia',
-        title: 'Underwriting Manager',
-        avatar: 'https://i.pravatar.cc/40?u=workforce-user-2',
-        isAvailable: true
-      },
-      {
-        id: 'workforce-user-3',
-        name: 'Closing Coordinator',
-        title: 'Workforce Member',
-        avatar: 'https://i.pravatar.cc/40?u=workforce-user-3',
-        isAvailable: true
+    try {
+      const response = await fetch('/api/workforce-members');
+      const result = await response.json();
+      
+      if (result.success && Array.isArray(result.workforceMembers)) {
+        return result.workforceMembers.map((member: any) => ({
+          id: member.uid,
+          name: member.name,
+          title: member.title,
+          avatar: member.avatar,
+          isAvailable: true // All workforce members are available for booking
+        }));
       }
-    ];
+      return [];
+    } catch (error) {
+      console.error('Error loading workforce members:', error);
+      return [];
+    }
   }, []);
 
   const generateRecentActivity = useCallback((applications: DashboardLoanApplication[], documents: DashboardDocument[]) => {

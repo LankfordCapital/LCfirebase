@@ -43,10 +43,18 @@ export default function SignUpPage() {
 
   const fetchInvitationDetails = async () => {
     try {
-      const response = await fetch(`/api/invitations/${invitationId}`);
+      // Try user invitations first, then fall back to chat invitations
+      let response = await fetch(`/api/user-invitations/${invitationId}`);
+      let isUserInvitation = true;
+      
+      if (!response.ok) {
+        response = await fetch(`/api/invitations/${invitationId}`);
+        isUserInvitation = false;
+      }
+      
       if (response.ok) {
         const data = await response.json();
-        setInvitationDetails(data);
+        setInvitationDetails({ ...data, isUserInvitation });
         // Pre-fill the form with invitation data
         setFullName(data.fullName || '');
         setEmail(data.email || '');
@@ -60,23 +68,44 @@ export default function SignUpPage() {
     if (!invitationId || !invitationDetails) return;
     
     try {
-      const response = await fetch('/api/invitations/accept', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          invitationId,
-          userId,
-          userEmail: email
-        }),
-      });
-
-      if (response.ok) {
-        toast({
-          title: 'Invitation Accepted!',
-          description: `You've been added to the ${invitationDetails.roomName} chat room.`,
+      if (invitationDetails?.isUserInvitation) {
+        // Handle user invitation
+        const response = await fetch(`/api/user-invitations/${invitationId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            status: 'accepted'
+          }),
         });
+
+        if (response.ok) {
+          toast({
+            title: 'Invitation Accepted!',
+            description: `Welcome to Lankford Capital as a ${invitationDetails.role}!`,
+          });
+        }
+      } else {
+        // Handle chat invitation (existing logic)
+        const response = await fetch('/api/invitations/accept', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            invitationId,
+            userId,
+            userEmail: email
+          }),
+        });
+
+        if (response.ok) {
+          toast({
+            title: 'Invitation Accepted!',
+            description: `You've been added to the ${invitationDetails.roomName} chat room.`,
+          });
+        }
       }
     } catch (error) {
       console.error('Error accepting invitation:', error);

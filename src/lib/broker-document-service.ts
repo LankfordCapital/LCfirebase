@@ -22,6 +22,7 @@ export interface BrokerDocument {
   name: string;
   fileName: string;
   fileUrl: string;
+  filePath: string; // Store the storage path for easier deletion
   fileSize: number;
   mimeType: string;
   uploadedAt: Timestamp;
