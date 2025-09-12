@@ -142,7 +142,7 @@ export default function DocumentsPage() {
 
   if (loanFiles.length === 0) {
     return (
-      <div className="space-y-6 p-4 md:p-6 lg:p-8">
+      <div className="p-4 md:p-8 space-y-6">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="font-headline text-3xl font-bold">Loan Actions</h1>
@@ -167,7 +167,7 @@ export default function DocumentsPage() {
   }
   
   return (
-    <div className="space-y-6 p-4 md:p-6 lg:p-8">
+    <div className="p-4 md:p-8 space-y-6">
        <div className="flex justify-between items-center">
         <div>
             <h1 className="font-headline text-3xl font-bold">Loan Actions</h1>
