@@ -10,6 +10,9 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
+// Set the API key for this request
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyCIxq07RjOO-W9-yIU4lh7OkAKwETVAifw';
+
 const AnswerVisitorQuestionInputSchema = z.object({
   question: z.string().describe('The visitor\'s question about loan products and eligibility.'),
 });

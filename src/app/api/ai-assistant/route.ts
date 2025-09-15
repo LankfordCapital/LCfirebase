@@ -12,8 +12,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if GEMINI_API_KEY is available
-    if (!process.env.GEMINI_API_KEY) {
+    // Check if GEMINI_API_KEY is available (with fallback)
+    const geminiApiKey = process.env.GEMINI_API_KEY || 'AIzaSyCIxq07RjOO-W9-yIU4lh7OkAKwETVAifw';
+    
+    if (!geminiApiKey) {
       console.error('GEMINI_API_KEY not found in environment variables');
       return NextResponse.json({
         answer: "I'm sorry, but the AI assistant is currently unavailable. Please contact our team directly using the 'Contact a Team Member' option, and we'll be happy to help you with your question about our loan products and services."
