@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
     return NextResponse.json({
+        GEMINI_API_KEY: process.env.GEMINI_API_KEY ? 'Set' : 'Not set',
         RESEND_API_KEY: process.env.RESEND_API_KEY ? 'Set' : 'Not set',
         MAILGUN_API_KEY: process.env.MAILGUN_API_KEY ? 'Set' : 'Not set',
         MAILGUN_DOMAIN: process.env.MAILGUN_DOMAIN ? 'Set' : 'Not set',
