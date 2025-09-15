@@ -153,14 +153,22 @@ export function AIAssistant() {
     setIsLoading(true);
 
     try {
-      // Dynamically import AI functionality only when needed
-      const { answerVisitorQuestion } = await import('@/ai/flows/ai-assistant').catch(error => {
-        console.error('Failed to load AI assistant:', error);
-        throw new Error('AI assistant is temporarily unavailable. Please try again later.');
+      // Call AI assistant API route
+      const response = await fetch('/api/ai-assistant', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question: inputValue,
+        }),
       });
-      const result = await answerVisitorQuestion({
-        question: inputValue,
-      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get AI response');
+      }
+
+      const result = await response.json();
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -172,14 +180,14 @@ export function AIAssistant() {
       console.error('AI Assistant Error:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: "I'm sorry, but I'm having trouble connecting right now. Please try again later.",
+        text: "I'm sorry, but I'm having trouble connecting right now. Please use the 'Contact a Team Member' option to get immediate assistance with your question. Our team will be happy to help you!",
         sender: 'ai',
       };
       setMessages((prev) => [...prev, errorMessage]);
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to get a response from the AI assistant.',
+        title: 'AI Assistant Unavailable',
+        description: 'Please use the Contact a Team Member option for immediate assistance.',
       });
     } finally {
       setIsLoading(false);
