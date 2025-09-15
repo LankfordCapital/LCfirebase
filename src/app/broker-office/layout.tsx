@@ -2,6 +2,7 @@
 'use client';
 
 import { ProtectedRoute } from '@/components/protected-route';
+import ChatLauncher from '@/components/chat-launcher';
 
 
 export default function BrokerOfficeLayout({
@@ -15,6 +16,7 @@ export default function BrokerOfficeLayout({
             <main className="p-4 md:p-6 lg:p-8">
               {children}
             </main>
+            <ChatLauncher />
           </div>
         </ProtectedRoute>
   );

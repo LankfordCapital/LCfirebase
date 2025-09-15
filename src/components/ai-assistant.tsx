@@ -5,15 +5,19 @@ import { useState, useRef, useEffect, type FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Send, MessageSquare, Sparkles, User } from 'lucide-react';
+import { Send, MessageSquare, Sparkles, User, Mail, Loader2 } from 'lucide-react';
 // Lazy load the AI functionality
 // import { answerVisitorQuestion, type AnswerVisitorQuestionOutput } from '@/ai/flows/ai-assistant';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { CustomLoader } from './ui/custom-loader';
 import { useUI } from '@/contexts/ui-context';
+import { useAuth } from '@/contexts/auth-context';
 import { ChatClient } from './chat-client';
 
 interface Message {
@@ -22,16 +26,25 @@ interface Message {
   sender: 'user' | 'ai';
 }
 
-type ChatMode = 'selector' | 'ai' | 'live';
+type ChatMode = 'selector' | 'ai' | 'email';
 
 export function AIAssistant() {
   const { isAssistantOpen, closeAssistant, assistantContext } = useUI();
+  const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [chatMode, setChatMode] = useState<ChatMode>('selector');
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  
+  // Contact form state
+  const [contactForm, setContactForm] = useState({
+    subject: '',
+    message: '',
+    priority: 'normal' as 'low' | 'normal' | 'high'
+  });
+  const [isSubmittingContact, setIsSubmittingContact] = useState(false);
 
   useEffect(() => {
     if (isAssistantOpen) {
@@ -68,8 +81,61 @@ export function AIAssistant() {
       ]);
   }
 
-  const handleStartLiveChat = () => {
-      setChatMode('live');
+  const handleStartEmailContact = () => {
+      setChatMode('email');
+      // Pre-fill subject if there's context
+      if (assistantContext) {
+        setContactForm(prev => ({
+          ...prev,
+          subject: `Question about: ${assistantContext.replace(/i have a question about the|document/gi, '').replace(/"/g, '').trim()}`
+        }));
+      }
+  }
+
+  const handleContactSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!contactForm.subject.trim() || !contactForm.message.trim() || !user?.email) return;
+
+    setIsSubmittingContact(true);
+    
+    try {
+      const response = await fetch('/api/contact-team', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userEmail: user.email,
+          userName: user.displayName || 'User',
+          subject: contactForm.subject,
+          message: contactForm.message,
+          priority: contactForm.priority,
+          context: assistantContext || null
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send contact request');
+      }
+
+      toast({
+        title: 'Message Sent!',
+        description: 'We\'ll get back to you at your account email within 24 hours.',
+      });
+
+      // Reset form and close assistant
+      setContactForm({ subject: '', message: '', priority: 'normal' });
+      closeAssistant();
+    } catch (error) {
+      console.error('Contact submission error:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to send your message. Please try again.',
+      });
+    } finally {
+      setIsSubmittingContact(false);
+    }
   }
 
   const handleSubmit = async (e: FormEvent) => {
@@ -135,11 +201,11 @@ export function AIAssistant() {
                 <Button onClick={handleStartAIChat} className="w-full h-16 text-lg">
                     <Sparkles className="mr-2 h-5 w-5"/> Chat with AI Assistant
                 </Button>
-                <Button onClick={handleStartLiveChat} variant="secondary" className="w-full h-16 text-lg">
-                    <User className="mr-2 h-5 w-5"/> Chat with a Team Member
+                <Button onClick={handleStartEmailContact} variant="secondary" className="w-full h-16 text-lg">
+                    <Mail className="mr-2 h-5 w-5"/> Contact a Team Member
                 </Button>
             </div>
-            <p className="text-xs text-muted-foreground mt-8">Our AI is available 24/7. Live support is available during business hours.</p>
+            <p className="text-xs text-muted-foreground mt-8">Our AI is available 24/7. Team support is available during business hours.</p>
           </div>
         );
       case 'ai':
@@ -215,18 +281,107 @@ export function AIAssistant() {
                 </SheetFooter>
             </>
         );
-       case 'live':
+       case 'email':
         return (
             <div className="h-full flex flex-col">
                 <SheetHeader>
                     <SheetTitle className="flex items-center gap-2 font-headline text-xl">
-                        <User className="h-6 w-6 text-primary" />
-                        Live Chat
+                        <Mail className="h-6 w-6 text-primary" />
+                        Contact Our Team
                     </SheetTitle>
                 </SheetHeader>
-                <div className="flex-1 min-h-0 py-4">
-                    {/* The roomId should be dynamic in a real application */}
-                    <ChatClient roomId="live-support" />
+                <div className="flex-1 flex flex-col p-6">
+                    <div className="space-y-4 mb-6">
+                        <div className="text-center space-y-2">
+                            <h3 className="text-lg font-semibold">Get in Touch with Our Team</h3>
+                            <p className="text-sm text-muted-foreground">
+                                Fill out the form below and we'll send you an email response within 24 hours.
+                            </p>
+                            {user?.email && (
+                                <p className="text-xs text-muted-foreground">
+                                    We'll respond to: <strong>{user.email}</strong>
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                    
+                    <form onSubmit={handleContactSubmit} className="space-y-4 flex-1 flex flex-col">
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="subject">Subject</Label>
+                                <Input
+                                    id="subject"
+                                    value={contactForm.subject}
+                                    onChange={(e) => setContactForm(prev => ({ ...prev, subject: e.target.value }))}
+                                    placeholder="What is your question about?"
+                                    required
+                                />
+                            </div>
+                            
+                            <div className="space-y-2">
+                                <Label htmlFor="priority">Priority</Label>
+                                <Select 
+                                    value={contactForm.priority} 
+                                    onValueChange={(value: 'low' | 'normal' | 'high') => 
+                                        setContactForm(prev => ({ ...prev, priority: value }))
+                                    }
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent 
+                                        className="z-[60] w-full max-h-none" 
+                                        position="item-aligned"
+                                        side="bottom"
+                                        align="start"
+                                        sideOffset={4}
+                                        style={{ maxHeight: 'none' }}
+                                    >
+                                        <SelectItem value="low">Low - General inquiry</SelectItem>
+                                        <SelectItem value="normal">Normal - Standard question</SelectItem>
+                                        <SelectItem value="high">High - Urgent matter</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            
+                            <div className="space-y-2">
+                                <Label htmlFor="message">Message</Label>
+                                <Textarea
+                                    id="message"
+                                    value={contactForm.message}
+                                    onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
+                                    placeholder="Please provide details about your question or concern..."
+                                    className="min-h-[120px]"
+                                    required
+                                />
+                            </div>
+                        </div>
+                        
+                        <div className="mt-auto pt-4 space-y-3">
+                            <Button 
+                                type="submit" 
+                                className="w-full h-12 text-lg"
+                                disabled={isSubmittingContact || !contactForm.subject.trim() || !contactForm.message.trim()}
+                            >
+                                {isSubmittingContact ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                        Sending...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Mail className="mr-2 h-5 w-5" />
+                                        Send Message
+                                    </>
+                                )}
+                            </Button>
+                            
+                            <div className="text-xs text-muted-foreground text-center space-y-1">
+                                <p><strong>Response Time:</strong> Within 24 hours</p>
+                                <p><strong>Business Hours:</strong> Monday - Friday, 9:00 AM - 5:00 PM EST</p>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         );

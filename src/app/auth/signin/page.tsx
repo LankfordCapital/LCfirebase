@@ -19,6 +19,7 @@ import { useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { CustomLoader } from "@/components/ui/custom-loader";
 import Image from "next/image";
+import { AuthDebugPanel } from "@/components/auth-debug-panel";
 
 export default function SignInPage() {
   const searchParams = useSearchParams();
@@ -229,6 +230,9 @@ export default function SignInPage() {
           </Card>
         </div>
       </div>
+      
+      {/* Auth Debug Panel - only visible in development */}
+      <AuthDebugPanel />
     </div>
   );
 }

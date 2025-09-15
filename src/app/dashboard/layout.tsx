@@ -2,6 +2,7 @@
 'use client';
 
 import { ProtectedRoute } from '@/components/protected-route';
+import ChatLauncher from '@/components/chat-launcher';
 
 export default function DashboardLayout({
   children,
@@ -15,6 +16,7 @@ export default function DashboardLayout({
         <main className="flex-1 bg-primary/5">
           {children}
         </main>
+        <ChatLauncher />
       </div>
     </ProtectedRoute>
   );

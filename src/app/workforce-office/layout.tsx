@@ -2,6 +2,7 @@
 'use client';
 
 import { ProtectedRoute } from '@/components/protected-route';
+import ChatLauncher from '@/components/chat-launcher';
 
 export default function WorkforceOfficeLayout({
   children,
@@ -14,6 +15,7 @@ export default function WorkforceOfficeLayout({
           <main className="flex-1 bg-primary/5 p-4 md:p-8">
             {children}
           </main>
+          <ChatLauncher />
         </div>
     </ProtectedRoute>
   );

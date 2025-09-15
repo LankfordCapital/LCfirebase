@@ -12,7 +12,6 @@ import Footer from './layout/footer';
 import ErrorBoundary from './error-boundary';
 import { AIAssistantFallback } from './ai-assistant-fallback';
 import { ChunkErrorHandler } from './chunk-error-handler';
-import { AuthDebugPanel } from './auth-debug-panel';
 
 // Lazy load the AI assistant to improve initial page load performance
 const AIAssistant = dynamic(() => import('./ai-assistant').then(mod => ({ default: mod.AIAssistant })), {
@@ -50,7 +49,6 @@ function AppContent({ children }: { children: React.ReactNode }) {
       <ErrorBoundary fallback={AIAssistantFallback}>
         <AIAssistant />
       </ErrorBoundary>
-      <AuthDebugPanel />
     </>
   );
 }

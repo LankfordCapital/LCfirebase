@@ -10,8 +10,8 @@ export function AuthDebugPanel() {
   const { clearAuthCache, clearAllAuthCache, debugAuthState, user, userProfile } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
 
-  // Only show in development or for admins
-  const shouldShow = process.env.NODE_ENV === 'development' || userProfile?.role === 'admin';
+  // Only show in development or for admins (or when no user on login page)
+  const shouldShow = process.env.NODE_ENV === 'development' || userProfile?.role === 'admin' || !user;
 
   if (!shouldShow) {
     return null;
@@ -91,9 +91,9 @@ export function AuthDebugPanel() {
             </div>
             
             <div className="pt-2 border-t text-xs text-muted-foreground">
-              <p><strong>Current User:</strong> {user?.email || 'None'}</p>
-              <p><strong>Role:</strong> {userProfile?.role || 'Unknown'}</p>
-              <p><strong>Status:</strong> {userProfile?.status || 'Unknown'}</p>
+              <p><strong>Current User:</strong> {user?.email || 'Not signed in'}</p>
+              <p><strong>Role:</strong> {userProfile?.role || 'Not available'}</p>
+              <p><strong>Status:</strong> {userProfile?.status || 'Not available'}</p>
             </div>
             
             <Button
