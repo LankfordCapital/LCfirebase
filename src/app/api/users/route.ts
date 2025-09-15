@@ -1,8 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { UserApiService } from '@/lib/api-services';
+import { adminAuth } from '@/lib/firebase-admin';
+
+// Helper function to verify Firebase Auth token
+async function verifyAuthToken(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return null;
+  }
+  
+  const token = authHeader.substring(7);
+  try {
+    const decodedToken = await adminAuth.verifyIdToken(token);
+    return decodedToken;
+  } catch (error) {
+    console.error('Token verification failed:', error);
+    return null;
+  }
+}
 
 export async function GET(request: NextRequest) {
   try {
+    // Verify authentication
+    const decodedToken = await verifyAuthToken(request);
+    if (!decodedToken) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Invalid or missing token' },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '1000'); // Get all users for admin purposes
@@ -24,6 +51,15 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify authentication
+    const decodedToken = await verifyAuthToken(request);
+    if (!decodedToken) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Invalid or missing token' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const { action, ...data } = body;
 

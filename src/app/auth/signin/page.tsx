@@ -108,7 +108,8 @@ export default function SignInPage() {
     
     try {
       await signInWithGoogle();
-       // AuthProvider will handle the redirect on successful sign-in
+      // AuthProvider will handle the redirect on successful sign-in
+      // Note: Don't set loading to false here as redirect will happen
     } catch (error: any) {
       console.error('Google sign-in error in component:', error);
       
@@ -120,8 +121,8 @@ export default function SignInPage() {
           description: error.message || 'An unexpected error occurred',
         });
       }
-    } finally {
-        setIsGoogleLoading(false);
+      // Always reset loading state on error
+      setIsGoogleLoading(false);
     }
   };
 

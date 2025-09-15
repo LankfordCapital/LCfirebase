@@ -24,7 +24,7 @@ import {
   EmailAuthProvider,
   linkWithCredential,
 } from 'firebase/auth';
-import { auth, db, googleProvider } from '@/lib/firebase-client';
+import { auth, db, googleProvider, markExplicitLogout, clearExplicitLogout, clearAllAuthCache, clearAuthCache } from '@/lib/firebase-client';
 import { doc, setDoc, serverTimestamp, getDoc, updateDoc, collection, getDocs } from 'firebase/firestore';
 import { useRouter, usePathname } from 'next/navigation';
 
@@ -52,12 +52,16 @@ interface AuthContextType {
   checkEmailExists: (email: string) => Promise<boolean>;
   sendPasswordReset: (email: string) => Promise<void>;
   logOut: () => Promise<void>;
+  forceLogout: () => Promise<void>;
+  clearAuthCache: () => void;
+  clearAllAuthCache: () => void;
   addPasswordToGoogleAccount: (password: string) => Promise<void>;
   canSignInWithPassword: (email: string) => Promise<boolean>;
   getAllUsers: () => Promise<UserProfile[]>;
   updateUserRole: (uid: string, newRole: UserProfile['role']) => Promise<void>;
   updateUserStatus: (uid: string, newStatus: UserProfile['status']) => Promise<void>;
   getRedirectPath: (profile?: UserProfile | null) => string;
+  debugAuthState: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -72,7 +76,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const isAdmin = userProfile?.role === 'admin';
   
-  const getRedirectPath = useCallback((profile: UserProfile | null) => {
+  const getRedirectPath = useCallback((profile?: UserProfile | null) => {
     if (!profile) return '/auth/signin';
     switch (profile.role) {
       case 'admin':
@@ -97,81 +101,201 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (userAuth) => {
-      setLoading(true); // Ensure loading is true until profile is fetched
-      if (userAuth) {
-        const userDocRef = doc(db, 'users', userAuth.uid);
-        const userDoc = await getDoc(userDocRef);
-        
-        setUser(userAuth);
+      setLoading(true);
+      console.log('🔄 Auth state changed:', userAuth ? `User: ${userAuth.email}` : 'No user');
+      
+      try {
+        if (userAuth) {
+          console.log('👤 User authenticated, fetching profile...');
+          
+          // Retry logic for fetching user profile
+          const maxRetries = 3;
+          let profile: UserProfile | null = null;
+          
+          for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+              const userDocRef = doc(db, 'users', userAuth.uid);
+              const userDoc = await getDoc(userDocRef);
+              
+              if (userDoc.exists()) {
+                profile = { uid: userDoc.id, ...userDoc.data() } as UserProfile;
+                console.log(`✅ User profile loaded on attempt ${attempt}:`, profile.email, profile.role);
+                break;
+              } else {
+                console.warn(`⚠️ User profile not found in Firestore on attempt ${attempt}`);
+              }
+            } catch (error) {
+              console.error(`❌ Error fetching user profile on attempt ${attempt}:`, error);
+              if (attempt < maxRetries) {
+                const delay = Math.pow(2, attempt) * 1000;
+                console.log(`⏳ Waiting ${delay}ms before retry...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+              }
+            }
+          }
+          
+          setUser(userAuth);
 
-        if (userDoc.exists()) {
-          const profile = { uid: userDoc.id, ...userDoc.data() } as UserProfile;
-          setUserProfile(profile);
-          handleAuthRedirect(profile);
-        } else {
+          if (profile) {
+            setUserProfile(profile);
+            handleAuthRedirect(profile);
+          } else {
             // This case handles a user that exists in Firebase Auth but not in Firestore.
             // It could happen if the Firestore document creation failed during signup.
-            // We set profile to null and stop loading. The ProtectedRoute will handle the redirect.
+            console.error('❌ User exists in Firebase Auth but not in Firestore');
             setUserProfile(null);
             router.push('/auth/signin');
+          }
+        } else {
+          console.log('👤 No user authenticated');
+          setUser(null);
+          setUserProfile(null);
         }
-      } else {
+      } catch (error) {
+        console.error('❌ Error in auth state change handler:', error);
         setUser(null);
         setUserProfile(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false); // Set loading to false only after all checks are done
     });
 
     return () => unsubscribe();
   }, [handleAuthRedirect, router]);
 
   const signUp = async (email: string, pass: string, fullName: string, role: string) => {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-    await updateProfile(userCredential.user, { displayName: fullName });
-    
-    const newProfile: UserProfile = {
-      uid: userCredential.user.uid,
-      email: userCredential.user.email!,
-      fullName: fullName,
-      role: role as UserProfile['role'],
-      status: (role === 'workforce' || role === 'admin') ? 'approved' : 'pending',
-      createdAt: serverTimestamp(),
-      authProvider: 'password',
-      hasPassword: true,
-    };
-    await setDoc(doc(db, "users", userCredential.user.uid), newProfile);
-    
-    setUserProfile(newProfile);
-    return userCredential;
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+      await updateProfile(userCredential.user, { displayName: fullName });
+      
+      const newProfile: UserProfile = {
+        uid: userCredential.user.uid,
+        email: userCredential.user.email!,
+        fullName: fullName,
+        role: role as UserProfile['role'],
+        status: (role === 'workforce' || role === 'admin') ? 'approved' : 'pending',
+        createdAt: serverTimestamp(),
+        authProvider: 'password',
+        hasPassword: true,
+      };
+      
+      // Create Firestore document - if this fails, we need to clean up the auth user
+      try {
+        await setDoc(doc(db, "users", userCredential.user.uid), newProfile);
+        setUserProfile(newProfile);
+        
+        // Clear explicit logout flag since user is signing up
+        clearExplicitLogout();
+        
+        return userCredential;
+      } catch (firestoreError) {
+        console.error('Failed to create user profile in Firestore:', firestoreError);
+        // Clean up the Firebase Auth user since Firestore creation failed
+        await userCredential.user.delete();
+        throw new Error('Failed to create user profile. Please try again.');
+      }
+    } catch (error) {
+      console.error('Sign up error:', error);
+      throw error;
+    }
   };
   
   const signIn = async (email: string, pass: string) => {
-    return signInWithEmailAndPassword(auth, email, pass);
+    const maxRetries = 3;
+    let lastError: any;
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`🔄 Sign in attempt ${attempt}/${maxRetries} for ${email}`);
+        const result = await signInWithEmailAndPassword(auth, email, pass);
+        console.log(`✅ Sign in successful on attempt ${attempt}`);
+        // Clear explicit logout flag since user is signing in
+        clearExplicitLogout();
+        return result;
+      } catch (error: any) {
+        lastError = error;
+        console.error(`❌ Sign in attempt ${attempt} failed:`, error.code, error.message);
+        
+        // Don't retry for certain errors
+        if (error.code === 'auth/user-not-found' || 
+            error.code === 'auth/wrong-password' || 
+            error.code === 'auth/invalid-email') {
+          throw error;
+        }
+        
+        // Wait before retrying (exponential backoff)
+        if (attempt < maxRetries) {
+          const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+          console.log(`⏳ Waiting ${delay}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+    }
+    
+    console.error(`❌ All ${maxRetries} sign in attempts failed`);
+    throw lastError;
   };
   
   const signUpWithGoogle = async (role: string = 'borrower') => {
-    const result = await signInWithPopup(auth, googleProvider);
-    const user = result.user;
-    const userDocRef = doc(db, 'users', user.uid);
-    const userDoc = await getDoc(userDocRef);
-    if (!userDoc.exists()) {
-        const newProfile: UserProfile = {
-          uid: user.uid,
-          email: user.email!,
-          fullName: user.displayName || 'New User',
-          role: role as UserProfile['role'],
-          status: (role === 'workforce' || role === 'admin') ? 'approved' : 'pending',
-          createdAt: serverTimestamp(),
-          authProvider: 'google',
-          hasPassword: false,
-        };
-        await setDoc(userDocRef, newProfile);
-        setUserProfile(newProfile);
-    } else {
-        const profile = userDoc.data() as UserProfile;
-        setUserProfile(profile);
+    const maxRetries = 3;
+    let lastError: any;
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`🔄 Google sign in attempt ${attempt}/${maxRetries}`);
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+        
+        console.log(`✅ Google sign in successful on attempt ${attempt} for user:`, user.email);
+        // Clear explicit logout flag since user is signing in
+        clearExplicitLogout();
+        
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+        
+        if (!userDoc.exists()) {
+            const newProfile: UserProfile = {
+              uid: user.uid,
+              email: user.email!,
+              fullName: user.displayName || 'New User',
+              role: role as UserProfile['role'],
+              status: (role === 'workforce' || role === 'admin') ? 'approved' : 'pending',
+              createdAt: serverTimestamp(),
+              authProvider: 'google',
+              hasPassword: false,
+            };
+            await setDoc(userDocRef, newProfile);
+            setUserProfile(newProfile);
+            console.log(`✅ New user profile created for Google user:`, user.email);
+        } else {
+            const profile = userDoc.data() as UserProfile;
+            setUserProfile(profile);
+            console.log(`✅ Existing user profile loaded for Google user:`, user.email);
+        }
+        
+        return result;
+      } catch (error: any) {
+        lastError = error;
+        console.error(`❌ Google sign in attempt ${attempt} failed:`, error.code, error.message);
+        
+        // Don't retry for certain errors
+        if (error.code === 'auth/popup-closed-by-user' || 
+            error.code === 'auth/cancelled-popup-request' ||
+            error.code === 'auth/popup-blocked') {
+          throw error;
+        }
+        
+        // Wait before retrying (exponential backoff)
+        if (attempt < maxRetries) {
+          const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+          console.log(`⏳ Waiting ${delay}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
     }
-    return result;
+    
+    console.error(`❌ All ${maxRetries} Google sign in attempts failed`);
+    throw lastError;
   };
 
   const signInWithGoogle = signUpWithGoogle;
@@ -196,11 +320,55 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logOut = async () => {
     setIsLoggingOut(true);
-    await signOut(auth);
-    setUser(null);
-    setUserProfile(null);
-    router.push('/auth/signin');
-    setIsLoggingOut(false);
+    console.log('🔒 User explicitly logging out...');
+    
+    try {
+      // Mark explicit logout to prevent auto-restoration
+      markExplicitLogout();
+      
+      // Sign out from Firebase Auth
+      await signOut(auth);
+      
+      // Clear all local state
+      setUser(null);
+      setUserProfile(null);
+      
+      // Clear authentication cache (but preserve explicit logout flag)
+      clearAuthCache();
+      
+      // Clear application-specific data
+      if (typeof window !== 'undefined') {
+        // Clear any application-specific local storage
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (
+            key.includes('loanApplication') ||
+            key.includes('groundUpConstruction') ||
+            key.includes('document') ||
+            key.includes('userData')
+          )) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+        
+        console.log('🧹 Cleared application-specific storage');
+      }
+      
+      // Redirect to sign-in page
+      router.push('/auth/signin');
+      console.log('✅ User successfully logged out and redirected');
+      
+    } catch (error) {
+      console.error('❌ Error during logout:', error);
+      // Even if logout fails, clear local state and redirect
+      setUser(null);
+      setUserProfile(null);
+      router.push('/auth/signin');
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   const checkEmailExists = async (email: string) => {
@@ -296,6 +464,50 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Debug function to help troubleshoot auth issues
+  const debugAuthState = () => {
+    console.log('🔍 === AUTH DEBUG INFO ===');
+    console.log('Current user:', user ? {
+      uid: user.uid,
+      email: user.email,
+      emailVerified: user.emailVerified,
+      displayName: user.displayName,
+      metadata: {
+        creationTime: user.metadata.creationTime,
+        lastSignInTime: user.metadata.lastSignInTime
+      }
+    } : 'No user');
+    console.log('User profile:', userProfile);
+    console.log('Loading state:', loading);
+    console.log('Is admin:', isAdmin);
+    console.log('Current path:', pathname);
+    console.log('Firebase auth current user:', auth.currentUser);
+    console.log('Explicit logout flag:', typeof window !== 'undefined' ? localStorage.getItem('userExplicitlyLoggedOut') : 'N/A');
+    console.log('========================');
+  };
+
+  // Function to force logout and clear all data (for admin/debugging purposes)
+  const forceLogout = async () => {
+    console.log('🔒 Force logout initiated...');
+    await logOut();
+    
+    // Use the comprehensive cache clearing function
+    clearAllAuthCache();
+  };
+
+  // Function to clear authentication cache (for troubleshooting)
+  const handleClearAuthCache = () => {
+    console.log('🧹 Manual auth cache clear initiated...');
+    clearAuthCache();
+    console.log('✅ Auth cache cleared - you may need to sign in again');
+  };
+
+  // Function to clear all cache (nuclear option for troubleshooting)
+  const handleClearAllCache = () => {
+    console.log('🧹 Manual full cache clear initiated...');
+    clearAllAuthCache();
+  };
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -310,12 +522,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       checkEmailExists, 
       sendPasswordReset, 
       logOut,
+      forceLogout,
+      clearAuthCache: handleClearAuthCache,
+      clearAllAuthCache: handleClearAllCache,
       addPasswordToGoogleAccount,
       canSignInWithPassword,
       getAllUsers,
       updateUserRole,
       updateUserStatus,
-      getRedirectPath
+      getRedirectPath,
+      debugAuthState
     }}>
       {children}
     </AuthContext.Provider>

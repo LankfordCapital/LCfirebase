@@ -16,6 +16,9 @@ export type Document = {
   storagePath: string;
   downloadURL: string;
   status: UploadStatus;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
 };
 
 type DocumentStore = {
@@ -27,6 +30,7 @@ interface DocumentContextType {
   addDocument: (doc: Pick<Document, 'name' | 'file'>) => Promise<boolean>;
   updateDocumentStatus: (docName: string, status: UploadStatus) => void;
   getDocument: (docName: string) => DocumentStore[string] | undefined;
+  restoreDocument: (docName: string, docData: Omit<Document, 'file' | 'dataUri'>) => void;
 }
 
 const DocumentContext = createContext<DocumentContextType | undefined>(undefined);
@@ -115,8 +119,16 @@ export const DocumentProvider = ({ children }: { children: ReactNode }) => {
     return documents[docName];
   }, [documents]);
 
+  const restoreDocument = useCallback((docName: string, docData: Omit<Document, 'file' | 'dataUri'>) => {
+    console.log('🔄 Restoring document to context:', docName, docData);
+    setDocuments(prev => ({
+      ...prev,
+      [docName]: docData
+    }));
+  }, []);
+
   return (
-    <DocumentContext.Provider value={{ documents, addDocument, updateDocumentStatus, getDocument }}>
+    <DocumentContext.Provider value={{ documents, addDocument, updateDocumentStatus, getDocument, restoreDocument }}>
       {children}
     </DocumentContext.Provider>
   );
@@ -131,6 +143,7 @@ export const useDocumentContext = () => {
       addDocument: async () => false,
       updateDocumentStatus: () => {},
       getDocument: () => undefined,
+      restoreDocument: () => {},
     };
   }
   return context;

@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback, useId } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Loader2, ArrowRight, Calendar as CalendarIcon, Building2, Briefcase, FileUp, FileText, Layers, DollarSign, Truck, PlusCircle, Trash2 } from 'lucide-react';
+import { Loader2, ArrowRight, Calendar as CalendarIcon, Building2, Briefcase, FileUp, FileText, Layers, DollarSign, Truck, PlusCircle, Trash2, Eye } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -37,6 +37,167 @@ type Quote = {
   description: string;
   cost: string;
 };
+
+// ============================================================================
+// LOAN APPLICATION PAGE 1 DATA TYPES
+// ============================================================================
+
+export interface LoanApplicationPage1Data {
+  // Core Property Information
+  propertyAddress: string;
+  propertyApn: string;
+  propertyTaxes: number;
+  propertyType: string;
+  otherPropertyType?: string;
+  propertySqFt: number;
+  lotSize: string;
+  
+  // Loan Details
+  loanAmount: number;
+  transactionType: 'purchase' | 'refinance';
+  
+  // Transaction-specific data
+  purchasePrice?: number;
+  originalPurchasePrice?: number;
+  purchaseDate?: Date;
+  currentDebt?: number;
+  
+  // Property Values
+  asIsValue: number;
+  afterRepairValue?: number;
+  afterConstructedValue?: number;
+  stabilizedValue?: number;
+  
+  // Construction Details
+  constructionTime?: number;
+  requestedClosingDate?: Date;
+  
+  // Business Information
+  companyName: string;
+  companyEin: string;
+  
+  // Land Acquisition specific
+  entitlementStatus?: string;
+  developmentCosts?: number;
+  afterDevelopmentValue?: number;
+  
+  // Mezzanine Loan specific
+  seniorLoanAmount?: number;
+  capitalStack?: string;
+  
+  // Mobilization Funding specific
+  contractValue?: number;
+  projectDescription?: string;
+  clientName?: string;
+  
+  // Equipment Financing specific
+  dealers?: Dealer[];
+  quotes?: Quote[];
+  
+  // Documents uploaded on page 1
+  documents: {
+    purchaseContract?: {
+      name: string;
+      status: string;
+      storagePath: string;
+      downloadURL: string;
+      fileName?: string;
+      fileSize?: number;
+      mimeType?: string;
+    };
+    earnestMoneyDeposit?: {
+      name: string;
+      status: string;
+      storagePath: string;
+      downloadURL: string;
+      fileName?: string;
+      fileSize?: number;
+      mimeType?: string;
+    };
+    feasibilityStudy?: {
+      name: string;
+      status: string;
+      storagePath: string;
+      downloadURL: string;
+      fileName?: string;
+      fileSize?: number;
+      mimeType?: string;
+    };
+    zoningDocuments?: {
+      name: string;
+      status: string;
+      storagePath: string;
+      downloadURL: string;
+      fileName?: string;
+      fileSize?: number;
+      mimeType?: string;
+    };
+    environmentalReport?: {
+      name: string;
+      status: string;
+      storagePath: string;
+      downloadURL: string;
+      fileName?: string;
+      fileSize?: number;
+      mimeType?: string;
+    };
+    executedContract?: {
+      name: string;
+      status: string;
+      storagePath: string;
+      downloadURL: string;
+      fileName?: string;
+      fileSize?: number;
+      mimeType?: string;
+    };
+    useOfFunds?: {
+      name: string;
+      status: string;
+      storagePath: string;
+      downloadURL: string;
+      fileName?: string;
+      fileSize?: number;
+      mimeType?: string;
+    };
+    equipmentQuote?: {
+      name: string;
+      status: string;
+      storagePath: string;
+      downloadURL: string;
+      fileName?: string;
+      fileSize?: number;
+      mimeType?: string;
+    };
+    seniorDebtTermSheet?: {
+      name: string;
+      status: string;
+      storagePath: string;
+      downloadURL: string;
+      fileName?: string;
+      fileSize?: number;
+      mimeType?: string;
+    };
+    capitalStackOverview?: {
+      name: string;
+      status: string;
+      storagePath: string;
+      downloadURL: string;
+      fileName?: string;
+      fileSize?: number;
+      mimeType?: string;
+    };
+    // Additional documents that might be uploaded
+    [key: string]: {
+      name: string;
+      status: string;
+      storagePath: string;
+      downloadURL: string;
+      fileName?: string;
+      fileSize?: number;
+      mimeType?: string;
+    } | undefined;
+  };
+}
 
 
 export function LoanApplicationClient({ 
@@ -160,7 +321,19 @@ export function LoanApplicationClient({
       if (app.propertyInfo?.requestedClosingDate) {
         const date = app.propertyInfo.requestedClosingDate;
         console.log(`🏗️ [Ground Up Construction] Setting requestedClosingDate:`, date);
-        setRequestedClosingDate(date instanceof Date ? date : date.toDate());
+        // Handle different date formats safely
+        let dateObj: Date;
+        if (date instanceof Date) {
+          dateObj = date;
+        } else if (typeof date === 'string') {
+          dateObj = new Date(date);
+        } else if (date && typeof date.toDate === 'function') {
+          dateObj = date.toDate();
+        } else {
+          console.warn('Invalid date format for requestedClosingDate:', date);
+          dateObj = new Date();
+        }
+        setRequestedClosingDate(dateObj);
       } else {
         console.log(`🏗️ [Ground Up Construction] No requestedClosingDate found in state`);
       }
@@ -270,7 +443,19 @@ export function LoanApplicationClient({
       if (app.propertyInfo?.requestedClosingDate) {
         const date = app.propertyInfo.requestedClosingDate;
         console.log(`🔄 [Ground Up Construction] Refreshing requestedClosingDate:`, date);
-        setRequestedClosingDate(date instanceof Date ? date : date.toDate());
+        // Handle different date formats safely
+        let dateObj: Date;
+        if (date instanceof Date) {
+          dateObj = date;
+        } else if (typeof date === 'string') {
+          dateObj = new Date(date);
+        } else if (date && typeof date.toDate === 'function') {
+          dateObj = date.toDate();
+        } else {
+          console.warn('Invalid date format for requestedClosingDate:', date);
+          dateObj = new Date();
+        }
+        setRequestedClosingDate(dateObj);
       }
       if (app.loanDetails?.loanAmount) {
         console.log(`🔄 [Ground Up Construction] Refreshing loanAmount:`, app.loanDetails.loanAmount);
@@ -411,7 +596,19 @@ export function LoanApplicationClient({
       if (app.propertyInfo?.requestedClosingDate) {
         const date = app.propertyInfo.requestedClosingDate;
         console.log(`🔄 [Ground Up Construction] Manual refresh - Setting requestedClosingDate:`, date);
-        setRequestedClosingDate(date instanceof Date ? date : date.toDate());
+        // Handle different date formats safely
+        let dateObj: Date;
+        if (date instanceof Date) {
+          dateObj = date;
+        } else if (typeof date === 'string') {
+          dateObj = new Date(date);
+        } else if (date && typeof date.toDate === 'function') {
+          dateObj = date.toDate();
+        } else {
+          console.warn('Invalid date format for requestedClosingDate:', date);
+          dateObj = new Date();
+        }
+        setRequestedClosingDate(dateObj);
       } else {
         console.log(`🔄 [Ground Up Construction] Manual refresh - No requestedClosingDate found`);
       }
@@ -494,55 +691,467 @@ export function LoanApplicationClient({
   const [quotes, setQuotes] = useState<Quote[]>([{ id: quoteId, description: '', cost: ''}]);
 
 
-  const { documents, addDocument } = useDocumentContext();
+  const { documents, addDocument, restoreDocument, updateDocumentStatus } = useDocumentContext();
   const router = useRouter();
   
-
+  // ============================================================================
+  // LOCAL STORAGE FOR PAGE 1 DATA
+  // ============================================================================
   
-  const handleContinue = () => {
-    // If this is a Ground Up Construction loan, save all form data to typed state
-    if (isGroundUpConstruction) {
-      console.log(`🏗️ [Ground Up Construction] ===== SAVING DATA DEBUG START =====`);
-      console.log(`🏗️ [Ground Up Construction] Current form field values:`);
-      console.log(`  propertyAddress:`, propertyAddress);
-      console.log(`  propertyApn:`, propertyApn);
-      console.log(`  propertyTaxes:`, propertyTaxes);
-      console.log(`  propertyType:`, propertyType);
-      console.log(`  asIsValue:`, asIsValue);
-      console.log(`  afterConstructedValue:`, afterConstructedValue);
-      console.log(`  stabilizedValue:`, stabilizedValue);
-      console.log(`  propertySqFt:`, propertySqFt);
-      console.log(`  lotSize:`, lotSize);
-      console.log(`  constructionTime:`, constructionTime);
-      console.log(`  requestedClosingDate:`, requestedClosingDate);
-      console.log(`  loanAmount:`, loanAmount);
-      console.log(`  transactionType:`, transactionType);
-      console.log(`  companyName:`, companyName);
-      console.log(`  companyEin:`, companyEin);
-      
-      const page1Data = {
-        'propertyInfo.propertyAddress': propertyAddress,
-        'propertyInfo.propertyApn': propertyApn,
-        'propertyInfo.annualPropertyTaxes': parseFloat(propertyTaxes) || 0,
-        'propertyInfo.propertyType': propertyType || 'multi-family',
-        'propertyInfo.asIsValue': parseFloat(asIsValue) || 0,
-        'propertyInfo.afterConstructedValue': parseFloat(afterConstructedValue) || 0,
-        'propertyInfo.stabilizedValue': parseFloat(stabilizedValue) || 0,
-        'propertyInfo.propertySquareFootage': parseFloat(propertySqFt) || 0,
-        'propertyInfo.lotSize': lotSize,
-        'propertyInfo.constructionTime': parseFloat(constructionTime) || 0,
-        'propertyInfo.requestedClosingDate': requestedClosingDate ? new Date(requestedClosingDate) : new Date(),
-        'loanDetails.loanAmount': parseFloat(loanAmount) || 0,
-        'loanDetails.transactionType': transactionType,
-        'businessInfo.companyName': companyName,
-        'businessInfo.companyEin': companyEin,
-      };
-      
-      console.log(`🏗️ [Ground Up Construction] Data being saved to typed state:`, page1Data);
-      groundUpConstructionState.updateMultipleFields(page1Data);
-      console.log(`🏗️ [Ground Up Construction] ===== SAVING DATA DEBUG END =====`);
+  const [page1LocalData, setPage1LocalData] = useState<LoanApplicationPage1Data | null>(null);
+  
+  // Save page 1 data to local storage
+  const savePage1ToLocal = (data: LoanApplicationPage1Data) => {
+    console.log('💾 Saving Page 1 data to local storage:', data);
+    console.log('💾 Purchase price being saved:', data.purchasePrice);
+    setPage1LocalData(data);
+    // Also save to sessionStorage for persistence across page refreshes
+    sessionStorage.setItem('loanApplicationPage1Data', JSON.stringify(data));
+    console.log('✅ Page 1 data saved to both state and sessionStorage');
+  };
+  
+  // Load page 1 data from local storage
+  const loadPage1FromLocal = (): LoanApplicationPage1Data | null => {
+    console.log('🔍 Checking for local Page 1 data...');
+    console.log('🔍 Current page1LocalData state:', page1LocalData);
+    
+    // First try to get from state
+    if (page1LocalData) {
+      console.log('📥 Loading Page 1 data from state:', page1LocalData);
+      console.log('📥 Purchase price from state:', page1LocalData.purchasePrice);
+      return page1LocalData;
     }
     
+    // Then try to get from sessionStorage
+    try {
+      const stored = sessionStorage.getItem('loanApplicationPage1Data');
+      console.log('🔍 Raw sessionStorage data:', stored);
+      if (stored) {
+        const data = JSON.parse(stored);
+        console.log('📥 Loading Page 1 data from sessionStorage:', data);
+        console.log('📥 Purchase price from sessionStorage:', data.purchasePrice);
+        setPage1LocalData(data);
+        return data;
+      }
+    } catch (error) {
+      console.error('❌ Error loading from sessionStorage:', error);
+    }
+    
+    console.log('ℹ️ No Page 1 data found in local storage');
+    return null;
+  };
+  
+  // Clear page 1 data from local storage
+  const clearPage1LocalData = () => {
+    console.log('🗑️ Clearing Page 1 local data...');
+    setPage1LocalData(null);
+    sessionStorage.removeItem('loanApplicationPage1Data');
+  };
+  
+  // Restore documents to document context
+  const restoreDocumentsToContext = (documentsData: LoanApplicationPage1Data['documents']) => {
+    console.log('🔄 Restoring documents to context:', documentsData);
+    
+    // Create a mapping of document names to their data
+    const documentMapping: { [key: string]: any } = {
+      'Executed Purchase Contract': documentsData.purchaseContract,
+      'Evidence of Earnest Money Deposit': documentsData.earnestMoneyDeposit,
+      'Feasibility Study': documentsData.feasibilityStudy,
+      'Zoning and Entitlement Documents': documentsData.zoningDocuments,
+      'Environmental Report': documentsData.environmentalReport,
+      'Executed Contract for the project': documentsData.executedContract,
+      'Detailed Use of Funds': documentsData.useOfFunds,
+      'Equipment Quote or Invoice #1': documentsData.equipmentQuote,
+      'Senior Debt Term Sheet': documentsData.seniorDebtTermSheet,
+      'Capital Stack overview': documentsData.capitalStackOverview,
+    };
+    
+    // Restore each document to the context
+    Object.entries(documentMapping).forEach(([docName, docData]) => {
+      if (docData) {
+        console.log(`📄 Restoring document: ${docName}`, docData);
+        // Restore the full document data to the context
+        restoreDocument(docName, {
+          name: docData.name,
+          status: docData.status,
+          storagePath: docData.storagePath,
+          downloadURL: docData.downloadURL,
+          fileName: docData.fileName,
+          fileSize: docData.fileSize,
+          mimeType: docData.mimeType,
+        });
+      }
+    });
+  };
+
+  // Apply page 1 data to form fields
+  const applyPage1DataToForm = (data: LoanApplicationPage1Data) => {
+    console.log('🔄 Applying Page 1 data to form fields:', data);
+    console.log('🔄 Setting purchase price to:', data.purchasePrice?.toString() || '');
+    
+    // Core Property Information
+    setPropertyAddress(data.propertyAddress || '');
+    setPropertyApn(data.propertyApn || '');
+    setPropertyTaxes(data.propertyTaxes?.toString() || '');
+    setPropertyType(data.propertyType || '');
+    setOtherPropertyType(data.otherPropertyType || '');
+    setPropertySqFt(data.propertySqFt?.toString() || '');
+    setLotSize(data.lotSize || '');
+    
+    // Loan Details
+    setLoanAmount(data.loanAmount?.toString() || '');
+    setTransactionType(data.transactionType || 'purchase');
+    
+    // Transaction-specific data
+    setPurchasePrice(data.purchasePrice?.toString() || '');
+    setOriginalPurchasePrice(data.originalPurchasePrice?.toString() || '');
+    setCurrentDebt(data.currentDebt?.toString() || '');
+    setPurchaseDate(data.purchaseDate);
+    
+    // Property Values
+    setAsIsValue(data.asIsValue?.toString() || '');
+    setAfterRepairValue(data.afterRepairValue?.toString() || '');
+    setAfterConstructedValue(data.afterConstructedValue?.toString() || '');
+    setStabilizedValue(data.stabilizedValue?.toString() || '');
+    
+    // Construction Details
+    setConstructionTime(data.constructionTime?.toString() || '');
+    setRequestedClosingDate(data.requestedClosingDate);
+    
+    // Business Information
+    setCompanyName(data.companyName || '');
+    setCompanyEin(data.companyEin || '');
+    
+    // Land Acquisition specific
+    setEntitlementStatus(data.entitlementStatus || '');
+    setDevelopmentCosts(data.developmentCosts?.toString() || '');
+    setAfterDevelopmentValue(data.afterDevelopmentValue?.toString() || '');
+    
+    // Mezzanine Loan specific
+    setSeniorLoanAmount(data.seniorLoanAmount?.toString() || '');
+    setCapitalStack(data.capitalStack || '');
+    
+    // Mobilization Funding specific
+    setContractValue(data.contractValue?.toString() || '');
+    setProjectDescription(data.projectDescription || '');
+    setClientName(data.clientName || '');
+    
+    // Equipment Financing specific
+    if (data.dealers && data.dealers.length > 0) {
+      setDealers(data.dealers);
+    }
+    if (data.quotes && data.quotes.length > 0) {
+      setQuotes(data.quotes);
+    }
+    
+    // Restore documents to document context
+    restoreDocumentsToContext(data.documents);
+    
+    console.log('✅ Page 1 data applied to form fields successfully');
+  };
+  
+  // ============================================================================
+  // HELPER FUNCTION TO COLLECT ALL PAGE 1 DATA
+  // ============================================================================
+  
+  const collectPage1Data = (): LoanApplicationPage1Data => {
+    const isIndustrial = loanProgram.toLowerCase().includes('industrial');
+    const isLandAcquisition = loanProgram.toLowerCase().includes('land acquisition');
+    const isMezzanine = loanProgram.toLowerCase().includes('mezzanine');
+    const isMobilization = loanProgram.toLowerCase().includes('mobilization funding');
+    const isEquipmentFinancing = loanProgram.toLowerCase().includes('equipment financing');
+    
+    // Base data structure
+    const page1Data: LoanApplicationPage1Data = {
+      // Core Property Information
+      propertyAddress,
+      propertyApn,
+      propertyTaxes: parseFloat(propertyTaxes) || 0,
+      propertyType: propertyType || 'multi-family',
+      otherPropertyType: propertyType === 'other' ? otherPropertyType : undefined,
+      propertySqFt: parseFloat(propertySqFt) || 0,
+      lotSize,
+      
+      // Loan Details
+      loanAmount: parseFloat(loanAmount) || 0,
+      transactionType: transactionType as 'purchase' | 'refinance',
+      
+      // Property Values
+      asIsValue: parseFloat(asIsValue) || 0,
+      afterRepairValue: parseFloat(afterRepairValue) || undefined,
+      afterConstructedValue: parseFloat(afterConstructedValue) || undefined,
+      stabilizedValue: parseFloat(stabilizedValue) || undefined,
+      
+      // Construction Details
+      constructionTime: parseFloat(constructionTime) || undefined,
+      requestedClosingDate,
+      
+      // Business Information
+      companyName,
+      companyEin,
+      
+      // Documents tracking - save actual document data
+      documents: {
+        purchaseContract: documents['Executed Purchase Contract'] ? {
+          name: documents['Executed Purchase Contract'].name,
+          status: documents['Executed Purchase Contract'].status,
+          storagePath: documents['Executed Purchase Contract'].storagePath,
+          downloadURL: documents['Executed Purchase Contract'].downloadURL,
+          fileName: documents['Executed Purchase Contract'].file?.name,
+          fileSize: documents['Executed Purchase Contract'].file?.size,
+          mimeType: documents['Executed Purchase Contract'].file?.type,
+        } : undefined,
+        earnestMoneyDeposit: documents['Evidence of Earnest Money Deposit'] ? {
+          name: documents['Evidence of Earnest Money Deposit'].name,
+          status: documents['Evidence of Earnest Money Deposit'].status,
+          storagePath: documents['Evidence of Earnest Money Deposit'].storagePath,
+          downloadURL: documents['Evidence of Earnest Money Deposit'].downloadURL,
+          fileName: documents['Evidence of Earnest Money Deposit'].file?.name,
+          fileSize: documents['Evidence of Earnest Money Deposit'].file?.size,
+          mimeType: documents['Evidence of Earnest Money Deposit'].file?.type,
+        } : undefined,
+        feasibilityStudy: documents['Feasibility Study'] ? {
+          name: documents['Feasibility Study'].name,
+          status: documents['Feasibility Study'].status,
+          storagePath: documents['Feasibility Study'].storagePath,
+          downloadURL: documents['Feasibility Study'].downloadURL,
+          fileName: documents['Feasibility Study'].file?.name,
+          fileSize: documents['Feasibility Study'].file?.size,
+          mimeType: documents['Feasibility Study'].file?.type,
+        } : undefined,
+        zoningDocuments: documents['Zoning and Entitlement Documents'] ? {
+          name: documents['Zoning and Entitlement Documents'].name,
+          status: documents['Zoning and Entitlement Documents'].status,
+          storagePath: documents['Zoning and Entitlement Documents'].storagePath,
+          downloadURL: documents['Zoning and Entitlement Documents'].downloadURL,
+          fileName: documents['Zoning and Entitlement Documents'].file?.name,
+          fileSize: documents['Zoning and Entitlement Documents'].file?.size,
+          mimeType: documents['Zoning and Entitlement Documents'].file?.type,
+        } : undefined,
+        environmentalReport: documents['Environmental Report'] ? {
+          name: documents['Environmental Report'].name,
+          status: documents['Environmental Report'].status,
+          storagePath: documents['Environmental Report'].storagePath,
+          downloadURL: documents['Environmental Report'].downloadURL,
+          fileName: documents['Environmental Report'].file?.name,
+          fileSize: documents['Environmental Report'].file?.size,
+          mimeType: documents['Environmental Report'].file?.type,
+        } : undefined,
+        executedContract: documents['Executed Contract for the project'] ? {
+          name: documents['Executed Contract for the project'].name,
+          status: documents['Executed Contract for the project'].status,
+          storagePath: documents['Executed Contract for the project'].storagePath,
+          downloadURL: documents['Executed Contract for the project'].downloadURL,
+          fileName: documents['Executed Contract for the project'].file?.name,
+          fileSize: documents['Executed Contract for the project'].file?.size,
+          mimeType: documents['Executed Contract for the project'].file?.type,
+        } : undefined,
+        useOfFunds: documents['Detailed Use of Funds'] ? {
+          name: documents['Detailed Use of Funds'].name,
+          status: documents['Detailed Use of Funds'].status,
+          storagePath: documents['Detailed Use of Funds'].storagePath,
+          downloadURL: documents['Detailed Use of Funds'].downloadURL,
+          fileName: documents['Detailed Use of Funds'].file?.name,
+          fileSize: documents['Detailed Use of Funds'].file?.size,
+          mimeType: documents['Detailed Use of Funds'].file?.type,
+        } : undefined,
+        equipmentQuote: documents['Equipment Quote or Invoice #1'] ? {
+          name: documents['Equipment Quote or Invoice #1'].name,
+          status: documents['Equipment Quote or Invoice #1'].status,
+          storagePath: documents['Equipment Quote or Invoice #1'].storagePath,
+          downloadURL: documents['Equipment Quote or Invoice #1'].downloadURL,
+          fileName: documents['Equipment Quote or Invoice #1'].file?.name,
+          fileSize: documents['Equipment Quote or Invoice #1'].file?.size,
+          mimeType: documents['Equipment Quote or Invoice #1'].file?.type,
+        } : undefined,
+        seniorDebtTermSheet: documents['Senior Debt Term Sheet'] ? {
+          name: documents['Senior Debt Term Sheet'].name,
+          status: documents['Senior Debt Term Sheet'].status,
+          storagePath: documents['Senior Debt Term Sheet'].storagePath,
+          downloadURL: documents['Senior Debt Term Sheet'].downloadURL,
+          fileName: documents['Senior Debt Term Sheet'].file?.name,
+          fileSize: documents['Senior Debt Term Sheet'].file?.size,
+          mimeType: documents['Senior Debt Term Sheet'].file?.type,
+        } : undefined,
+        capitalStackOverview: documents['Capital Stack overview'] ? {
+          name: documents['Capital Stack overview'].name,
+          status: documents['Capital Stack overview'].status,
+          storagePath: documents['Capital Stack overview'].storagePath,
+          downloadURL: documents['Capital Stack overview'].downloadURL,
+          fileName: documents['Capital Stack overview'].file?.name,
+          fileSize: documents['Capital Stack overview'].file?.size,
+          mimeType: documents['Capital Stack overview'].file?.type,
+        } : undefined,
+      }
+    };
+    
+    // Transaction-specific data
+    // Always save purchase price regardless of transaction type
+    page1Data.purchasePrice = parseFloat(purchasePrice) || undefined;
+    
+    if (transactionType === 'purchase') {
+      // Purchase-specific fields (purchasePrice already saved above)
+    } else if (transactionType === 'refinance') {
+      page1Data.originalPurchasePrice = parseFloat(originalPurchasePrice) || undefined;
+      page1Data.purchaseDate = purchaseDate;
+      page1Data.currentDebt = parseFloat(currentDebt) || undefined;
+    }
+    
+    // Land Acquisition specific fields
+    if (isLandAcquisition) {
+      page1Data.entitlementStatus = entitlementStatus;
+      page1Data.developmentCosts = parseFloat(developmentCosts) || undefined;
+      page1Data.afterDevelopmentValue = parseFloat(afterDevelopmentValue) || undefined;
+    }
+    
+    // Mezzanine Loan specific fields
+    if (isMezzanine) {
+      page1Data.seniorLoanAmount = parseFloat(seniorLoanAmount) || undefined;
+      page1Data.capitalStack = capitalStack;
+    }
+    
+    // Mobilization Funding specific fields
+    if (isMobilization) {
+      page1Data.contractValue = parseFloat(contractValue) || undefined;
+      page1Data.projectDescription = projectDescription;
+      page1Data.clientName = clientName;
+    }
+    
+    // Equipment Financing specific fields
+    if (isEquipmentFinancing) {
+      page1Data.dealers = dealers.filter(dealer => 
+        dealer.name || dealer.phone || dealer.email || dealer.address
+      );
+      page1Data.quotes = quotes.filter(quote => 
+        quote.description || quote.cost
+      );
+    }
+    
+    return page1Data;
+  };
+  
+  // ============================================================================
+  // SAVE PAGE 1 DATA FUNCTION
+  // ============================================================================
+  
+  const savePage1Data = async (page1Data: LoanApplicationPage1Data) => {
+    try {
+      console.log('💾 Saving Page 1 Data:', page1Data);
+      
+      if (applicationId) {
+        // Update existing application
+        const updates = {
+          // Property Information
+          'propertyInfo.propertyAddress': page1Data.propertyAddress,
+          'propertyInfo.propertyApn': page1Data.propertyApn,
+          'propertyInfo.annualPropertyTaxes': page1Data.propertyTaxes,
+          'propertyInfo.propertyType': page1Data.propertyType,
+          'propertyInfo.otherPropertyType': page1Data.otherPropertyType,
+          'propertyInfo.propertySquareFootage': page1Data.propertySqFt,
+          'propertyInfo.lotSize': page1Data.lotSize,
+          'propertyInfo.asIsValue': page1Data.asIsValue,
+          'propertyInfo.afterRepairValue': page1Data.afterRepairValue,
+          'propertyInfo.afterConstructedValue': page1Data.afterConstructedValue,
+          'propertyInfo.stabilizedValue': page1Data.stabilizedValue,
+          'propertyInfo.constructionTime': page1Data.constructionTime,
+          'propertyInfo.requestedClosingDate': page1Data.requestedClosingDate,
+          
+          // Loan Details
+          'loanDetails.loanAmount': page1Data.loanAmount,
+          'loanDetails.transactionType': page1Data.transactionType,
+          'loanDetails.purchasePrice': page1Data.purchasePrice,
+          'loanDetails.originalPurchasePrice': page1Data.originalPurchasePrice,
+          'loanDetails.purchaseDate': page1Data.purchaseDate,
+          'loanDetails.currentDebt': page1Data.currentDebt,
+          
+          // Business Information
+          'businessInfo.companyName': page1Data.companyName,
+          'businessInfo.companyEin': page1Data.companyEin,
+          
+          // Program-specific fields
+          ...(page1Data.entitlementStatus && { 'landAcquisitionInfo.entitlementStatus': page1Data.entitlementStatus }),
+          ...(page1Data.developmentCosts && { 'landAcquisitionInfo.developmentCosts': page1Data.developmentCosts }),
+          ...(page1Data.afterDevelopmentValue && { 'landAcquisitionInfo.afterDevelopmentValue': page1Data.afterDevelopmentValue }),
+          ...(page1Data.seniorLoanAmount && { 'mezzanineInfo.seniorLoanAmount': page1Data.seniorLoanAmount }),
+          ...(page1Data.capitalStack && { 'mezzanineInfo.capitalStack': page1Data.capitalStack }),
+          ...(page1Data.contractValue && { 'mobilizationInfo.contractValue': page1Data.contractValue }),
+          ...(page1Data.projectDescription && { 'mobilizationInfo.projectDescription': page1Data.projectDescription }),
+          ...(page1Data.clientName && { 'mobilizationInfo.clientName': page1Data.clientName }),
+          ...(page1Data.dealers && { 'equipmentInfo.dealers': page1Data.dealers }),
+          ...(page1Data.quotes && { 'equipmentInfo.quotes': page1Data.quotes }),
+          
+          // Progress tracking
+          'progress.propertyInfoCompleted': true,
+          'progress.loanDetailsCompleted': true,
+          'progress.businessInfoCompleted': true,
+          'updatedAt': new Date(),
+        };
+        
+        await updateFields(updates);
+        console.log('✅ Page 1 data saved successfully');
+      } else {
+        console.log('⚠️ No application ID - cannot save data');
+      }
+    } catch (error) {
+      console.error('❌ Error saving Page 1 data:', error);
+      throw error;
+    }
+  };
+  
+  const handleContinue = async () => {
+    try {
+      console.log('🚀 Starting Page 1 Continue Process...');
+      
+      // Collect all page 1 data
+      const page1Data = collectPage1Data();
+      console.log('📊 Collected Page 1 Data:', page1Data);
+      
+      // Validate the data
+      const validation = validatePage1Data(page1Data);
+      if (!validation.isValid) {
+        console.error('❌ Validation failed:', validation.errors);
+        // You might want to show a toast notification here
+        // toast({
+        //   variant: 'destructive',
+        //   title: 'Validation Error',
+        //   description: validation.errors.join(', '),
+        // });
+        return; // Don't proceed if validation fails
+      }
+      
+      console.log('✅ Page 1 data validation passed');
+      
+      // Save to local storage instead of database
+      savePage1ToLocal(page1Data);
+      
+      // Special handling for Ground Up Construction loans
+      if (isGroundUpConstruction) {
+        console.log(`🏗️ [Ground Up Construction] Updating typed state...`);
+        const groundUpData = {
+          'propertyInfo.propertyAddress': page1Data.propertyAddress,
+          'propertyInfo.propertyApn': page1Data.propertyApn,
+          'propertyInfo.annualPropertyTaxes': page1Data.propertyTaxes,
+          'propertyInfo.propertyType': page1Data.propertyType,
+          'propertyInfo.asIsValue': page1Data.asIsValue,
+          'propertyInfo.afterConstructedValue': page1Data.afterConstructedValue,
+          'propertyInfo.stabilizedValue': page1Data.stabilizedValue,
+          'propertyInfo.propertySquareFootage': page1Data.propertySqFt,
+          'propertyInfo.lotSize': page1Data.lotSize,
+          'propertyInfo.constructionTime': page1Data.constructionTime,
+          'propertyInfo.requestedClosingDate': page1Data.requestedClosingDate,
+          'loanDetails.loanAmount': page1Data.loanAmount,
+          'loanDetails.transactionType': page1Data.transactionType,
+          'businessInfo.companyName': page1Data.companyName,
+          'businessInfo.companyEin': page1Data.companyEin,
+        };
+        
+        groundUpConstructionState.updateMultipleFields(groundUpData);
+        console.log(`🏗️ [Ground Up Construction] Typed state updated`);
+      }
+      
+      console.log('✅ Page 1 data saved to local storage successfully, navigating to page 2...');
+      
+      // Navigate to page 2
     const programSlug = loanProgram.toLowerCase().replace(/ /g, '-').replace(/&/g, 'and');
     const urlParams = new URLSearchParams(window.location.search);
     const paramString = urlParams.toString();
@@ -552,6 +1161,16 @@ export function LoanApplicationClient({
     const basePath = getOfficeBasePath(currentOfficeContext);
     
     router.push(`${basePath}/${programSlug}/page-2${paramString ? `?${paramString}` : ''}`);
+      
+    } catch (error) {
+      console.error('❌ Error in handleContinue:', error);
+      // You might want to show a toast notification here
+      // toast({
+      //   variant: 'destructive',
+      //   title: 'Error',
+      //   description: 'Failed to save page 1 data. Please try again.',
+      // });
+    }
   };
   
   const handleFileChange = useCallback(async (itemName: string, event: React.ChangeEvent<HTMLInputElement>) => {
@@ -592,15 +1211,53 @@ export function LoanApplicationClient({
     const doc = documents[name];
     const fileInputId = `upload-${name.replace(/\s+/g, '-')}`;
     return (
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-md border">
+      <div className="flex flex-col gap-2 p-3 rounded-md border">
         <div className="flex items-center gap-3">
           {doc?.status === 'uploaded' && <FileUp className="h-5 w-5 text-blue-500" />}
           {!doc && <FileText className="h-5 w-5 text-muted-foreground" />}
           <Label htmlFor={fileInputId} className="font-medium">{name}</Label>
         </div>
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Input id={fileInputId} type="file" className="w-full sm:w-auto" onChange={(e) => handleFileChange(name, e)} disabled={!!doc} />
+        
+        {doc?.status === 'uploaded' ? (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-green-600 font-medium">✓ Uploaded</span>
+            {doc.fileName && (
+              <span className="text-sm text-muted-foreground">({doc.fileName})</span>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => window.open(doc.downloadURL, '_blank')}
+              className="ml-auto"
+            >
+              <Eye className="h-4 w-4 mr-1" />
+              View
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                // Remove document from context
+                updateDocumentStatus(name, 'missing');
+              }}
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              Remove
+            </Button>
         </div>
+        ) : (
+          <div className="flex items-center gap-2 w-full">
+            <Input 
+              id={fileInputId} 
+              type="file" 
+              className="w-full" 
+              onChange={(e) => handleFileChange(name, e)} 
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+            />
+          </div>
+        )}
       </div>
     );
   };
@@ -612,47 +1269,222 @@ export function LoanApplicationClient({
   const isEquipmentFinancing = loanProgram.toLowerCase().includes('equipment financing');
 
 
-  // Load existing application data when component mounts
-  useEffect(() => {
-    if (application && applicationId) {
-      console.log('Application loaded successfully:', application.id);
+  // ============================================================================
+  // VALIDATION FUNCTION
+  // ============================================================================
+  
+  const validatePage1Data = (data: LoanApplicationPage1Data): { isValid: boolean; errors: string[] } => {
+    const errors: string[] = [];
+    
+    // Core required fields
+    if (!data.propertyAddress.trim()) errors.push('Property address is required');
+    if (!data.loanAmount || data.loanAmount <= 0) errors.push('Loan amount is required and must be greater than 0');
+    if (!data.propertyType) errors.push('Property type is required');
+    if (!data.companyName.trim()) errors.push('Company name is required');
+    if (!data.companyEin.trim()) errors.push('Company EIN is required');
+    
+    // Transaction-specific validation
+    if (data.transactionType === 'purchase' && (!data.purchasePrice || data.purchasePrice <= 0)) {
+      errors.push('Purchase price is required for purchase transactions');
+    }
+    
+    if (data.transactionType === 'refinance') {
+      if (!data.originalPurchasePrice || data.originalPurchasePrice <= 0) {
+        errors.push('Original purchase price is required for refinance transactions');
+      }
+      if (!data.purchaseDate) {
+        errors.push('Purchase date is required for refinance transactions');
+      }
+    }
+    
+    // Program-specific validation
+    const isLandAcquisition = loanProgram.toLowerCase().includes('land acquisition');
+    const isMezzanine = loanProgram.toLowerCase().includes('mezzanine');
+    const isMobilization = loanProgram.toLowerCase().includes('mobilization funding');
+    const isEquipmentFinancing = loanProgram.toLowerCase().includes('equipment financing');
+    
+    if (isLandAcquisition) {
+      if (!data.entitlementStatus?.trim()) errors.push('Entitlement status is required for land acquisition loans');
+      if (!data.developmentCosts || data.developmentCosts <= 0) errors.push('Development costs are required for land acquisition loans');
+    }
+    
+    if (isMezzanine) {
+      if (!data.seniorLoanAmount || data.seniorLoanAmount <= 0) errors.push('Senior loan amount is required for mezzanine loans');
+      if (!data.capitalStack?.trim()) errors.push('Capital stack description is required for mezzanine loans');
+    }
+    
+    if (isMobilization) {
+      if (!data.contractValue || data.contractValue <= 0) errors.push('Contract value is required for mobilization funding');
+      if (!data.clientName?.trim()) errors.push('Client name is required for mobilization funding');
+      if (!data.projectDescription?.trim()) errors.push('Project description is required for mobilization funding');
+    }
+    
+    if (isEquipmentFinancing) {
+      if (!data.dealers || data.dealers.length === 0) errors.push('At least one dealer is required for equipment financing');
+      if (!data.quotes || data.quotes.length === 0) errors.push('At least one equipment quote is required for equipment financing');
+    }
+    
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  };
+
+  // ============================================================================
+  // LOAD EXISTING PAGE 1 DATA FUNCTION
+  // ============================================================================
+  
+  const loadExistingPage1Data = (app: any) => {
+    console.log('📥 Loading existing Page 1 data from application:', app.id);
       
       // Load property information
-      if (application.propertyInfo) {
-        // Comment out for now due to type mismatch - need to fix PropertyInformation interface
-        // setPropertyAddress(application.propertyInfo.propertyAddress?.street || '');
-        // setPropertyApn(application.propertyInfo.propertyAddress?.city || '');
-        setPropertyTaxes(application.propertyInfo.propertyTaxes?.toString() || '');
-        setPropertyType(application.propertyInfo.propertyType || '');
-        setPropertySqFt(application.propertyInfo.squareFootage?.toString() || '');
-        setLotSize(application.propertyInfo.lotSize?.toString() || '');
-        // setPurchasePrice(application.propertyInfo.purchasePrice?.toString() || '');
-        // setAsIsValue(application.propertyInfo.currentValue?.toString() || '');
-        // setAfterRepairValue(application.propertyInfo.afterRepairValue?.toString() || '');
+    if (app.propertyInfo) {
+      setPropertyAddress(app.propertyInfo.propertyAddress || '');
+      setPropertyApn(app.propertyInfo.propertyApn || '');
+      setPropertyTaxes(app.propertyInfo.annualPropertyTaxes?.toString() || '');
+      setPropertyType(app.propertyInfo.propertyType || '');
+      setOtherPropertyType(app.propertyInfo.otherPropertyType || '');
+      setPropertySqFt(app.propertyInfo.propertySquareFootage?.toString() || '');
+      setLotSize(app.propertyInfo.lotSize || '');
+      setAsIsValue(app.propertyInfo.asIsValue?.toString() || '');
+      setAfterRepairValue(app.propertyInfo.afterRepairValue?.toString() || '');
+      setAfterConstructedValue(app.propertyInfo.afterConstructedValue?.toString() || '');
+      setStabilizedValue(app.propertyInfo.stabilizedValue?.toString() || '');
+      setConstructionTime(app.propertyInfo.constructionTime?.toString() || '');
+      
+      if (app.propertyInfo.requestedClosingDate) {
+        const date = app.propertyInfo.requestedClosingDate;
+        // Handle different date formats safely
+        let dateObj: Date;
+        if (date instanceof Date) {
+          dateObj = date;
+        } else if (typeof date === 'string') {
+          dateObj = new Date(date);
+        } else if (date && typeof date.toDate === 'function') {
+          dateObj = date.toDate();
+        } else {
+          console.warn('Invalid date format for requestedClosingDate:', date);
+          dateObj = new Date();
+        }
+        setRequestedClosingDate(dateObj);
+      }
       }
 
       // Load loan details
-      if (application.loanDetails) {
-        setLoanAmount(application.loanDetails.loanAmount?.toString() || '');
-        setTransactionType(application.loanDetails.loanPurpose || 'purchase');
-        setPropertyType(application.loanDetails.propertyType || '');
+    if (app.loanDetails) {
+      setLoanAmount(app.loanDetails.loanAmount?.toString() || '');
+      setTransactionType(app.loanDetails.transactionType || 'purchase');
+      setPurchasePrice(app.loanDetails.purchasePrice?.toString() || '');
+      setOriginalPurchasePrice(app.loanDetails.originalPurchasePrice?.toString() || '');
+      setCurrentDebt(app.loanDetails.currentDebt?.toString() || '');
+      
+      if (app.loanDetails.purchaseDate) {
+        const date = app.loanDetails.purchaseDate;
+        // Handle different date formats safely
+        let dateObj: Date;
+        if (date instanceof Date) {
+          dateObj = date;
+        } else if (typeof date === 'string') {
+          dateObj = new Date(date);
+        } else if (date && typeof date.toDate === 'function') {
+          dateObj = date.toDate();
+        } else {
+          console.warn('Invalid date format for purchaseDate:', date);
+          dateObj = new Date();
+        }
+        setPurchaseDate(dateObj);
+      }
       }
 
       // Load business information
-      if (application.businessInfo) {
-        setCompanyName(application.businessInfo.businessName || '');
-        setCompanyEin(application.businessInfo.ein || '');
-      }
-    } else if (applicationId && !application) {
-      console.log('Application ID provided but no application loaded:', applicationId);
-    } else if (!applicationId) {
-      console.log('No application ID provided - this is a new application');
+    if (app.businessInfo) {
+      setCompanyName(app.businessInfo.companyName || '');
+      setCompanyEin(app.businessInfo.companyEin || '');
     }
-  }, [application, applicationId]);
+    
+    // Load program-specific data
+    if (app.landAcquisitionInfo) {
+      setEntitlementStatus(app.landAcquisitionInfo.entitlementStatus || '');
+      setDevelopmentCosts(app.landAcquisitionInfo.developmentCosts?.toString() || '');
+      setAfterDevelopmentValue(app.landAcquisitionInfo.afterDevelopmentValue?.toString() || '');
+    }
+    
+    if (app.mezzanineInfo) {
+      setSeniorLoanAmount(app.mezzanineInfo.seniorLoanAmount?.toString() || '');
+      setCapitalStack(app.mezzanineInfo.capitalStack || '');
+    }
+    
+    if (app.mobilizationInfo) {
+      setContractValue(app.mobilizationInfo.contractValue?.toString() || '');
+      setProjectDescription(app.mobilizationInfo.projectDescription || '');
+      setClientName(app.mobilizationInfo.clientName || '');
+    }
+    
+    if (app.equipmentInfo) {
+      if (app.equipmentInfo.dealers) {
+        setDealers(app.equipmentInfo.dealers);
+      }
+      if (app.equipmentInfo.quotes) {
+        setQuotes(app.equipmentInfo.quotes);
+      }
+    }
+    
+    console.log('✅ Page 1 data loaded successfully');
+  };
+
+  // Load local data when component mounts (runs once)
+  useEffect(() => {
+    console.log('🔄 Component mounted - checking for local data...');
+    
+    // Try to load from local storage (for navigation back to page 1)
+    const localData = loadPage1FromLocal();
+    if (localData) {
+      console.log('📥 Found local Page 1 data, applying to form...');
+      applyPage1DataToForm(localData);
+    } else {
+      console.log('ℹ️ No local data found');
+    }
+  }, []); // Empty dependency array - runs only on mount
+  
+  // Load existing application data when application state changes
+  useEffect(() => {
+    console.log('🔄 Application state changed - checking for database data...');
+    
+    // Only load from database if we don't have local data
+    if (page1LocalData) {
+      console.log('📥 Local data exists, skipping database load');
+      return;
+    }
+    
+    // If no local data, try to load from database (for editing existing applications)
+    if (application && applicationId) {
+      console.log('📥 Application loaded successfully from database:', application.id);
+      loadExistingPage1Data(application);
+    } else if (applicationId && !application) {
+      console.log('⚠️ Application ID provided but no application loaded:', applicationId);
+    } else if (!applicationId) {
+      console.log('ℹ️ No application ID provided - this is a new application');
+    }
+  }, [application, applicationId, page1LocalData]);
 
   // Auto-create application with borrower information when officeContext is "borrower" and no applicationId
+  // BUT ONLY if we don't have local data (to prevent creating new apps when navigating back)
   useEffect(() => {
-    if (officeContext === 'borrower' && user && userProfile && !applicationId && !application) {
+    // Check if we have local data first
+    const hasLocalData = page1LocalData || sessionStorage.getItem('loanApplicationPage1Data');
+    
+    console.log('🔍 Auto-create check:', {
+      officeContext,
+      hasUser: !!user,
+      hasUserProfile: !!userProfile,
+      hasApplicationId: !!applicationId,
+      hasApplication: !!application,
+      hasLocalData: !!hasLocalData,
+      page1LocalData: !!page1LocalData,
+      sessionStorageData: !!sessionStorage.getItem('loanApplicationPage1Data')
+    });
+    
+    if (officeContext === 'borrower' && user && userProfile && !applicationId && !application && !hasLocalData) {
       console.log('Auto-creating application with borrower information from user profile:', {
         displayName: user.displayName,
         email: user.email,
@@ -663,13 +1495,23 @@ export function LoanApplicationClient({
       const borrowerInfo = {
         fullName: user.displayName || userProfile.fullName || '',
         email: user.email || userProfile.email || '',
-        phone: userProfile.phoneNumber || '',
-        address: {
-          street: userProfile.address?.street || '',
-          city: userProfile.address?.city || '',
-          state: userProfile.address?.state || '',
-          zipCode: userProfile.address?.zipCode || ''
-        }
+        phone: '', // Will be collected in the form
+        dateOfBirth: '', // Will be collected in the form
+        ssn: '', // Will be collected in the form
+        maritalStatus: 'single' as const,
+        dependents: 0,
+        currentAddress: {
+          street: '',
+          city: '',
+          state: '',
+          zipCode: '',
+          yearsAtAddress: 0,
+          rentOrOwn: 'rent' as const
+        },
+        previousAddresses: [],
+        employmentStatus: 'employed' as const,
+        annualIncome: 0,
+        citizenship: 'us_citizen' as const
       };
       
       // Create application with borrower information pre-populated
@@ -686,8 +1528,16 @@ export function LoanApplicationClient({
       }).catch((error) => {
         console.error('Failed to create application with borrower information:', error);
       });
+    } else {
+      console.log('🚫 Skipping auto-create application:', {
+        reason: hasLocalData ? 'local data exists' : 
+               applicationId ? 'application ID provided' :
+               application ? 'application already exists' :
+               officeContext !== 'borrower' ? 'not borrower context' :
+               !user ? 'no user' : 'no user profile'
+      });
     }
-  }, [officeContext, user, userProfile, applicationId, application, createApplication, loanProgram]);
+  }, [officeContext, user, userProfile, applicationId, application, createApplication, loanProgram, page1LocalData]);
 
 
   // Handle field updates (no auto-save, only save on navigation)

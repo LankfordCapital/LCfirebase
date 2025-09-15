@@ -421,20 +421,20 @@ export const useResidentialNOOGroundUpConstructionState = (
         // Convert Timestamp objects to strings for JSON serialization
         const serializableData = {
           ...data,
-          createdAt: data.createdAt instanceof Date ? data.createdAt.toISOString() : data.createdAt,
-          updatedAt: data.updatedAt instanceof Date ? data.updatedAt.toISOString() : data.updatedAt,
+          createdAt: data.createdAt instanceof Date ? data.createdAt.toISOString() : (typeof data.createdAt === 'string' ? data.createdAt : data.createdAt?.toString?.() || new Date().toISOString()),
+          updatedAt: data.updatedAt instanceof Date ? data.updatedAt.toISOString() : (typeof data.updatedAt === 'string' ? data.updatedAt : data.updatedAt?.toString?.() || new Date().toISOString()),
           propertyInfo: {
             ...data.propertyInfo,
-            requestedClosingDate: data.propertyInfo?.requestedClosingDate instanceof Date ? data.propertyInfo.requestedClosingDate.toISOString() : data.propertyInfo?.requestedClosingDate,
+            requestedClosingDate: data.propertyInfo?.requestedClosingDate instanceof Date ? data.propertyInfo.requestedClosingDate.toISOString() : (typeof data.propertyInfo?.requestedClosingDate === 'string' ? data.propertyInfo.requestedClosingDate : data.propertyInfo?.requestedClosingDate?.toString?.() || new Date().toISOString()),
           },
           borrowerInfo: {
             ...data.borrowerInfo,
-            dateOfBirth: data.borrowerInfo?.dateOfBirth instanceof Date ? data.borrowerInfo.dateOfBirth.toISOString() : data.borrowerInfo?.dateOfBirth,
+            dateOfBirth: data.borrowerInfo?.dateOfBirth instanceof Date ? data.borrowerInfo.dateOfBirth.toISOString() : (typeof data.borrowerInfo?.dateOfBirth === 'string' ? data.borrowerInfo.dateOfBirth : data.borrowerInfo?.dateOfBirth?.toString?.() || new Date().toISOString()),
           },
           progress: {
             ...data.progress,
-            applicationStarted: data.progress?.applicationStarted instanceof Date ? data.progress.applicationStarted.toISOString() : data.progress?.applicationStarted,
-            lastUpdated: data.progress?.lastUpdated instanceof Date ? data.progress.lastUpdated.toISOString() : data.progress?.lastUpdated,
+            applicationStarted: data.progress?.applicationStarted instanceof Date ? data.progress.applicationStarted.toISOString() : (typeof data.progress?.applicationStarted === 'string' ? data.progress.applicationStarted : data.progress?.applicationStarted?.toString?.() || new Date().toISOString()),
+            lastUpdated: data.progress?.lastUpdated instanceof Date ? data.progress.lastUpdated.toISOString() : (typeof data.progress?.lastUpdated === 'string' ? data.progress.lastUpdated : data.progress?.lastUpdated?.toString?.() || new Date().toISOString()),
           },
         };
         

@@ -159,14 +159,20 @@ export default function SignUpPage() {
       });
 
       // Let the automatic redirect handle routing
+      // Note: Don't set loading to false here as redirect will happen
 
     } catch (error: any) {
       console.error("Google Sign Up Error:", error);
-      toast({
-        variant: 'destructive',
-        title: 'Google Sign Up Failed',
-        description: error.message || 'Failed to sign up with Google',
-      });
+      
+      // Don't show error toast if user closed the popup
+      if (error.code !== 'auth/popup-closed-by-user') {
+        toast({
+          variant: 'destructive',
+          title: 'Google Sign Up Failed',
+          description: error.message || 'Failed to sign up with Google',
+        });
+      }
+      // Always reset loading state on error
       setIsGoogleLoading(false);
     }
   };
