@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
 import { sendEmail } from '@/lib/email-service';
+import { requireAuth, requireRole } from '@/lib/auth-utils';
 
 export async function GET(request: NextRequest) {
     try {
+        // Require authentication and workforce/admin role
+        const authError = await requireRole(request, ['workforce', 'admin']);
+        if (authError) return authError;
+
         // Get all invitations
         const invitationsSnapshot = await adminDb.collection('invitations')
             .orderBy('createdAt', 'desc')
@@ -33,6 +38,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
     try {
+        // Require authentication and workforce/admin role
+        const authError = await requireRole(request, ['workforce', 'admin']);
+        if (authError) return authError;
+
         const { fullName, email, roomId, roomName, invitedBy } = await request.json();
 
         // Validate required fields

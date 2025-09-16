@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { enhancedLoanApplicationServiceAdmin } from '@/lib/enhanced-loan-application-service-admin';
+import { requireAuth, requireRole, getAuthenticatedUser } from '@/lib/auth-utils';
 
 export async function GET(request: NextRequest) {
   try {
+    // Require authentication
+    const authError = await requireAuth(request);
+    if (authError) return authError;
+
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 401 });
+    }
+
     console.log('GET request to enhanced-loan-applications API');
     
     const { searchParams } = new URL(request.url);
@@ -14,6 +24,11 @@ export async function GET(request: NextRequest) {
     console.log('Request parameters:', { applicationId, userId, brokerId, action });
 
     if (action === 'getByUser' && userId) {
+      // Users can only access their own applications, admins can access any
+      if (user.role !== 'admin' && user.uid !== userId) {
+        return NextResponse.json({ error: 'Forbidden - Can only access your own applications' }, { status: 403 });
+      }
+      
       console.log('Getting applications by user:', userId);
       const applications = await enhancedLoanApplicationServiceAdmin.getLoanApplicationsByUser(userId);
       console.log(`Found ${applications.length} applications for user`);
@@ -21,6 +36,10 @@ export async function GET(request: NextRequest) {
     }
 
     if (action === 'getByBroker' && brokerId) {
+      // Only brokers, workforce, and admins can access broker applications
+      const brokerAccessError = await requireRole(request, ['broker', 'workforce', 'admin']);
+      if (brokerAccessError) return brokerAccessError;
+      
       console.log('Getting applications by broker:', brokerId);
       const applications = await enhancedLoanApplicationServiceAdmin.getLoanApplicationsByBroker(brokerId);
       console.log(`Found ${applications.length} applications for broker`);
@@ -28,6 +47,10 @@ export async function GET(request: NextRequest) {
     }
 
     if (action === 'getAll') {
+      // Only workforce and admins can access all applications
+      const adminAccessError = await requireRole(request, ['workforce', 'admin']);
+      if (adminAccessError) return adminAccessError;
+      
       console.log('Getting all applications');
       const applications = await enhancedLoanApplicationServiceAdmin.getAllLoanApplications();
       console.log(`Found ${applications.length} total applications`);
@@ -73,6 +96,15 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Require authentication
+    const authError = await requireAuth(request);
+    if (authError) return authError;
+
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 401 });
+    }
+
     console.log('POST request to enhanced-loan-applications API');
     
     const body = await request.json();

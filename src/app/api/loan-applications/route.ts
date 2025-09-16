@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { LoanApplicationApiService } from '@/lib/api-services';
+import { requireAuth, requireRole, getAuthenticatedUser } from '@/lib/auth-utils';
 
 export async function GET(request: NextRequest) {
   try {
+    // Require authentication
+    const authError = await requireAuth(request);
+    if (authError) return authError;
+
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
@@ -10,6 +20,20 @@ export async function GET(request: NextRequest) {
     const program = searchParams.get('program') || undefined;
     const brokerId = searchParams.get('brokerId') || undefined;
     const userId = searchParams.get('userId') || undefined;
+
+    // Role-based access control
+    if (userId && user.role !== 'admin' && user.uid !== userId) {
+      return NextResponse.json({ error: 'Forbidden - Can only access your own applications' }, { status: 403 });
+    }
+
+    if (brokerId && !['broker', 'workforce', 'admin'].includes(user.role || '')) {
+      return NextResponse.json({ error: 'Forbidden - Insufficient permissions' }, { status: 403 });
+    }
+
+    // Only workforce and admins can access all applications without filters
+    if (!userId && !brokerId && !['workforce', 'admin'].includes(user.role || '')) {
+      return NextResponse.json({ error: 'Forbidden - Insufficient permissions' }, { status: 403 });
+    }
 
     const result = await LoanApplicationApiService.getAllApplications(
       page,
@@ -32,6 +56,15 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Require authentication
+    const authError = await requireAuth(request);
+    if (authError) return authError;
+
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { action, ...data } = body;
 
@@ -42,6 +75,11 @@ export async function POST(request: NextRequest) {
             { error: 'Missing required fields: userId, program' },
             { status: 400 }
           );
+        }
+
+        // Users can only create applications for themselves, admins can create for anyone
+        if (user.role !== 'admin' && user.uid !== data.userId) {
+          return NextResponse.json({ error: 'Forbidden - Can only create applications for yourself' }, { status: 403 });
         }
         // Create a basic loan application structure
         const applicationData = {

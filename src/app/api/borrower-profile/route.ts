@@ -1,6 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
+import { requireAuth, getAuthenticatedUser } from '@/lib/auth-utils';
 
 // Mock data for testing - replace with actual Firestore operations later
 const mockProfile = {
@@ -74,6 +75,15 @@ const mockProfile = {
 
 export async function GET(request: NextRequest) {
   try {
+    // Require authentication
+    const authError = await requireAuth(request);
+    if (authError) return authError;
+
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const uid = searchParams.get('uid');
 
@@ -82,6 +92,11 @@ export async function GET(request: NextRequest) {
         { error: 'User ID is required' },
         { status: 400 }
       );
+    }
+
+    // Users can only access their own profile, admins can access any
+    if (user.role !== 'admin' && user.uid !== uid) {
+      return NextResponse.json({ error: 'Forbidden - Can only access your own profile' }, { status: 403 });
     }
 
     try {
@@ -155,6 +170,15 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Require authentication
+    const authError = await requireAuth(request);
+    if (authError) return authError;
+
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { action, ...data } = body;
 

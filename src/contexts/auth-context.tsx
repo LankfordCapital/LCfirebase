@@ -100,7 +100,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [pathname, router, getRedirectPath]);
 
   useEffect(() => {
+    let isMounted = true; // Flag to prevent state updates after unmount
+    
     const unsubscribe = onAuthStateChanged(auth, async (userAuth) => {
+      if (!isMounted) return; // Prevent state updates if component unmounted
+      
       setLoading(true);
       console.log('🔄 Auth state changed:', userAuth ? `User: ${userAuth.email}` : 'No user');
       
@@ -112,10 +116,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           const maxRetries = 3;
           let profile: UserProfile | null = null;
           
-          for (let attempt = 1; attempt <= maxRetries; attempt++) {
+          for (let attempt = 1; attempt <= maxRetries && isMounted; attempt++) {
             try {
               const userDocRef = doc(db, 'users', userAuth.uid);
               const userDoc = await getDoc(userDocRef);
+              
+              if (!isMounted) return; // Check if still mounted
               
               if (userDoc.exists()) {
                 profile = { uid: userDoc.id, ...userDoc.data() } as UserProfile;
@@ -126,13 +132,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               }
             } catch (error) {
               console.error(`❌ Error fetching user profile on attempt ${attempt}:`, error);
-              if (attempt < maxRetries) {
+              if (attempt < maxRetries && isMounted) {
                 const delay = Math.pow(2, attempt) * 1000;
                 console.log(`⏳ Waiting ${delay}ms before retry...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
               }
             }
           }
+          
+          if (!isMounted) return; // Check if still mounted before state updates
           
           setUser(userAuth);
 
@@ -147,21 +155,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             router.push('/auth/signin');
           }
         } else {
+          if (!isMounted) return; // Check if still mounted
           console.log('👤 No user authenticated');
           setUser(null);
           setUserProfile(null);
         }
       } catch (error) {
         console.error('❌ Error in auth state change handler:', error);
-        setUser(null);
-        setUserProfile(null);
+        if (isMounted) {
+          setUser(null);
+          setUserProfile(null);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     });
 
-    return () => unsubscribe();
-  }, [handleAuthRedirect, router]);
+    return () => {
+      isMounted = false; // Mark as unmounted
+      unsubscribe(); // Clean up listener
+    };
+  }, []); // Empty dependency array to prevent recreation
 
   const signUp = async (email: string, pass: string, fullName: string, role: string) => {
     try {
@@ -298,7 +314,57 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     throw lastError;
   };
 
-  const signInWithGoogle = signUpWithGoogle;
+  const signInWithGoogle = async () => {
+    const maxRetries = 3;
+    let lastError: any;
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`🔄 Google sign in attempt ${attempt}/${maxRetries}`);
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+        
+        console.log(`✅ Google sign in successful on attempt ${attempt} for user:`, user.email);
+        // Clear explicit logout flag since user is signing in
+        clearExplicitLogout();
+        
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+        
+        if (!userDoc.exists()) {
+          // User doesn't exist in Firestore - this shouldn't happen for sign-in
+          console.error('❌ User exists in Firebase Auth but not in Firestore - this is a sign-in error');
+          throw new Error('Account not found. Please sign up first.');
+        } else {
+          const profile = userDoc.data() as UserProfile;
+          setUserProfile(profile);
+          console.log(`✅ Existing user profile loaded for Google user:`, user.email);
+        }
+        
+        return result;
+      } catch (error: any) {
+        lastError = error;
+        console.error(`❌ Google sign in attempt ${attempt} failed:`, error.code, error.message);
+        
+        // Don't retry for certain errors
+        if (error.code === 'auth/popup-closed-by-user' || 
+            error.code === 'auth/cancelled-popup-request' ||
+            error.code === 'auth/popup-blocked') {
+          throw error;
+        }
+        
+        // Wait before retrying (exponential backoff)
+        if (attempt < maxRetries) {
+          const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+          console.log(`⏳ Waiting ${delay}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+    }
+    
+    console.error(`❌ All ${maxRetries} Google sign in attempts failed`);
+    throw lastError;
+  };
 
   const addPasswordToGoogleAccount = async (password: string) => {
     if (!user || !user.email) {

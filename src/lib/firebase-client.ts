@@ -7,13 +7,13 @@ import { getFirestore, type Firestore } from "firebase/firestore";
 import { getStorage, type FirebaseStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCu0RxaSo1IKfWQ-as3xOLx8mSMm4CzrpI",
-  authDomain: "lankford-lending.firebaseapp.com",
-  projectId: "lankford-lending",
-  storageBucket: "lankford-lending.firebasestorage.app",
-  messagingSenderId: "940157326397",
-  appId: "1:940157326397:web:02fbefc8cd0a13c2160654",
-  measurementId: ""
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyCu0RxaSo1IKfWQ-as3xOLx8mSMm4CzrpI",
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "lankford-lending.firebaseapp.com",
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "lankford-lending",
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "lankford-lending.firebasestorage.app",
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "940157326397",
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:940157326397:web:02fbefc8cd0a13c2160654",
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || ""
 };
 
 let app: FirebaseApp;
