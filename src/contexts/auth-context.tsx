@@ -145,27 +145,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       // Only handle transition from visible to hidden
-      // Add additional checks to prevent false triggers
+      // DISABLED: Don't logout on tab switching - only on actual page exit
       if (isPageVisible && !currentlyVisible) {
-        // Only logout if page has been visible for at least 2 seconds
-        // This prevents logout during rapid tab switching or page loads
-        const timeVisible = Date.now() - (window as any).pageVisibleStartTime || 0;
-        
-        if (timeVisible > 2000) { // 2 seconds minimum
-          // Debounce visibility change to prevent rapid firing
-          visibilityTimeout = setTimeout(() => {
-            if (!document.hidden) return; // Double-check page is still hidden
-            
-            if (process.env.NODE_ENV === 'development') {
-              console.log('👁️ Page hidden - logging out');
-            }
-            handlePageExit();
-          }, 500); // Increased debounce to 500ms
-        } else {
-          if (process.env.NODE_ENV === 'development') {
-            console.log('👁️ Page hidden too quickly, not logging out');
-          }
+        if (process.env.NODE_ENV === 'development') {
+          console.log('👁️ Page hidden - but NOT logging out (tab switching allowed)');
         }
+        // Don't logout on visibility change - only on actual page exit events
       }
       
       isPageVisible = currentlyVisible;
@@ -197,10 +182,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     document.addEventListener('visibilitychange', handleVisibilityChange, eventOptions);
     window.addEventListener('pagehide', handlePageHide, eventOptions);
     
-    // Additional mobile-specific events
-    if (navigator.userAgent.includes('Mobile')) {
-      window.addEventListener('blur', handlePageExit, eventOptions);
-    }
+    // Mobile blur event removed - too aggressive for tab switching
+    // Only use pagehide and beforeunload for actual page exits
 
     return () => {
       // Cleanup function with proper error handling
@@ -212,10 +195,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         window.removeEventListener('beforeunload', handleBeforeUnload);
         document.removeEventListener('visibilitychange', handleVisibilityChange);
         window.removeEventListener('pagehide', handlePageHide);
-        
-        if (navigator.userAgent.includes('Mobile')) {
-          window.removeEventListener('blur', handlePageExit);
-        }
       } catch (error) {
         console.error('Error cleaning up page exit listeners:', error);
       }
