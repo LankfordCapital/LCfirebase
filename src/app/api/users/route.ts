@@ -1,33 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { UserApiService } from '@/lib/api-services';
-import { adminAuth } from '@/lib/firebase-admin';
-
-// Helper function to verify Firebase Auth token
-async function verifyAuthToken(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
-  }
-  
-  const token = authHeader.substring(7);
-  try {
-    const decodedToken = await adminAuth.verifyIdToken(token);
-    return decodedToken;
-  } catch (error) {
-    console.error('Token verification failed:', error);
-    return null;
-  }
-}
+import { requireAuth, requireRole, getAuthenticatedUser } from '@/lib/auth-utils';
 
 export async function GET(request: NextRequest) {
   try {
-    // Verify authentication
-    const decodedToken = await verifyAuthToken(request);
-    if (!decodedToken) {
-      return NextResponse.json(
-        { error: 'Unauthorized - Invalid or missing token' },
-        { status: 401 }
-      );
+    // Require authentication
+    const authError = await requireAuth(request);
+    if (authError) return authError;
+
+    // Require admin role
+    const roleError = await requireRole(request, ['admin']);
+    if (roleError) return roleError;
+
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -51,13 +38,17 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify authentication
-    const decodedToken = await verifyAuthToken(request);
-    if (!decodedToken) {
-      return NextResponse.json(
-        { error: 'Unauthorized - Invalid or missing token' },
-        { status: 401 }
-      );
+    // Require authentication
+    const authError = await requireAuth(request);
+    if (authError) return authError;
+
+    // Require admin role
+    const roleError = await requireRole(request, ['admin']);
+    if (roleError) return roleError;
+
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 401 });
     }
 
     const body = await request.json();

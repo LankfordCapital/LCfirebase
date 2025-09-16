@@ -2,6 +2,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
+import { authenticatedGet, authenticatedPost } from '@/lib/api-client';
 import type { 
   BorrowerProfile, 
   CompanyProfile, 
@@ -34,7 +35,7 @@ export function useBorrowerProfile() {
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const response = await fetch(`/api/borrower-profile?uid=${user.uid}`);
+      const response = await authenticatedGet('/api/borrower-profile', { uid: user.uid });
       const result = await response.json();
 
       if (result.success) {
@@ -67,14 +68,10 @@ export function useBorrowerProfile() {
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const response = await fetch('/api/borrower-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'updatePersonalInfo',
-          uid: user.uid,
-          personalInfo
-        })
+      const response = await authenticatedPost('/api/borrower-profile', {
+        action: 'updatePersonalInfo',
+        uid: user.uid,
+        personalInfo
       });
 
       const result = await response.json();
@@ -127,14 +124,10 @@ export function useBorrowerProfile() {
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const response = await fetch('/api/borrower-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'updateContactInfo',
-          uid: user.uid,
-          contactInfo
-        })
+      const response = await authenticatedPost('/api/borrower-profile', {
+        action: 'updateContactInfo',
+        uid: user.uid,
+        contactInfo
       });
 
       const result = await response.json();

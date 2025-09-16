@@ -25,6 +25,7 @@ import {
   linkWithCredential,
 } from 'firebase/auth';
 import { auth, db, googleProvider, markExplicitLogout, clearExplicitLogout, clearAllAuthCache, clearAuthCache } from '@/lib/firebase-client';
+import { authenticatedGet, authenticatedPost } from '@/lib/api-client';
 import { doc, setDoc, serverTimestamp, getDoc, updateDoc, collection, getDocs } from 'firebase/firestore';
 import { useRouter, usePathname } from 'next/navigation';
 
@@ -99,8 +100,177 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [pathname, router, getRedirectPath]);
 
+  // Production-ready page exit detection with proper cleanup and error handling
+  useEffect(() => {
+    if (!user || typeof window === 'undefined') return;
+
+    let isLoggingOut = false; // Prevent multiple simultaneous logouts
+    let visibilityTimeout: NodeJS.Timeout | null = null;
+    let isPageVisible = !document.hidden;
+
+    const handlePageExit = () => {
+      if (isLoggingOut) return; // Prevent multiple calls
+      isLoggingOut = true;
+
+      try {
+        // Immediate state cleanup for responsive UI
+        setUser(null);
+        setUserProfile(null);
+        markExplicitLogout();
+        clearAuthCache();
+        
+        // Sign out from Firebase to clean up all listeners
+        if (auth.currentUser) {
+          signOut(auth).catch((error) => {
+            console.error('Error signing out from Firebase during page exit:', error);
+          });
+        }
+        
+        // Log only in development
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🚪 User exiting page - logged out');
+        }
+      } catch (error) {
+        console.error('Error during page exit logout:', error);
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      const currentlyVisible = !document.hidden;
+      
+      // Clear previous timeout
+      if (visibilityTimeout) {
+        clearTimeout(visibilityTimeout);
+        visibilityTimeout = null;
+      }
+
+      // Only handle transition from visible to hidden
+      // Add additional checks to prevent false triggers
+      if (isPageVisible && !currentlyVisible) {
+        // Only logout if page has been visible for at least 2 seconds
+        // This prevents logout during rapid tab switching or page loads
+        const timeVisible = Date.now() - (window as any).pageVisibleStartTime || 0;
+        
+        if (timeVisible > 2000) { // 2 seconds minimum
+          // Debounce visibility change to prevent rapid firing
+          visibilityTimeout = setTimeout(() => {
+            if (!document.hidden) return; // Double-check page is still hidden
+            
+            if (process.env.NODE_ENV === 'development') {
+              console.log('👁️ Page hidden - logging out');
+            }
+            handlePageExit();
+          }, 500); // Increased debounce to 500ms
+        } else {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('👁️ Page hidden too quickly, not logging out');
+          }
+        }
+      }
+      
+      isPageVisible = currentlyVisible;
+      
+      // Track when page becomes visible
+      if (currentlyVisible) {
+        (window as any).pageVisibleStartTime = Date.now();
+      }
+    };
+
+    const handlePageHide = () => {
+      // pagehide is more reliable than beforeunload on mobile
+      handlePageExit();
+    };
+
+    const handleBeforeUnload = () => {
+      // beforeunload is unreliable on mobile, but good for desktop
+      if (navigator.userAgent.includes('Mobile')) return;
+      handlePageExit();
+    };
+
+    // Initialize page visible start time
+    (window as any).pageVisibleStartTime = Date.now();
+    
+    // Add event listeners with passive option where possible
+    const eventOptions = { passive: true, capture: false };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload, eventOptions);
+    document.addEventListener('visibilitychange', handleVisibilityChange, eventOptions);
+    window.addEventListener('pagehide', handlePageHide, eventOptions);
+    
+    // Additional mobile-specific events
+    if (navigator.userAgent.includes('Mobile')) {
+      window.addEventListener('blur', handlePageExit, eventOptions);
+    }
+
+    return () => {
+      // Cleanup function with proper error handling
+      try {
+        if (visibilityTimeout) {
+          clearTimeout(visibilityTimeout);
+        }
+        
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        window.removeEventListener('pagehide', handlePageHide);
+        
+        if (navigator.userAgent.includes('Mobile')) {
+          window.removeEventListener('blur', handlePageExit);
+        }
+      } catch (error) {
+        console.error('Error cleaning up page exit listeners:', error);
+      }
+    };
+  }, [user]); // Only re-run when user changes
+
+  // Handle logout when navigating to home page
+  useEffect(() => {
+    if (!user || typeof window === 'undefined') return;
+
+    // Only trigger logout if user is fully authenticated and we're on home page
+    // Add additional checks to prevent race conditions during auth flow
+    if (user && userProfile && !loading && (pathname === '/' || pathname === '/home')) {
+      // Check if this is a direct navigation to home page (not a redirect)
+      // by checking if we came from an authenticated page
+      const isDirectNavigation = !document.referrer || 
+        document.referrer.includes(window.location.origin) ||
+        pathname === '/';
+      
+      if (isDirectNavigation) {
+        // Add a small delay to ensure auth state is stable
+        const timeoutId = setTimeout(() => {
+          // Double-check conditions haven't changed
+          if (user && userProfile && !loading && (pathname === '/' || pathname === '/home')) {
+            if (process.env.NODE_ENV === 'development') {
+              console.log('🏠 On home page - logging out');
+            }
+            
+            // Perform logout when on home page
+            try {
+              setUser(null);
+              setUserProfile(null);
+              markExplicitLogout();
+              clearAuthCache();
+              
+              // Sign out from Firebase (async but don't block UI)
+              if (auth.currentUser) {
+                signOut(auth).catch((error) => {
+                  console.error('Error signing out from Firebase:', error);
+                });
+              }
+            } catch (error) {
+              console.error('Error during home page logout:', error);
+            }
+          }
+        }, 500); // Increased delay to prevent race conditions
+
+        return () => clearTimeout(timeoutId);
+      }
+    }
+  }, [pathname, user, userProfile, loading]); // Include loading state to prevent race conditions
+
   useEffect(() => {
     let isMounted = true; // Flag to prevent state updates after unmount
+    let timeoutId: NodeJS.Timeout | null = null;
     
     const unsubscribe = onAuthStateChanged(auth, async (userAuth) => {
       if (!isMounted) return; // Prevent state updates if component unmounted
@@ -108,52 +278,77 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(true);
       console.log('🔄 Auth state changed:', userAuth ? `User: ${userAuth.email}` : 'No user');
       
+      // Set a timeout to prevent infinite loading
+      timeoutId = setTimeout(() => {
+        if (isMounted) {
+          console.warn('⚠️ Auth state change timeout - forcing loading to false');
+          setLoading(false);
+        }
+      }, 10000); // 10 second timeout
+      
       try {
         if (userAuth) {
           console.log('👤 User authenticated, fetching profile...');
           
-          // Retry logic for fetching user profile
-          const maxRetries = 3;
-          let profile: UserProfile | null = null;
+                    // Retry logic for fetching user profile
+                    const maxRetries = 3;
+                    let profile: UserProfile | null = null;
+                    
+                    for (let attempt = 1; attempt <= maxRetries && isMounted; attempt++) {
+                      try {
+                        const userDocRef = doc(db, 'users', userAuth.uid);
+                        const userDoc = await getDoc(userDocRef);
+                        
+                        if (!isMounted) return; // Check if still mounted
+                        
+                        if (userDoc.exists()) {
+                          profile = { uid: userDoc.id, ...userDoc.data() } as UserProfile;
+                          console.log(`✅ User profile loaded on attempt ${attempt}:`, profile.email, profile.role);
+                          break;
+                        } else {
+                          console.warn(`⚠️ User profile not found in Firestore on attempt ${attempt}`);
+                          // If this is the first attempt and profile doesn't exist, 
+                          // it might be a new user - don't retry immediately
+                          if (attempt === 1) {
+                            console.log('🔄 First attempt - user profile may not exist yet, waiting before retry...');
+                            await new Promise(resolve => setTimeout(resolve, 2000));
+                          }
+                        }
+                      } catch (error) {
+                        console.error(`❌ Error fetching user profile on attempt ${attempt}:`, error);
+                        if (attempt < maxRetries && isMounted) {
+                          const delay = Math.pow(2, attempt) * 1000;
+                          console.log(`⏳ Waiting ${delay}ms before retry...`);
+                          await new Promise(resolve => setTimeout(resolve, delay));
+                        }
+                      }
+                    }
           
-          for (let attempt = 1; attempt <= maxRetries && isMounted; attempt++) {
-            try {
-              const userDocRef = doc(db, 'users', userAuth.uid);
-              const userDoc = await getDoc(userDocRef);
-              
-              if (!isMounted) return; // Check if still mounted
-              
-              if (userDoc.exists()) {
-                profile = { uid: userDoc.id, ...userDoc.data() } as UserProfile;
-                console.log(`✅ User profile loaded on attempt ${attempt}:`, profile.email, profile.role);
-                break;
-              } else {
-                console.warn(`⚠️ User profile not found in Firestore on attempt ${attempt}`);
-              }
-            } catch (error) {
-              console.error(`❌ Error fetching user profile on attempt ${attempt}:`, error);
-              if (attempt < maxRetries && isMounted) {
-                const delay = Math.pow(2, attempt) * 1000;
-                console.log(`⏳ Waiting ${delay}ms before retry...`);
-                await new Promise(resolve => setTimeout(resolve, delay));
-              }
-            }
-          }
-          
-          if (!isMounted) return; // Check if still mounted before state updates
-          
-          setUser(userAuth);
+                    if (!isMounted) return; // Check if still mounted before state updates
+                    
+                    setUser(userAuth);
 
-          if (profile) {
-            setUserProfile(profile);
-            handleAuthRedirect(profile);
-          } else {
-            // This case handles a user that exists in Firebase Auth but not in Firestore.
-            // It could happen if the Firestore document creation failed during signup.
-            console.error('❌ User exists in Firebase Auth but not in Firestore');
-            setUserProfile(null);
-            router.push('/auth/signin');
-          }
+                    if (profile) {
+                      setUserProfile(profile);
+                      // Handle redirect inline to avoid dependency issues
+                      const authPages = ['/auth/signin', '/auth/signup', '/auth/forgot-password', '/auth/reset-password'];
+                      if (authPages.includes(pathname)) {
+                        const path = getRedirectPath(profile);
+                        console.log(`🔄 Redirecting to: ${path}`);
+                        router.push(path);
+                      }
+                    } else {
+                      // This case handles a user that exists in Firebase Auth but not in Firestore.
+                      // It could happen if the Firestore document creation failed during signup.
+                      console.error('❌ User exists in Firebase Auth but not in Firestore');
+                      setUserProfile(null);
+                      
+                      // Only redirect to signin if we're not already on an auth page
+                      const authPages = ['/auth/signin', '/auth/signup', '/auth/forgot-password', '/auth/reset-password'];
+                      if (!authPages.includes(pathname)) {
+                        router.push('/auth/signin');
+                      }
+                    }
         } else {
           if (!isMounted) return; // Check if still mounted
           console.log('👤 No user authenticated');
@@ -168,6 +363,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       } finally {
         if (isMounted) {
+          // Clear timeout since we're done processing
+          if (timeoutId) {
+            clearTimeout(timeoutId);
+          }
           setLoading(false);
         }
       }
@@ -175,9 +374,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     return () => {
       isMounted = false; // Mark as unmounted
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
       unsubscribe(); // Clean up listener
     };
-  }, []); // Empty dependency array to prevent recreation
+  }, [pathname, router, getRedirectPath]); // Include dependencies for redirect logic
 
   const signUp = async (email: string, pass: string, fullName: string, role: string) => {
     try {
@@ -384,47 +586,64 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Production-ready logout function with comprehensive error handling
   const logOut = async () => {
     setIsLoggingOut(true);
-    console.log('🔒 User explicitly logging out...');
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔒 User explicitly logging out...');
+    }
     
     try {
       // Mark explicit logout to prevent auto-restoration
       markExplicitLogout();
       
-      // Sign out from Firebase Auth
-      await signOut(auth);
-      
-      // Clear all local state
+      // Clear local state immediately for responsive UI
       setUser(null);
       setUserProfile(null);
       
-      // Clear authentication cache (but preserve explicit logout flag)
+      // Sign out from Firebase Auth (async but don't block UI)
+      if (auth.currentUser) {
+        signOut(auth).catch((error) => {
+          console.error('Error signing out from Firebase:', error);
+        });
+      }
+      
+      // Clear authentication cache
       clearAuthCache();
       
       // Clear application-specific data
       if (typeof window !== 'undefined') {
-        // Clear any application-specific local storage
-        const keysToRemove = [];
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key && (
-            key.includes('loanApplication') ||
-            key.includes('groundUpConstruction') ||
-            key.includes('document') ||
-            key.includes('userData')
-          )) {
-            keysToRemove.push(key);
+        try {
+          // Clear any application-specific local storage
+          const keysToRemove = [];
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && (
+              key.includes('loanApplication') ||
+              key.includes('groundUpConstruction') ||
+              key.includes('document') ||
+              key.includes('userData')
+            )) {
+              keysToRemove.push(key);
+            }
           }
+          keysToRemove.forEach(key => localStorage.removeItem(key));
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.log('🧹 Cleared application-specific storage');
+          }
+        } catch (storageError) {
+          console.error('Error clearing application storage:', storageError);
         }
-        keysToRemove.forEach(key => localStorage.removeItem(key));
-        
-        console.log('🧹 Cleared application-specific storage');
       }
       
       // Redirect to sign-in page
       router.push('/auth/signin');
-      console.log('✅ User successfully logged out and redirected');
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('✅ User successfully logged out and redirected');
+      }
       
     } catch (error) {
       console.error('❌ Error during logout:', error);
@@ -459,12 +678,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!isAdmin) throw new Error("Unauthorized");
     
     try {
-      const response = await fetch('/api/users', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await authenticatedGet('/api/users');
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -482,16 +696,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!isAdmin) throw new Error("Unauthorized");
     
     try {
-      const response = await fetch('/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'updateRole',
-          uid,
-          newRole
-        }),
+      const response = await authenticatedPost('/api/users', {
+        action: 'updateRole',
+        uid,
+        newRole
       });
       
       if (!response.ok) {
@@ -508,16 +716,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!isAdmin) throw new Error("Unauthorized");
     
     try {
-      const response = await fetch('/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'updateStatus',
-          uid,
-          newStatus
-        }),
+      const response = await authenticatedPost('/api/users', {
+        action: 'updateStatus',
+        uid,
+        newStatus
       });
       
       if (!response.ok) {

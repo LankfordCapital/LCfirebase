@@ -55,31 +55,53 @@ if (typeof window !== 'undefined') {
 }
 
 if (typeof window !== 'undefined') {
-    // Enhanced persistence setup with explicit logout tracking
+    // Production-ready persistence setup with comprehensive error handling
     const setupPersistence = async () => {
         try {
             // Only set persistence if user hasn't explicitly logged out
             if (!userExplicitlyLoggedOut) {
-                await setPersistence(auth, browserLocalPersistence);
-                console.log('Firebase auth persistence set to browserLocalPersistence');
+                // Use session persistence for automatic logout on browser close
+                await setPersistence(auth, browserSessionPersistence);
+                
+                if (process.env.NODE_ENV === 'development') {
+                    console.log('Firebase auth persistence set to browserSessionPersistence');
+                }
             } else {
-                console.log('User explicitly logged out, skipping persistence setup');
+                if (process.env.NODE_ENV === 'development') {
+                    console.log('User explicitly logged out, skipping persistence setup');
+                }
                 // Clear the explicit logout flag after app restart
                 localStorage.removeItem('userExplicitlyLoggedOut');
                 userExplicitlyLoggedOut = false;
             }
         } catch (error) {
-            console.warn("Failed to set browserLocalPersistence, trying session persistence:", error);
+            // Comprehensive error handling with fallback strategy
+            console.warn("Failed to set browserSessionPersistence, trying fallback:", error);
+            
             try {
-                await setPersistence(auth, browserSessionPersistence);
-                console.log('Firebase auth persistence set to browserSessionPersistence');
-            } catch (sessionError) {
-                console.warn("Failed to set any persistence, auth will use default:", sessionError);
+                // Fallback to local persistence if session fails
+                await setPersistence(auth, browserLocalPersistence);
+                
+                if (process.env.NODE_ENV === 'development') {
+                    console.log('Firebase auth persistence set to browserLocalPersistence (fallback)');
+                }
+            } catch (fallbackError) {
+                // Final fallback - let Firebase use default persistence
+                console.warn("Failed to set any persistence, auth will use default:", fallbackError);
+                
+                // In production, we might want to track this error
+                if (process.env.NODE_ENV === 'production') {
+                    // Could send to error tracking service here
+                    console.error('Critical: Unable to set Firebase auth persistence', fallbackError);
+                }
             }
         }
     };
     
-    setupPersistence();
+    // Set up persistence with error boundary
+    setupPersistence().catch((error) => {
+        console.error('Critical error in persistence setup:', error);
+    });
 }
 
 // Export function to mark explicit logout
@@ -171,11 +193,9 @@ export const clearAllAuthCache = () => {
     }
 };
 
-// Function to clear only authentication-related cache (less aggressive)
+// Production-ready function to clear authentication-related cache
 export const clearAuthCache = () => {
     if (typeof window !== 'undefined') {
-        console.log('🧹 Clearing authentication cache...');
-        
         try {
             // Clear Firebase-specific localStorage
             const firebaseKeys = Object.keys(localStorage).filter(key => 
@@ -186,12 +206,17 @@ export const clearAuthCache = () => {
             
             firebaseKeys.forEach(key => {
                 localStorage.removeItem(key);
-                console.log(`🗑️ Removed auth key: ${key}`);
+                if (process.env.NODE_ENV === 'development') {
+                    console.log(`🗑️ Removed auth key: ${key}`);
+                }
             });
             
-            // Clear sessionStorage
+            // Clear sessionStorage for complete logout
             sessionStorage.clear();
-            console.log('🗑️ Cleared sessionStorage');
+            
+            if (process.env.NODE_ENV === 'development') {
+                console.log('✅ Authentication cache cleared');
+            }
             
         } catch (error) {
             console.error('Error clearing auth cache:', error);

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/auth-context';
+import { authenticatedGet } from '@/lib/api-client';
 import { useToast } from '@/hooks/use-toast';
 
 export interface WorkforceLoanApplication {
@@ -71,10 +72,7 @@ export function useWorkforceData() {
 
   const loadLoanApplications = useCallback(async () => {
     try {
-      const response = await fetch('/api/enhanced-loan-applications?action=getAll', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
+      const response = await authenticatedGet('/api/enhanced-loan-applications?action=getAll');
 
       const result = await response.json();
       

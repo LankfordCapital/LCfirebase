@@ -93,6 +93,8 @@ export default function SignInPage() {
       }
       
       // AuthProvider will handle the redirect on successful sign-in
+      // Don't reset loading state here as redirect will happen
+      console.log('✅ Sign-in successful, waiting for redirect...');
     } catch (error: any) {
       console.error('Sign-in error in component:', error);
       toast({

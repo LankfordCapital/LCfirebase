@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/auth-context';
+import { authenticatedGet } from '@/lib/api-client';
 import { useToast } from '@/hooks/use-toast';
 
 export interface DashboardLoanApplication {
@@ -73,7 +74,7 @@ export function useDashboardData() {
     if (!user?.uid) return [];
 
     try {
-      const response = await fetch(`/api/enhanced-loan-applications?action=getByUser&userId=${user.uid}`);
+      const response = await authenticatedGet(`/api/enhanced-loan-applications?action=getByUser&userId=${user.uid}`);
       const result = await response.json();
       
       if (result.success && Array.isArray(result.data)) {

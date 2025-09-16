@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/auth-context';
+import { authenticatedGet } from '@/lib/api-client';
 
 export interface BrokerStats {
   activeBorrowers: number;
@@ -31,7 +32,7 @@ export function useBrokerStats() {
       setStats(prev => ({ ...prev, loading: true, error: null }));
 
       // Get broker's loan applications
-      const applicationsResponse = await fetch(`/api/enhanced-loan-applications?action=getByBroker&brokerId=${user.uid}`);
+      const applicationsResponse = await authenticatedGet(`/api/enhanced-loan-applications?action=getByBroker&brokerId=${user.uid}`);
       const applicationsResult = await applicationsResponse.json();
 
       if (!applicationsResult.success) {
