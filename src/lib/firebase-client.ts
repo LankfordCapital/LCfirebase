@@ -40,6 +40,9 @@ try {
   throw error;
 }
 
+// Ensure auth instance is stable across page refreshes
+console.log('Firebase auth instance created:', auth.app.name);
+
 // Initialize Google Auth Provider
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({
@@ -54,54 +57,47 @@ if (typeof window !== 'undefined') {
     userExplicitlyLoggedOut = localStorage.getItem('userExplicitlyLoggedOut') === 'true';
 }
 
+// Set up persistence immediately and synchronously
 if (typeof window !== 'undefined') {
-    // Production-ready persistence setup with comprehensive error handling
-    const setupPersistence = async () => {
-        try {
-            // Only set persistence if user hasn't explicitly logged out
-            if (!userExplicitlyLoggedOut) {
-                // Use session persistence for automatic logout on browser close
-                await setPersistence(auth, browserSessionPersistence);
+    console.log('🔧 Setting up Firebase auth persistence...');
+    console.log('🔧 userExplicitlyLoggedOut:', userExplicitlyLoggedOut);
+    try {
+        // Only set persistence if user hasn't explicitly logged out
+        if (!userExplicitlyLoggedOut) {
+            // Use local persistence to maintain login across page refreshes
+            setPersistence(auth, browserLocalPersistence).then(() => {
+                console.log('✅ Firebase auth persistence set to browserLocalPersistence');
+                console.log('✅ Current auth user:', auth.currentUser?.email || 'No user');
                 
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('Firebase auth persistence set to browserSessionPersistence');
+                // Force auth state refresh after setting persistence
+                if (auth.currentUser) {
+                    console.log('✅ Auth user found after persistence setup, triggering auth state change');
+                    // The auth state change will be triggered automatically
+                } else {
+                    console.log('ℹ️ No auth user found after persistence setup');
                 }
-            } else {
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('User explicitly logged out, skipping persistence setup');
-                }
-                // Clear the explicit logout flag after app restart
-                localStorage.removeItem('userExplicitlyLoggedOut');
-                userExplicitlyLoggedOut = false;
+            }).catch((error) => {
+                console.warn("Failed to set browserLocalPersistence, trying fallback:", error);
+                
+                // Fallback to session persistence if local fails
+                setPersistence(auth, browserSessionPersistence).then(() => {
+                    console.log('✅ Firebase auth persistence set to browserSessionPersistence (fallback)');
+                    console.log('✅ Current auth user:', auth.currentUser?.email || 'No user');
+                }).catch((fallbackError) => {
+                    console.warn("Failed to set any persistence, auth will use default:", fallbackError);
+                });
+            });
+        } else {
+            if (process.env.NODE_ENV === 'development') {
+                console.log('User explicitly logged out, skipping persistence setup');
             }
-        } catch (error) {
-            // Comprehensive error handling with fallback strategy
-            console.warn("Failed to set browserSessionPersistence, trying fallback:", error);
-            
-            try {
-                // Fallback to local persistence if session fails
-                await setPersistence(auth, browserLocalPersistence);
-                
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('Firebase auth persistence set to browserLocalPersistence (fallback)');
-                }
-            } catch (fallbackError) {
-                // Final fallback - let Firebase use default persistence
-                console.warn("Failed to set any persistence, auth will use default:", fallbackError);
-                
-                // In production, we might want to track this error
-                if (process.env.NODE_ENV === 'production') {
-                    // Could send to error tracking service here
-                    console.error('Critical: Unable to set Firebase auth persistence', fallbackError);
-                }
-            }
+            // Clear the explicit logout flag after app restart
+            localStorage.removeItem('userExplicitlyLoggedOut');
+            userExplicitlyLoggedOut = false;
         }
-    };
-    
-    // Set up persistence with error boundary
-    setupPersistence().catch((error) => {
+    } catch (error) {
         console.error('Critical error in persistence setup:', error);
-    });
+    }
 }
 
 // Export function to mark explicit logout

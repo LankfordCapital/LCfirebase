@@ -61,11 +61,13 @@ const PnLInput = ({
 export function LoanApplicationClientPage2Enhanced({ 
   loanProgram, 
   officeContext = 'borrower',
-  applicationId 
+  applicationId,
+  borrowerId 
 }: { 
   loanProgram: string, 
   officeContext?: 'borrower' | 'broker' | 'workforce',
-  applicationId?: string
+  applicationId?: string,
+  borrowerId?: string
 }) {
   const router = useRouter();
   const { toast } = useToast();

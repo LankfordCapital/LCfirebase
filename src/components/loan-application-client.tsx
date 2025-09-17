@@ -327,6 +327,10 @@ export function LoanApplicationClient({
           dateObj = date;
         } else if (typeof date === 'string') {
           dateObj = new Date(date);
+          if (isNaN(dateObj.getTime())) {
+            console.warn('Invalid date string:', date);
+            dateObj = new Date();
+          }
         } else if (date && typeof date.toDate === 'function') {
           dateObj = date.toDate();
         } else {
@@ -382,7 +386,7 @@ export function LoanApplicationClient({
         console.log(`  companyName:`, companyName);
       }, 100);
     }
-  }, [isGroundUpConstruction]); // Remove groundUpConstructionState.application from dependencies to prevent infinite loop
+  }, [isGroundUpConstruction, groundUpConstructionState.application]); // Include groundUpConstructionState.application to trigger when state loads
 
   // Trigger form population when Ground Up Construction state changes (for navigation back)
   useEffect(() => {
@@ -449,6 +453,10 @@ export function LoanApplicationClient({
           dateObj = date;
         } else if (typeof date === 'string') {
           dateObj = new Date(date);
+          if (isNaN(dateObj.getTime())) {
+            console.warn('Invalid date string:', date);
+            dateObj = new Date();
+          }
         } else if (date && typeof date.toDate === 'function') {
           dateObj = date.toDate();
         } else {
@@ -602,6 +610,10 @@ export function LoanApplicationClient({
           dateObj = date;
         } else if (typeof date === 'string') {
           dateObj = new Date(date);
+          if (isNaN(dateObj.getTime())) {
+            console.warn('Invalid date string:', date);
+            dateObj = new Date();
+          }
         } else if (date && typeof date.toDate === 'function') {
           dateObj = date.toDate();
         } else {
@@ -806,7 +818,7 @@ export function LoanApplicationClient({
     setPurchasePrice(data.purchasePrice?.toString() || '');
     setOriginalPurchasePrice(data.originalPurchasePrice?.toString() || '');
     setCurrentDebt(data.currentDebt?.toString() || '');
-    setPurchaseDate(data.purchaseDate);
+    setPurchaseDate(data.purchaseDate instanceof Date && !isNaN(data.purchaseDate.getTime()) ? data.purchaseDate : undefined);
     
     // Property Values
     setAsIsValue(data.asIsValue?.toString() || '');
@@ -816,7 +828,7 @@ export function LoanApplicationClient({
     
     // Construction Details
     setConstructionTime(data.constructionTime?.toString() || '');
-    setRequestedClosingDate(data.requestedClosingDate);
+    setRequestedClosingDate(data.requestedClosingDate instanceof Date && !isNaN(data.requestedClosingDate.getTime()) ? data.requestedClosingDate : undefined);
     
     // Business Information
     setCompanyName(data.companyName || '');
@@ -1360,6 +1372,10 @@ export function LoanApplicationClient({
           dateObj = date;
         } else if (typeof date === 'string') {
           dateObj = new Date(date);
+          if (isNaN(dateObj.getTime())) {
+            console.warn('Invalid date string:', date);
+            dateObj = new Date();
+          }
         } else if (date && typeof date.toDate === 'function') {
           dateObj = date.toDate();
         } else {
@@ -1386,6 +1402,10 @@ export function LoanApplicationClient({
           dateObj = date;
         } else if (typeof date === 'string') {
           dateObj = new Date(date);
+          if (isNaN(dateObj.getTime())) {
+            console.warn('Invalid date string:', date);
+            dateObj = new Date();
+          }
         } else if (date && typeof date.toDate === 'function') {
           dateObj = date.toDate();
         } else {
@@ -1542,10 +1562,11 @@ export function LoanApplicationClient({
 
   // Handle field updates (no auto-save, only save on navigation)
   const handleFieldUpdate = (field: string, value: any) => {
-    // For Ground Up Construction loans, completely bypass the generic system
+    // For Ground Up Construction loans, update the typed state instead of generic system
     if (isGroundUpConstruction) {
-      console.log(`🏗️ [Ground Up Construction] Field update bypassed for generic system: ${field} = ${value}`);
-      return; // Don't call the generic updateField at all
+      console.log(`🏗️ [Ground Up Construction] Updating typed state: ${field} = ${value}`);
+      groundUpConstructionState.updateField(field, value);
+      return;
     }
     
     if (applicationId) {
@@ -1863,7 +1884,10 @@ export function LoanApplicationClient({
                                         <Calendar
                                         mode="single"
                                         selected={purchaseDate}
-                                        onSelect={setPurchaseDate}
+                                        onSelect={(date) => {
+                                            setPurchaseDate(date);
+                                            handleFieldUpdate('loanDetails.purchaseDate', date);
+                                        }}
                                         initialFocus
                                         />
                                     </PopoverContent>
@@ -1993,7 +2017,10 @@ export function LoanApplicationClient({
                                 <Calendar
                                 mode="single"
                                 selected={requestedClosingDate}
-                                onSelect={setRequestedClosingDate}
+                                onSelect={(date) => {
+                                    setRequestedClosingDate(date);
+                                    handleFieldUpdate('propertyInfo.requestedClosingDate', date);
+                                }}
                                 initialFocus
                                 />
                             </PopoverContent>

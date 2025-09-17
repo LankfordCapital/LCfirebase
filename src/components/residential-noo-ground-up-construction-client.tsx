@@ -153,23 +153,31 @@ export function ResidentialNOOGroundUpConstructionClient({
   
   const handleDocumentUpload = async (documentType: string, file: File) => {
     try {
-      const result = await uploadDocument(file);
+      const success = await addDocument({
+        name: documentType,
+        file
+      });
       
-      if (result.success) {
-        // Update the document in the application
-        const documentData = {
-          name: documentType,
-          fileUrl: result.url,
-          fileName: file.name,
-          fileSize: file.size,
-          mimeType: file.type,
-          uploadedAt: new Date(),
-          uploadedBy: borrowerId || 'unknown',
-          status: 'uploaded' as const
-        };
+      if (success) {
+        // Get the uploaded document from context
+        const uploadedDoc = documents[documentType];
+        
+        if (uploadedDoc && uploadedDoc.downloadURL) {
+          // Update the document in the application
+          const documentData = {
+            name: documentType,
+            fileUrl: uploadedDoc.downloadURL,
+            fileName: file.name,
+            fileSize: file.size,
+            mimeType: file.type,
+            uploadedAt: new Date(),
+            uploadedBy: borrowerId || 'unknown',
+            status: 'uploaded' as const
+          };
 
-        // Update the specific document field
-        updateField(`documents.${documentType}`, documentData);
+          // Update the specific document field
+          updateField(`documents.${documentType}`, documentData);
+        }
       }
     } catch (error) {
       console.error('Document upload failed:', error);

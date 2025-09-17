@@ -67,6 +67,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Global flag to prevent multiple auth listeners
+let authListenerSet = false;
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -248,6 +251,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [pathname, user, userProfile, loading]); // Include loading state to prevent race conditions
 
   useEffect(() => {
+    // Prevent multiple auth listeners
+    if (authListenerSet) {
+      console.log('⚠️ Auth listener already set, skipping...');
+      return;
+    }
+    
+    authListenerSet = true;
+    console.log('🔧 Setting up auth state listener...');
+    
     let isMounted = true; // Flag to prevent state updates after unmount
     let timeoutId: NodeJS.Timeout | null = null;
     
@@ -256,6 +268,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       setLoading(true);
       console.log('🔄 Auth state changed:', userAuth ? `User: ${userAuth.email}` : 'No user');
+      console.log('🔄 Auth state change timestamp:', new Date().toISOString());
+      console.log('🔄 Current auth instance:', auth.app.name);
       
       // Set a timeout to prevent infinite loading
       timeoutId = setTimeout(() => {
@@ -263,7 +277,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           console.warn('⚠️ Auth state change timeout - forcing loading to false');
           setLoading(false);
         }
-      }, 10000); // 10 second timeout
+      }, 15000); // 15 second timeout - increased for better persistence handling
       
       try {
         if (userAuth) {
@@ -353,12 +367,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     return () => {
       isMounted = false; // Mark as unmounted
+      authListenerSet = false; // Reset flag for cleanup
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
       unsubscribe(); // Clean up listener
+      console.log('🧹 Auth listener cleaned up');
     };
-  }, [pathname, router, getRedirectPath]); // Include dependencies for redirect logic
+  }, []); // Only run once on mount - don't recreate listener on pathname changes
 
   const signUp = async (email: string, pass: string, fullName: string, role: string) => {
     try {

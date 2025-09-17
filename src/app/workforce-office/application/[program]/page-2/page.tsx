@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { LoanApplicationClientPage2 } from '@/components/loan-application-client-page-2';
+import { LoanApplicationClientPage2Enhanced } from '@/components/loan-application-client-page-2-enhanced';
 import { Skeleton } from '@/components/ui/skeleton';
 
 function Page2Skeleton() {
@@ -28,7 +28,7 @@ export default async function WorkforceOfficepage2Page({ params }: { params: Pro
 
     return (
         <Suspense fallback={<Page2Skeleton />}>
-            <LoanApplicationClientPage2 loanProgram={loanProgram} officeContext="workforce" />
+            <LoanApplicationClientPage2Enhanced loanProgram={loanProgram} officeContext="workforce" />
         </Suspense>
     )
 }

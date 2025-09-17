@@ -38,11 +38,11 @@ export class BrokerDocumentAdminService {
         },
       });
 
-      // Generate a signed URL for the file (valid for 1 year)
-      const [downloadURL] = await fileRef.getSignedUrl({
-        action: 'read',
-        expires: Date.now() + 365 * 24 * 60 * 60 * 1000, // 1 year from now
-      });
+      // Make the file publicly accessible instead of using signed URLs
+      await fileRef.makePublic();
+
+      // Generate the public URL
+      const downloadURL = `https://storage.googleapis.com/${bucket.name}/${storagePath}`;
 
       return { success: true, url: downloadURL, path: storagePath };
     } catch (error) {

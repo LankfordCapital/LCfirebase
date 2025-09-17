@@ -385,11 +385,11 @@ export const useResidentialNOOGroundUpConstructionState = (
             updatedAt: parsedData.updatedAt ? new Date(parsedData.updatedAt) : Timestamp.now(),
             propertyInfo: {
               ...parsedData.propertyInfo,
-              requestedClosingDate: parsedData.propertyInfo?.requestedClosingDate ? new Date(parsedData.propertyInfo.requestedClosingDate) : Timestamp.now(),
+              requestedClosingDate: parsedData.propertyInfo?.requestedClosingDate ? new Date(parsedData.propertyInfo.requestedClosingDate) : undefined,
             },
             borrowerInfo: {
               ...parsedData.borrowerInfo,
-              dateOfBirth: parsedData.borrowerInfo?.dateOfBirth ? new Date(parsedData.borrowerInfo.dateOfBirth) : Timestamp.now(),
+              dateOfBirth: parsedData.borrowerInfo?.dateOfBirth ? new Date(parsedData.borrowerInfo.dateOfBirth) : undefined,
             },
             progress: {
               ...parsedData.progress,
@@ -421,20 +421,32 @@ export const useResidentialNOOGroundUpConstructionState = (
         // Convert Timestamp objects to strings for JSON serialization
         const serializableData = {
           ...data,
-          createdAt: data.createdAt instanceof Date ? data.createdAt.toISOString() : (typeof data.createdAt === 'string' ? data.createdAt : data.createdAt?.toString?.() || new Date().toISOString()),
-          updatedAt: data.updatedAt instanceof Date ? data.updatedAt.toISOString() : (typeof data.updatedAt === 'string' ? data.updatedAt : data.updatedAt?.toString?.() || new Date().toISOString()),
+          createdAt: data.createdAt instanceof Date ? 
+            (isNaN(data.createdAt.getTime()) ? new Date().toISOString() : data.createdAt.toISOString()) : 
+            (typeof data.createdAt === 'string' ? data.createdAt : data.createdAt?.toString?.() || new Date().toISOString()),
+          updatedAt: data.updatedAt instanceof Date ? 
+            (isNaN(data.updatedAt.getTime()) ? new Date().toISOString() : data.updatedAt.toISOString()) : 
+            (typeof data.updatedAt === 'string' ? data.updatedAt : data.updatedAt?.toString?.() || new Date().toISOString()),
           propertyInfo: {
             ...data.propertyInfo,
-            requestedClosingDate: data.propertyInfo?.requestedClosingDate instanceof Date ? data.propertyInfo.requestedClosingDate.toISOString() : (typeof data.propertyInfo?.requestedClosingDate === 'string' ? data.propertyInfo.requestedClosingDate : data.propertyInfo?.requestedClosingDate?.toString?.() || new Date().toISOString()),
+            requestedClosingDate: data.propertyInfo?.requestedClosingDate instanceof Date ? 
+              (isNaN(data.propertyInfo.requestedClosingDate.getTime()) ? null : data.propertyInfo.requestedClosingDate.toISOString()) : 
+              (typeof data.propertyInfo?.requestedClosingDate === 'string' ? data.propertyInfo.requestedClosingDate : data.propertyInfo?.requestedClosingDate?.toString?.() || null),
           },
           borrowerInfo: {
             ...data.borrowerInfo,
-            dateOfBirth: data.borrowerInfo?.dateOfBirth instanceof Date ? data.borrowerInfo.dateOfBirth.toISOString() : (typeof data.borrowerInfo?.dateOfBirth === 'string' ? data.borrowerInfo.dateOfBirth : data.borrowerInfo?.dateOfBirth?.toString?.() || new Date().toISOString()),
+            dateOfBirth: data.borrowerInfo?.dateOfBirth instanceof Date ? 
+              (isNaN(data.borrowerInfo.dateOfBirth.getTime()) ? null : data.borrowerInfo.dateOfBirth.toISOString()) : 
+              (typeof data.borrowerInfo?.dateOfBirth === 'string' ? data.borrowerInfo.dateOfBirth : data.borrowerInfo?.dateOfBirth?.toString?.() || null),
           },
           progress: {
             ...data.progress,
-            applicationStarted: data.progress?.applicationStarted instanceof Date ? data.progress.applicationStarted.toISOString() : (typeof data.progress?.applicationStarted === 'string' ? data.progress.applicationStarted : data.progress?.applicationStarted?.toString?.() || new Date().toISOString()),
-            lastUpdated: data.progress?.lastUpdated instanceof Date ? data.progress.lastUpdated.toISOString() : (typeof data.progress?.lastUpdated === 'string' ? data.progress.lastUpdated : data.progress?.lastUpdated?.toString?.() || new Date().toISOString()),
+            applicationStarted: data.progress?.applicationStarted instanceof Date ? 
+              (isNaN(data.progress.applicationStarted.getTime()) ? new Date().toISOString() : data.progress.applicationStarted.toISOString()) : 
+              (typeof data.progress?.applicationStarted === 'string' ? data.progress.applicationStarted : data.progress?.applicationStarted?.toString?.() || new Date().toISOString()),
+            lastUpdated: data.progress?.lastUpdated instanceof Date ? 
+              (isNaN(data.progress.lastUpdated.getTime()) ? new Date().toISOString() : data.progress.lastUpdated.toISOString()) : 
+              (typeof data.progress?.lastUpdated === 'string' ? data.progress.lastUpdated : data.progress?.lastUpdated?.toString?.() || new Date().toISOString()),
           },
         };
         
