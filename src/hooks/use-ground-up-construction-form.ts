@@ -3,7 +3,7 @@
 // ============================================================================
 // Simple hook to save form data to the comprehensive object structure
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { 
@@ -21,6 +21,9 @@ export function useGroundUpConstructionForm(applicationId?: string) {
   const [saving, setSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  
+  // Auto-save timer ref
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   // Hooks - with safe initialization
   const authContext = useAuth();
@@ -928,7 +931,11 @@ export function useGroundUpConstructionForm(applicationId?: string) {
       current[fieldParts[fieldParts.length - 1]] = value;
       return newApp;
     });
-  }, [application]);
+    
+    // Trigger auto-save with the updated data
+    const updates = { [fieldPath]: value };
+    debouncedAutoSave(updates);
+  }, [application, debouncedAutoSave]);
   
   const updateFields = useCallback((updates: Record<string, any>) => {
     if (!application) return;
@@ -939,6 +946,64 @@ export function useGroundUpConstructionForm(applicationId?: string) {
       return { ...prev, ...updates };
     });
   }, [application]);
+
+  // ============================================================================
+  // AUTO-SAVE OPERATIONS
+  // ============================================================================
+  
+  const autoSave = useCallback(async (data: Partial<ResidentialNOOGroundUpConstructionApplication>) => {
+    if (!applicationId || !user || !userProfile) return;
+    
+    try {
+      setSaving(true);
+      console.log('Auto-saving application data:', data);
+      
+      const response = await fetch('/api/enhanced-loan-applications', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${await user.getIdToken()}`
+        },
+        body: JSON.stringify({
+          action: 'updateSection',
+          applicationId: applicationId,
+          section: 'propertyInfo',
+          data: data
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Auto-save failed: ${response.statusText}`);
+      }
+      
+      const result = await response.json();
+      if (result.success) {
+        setLastSaved(new Date());
+        console.log('Auto-save successful');
+      } else {
+        throw new Error(result.error || 'Auto-save failed');
+      }
+      
+    } catch (err) {
+      console.error('Auto-save error:', err);
+      // Don't show toast for auto-save errors to avoid spam
+    } finally {
+      setSaving(false);
+    }
+  }, [applicationId, user, userProfile]);
+  
+  // Debounced auto-save
+  const debouncedAutoSave = useCallback((data: Partial<ResidentialNOOGroundUpConstructionApplication>) => {
+    // Clear existing timer
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+    
+    // Set new timer for 2 seconds
+    autoSaveTimerRef.current = setTimeout(() => {
+      autoSave(data);
+    }, 2000);
+  }, [autoSave]);
 
   // ============================================================================
   // SAVE OPERATIONS
@@ -1060,5 +1125,38 @@ export function useGroundUpConstructionForm(applicationId?: string) {
       
       return { uploaded, total };
     }
+  };
+  
+  // Cleanup auto-save timer on unmount
+  useEffect(() => {
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, []);
+  
+  // ============================================================================
+  // RETURN HOOK INTERFACE
+  // ============================================================================
+  
+  return {
+    // State
+    application,
+    saving,
+    lastSaved,
+    isInitialized,
+    
+    // Operations
+    initializeApplication,
+    updateField,
+    updateFields,
+    saveApplication,
+    markPageCompleted,
+    getApplicationData,
+    resetApplication,
+    
+    // Utilities
+    getDocumentProgress
   };
 }

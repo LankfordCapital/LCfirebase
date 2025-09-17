@@ -79,16 +79,15 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      console.log('File saved to storage, generating signed URL...');
+          console.log('File saved to storage, generating download URL...');
 
-      // With uniform bucket-level access, we need to use signed URLs instead of public URLs
-      // Generate a signed URL for secure access (works with uniform bucket-level access)
-      const [downloadURL] = await fileUpload.getSignedUrl({
-        action: 'read',
-        expires: Date.now() + 365 * 24 * 60 * 60 * 1000, // 1 year from now
-      });
-      
-      console.log('Upload successful, signed URL generated:', downloadURL);
+    // Generate download URL using signed URL
+    const [downloadURL] = await fileUpload.getSignedUrl({
+      action: 'read',
+      expires: Date.now() + 365 * 24 * 60 * 60 * 1000, // 1 year from now
+    });
+    
+    console.log('Upload successful, download URL generated:', downloadURL);
 
       return NextResponse.json({
         success: true,

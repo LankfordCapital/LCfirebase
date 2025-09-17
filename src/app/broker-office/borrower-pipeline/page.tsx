@@ -13,6 +13,7 @@ import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
+import { authenticatedGet } from '@/lib/api-client';
 import { 
   MoreHorizontal, 
   Calendar, 
@@ -202,7 +203,7 @@ export default function BorrowerPipelinePage() {
       setLoading(true);
       console.log('Loading applications for broker:', user.uid);
       
-      const response = await fetch(`/api/enhanced-loan-applications?action=getByBroker&brokerId=${user.uid}`);
+      const response = await authenticatedGet(`/api/enhanced-loan-applications?action=getByBroker&brokerId=${user.uid}`);
       
       if (!response.ok) {
         const errorText = await response.text();

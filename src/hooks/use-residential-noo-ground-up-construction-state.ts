@@ -1,5 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Timestamp } from 'firebase/firestore';
+import { auth } from '@/lib/firebase-client';
 import { 
   ResidentialNOOGroundUpConstructionApplication,
   ApplicationDocument
@@ -368,6 +369,9 @@ export const useResidentialNOOGroundUpConstructionState = (
   // Create a unique key for this user's Ground Up Construction application
   const storageKey = `ground-up-construction-${userId}-${brokerId}`;
   
+  // Auto-save timer ref
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  
   const [application, setApplication] = useState<ResidentialNOOGroundUpConstructionApplication>(() => {
     // Try to load from localStorage first
     if (typeof window !== 'undefined') {
@@ -410,6 +414,64 @@ export const useResidentialNOOGroundUpConstructionState = (
     const baseApplication = createInitialApplication(userId, brokerId);
     return initialData ? { ...baseApplication, ...initialData } : baseApplication;
   });
+
+  // ============================================================================
+  // DATABASE AUTO-SAVE FUNCTIONS
+  // ============================================================================
+  
+  const saveToDatabase = useCallback(async (data: Partial<ResidentialNOOGroundUpConstructionApplication>) => {
+    if (!auth.currentUser) {
+      console.warn('No authenticated user for database save');
+      return;
+    }
+    
+    try {
+      const token = await auth.currentUser.getIdToken();
+      console.log('🔄 [Ground Up Construction] Auto-saving to database:', data);
+      
+      const response = await fetch('/api/enhanced-loan-applications', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          action: 'updateSection',
+          applicationId: data.id || 'temp-id', // Use temp ID if no application ID yet
+          section: 'propertyInfo',
+          data: data
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Database save failed: ${response.statusText}`);
+      }
+      
+      const result = await response.json();
+      if (result.success) {
+        console.log('✅ [Ground Up Construction] Database save successful');
+      } else {
+        throw new Error(result.error || 'Database save failed');
+      }
+      
+    } catch (err) {
+      console.error('❌ [Ground Up Construction] Database save error:', err);
+      // Don't show toast for auto-save errors to avoid spam
+    }
+  }, []);
+  
+  // Debounced auto-save to database
+  const debouncedDatabaseSave = useCallback((data: Partial<ResidentialNOOGroundUpConstructionApplication>) => {
+    // Clear existing timer
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+    
+    // Set new timer for 2 seconds
+    autoSaveTimerRef.current = setTimeout(() => {
+      saveToDatabase(data);
+    }, 2000);
+  }, [saveToDatabase]);
 
   // ============================================================================
   // PERSISTENCE FUNCTIONS
@@ -530,12 +592,15 @@ export const useResidentialNOOGroundUpConstructionState = (
       // Save to localStorage
       saveToLocalStorage(updated);
       
+      // Also save to database
+      debouncedDatabaseSave(updated);
+      
       console.log(`✅ [Ground Up Construction] Multiple fields updated successfully`);
       console.log(`📊 [Ground Up Construction] Current application state:`, updated);
       
       return updated;
     });
-  }, [saveToLocalStorage]);
+  }, [saveToLocalStorage, debouncedDatabaseSave]);
 
   // ============================================================================
   // LOGGING FUNCTIONS

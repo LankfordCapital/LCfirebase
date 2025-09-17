@@ -742,6 +742,17 @@ export function LoanApplicationClient({
         const data = JSON.parse(stored);
         console.log('📥 Loading Page 1 data from sessionStorage:', data);
         console.log('📥 Purchase price from sessionStorage:', data.purchasePrice);
+        
+        // Convert date strings back to Date objects
+        if (data.requestedClosingDate && typeof data.requestedClosingDate === 'string') {
+          data.requestedClosingDate = new Date(data.requestedClosingDate);
+          console.log('📥 Converted requestedClosingDate from string to Date:', data.requestedClosingDate);
+        }
+        if (data.purchaseDate && typeof data.purchaseDate === 'string') {
+          data.purchaseDate = new Date(data.purchaseDate);
+          console.log('📥 Converted purchaseDate from string to Date:', data.purchaseDate);
+        }
+        
         setPage1LocalData(data);
         return data;
       }

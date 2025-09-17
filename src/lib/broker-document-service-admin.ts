@@ -38,14 +38,15 @@ export class BrokerDocumentAdminService {
         },
       });
 
-      // Generate a signed URL for secure access (works with uniform bucket-level access)
-      // The URL will be valid for 1 year (max allowed)
-      const [signedUrl] = await fileRef.getSignedUrl({
-        action: 'read',
-        expires: Date.now() + 365 * 24 * 60 * 60 * 1000, // 1 year from now
-      });
+    // Generate download URL using signed URL
+    const [downloadURL] = await fileRef.getSignedUrl({
+      action: 'read',
+      expires: Date.now() + 365 * 24 * 60 * 60 * 1000, // 1 year from now
+    });
+    
+    console.log('Signed URL generated successfully');
 
-      return { success: true, url: signedUrl, path: storagePath };
+      return { success: true, url: downloadURL, path: storagePath };
     } catch (error) {
       console.error('Error uploading document:', error);
       return { 
