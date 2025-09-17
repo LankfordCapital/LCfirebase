@@ -1,14 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { brokerDocumentAdminService } from '@/lib/broker-document-service-admin';
+import { requireAuth, getAuthenticatedUser } from '@/lib/auth-utils-server';
 
 // GET - Get all documents for a broker
 export async function GET(request: NextRequest) {
   try {
+    // Require authentication
+    const authError = await requireAuth(request);
+    if (authError) return authError;
+
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const brokerId = searchParams.get('brokerId');
 
     if (!brokerId) {
       return NextResponse.json({ error: 'Broker ID is required' }, { status: 400 });
+    }
+
+    // Users can only access their own documents, admins can access any
+    if (user.role !== 'admin' && user.uid !== brokerId) {
+      return NextResponse.json({ 
+        error: 'Forbidden - Can only access your own documents' 
+      }, { status: 403 });
     }
 
     const result = await brokerDocumentAdminService.getBrokerDocuments(brokerId);
@@ -35,12 +52,28 @@ export async function GET(request: NextRequest) {
 // POST - Add a new broker document
 export async function POST(request: NextRequest) {
   try {
+    // Require authentication
+    const authError = await requireAuth(request);
+    if (authError) return authError;
+
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 401 });
+    }
+
     const { brokerId, type, name, fileName, fileUrl, fileSize, mimeType } = await request.json();
 
     if (!brokerId || !type || !name || !fileName || !fileUrl) {
       return NextResponse.json({ 
         error: 'Missing required fields: brokerId, type, name, fileName, fileUrl' 
       }, { status: 400 });
+    }
+
+    // Users can only add documents for themselves, admins can add for anyone
+    if (user.role !== 'admin' && user.uid !== brokerId) {
+      return NextResponse.json({ 
+        error: 'Forbidden - Can only add documents for yourself' 
+      }, { status: 403 });
     }
 
     const documentData = {

@@ -15,6 +15,7 @@ import { User, Building, Mail, Phone, Upload, Save, BarChart, DollarSign, X, Cam
 import { updateProfile } from 'firebase/auth';
 import { PhotoUploadService } from '@/lib/photo-upload-service';
 import { BrokerDocument } from '@/lib/broker-document-service';
+import { authenticatedGet, authenticatedPost, authenticatedDelete } from '@/lib/api-client';
 import { useBrokerStats } from '@/hooks/use-broker-stats';
 
 export default function BrokerProfilePage() {
@@ -67,7 +68,7 @@ export default function BrokerProfilePage() {
     
     setIsLoadingDocuments(true);
     try {
-      const response = await fetch(`/api/broker-documents?brokerId=${user.uid}`);
+      const response = await authenticatedGet('/api/broker-documents', { brokerId: user.uid });
       const data = await response.json();
       
       if (data.success) {
@@ -228,10 +229,7 @@ export default function BrokerProfilePage() {
       formData.append('documentType', documentType);
       formData.append('documentName', documentName);
 
-      const response = await fetch('/api/broker-documents/upload', {
-        method: 'POST',
-        body: formData,
-      });
+      const response = await authenticatedPost('/api/broker-documents/upload', formData);
 
       const data = await response.json();
 
@@ -265,9 +263,7 @@ export default function BrokerProfilePage() {
     if (!confirm(`Are you sure you want to delete ${documentName}?`)) return;
 
     try {
-      const response = await fetch(`/api/broker-documents?documentId=${documentId}&filePath=${encodeURIComponent(filePath)}`, {
-        method: 'DELETE',
-      });
+      const response = await authenticatedDelete(`/api/broker-documents?documentId=${documentId}&filePath=${encodeURIComponent(filePath)}`);
 
       const data = await response.json();
 

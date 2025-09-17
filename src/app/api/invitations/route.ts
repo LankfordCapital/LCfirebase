@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
 import { sendEmail } from '@/lib/email-service';
-import { requireAuth, requireRole } from '@/lib/auth-utils';
+import { requireAuth, requireRole } from '@/lib/auth-utils-server';
 
 export async function GET(request: NextRequest) {
     try {

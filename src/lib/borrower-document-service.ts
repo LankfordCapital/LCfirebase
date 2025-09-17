@@ -1,4 +1,5 @@
 // Removed direct Firestore imports - using API endpoints instead
+import { authenticatedGet, authenticatedPost, authenticatedDelete } from './api-client';
 
 export interface BorrowerDocument {
   id?: string;
@@ -30,10 +31,7 @@ export class BorrowerDocumentService {
       formData.append('documentType', documentType);
       formData.append('documentName', documentType);
 
-      const response = await fetch('/api/borrower-documents/upload', {
-        method: 'POST',
-        body: formData,
-      });
+      const response = await authenticatedPost('/api/borrower-documents/upload', formData);
 
       const data = await response.json();
 
@@ -56,13 +54,9 @@ export class BorrowerDocumentService {
    */
   async addDocument(documentData: Omit<BorrowerDocument, 'id' | 'uploadedAt'>): Promise<{ success: boolean; id?: string; error?: string }> {
     try {
-      const response = await fetch('/api/borrower-documents', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'addDocument',
-          documentData
-        })
+      const response = await authenticatedPost('/api/borrower-documents', {
+        action: 'addDocument',
+        documentData
       });
 
       const data = await response.json();
@@ -86,7 +80,7 @@ export class BorrowerDocumentService {
    */
   async getBorrowerDocuments(borrowerId: string): Promise<{ success: boolean; documents?: BorrowerDocument[]; error?: string }> {
     try {
-      const response = await fetch(`/api/borrower-documents?borrowerId=${borrowerId}`);
+      const response = await authenticatedGet('/api/borrower-documents', { borrowerId });
       const data = await response.json();
 
       if (data.success) {
@@ -113,16 +107,12 @@ export class BorrowerDocumentService {
     notes?: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const response = await fetch('/api/borrower-documents', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'updateDocumentStatus',
-          documentId,
-          status,
-          reviewedBy,
-          notes
-        })
+      const response = await authenticatedPost('/api/borrower-documents', {
+        action: 'updateDocumentStatus',
+        documentId,
+        status,
+        reviewedBy,
+        notes
       });
 
       const data = await response.json();
@@ -146,14 +136,10 @@ export class BorrowerDocumentService {
    */
   async deleteDocument(documentId: string, fileUrl: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const response = await fetch('/api/borrower-documents', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'deleteDocument',
-          documentId,
-          fileUrl
-        })
+      const response = await authenticatedPost('/api/borrower-documents', {
+        action: 'deleteDocument',
+        documentId,
+        fileUrl
       });
 
       const data = await response.json();
@@ -177,7 +163,7 @@ export class BorrowerDocumentService {
    */
   async getDocument(documentId: string): Promise<{ success: boolean; document?: BorrowerDocument; error?: string }> {
     try {
-      const response = await fetch(`/api/borrower-documents?documentId=${documentId}`);
+      const response = await authenticatedGet('/api/borrower-documents', { documentId });
       const data = await response.json();
 
       if (data.success && data.document) {

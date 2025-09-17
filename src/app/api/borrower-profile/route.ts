@@ -1,7 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
-import { requireAuth, getAuthenticatedUser } from '@/lib/auth-utils';
+import { requireAuth, getAuthenticatedUser } from '@/lib/auth-utils-server';
 
 // Mock data for testing - replace with actual Firestore operations later
 const mockProfile = {

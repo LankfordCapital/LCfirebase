@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { BrokerDocument } from "@/lib/broker-document-service-admin";
 import { useBrokerStats } from "@/hooks/use-broker-stats";
 import { useWorkforceMembers } from "@/hooks/use-workforce-members";
+import { authenticatedGet } from "@/lib/api-client";
 
 // Pipeline data will be loaded from the database
 const pipelinePreview: any[] = [];
@@ -37,7 +38,7 @@ export default function BrokerOfficePageClient() {
         
         setIsLoadingDocuments(true);
         try {
-            const response = await fetch(`/api/broker-documents?brokerId=${user.uid}`);
+            const response = await authenticatedGet('/api/broker-documents', { brokerId: user.uid });
             const data = await response.json();
             
             if (data.success) {

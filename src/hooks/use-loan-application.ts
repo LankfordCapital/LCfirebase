@@ -43,7 +43,7 @@ export function useLoanApplication(applicationId?: string) {
   // LOAD APPLICATION DATA
   // ============================================================================
   
-  const loadApplication = useCallback(async () => {
+  const loadApplication = useCallback(async (retryCount = 0) => {
     if (!applicationId) return;
     
     // Don't try to load if user is not authenticated
@@ -56,27 +56,73 @@ export function useLoanApplication(applicationId?: string) {
       setLoading(true);
       setError(null);
       
+      console.log(`🔄 Loading loan application ${applicationId} (attempt ${retryCount + 1})`);
       const appData = await enhancedLoanApplicationService.getLoanApplication(applicationId);
+      
       if (appData) {
         setApplication(appData);
         // Store the last saved data for comparison
         lastSavedDataRef.current = JSON.stringify(appData);
+        console.log('✅ Loan application loaded successfully');
       } else {
         setError('Application not found');
+        console.log('⚠️ Application not found in database');
       }
     } catch (err) {
       console.error('Error loading application:', err);
       
-      // Handle permission errors gracefully
-      if (err instanceof Error && err.message.includes('permission-denied')) {
-        setError('You do not have permission to access this application');
+      // Handle different types of errors gracefully
+      if (err instanceof Error) {
+        if (err.message.includes('permission-denied')) {
+          setError('You do not have permission to access this application');
+          toast({
+            variant: 'destructive',
+            title: 'Access Denied',
+            description: 'You do not have permission to access this application.',
+          });
+        } else if (err.message.includes('Failed to get loan application')) {
+          // Retry for API errors (up to 3 times)
+          if (retryCount < 2) {
+            console.log(`🔄 Retrying loan application load (attempt ${retryCount + 2})`);
+            setTimeout(() => loadApplication(retryCount + 1), 1000 * (retryCount + 1));
+            return;
+          }
+          
+          setError('Unable to load application. Please try again.');
+          toast({
+            variant: 'destructive',
+            title: 'Loading Failed',
+            description: 'Unable to load the loan application. Please check your connection and try again.',
+          });
+        } else if (err.message.includes('network') || err.message.includes('fetch')) {
+          // Retry for network errors (up to 3 times)
+          if (retryCount < 2) {
+            console.log(`🔄 Retrying loan application load due to network error (attempt ${retryCount + 2})`);
+            setTimeout(() => loadApplication(retryCount + 1), 2000 * (retryCount + 1));
+            return;
+          }
+          
+          setError('Network error. Please check your connection.');
+          toast({
+            variant: 'destructive',
+            title: 'Network Error',
+            description: 'Please check your internet connection and try again.',
+          });
+        } else {
+          setError(err.message);
+          toast({
+            variant: 'destructive',
+            title: 'Error Loading Application',
+            description: err.message,
+          });
+        }
+      } else {
+        setError('Failed to load application');
         toast({
           variant: 'destructive',
-          title: 'Access Denied',
-          description: 'You do not have permission to access this application.',
+          title: 'Error',
+          description: 'An unexpected error occurred while loading the application.',
         });
-      } else {
-        setError(err instanceof Error ? err.message : 'Failed to load application');
       }
     } finally {
       setLoading(false);

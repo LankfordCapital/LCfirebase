@@ -16,11 +16,33 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || ""
 };
 
+// Validate Firebase configuration
+const validateFirebaseConfig = () => {
+  const requiredKeys = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId'];
+  const missingKeys = requiredKeys.filter(key => !process.env[`NEXT_PUBLIC_FIREBASE_${key.toUpperCase()}`]);
+  
+  if (missingKeys.length > 0) {
+    console.warn('⚠️ Missing Firebase environment variables:', missingKeys);
+    console.warn('⚠️ Using fallback values - this may cause authentication issues in production');
+  } else {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ All Firebase environment variables are properly configured');
+    }
+  }
+};
+
+// Validate config on initialization
+if (typeof window !== 'undefined') {
+  validateFirebaseConfig();
+}
+
 let app: FirebaseApp;
 
 try {
   app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-  console.log('Firebase app initialized successfully');
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Firebase app initialized successfully');
+  }
 } catch (error) {
   console.error('Error initializing Firebase app:', error);
   throw error;
@@ -34,14 +56,13 @@ try {
   auth = getAuth(app);
   db = getFirestore(app);
   storage = getStorage(app);
-  console.log('Firebase services initialized successfully');
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Firebase services initialized successfully');
+  }
 } catch (error) {
   console.error('Error initializing Firebase services:', error);
   throw error;
 }
-
-// Ensure auth instance is stable across page refreshes
-console.log('Firebase auth instance created:', auth.app.name);
 
 // Initialize Google Auth Provider
 const googleProvider = new GoogleAuthProvider();
@@ -59,30 +80,25 @@ if (typeof window !== 'undefined') {
 
 // Set up persistence immediately and synchronously
 if (typeof window !== 'undefined') {
-    console.log('🔧 Setting up Firebase auth persistence...');
-    console.log('🔧 userExplicitlyLoggedOut:', userExplicitlyLoggedOut);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Setting up Firebase auth persistence...');
+    }
     try {
         // Only set persistence if user hasn't explicitly logged out
         if (!userExplicitlyLoggedOut) {
             // Use local persistence to maintain login across page refreshes
             setPersistence(auth, browserLocalPersistence).then(() => {
-                console.log('✅ Firebase auth persistence set to browserLocalPersistence');
-                console.log('✅ Current auth user:', auth.currentUser?.email || 'No user');
-                
-                // Force auth state refresh after setting persistence
-                if (auth.currentUser) {
-                    console.log('✅ Auth user found after persistence setup, triggering auth state change');
-                    // The auth state change will be triggered automatically
-                } else {
-                    console.log('ℹ️ No auth user found after persistence setup');
+                if (process.env.NODE_ENV === 'development') {
+                  console.log('Firebase auth persistence set to browserLocalPersistence');
                 }
             }).catch((error) => {
                 console.warn("Failed to set browserLocalPersistence, trying fallback:", error);
                 
                 // Fallback to session persistence if local fails
                 setPersistence(auth, browserSessionPersistence).then(() => {
-                    console.log('✅ Firebase auth persistence set to browserSessionPersistence (fallback)');
-                    console.log('✅ Current auth user:', auth.currentUser?.email || 'No user');
+                    if (process.env.NODE_ENV === 'development') {
+                      console.log('Firebase auth persistence set to browserSessionPersistence (fallback)');
+                    }
                 }).catch((fallbackError) => {
                     console.warn("Failed to set any persistence, auth will use default:", fallbackError);
                 });

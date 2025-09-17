@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { enhancedLoanApplicationServiceAdmin } from '@/lib/enhanced-loan-application-service-admin';
-import { requireAuth, requireRole, getAuthenticatedUser } from '@/lib/auth-utils';
+import { requireAuth, requireRole, getAuthenticatedUser } from '@/lib/auth-utils-server';
 
 export async function GET(request: NextRequest) {
   try {

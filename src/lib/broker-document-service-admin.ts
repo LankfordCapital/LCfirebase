@@ -38,13 +38,14 @@ export class BrokerDocumentAdminService {
         },
       });
 
-      // Make the file publicly accessible instead of using signed URLs
-      await fileRef.makePublic();
+      // Generate a signed URL for secure access (works with uniform bucket-level access)
+      // The URL will be valid for 1 year (max allowed)
+      const [signedUrl] = await fileRef.getSignedUrl({
+        action: 'read',
+        expires: Date.now() + 365 * 24 * 60 * 60 * 1000, // 1 year from now
+      });
 
-      // Generate the public URL
-      const downloadURL = `https://storage.googleapis.com/${bucket.name}/${storagePath}`;
-
-      return { success: true, url: downloadURL, path: storagePath };
+      return { success: true, url: signedUrl, path: storagePath };
     } catch (error) {
       console.error('Error uploading document:', error);
       return { 

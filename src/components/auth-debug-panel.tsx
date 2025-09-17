@@ -3,8 +3,9 @@
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trash2, RefreshCw, AlertTriangle, Info } from 'lucide-react';
-import { useState } from 'react';
+import { Trash2, RefreshCw, AlertTriangle, Info, Heart, Activity } from 'lucide-react';
+import { useState, useEffect } from 'react';
+// Removed health check imports to simplify auth system
 
 export function AuthDebugPanel() {
   const { clearAuthCache, clearAllAuthCache, debugAuthState, user, userProfile } = useAuth();
@@ -31,7 +32,6 @@ export function AuthDebugPanel() {
 
   const handleDebugAuth = () => {
     debugAuthState();
-    console.log('🔍 Auth debug info logged to console');
   };
 
   return (
@@ -47,7 +47,7 @@ export function AuthDebugPanel() {
           Auth Debug
         </Button>
       ) : (
-        <Card className="w-80 bg-background/95 backdrop-blur-sm border-2">
+        <Card className="w-96 bg-background/95 backdrop-blur-sm border-2">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center">
               <AlertTriangle className="h-4 w-4 mr-2 text-orange-500" />

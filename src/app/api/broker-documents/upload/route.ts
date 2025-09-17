@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { brokerDocumentAdminService } from '@/lib/broker-document-service-admin';
+import { requireAuth, getAuthenticatedUser } from '@/lib/auth-utils-server';
 
 export async function POST(request: NextRequest) {
   try {
+    // Require authentication
+    const authError = await requireAuth(request);
+    if (authError) return authError;
+
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 401 });
+    }
+
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const brokerId = formData.get('brokerId') as string;
@@ -13,6 +23,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ 
         error: 'Missing required fields: file, brokerId, documentType, documentName' 
       }, { status: 400 });
+    }
+
+    // Users can only upload documents for themselves, admins can upload for anyone
+    if (user.role !== 'admin' && user.uid !== brokerId) {
+      return NextResponse.json({ 
+        error: 'Forbidden - Can only upload documents for yourself' 
+      }, { status: 403 });
     }
 
     // Validate file

@@ -95,7 +95,10 @@ export default function ProfilePage() {
 
   // Helper function to safely find documents
   const findDocument = (predicate: (doc: BorrowerDocument) => boolean) => {
-    return Array.isArray(borrowerDocuments) ? borrowerDocuments.find(predicate) : undefined;
+    console.log('🔍 Finding document in:', borrowerDocuments);
+    const result = Array.isArray(borrowerDocuments) ? borrowerDocuments.find(predicate) : undefined;
+    console.log('🔍 Document found:', result);
+    return result;
   };
 
   // Load documents when component mounts
@@ -111,9 +114,12 @@ export default function ProfilePage() {
     setIsLoadingDocuments(true);
     try {
       const result = await borrowerDocumentService.getBorrowerDocuments(user.uid);
+      console.log('📄 Loaded documents result:', result);
       if (result.success && Array.isArray(result.documents)) {
+        console.log('📄 Documents loaded successfully:', result.documents);
         setBorrowerDocuments(result.documents);
       } else {
+        console.log('📄 No documents found or error:', result);
         // Reset to empty array if documents is not an array or if the call failed
         setBorrowerDocuments([]);
       }
@@ -387,11 +393,13 @@ export default function ProfilePage() {
       const addResult = await borrowerDocumentService.addDocument(documentData);
       
       if (addResult.success) {
+        console.log('✅ Document uploaded and saved successfully:', addResult);
         toast({
           title: 'Document Uploaded',
           description: `${documentName} has been uploaded successfully.`,
         });
         // Reload documents
+        console.log('🔄 Reloading documents...');
         await loadDocuments();
       } else {
         throw new Error(addResult.error || 'Failed to save document');
@@ -486,7 +494,7 @@ export default function ProfilePage() {
   const handleScanCreditReport = async () => {
     // Find the credit report document in borrower documents
     const creditReportDoc = Array.isArray(borrowerDocuments) ? borrowerDocuments.find(doc => 
-      doc.name === 'Credit Report (Borrower)' && doc.type === 'Credit Report (Borrower)'
+      doc.name === 'Credit Report (Borrower)' && doc.type === 'credit_report'
     ) : undefined;
     
     if (!creditReportDoc?.fileUrl) {
@@ -540,13 +548,268 @@ export default function ProfilePage() {
       setIsScanningCredit(false);
     }
   };
+
+  const handleReplaceCreditReport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user?.uid) return;
+
+    // Validate file
+    const validation = borrowerDocumentService.validateFile(file);
+    if (!validation.valid) {
+      toast({
+        variant: 'destructive',
+        title: 'Invalid File',
+        description: validation.error,
+      });
+      return;
+    }
+
+    // Find existing credit report document
+    const existingDoc = findDocument(doc => doc.name === 'Credit Report (Borrower)' && doc.type === 'credit_report');
+    if (!existingDoc?.id) {
+      toast({
+        variant: 'destructive',
+        title: 'No Document Found',
+        description: 'No existing credit report found to replace.',
+      });
+      return;
+    }
+
+    const documentKey = `credit_report-Credit Report (Borrower)`;
+    setUploadingDocuments(prev => new Set(prev).add(documentKey));
+
+    try {
+      // Delete existing document first
+      if (existingDoc.fileUrl) {
+        const deleteResult = await borrowerDocumentService.deleteDocument(existingDoc.id, existingDoc.fileUrl);
+        if (!deleteResult.success) {
+          console.warn('Failed to delete existing document:', deleteResult.error);
+        }
+      }
+
+      // Upload new file to storage
+      const uploadResult = await borrowerDocumentService.uploadDocument(file, user.uid, 'credit_report');
+      
+      if (!uploadResult.success || !uploadResult.url) {
+        throw new Error(uploadResult.error || 'Upload failed');
+      }
+
+      // Add new document to Firestore
+      const documentData: Omit<BorrowerDocument, 'id' | 'uploadedAt'> = {
+        borrowerId: user.uid,
+        type: 'credit_report',
+        name: 'Credit Report (Borrower)',
+        fileName: file.name,
+        fileUrl: uploadResult.url,
+        fileSize: file.size,
+        mimeType: file.type,
+        status: 'pending'
+      };
+
+      const addResult = await borrowerDocumentService.addDocument(documentData);
+      
+      if (addResult.success) {
+        toast({
+          title: 'Document Replaced',
+          description: 'Credit report has been replaced successfully.',
+        });
+        // Clear existing credit scores since new document was uploaded
+        setCreditScores(null);
+        // Reload documents
+        await loadDocuments();
+      } else {
+        throw new Error(addResult.error || 'Failed to save document');
+      }
+    } catch (error) {
+      console.error('Error replacing document:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Replace Failed',
+        description: 'There was an error replacing the document.',
+      });
+    } finally {
+      setUploadingDocuments(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(documentKey);
+        return newSet;
+      });
+    }
+  };
+
+  const handleDeleteCreditReport = async () => {
+    const creditReportDoc = findDocument(doc => doc.name === 'Credit Report (Borrower)' && doc.type === 'credit_report');
+    
+    if (!creditReportDoc?.id) {
+      toast({
+        variant: 'destructive',
+        title: 'No Document Found',
+        description: 'No credit report found to delete.',
+      });
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to delete "${creditReportDoc.fileName}"?`)) {
+      return;
+    }
+
+    try {
+      const deleteResult = await borrowerDocumentService.deleteDocument(creditReportDoc.id, creditReportDoc.fileUrl);
+      
+      if (deleteResult.success) {
+        toast({
+          title: 'Document Deleted',
+          description: 'Credit report has been deleted successfully.',
+        });
+        // Clear credit scores since document was deleted
+        setCreditScores(null);
+        // Reload documents
+        await loadDocuments();
+      } else {
+        throw new Error(deleteResult.error || 'Failed to delete document');
+      }
+    } catch (error) {
+      console.error('Error deleting document:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Delete Failed',
+        description: 'There was an error deleting the document.',
+      });
+    }
+  };
+
+  const handleReplaceAssetStatement = async (type: 'personal' | 'company', event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user?.uid) return;
+
+    const docName = type === 'personal' ? 'Personal Asset Statement (Borrower)' : 'Company Asset Statement (Company)';
+
+    // Validate file
+    const validation = borrowerDocumentService.validateFile(file);
+    if (!validation.valid) {
+      toast({
+        variant: 'destructive',
+        title: 'Invalid File',
+        description: validation.error,
+      });
+      return;
+    }
+
+    // Find existing asset statement document
+    const existingDoc = findDocument(doc => doc.name === docName && doc.type === 'asset_statement');
+    if (!existingDoc?.id) {
+      toast({
+        variant: 'destructive',
+        title: 'No Document Found',
+        description: `No existing ${type} asset statement found to replace.`,
+      });
+      return;
+    }
+
+    const documentKey = `asset_statement-${docName}`;
+    setUploadingDocuments(prev => new Set(prev).add(documentKey));
+
+    try {
+      // Delete existing document first
+      if (existingDoc.fileUrl) {
+        const deleteResult = await borrowerDocumentService.deleteDocument(existingDoc.id, existingDoc.fileUrl);
+        if (!deleteResult.success) {
+          console.warn('Failed to delete existing document:', deleteResult.error);
+        }
+      }
+
+      // Upload new file to storage
+      const uploadResult = await borrowerDocumentService.uploadDocument(file, user.uid, 'asset_statement');
+      
+      if (!uploadResult.success || !uploadResult.url) {
+        throw new Error(uploadResult.error || 'Upload failed');
+      }
+
+      // Add new document to Firestore
+      const documentData: Omit<BorrowerDocument, 'id' | 'uploadedAt'> = {
+        borrowerId: user.uid,
+        type: 'asset_statement',
+        name: docName,
+        fileName: file.name,
+        fileUrl: uploadResult.url,
+        fileSize: file.size,
+        mimeType: file.type,
+        status: 'pending'
+      };
+
+      const addResult = await borrowerDocumentService.addDocument(documentData);
+      
+      if (addResult.success) {
+        toast({
+          title: 'Document Replaced',
+          description: `${type === 'personal' ? 'Personal' : 'Company'} asset statement has been replaced successfully.`,
+        });
+        // Reload documents
+        await loadDocuments();
+      } else {
+        throw new Error(addResult.error || 'Failed to save document');
+      }
+    } catch (error) {
+      console.error('Error replacing asset statement:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Replace Failed',
+        description: 'There was an error replacing the document.',
+      });
+    } finally {
+      setUploadingDocuments(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(documentKey);
+        return newSet;
+      });
+    }
+  };
+
+  const handleDeleteAssetStatement = async (type: 'personal' | 'company') => {
+    const docName = type === 'personal' ? 'Personal Asset Statement (Borrower)' : 'Company Asset Statement (Company)';
+    const assetStatementDoc = findDocument(doc => doc.name === docName && doc.type === 'asset_statement');
+    
+    if (!assetStatementDoc?.id) {
+      toast({
+        variant: 'destructive',
+        title: 'No Document Found',
+        description: `No ${type} asset statement found to delete.`,
+      });
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to delete "${assetStatementDoc.fileName}"?`)) {
+      return;
+    }
+
+    try {
+      const deleteResult = await borrowerDocumentService.deleteDocument(assetStatementDoc.id, assetStatementDoc.fileUrl);
+      
+      if (deleteResult.success) {
+        toast({
+          title: 'Document Deleted',
+          description: `${type === 'personal' ? 'Personal' : 'Company'} asset statement has been deleted successfully.`,
+        });
+        // Reload documents
+        await loadDocuments();
+      } else {
+        throw new Error(deleteResult.error || 'Failed to delete document');
+      }
+    } catch (error) {
+      console.error('Error deleting asset statement:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Delete Failed',
+        description: 'There was an error deleting the document.',
+      });
+    }
+  };
   
   const handleScanAssetStatement = async (type: 'personal' | 'company') => {
     const docName = type === 'personal' ? 'Personal Asset Statement (Borrower)' : 'Company Asset Statement (Company)';
     
     // Find the asset statement document in borrower documents
     const assetStatementDoc = Array.isArray(borrowerDocuments) ? borrowerDocuments.find(doc => 
-      doc.name === docName && doc.type === docName
+      doc.name === docName && doc.type === 'asset_statement'
     ) : undefined;
 
     if (!assetStatementDoc?.fileUrl) {
@@ -936,8 +1199,8 @@ export default function ProfilePage() {
                 <div className="space-y-3">
                   <Label htmlFor="credit-report-upload" className="text-sm font-medium">Upload Tri-Merged Credit Report</Label>
                   <div className="flex gap-3">
-                    <Input id="credit-report-upload" type="file" onChange={(e) => handleDocumentUpload('Credit Report (Borrower)', 'Credit Report (Borrower)', e)} className="flex-1" />
-                    <Button onClick={handleScanCreditReport} disabled={isScanningCredit || !findDocument(doc => doc.name === 'Credit Report (Borrower)' && doc.type === 'Credit Report (Borrower)')} className="gap-2">
+                    <Input id="credit-report-upload" type="file" accept=".pdf" onChange={(e) => handleDocumentUpload('credit_report', 'Credit Report (Borrower)', e)} className="flex-1" />
+                    <Button onClick={handleScanCreditReport} disabled={isScanningCredit || !findDocument(doc => doc.name === 'Credit Report (Borrower)' && doc.type === 'credit_report')} className="gap-2">
                       {isScanningCredit ? <CustomLoader className="h-4 w-4" /> : <ScanLine className="h-4 w-4" />}
                       <span className="hidden sm:inline">Scan Report</span>
                     </Button>
@@ -945,30 +1208,64 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Display uploaded credit report */}
-                {findDocument(doc => doc.name === 'Credit Report (Borrower)' && doc.type === 'Credit Report (Borrower)') && (
+                {findDocument(doc => doc.name === 'Credit Report (Borrower)' && doc.type === 'credit_report') && (
                   <div className="space-y-3">
                     <Label className="text-sm font-medium">Uploaded Credit Report</Label>
                     <div className="flex items-center justify-between p-3 bg-green-50 rounded-md border border-green-200">
                       <div className="flex items-center gap-2">
                         <div className="h-2 w-2 bg-green-500 rounded-full"></div>
                         <span className="text-sm text-green-700">
-                          {findDocument(doc => doc.name === 'Credit Report (Borrower)' && doc.type === 'Credit Report (Borrower)')?.fileName}
+                          {findDocument(doc => doc.name === 'Credit Report (Borrower)' && doc.type === 'credit_report')?.fileName}
                         </span>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          const doc = findDocument(doc => doc.name === 'Credit Report (Borrower)' && doc.type === 'Credit Report (Borrower)');
-                          if (doc?.fileUrl) {
-                            window.open(doc.fileUrl, '_blank');
-                          }
-                        }}
-                        className="h-8"
-                      >
-                        View
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const doc = findDocument(doc => doc.name === 'Credit Report (Borrower)' && doc.type === 'credit_report');
+                            if (doc?.fileUrl) {
+                              window.open(doc.fileUrl, '_blank');
+                            }
+                          }}
+                          className="h-8"
+                        >
+                          View
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const input = document.getElementById('credit-report-replace') as HTMLInputElement;
+                            input?.click();
+                          }}
+                          className="h-8"
+                          disabled={uploadingDocuments.has('credit_report-Credit Report (Borrower)')}
+                        >
+                          {uploadingDocuments.has('credit_report-Credit Report (Borrower)') ? (
+                            <CustomLoader className="h-4 w-4" />
+                          ) : (
+                            'Replace'
+                          )}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleDeleteCreditReport}
+                          className="h-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
+                    {/* Hidden file input for replace functionality */}
+                    <Input
+                      id="credit-report-replace"
+                      type="file"
+                      accept=".pdf"
+                      onChange={handleReplaceCreditReport}
+                      className="hidden"
+                    />
                   </div>
                 )}
 
@@ -1018,8 +1315,8 @@ export default function ProfilePage() {
                   <div className="space-y-3">
                     <Label htmlFor="personal-asset-upload" className="text-sm font-medium">Upload Latest Personal Asset Statement</Label>
                     <div className="flex gap-3">
-                      <Input id="personal-asset-upload" type="file" onChange={(e) => handleDocumentUpload('Personal Asset Statement (Borrower)', 'Personal Asset Statement (Borrower)', e)} className="flex-1" />
-                      <Button onClick={() => handleScanAssetStatement('personal')} disabled={isScanningPersonalAsset || !findDocument(doc => doc.name === 'Personal Asset Statement (Borrower)' && doc.type === 'Personal Asset Statement (Borrower)')} className="gap-2">
+                      <Input id="personal-asset-upload" type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => handleDocumentUpload('asset_statement', 'Personal Asset Statement (Borrower)', e)} className="flex-1" />
+                      <Button onClick={() => handleScanAssetStatement('personal')} disabled={isScanningPersonalAsset || !findDocument(doc => doc.name === 'Personal Asset Statement (Borrower)' && doc.type === 'asset_statement')} className="gap-2">
                         {isScanningPersonalAsset ? <CustomLoader className="h-4 w-4" /> : <Landmark className="h-4 w-4" />}
                         <span className="hidden sm:inline">Scan</span>
                       </Button>
@@ -1027,30 +1324,64 @@ export default function ProfilePage() {
                   </div>
 
                   {/* Display uploaded personal asset statement */}
-                  {findDocument(doc => doc.name === 'Personal Asset Statement (Borrower)' && doc.type === 'Personal Asset Statement (Borrower)') && (
+                  {findDocument(doc => doc.name === 'Personal Asset Statement (Borrower)' && doc.type === 'asset_statement') && (
                     <div className="space-y-3">
                       <Label className="text-sm font-medium">Uploaded Personal Asset Statement</Label>
                       <div className="flex items-center justify-between p-3 bg-green-50 rounded-md border border-green-200">
                         <div className="flex items-center gap-2">
                           <div className="h-2 w-2 bg-green-500 rounded-full"></div>
                           <span className="text-sm text-green-700">
-                            {findDocument(doc => doc.name === 'Personal Asset Statement (Borrower)' && doc.type === 'Personal Asset Statement (Borrower)')?.fileName}
+                            {findDocument(doc => doc.name === 'Personal Asset Statement (Borrower)' && doc.type === 'asset_statement')?.fileName}
                           </span>
                         </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            const doc = findDocument(doc => doc.name === 'Personal Asset Statement (Borrower)' && doc.type === 'Personal Asset Statement (Borrower)');
-                            if (doc?.fileUrl) {
-                              window.open(doc.fileUrl, '_blank');
-                            }
-                          }}
-                          className="h-8"
-                        >
-                          View
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const doc = findDocument(doc => doc.name === 'Personal Asset Statement (Borrower)' && doc.type === 'asset_statement');
+                              if (doc?.fileUrl) {
+                                window.open(doc.fileUrl, '_blank');
+                              }
+                            }}
+                            className="h-8"
+                          >
+                            View
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const input = document.getElementById('personal-asset-replace') as HTMLInputElement;
+                              input?.click();
+                            }}
+                            className="h-8"
+                            disabled={uploadingDocuments.has('asset_statement-Personal Asset Statement (Borrower)')}
+                          >
+                            {uploadingDocuments.has('asset_statement-Personal Asset Statement (Borrower)') ? (
+                              <CustomLoader className="h-4 w-4" />
+                            ) : (
+                              'Replace'
+                            )}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteAssetStatement('personal')}
+                            className="h-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
+                      {/* Hidden file input for replace functionality */}
+                      <Input
+                        id="personal-asset-replace"
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(e) => handleReplaceAssetStatement('personal', e)}
+                        className="hidden"
+                      />
                     </div>
                   )}
 
@@ -1070,8 +1401,8 @@ export default function ProfilePage() {
                   <div className="space-y-3">
                     <Label htmlFor="company-asset-upload" className="text-sm font-medium">Upload Latest Company Asset Statement</Label>
                     <div className="flex gap-3">
-                      <Input id="company-asset-upload" type="file" onChange={(e) => handleDocumentUpload('Company Asset Statement (Company)', 'Company Asset Statement (Company)', e)} className="flex-1" />
-                      <Button onClick={() => handleScanAssetStatement('company')} disabled={isScanningCompanyAsset || !findDocument(doc => doc.name === 'Company Asset Statement (Company)' && doc.type === 'Company Asset Statement (Company)')} className="gap-2">
+                      <Input id="company-asset-upload" type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => handleDocumentUpload('asset_statement', 'Company Asset Statement (Company)', e)} className="flex-1" />
+                      <Button onClick={() => handleScanAssetStatement('company')} disabled={isScanningCompanyAsset || !findDocument(doc => doc.name === 'Company Asset Statement (Company)' && doc.type === 'asset_statement')} className="gap-2">
                         {isScanningCompanyAsset ? <CustomLoader className="h-4 w-4" /> : <Landmark className="h-4 w-4" />}
                         <span className="hidden sm:inline">Scan</span>
                       </Button>
@@ -1079,30 +1410,64 @@ export default function ProfilePage() {
                   </div>
 
                   {/* Display uploaded company asset statement */}
-                  {findDocument(doc => doc.name === 'Company Asset Statement (Company)' && doc.type === 'Company Asset Statement (Company)') && (
+                  {findDocument(doc => doc.name === 'Company Asset Statement (Company)' && doc.type === 'asset_statement') && (
                     <div className="space-y-3">
                       <Label className="text-sm font-medium">Uploaded Company Asset Statement</Label>
                       <div className="flex items-center justify-between p-3 bg-green-50 rounded-md border border-green-200">
                         <div className="flex items-center gap-2">
                           <div className="h-2 w-2 bg-green-500 rounded-full"></div>
                           <span className="text-sm text-green-700">
-                            {findDocument(doc => doc.name === 'Company Asset Statement (Company)' && doc.type === 'Company Asset Statement (Company)')?.fileName}
+                            {findDocument(doc => doc.name === 'Company Asset Statement (Company)' && doc.type === 'asset_statement')?.fileName}
                           </span>
                         </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            const doc = findDocument(doc => doc.name === 'Company Asset Statement (Company)' && doc.type === 'Company Asset Statement (Company)');
-                            if (doc?.fileUrl) {
-                              window.open(doc.fileUrl, '_blank');
-                            }
-                          }}
-                          className="h-8"
-                        >
-                          View
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const doc = findDocument(doc => doc.name === 'Company Asset Statement (Company)' && doc.type === 'asset_statement');
+                              if (doc?.fileUrl) {
+                                window.open(doc.fileUrl, '_blank');
+                              }
+                            }}
+                            className="h-8"
+                          >
+                            View
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const input = document.getElementById('company-asset-replace') as HTMLInputElement;
+                              input?.click();
+                            }}
+                            className="h-8"
+                            disabled={uploadingDocuments.has('asset_statement-Company Asset Statement (Company)')}
+                          >
+                            {uploadingDocuments.has('asset_statement-Company Asset Statement (Company)') ? (
+                              <CustomLoader className="h-4 w-4" />
+                            ) : (
+                              'Replace'
+                            )}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteAssetStatement('company')}
+                            className="h-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
+                      {/* Hidden file input for replace functionality */}
+                      <Input
+                        id="company-asset-replace"
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={(e) => handleReplaceAssetStatement('company', e)}
+                        className="hidden"
+                      />
                     </div>
                   )}
 

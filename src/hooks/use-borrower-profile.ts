@@ -180,14 +180,10 @@ export function useBorrowerProfile() {
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const response = await fetch('/api/borrower-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'updateCompanyInfo',
-          uid: user.uid,
-          company
-        })
+      const response = await authenticatedPost('/api/borrower-profile', {
+        action: 'updateCompanyInfo',
+        uid: user.uid,
+        company
       });
 
       const result = await response.json();
@@ -253,14 +249,10 @@ export function useBorrowerProfile() {
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const response = await fetch('/api/borrower-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'removeCompany',
-          uid: user.uid,
-          companyId
-        })
+      const response = await authenticatedPost('/api/borrower-profile', {
+        action: 'removeCompany',
+        uid: user.uid,
+        companyId
       });
 
       const result = await response.json();
@@ -319,14 +311,10 @@ export function useBorrowerProfile() {
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const response = await fetch('/api/borrower-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'updateCreditScores',
-          uid: user.uid,
-          creditScores
-        })
+      const response = await authenticatedPost('/api/borrower-profile', {
+        action: 'updateCreditScores',
+        uid: user.uid,
+        creditScores
       });
 
       const result = await response.json();
@@ -390,16 +378,12 @@ export function useBorrowerProfile() {
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const response = await fetch('/api/borrower-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'updateAssetInfo',
-          uid: user.uid,
-          assetType,
-          assetData,
-          companyId
-        })
+      const response = await authenticatedPost('/api/borrower-profile', {
+        action: 'updateAssetInfo',
+        uid: user.uid,
+        assetType,
+        assetData,
+        companyId
       });
 
       const result = await response.json();
@@ -466,16 +450,12 @@ export function useBorrowerProfile() {
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const response = await fetch('/api/borrower-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'updateDocumentStatus',
-          uid: user.uid,
-          documentType,
-          status,
-          companyId
-        })
+      const response = await authenticatedPost('/api/borrower-profile', {
+        action: 'updateDocumentStatus',
+        uid: user.uid,
+        documentType,
+        status,
+        companyId
       });
 
       const result = await response.json();
@@ -541,13 +521,9 @@ export function useBorrowerProfile() {
     if (!user?.uid) return;
 
     try {
-      const response = await fetch('/api/borrower-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'calculateProfileCompletion',
-          uid: user.uid
-        })
+      const response = await authenticatedPost('/api/borrower-profile', {
+        action: 'calculateProfileCompletion',
+        uid: user.uid
       });
 
       const result = await response.json();
@@ -571,14 +547,10 @@ export function useBorrowerProfile() {
       console.log('Hook: Saving financial statement for user:', user.uid);
       console.log('Hook: Financial data:', financialData);
       
-      const response = await fetch('/api/borrower-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'upsertFinancialStatement',
-          userId: user.uid,
-          financialData
-        })
+      const response = await authenticatedPost('/api/borrower-profile', {
+        action: 'upsertFinancialStatement',
+        userId: user.uid,
+        financialData
       });
 
       const result = await response.json();
@@ -620,15 +592,11 @@ export function useBorrowerProfile() {
       console.log('Hook: Company ID:', companyId);
       console.log('Hook: Debt data:', debtData);
       
-      const response = await fetch('/api/borrower-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'upsertDebtSchedule',
-          userId: user.uid,
-          companyId,
-          debtData
-        })
+      const response = await authenticatedPost('/api/borrower-profile', {
+        action: 'upsertDebtSchedule',
+        userId: user.uid,
+        companyId,
+        debtData
       });
 
       const result = await response.json();
@@ -663,14 +631,10 @@ export function useBorrowerProfile() {
       console.log('Hook: Loading debt schedule for user:', user.uid);
       console.log('Hook: Company ID:', companyId);
       
-      const response = await fetch('/api/borrower-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'getDebtSchedule',
-          userId: user.uid,
-          companyId
-        })
+      const response = await authenticatedPost('/api/borrower-profile', {
+        action: 'getDebtSchedule',
+        userId: user.uid,
+        companyId
       });
 
       const result = await response.json();
@@ -702,14 +666,10 @@ export function useBorrowerProfile() {
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const response = await fetch('/api/borrower-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'updateDealHistory',
-          uid: user.uid,
-          dealHistory
-        })
+      const response = await authenticatedPost('/api/borrower-profile', {
+        action: 'updateDealHistory',
+        uid: user.uid,
+        dealHistory
       });
 
       const result = await response.json();
@@ -747,14 +707,10 @@ export function useBorrowerProfile() {
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const response = await fetch('/api/borrower-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'addDeal',
-          uid: user.uid,
-          deal
-        })
+      const response = await authenticatedPost('/api/borrower-profile', {
+        action: 'addDeal',
+        uid: user.uid,
+        deal
       });
 
       const result = await response.json();
@@ -788,15 +744,11 @@ export function useBorrowerProfile() {
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const response = await fetch('/api/borrower-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'updateDeal',
-          uid: user.uid,
-          dealId,
-          updates
-        })
+      const response = await authenticatedPost('/api/borrower-profile', {
+        action: 'updateDeal',
+        uid: user.uid,
+        dealId,
+        updates
       });
 
       const result = await response.json();
@@ -830,14 +782,10 @@ export function useBorrowerProfile() {
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const response = await fetch('/api/borrower-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'removeDeal',
-          uid: user.uid,
-          dealId
-        })
+      const response = await authenticatedPost('/api/borrower-profile', {
+        action: 'removeDeal',
+        uid: user.uid,
+        dealId
       });
 
       const result = await response.json();

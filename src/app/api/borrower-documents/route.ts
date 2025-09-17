@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
+import { requireAuth, getAuthenticatedUser } from '@/lib/auth-utils-server';
 
 export async function GET(request: NextRequest) {
   try {
+    // Require authentication
+    const authError = await requireAuth(request);
+    if (authError) return authError;
+
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const borrowerId = searchParams.get('borrowerId');
 
@@ -11,6 +21,13 @@ export async function GET(request: NextRequest) {
         { error: 'Borrower ID is required' },
         { status: 400 }
       );
+    }
+
+    // Users can only access their own documents, admins can access any
+    if (user.role !== 'admin' && user.uid !== borrowerId) {
+      return NextResponse.json({ 
+        error: 'Forbidden - Can only access your own documents' 
+      }, { status: 403 });
     }
 
     try {
@@ -51,6 +68,15 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Require authentication
+    const authError = await requireAuth(request);
+    if (authError) return authError;
+
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { action, ...data } = body;
 

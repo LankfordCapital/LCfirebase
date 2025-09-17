@@ -100,7 +100,7 @@ export function useDashboardData() {
     if (!user?.uid) return [];
 
     try {
-      const response = await fetch(`/api/borrower-documents?borrowerId=${user.uid}`);
+      const response = await authenticatedGet('/api/borrower-documents', { borrowerId: user.uid });
       const result = await response.json();
       
       if (result.success && Array.isArray(result.documents)) {

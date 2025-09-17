@@ -31,8 +31,11 @@ export async function authenticatedFetch(url: string, options: RequestInit = {})
     throw new Error('No authentication token available');
   }
   
+  // For FormData, don't set Content-Type - let the browser set it with boundary
+  const isFormData = options.body instanceof FormData;
+  
   const headers = {
-    'Content-Type': 'application/json',
+    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     'Authorization': `Bearer ${token}`,
     ...options.headers,
   };
@@ -70,9 +73,12 @@ export async function authenticatedGet(url: string, params?: Record<string, stri
  * @returns Promise<Response> - The fetch response
  */
 export async function authenticatedPost(url: string, data?: any): Promise<Response> {
+  // Handle FormData differently - don't stringify it
+  const isFormData = data instanceof FormData;
+  
   return authenticatedFetch(url, {
     method: 'POST',
-    body: data ? JSON.stringify(data) : undefined,
+    body: data ? (isFormData ? data : JSON.stringify(data)) : undefined,
   });
 }
 

@@ -20,6 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CustomLoader } from "@/components/ui/custom-loader";
 import Image from "next/image";
 import { AuthDebugPanel } from "@/components/auth-debug-panel";
+import { validateEmail, validatePassword, getAuthError } from "@/lib/auth-utils";
 
 export default function SignInPage() {
   const searchParams = useSearchParams();
@@ -80,8 +81,39 @@ export default function SignInPage() {
     }
   };
 
+  // Input validation using auth utilities
+  const validateInputs = () => {
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.isValid) {
+      toast({
+        variant: 'destructive',
+        title: 'Invalid Email',
+        description: emailValidation.error!,
+      });
+      return false;
+    }
+    
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      toast({
+        variant: 'destructive',
+        title: 'Invalid Password',
+        description: passwordValidation.error!,
+      });
+      return false;
+    }
+    
+    return true;
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    
+    // Validate inputs before attempting sign in
+    if (!validateInputs()) {
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
@@ -97,10 +129,14 @@ export default function SignInPage() {
       console.log('✅ Sign-in successful, waiting for redirect...');
     } catch (error: any) {
       console.error('Sign-in error in component:', error);
+      
+      // Use auth utilities for consistent error handling
+      const authError = getAuthError(error);
+      
       toast({
         variant: 'destructive',
         title: 'Sign In Failed',
-        description: error.message || 'An unexpected error occurred',
+        description: authError.userFriendlyMessage,
       });
       setIsLoading(false);
     }
@@ -116,12 +152,15 @@ export default function SignInPage() {
     } catch (error: any) {
       console.error('Google sign-in error in component:', error);
       
+      // Use auth utilities for consistent error handling
+      const authError = getAuthError(error);
+      
       // Don't show error toast if user closed the popup
       if (error.code !== 'auth/popup-closed-by-user') {
         toast({
           variant: 'destructive',
           title: 'Google Sign In Failed',
-          description: error.message || 'An unexpected error occurred',
+          description: authError.userFriendlyMessage,
         });
       }
       // Always reset loading state on error

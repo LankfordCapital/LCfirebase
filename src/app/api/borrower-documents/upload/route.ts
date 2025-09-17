@@ -1,9 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminStorage } from '@/lib/firebase-admin';
 import { getDownloadURL } from 'firebase-admin/storage';
+import { requireAuth, getAuthenticatedUser } from '@/lib/auth-utils-server';
 
 export async function POST(request: NextRequest) {
   try {
+    // Require authentication
+    const authError = await requireAuth(request);
+    if (authError) return authError;
+
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 401 });
+    }
+
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const borrowerId = formData.get('borrowerId') as string;
@@ -15,6 +25,13 @@ export async function POST(request: NextRequest) {
         { error: 'Missing required fields' },
         { status: 400 }
       );
+    }
+
+    // Users can only upload documents for themselves, admins can upload for anyone
+    if (user.role !== 'admin' && user.uid !== borrowerId) {
+      return NextResponse.json({ 
+        error: 'Forbidden - Can only upload documents for yourself' 
+      }, { status: 403 });
     }
 
     // Validate file
@@ -62,13 +79,16 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      console.log('File saved to storage, generating download URL...');
+      console.log('File saved to storage, generating signed URL...');
 
-      // With uniform bucket-level access, we need to use Firebase Storage's download URL
-      // This approach stores the file path and generates URLs on-demand from the client
-      const downloadURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(storagePath)}?alt=media`;
+      // With uniform bucket-level access, we need to use signed URLs instead of public URLs
+      // Generate a signed URL for secure access (works with uniform bucket-level access)
+      const [downloadURL] = await fileUpload.getSignedUrl({
+        action: 'read',
+        expires: Date.now() + 365 * 24 * 60 * 60 * 1000, // 1 year from now
+      });
       
-      console.log('Upload successful, Firebase Storage URL generated:', downloadURL);
+      console.log('Upload successful, signed URL generated:', downloadURL);
 
       return NextResponse.json({
         success: true,

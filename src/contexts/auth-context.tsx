@@ -26,6 +26,7 @@ import {
 } from 'firebase/auth';
 import { auth, db, googleProvider, markExplicitLogout, clearExplicitLogout, clearAllAuthCache, clearAuthCache } from '@/lib/firebase-client';
 import { authenticatedGet, authenticatedPost } from '@/lib/api-client';
+import { createAuthRetryWrapper, getAuthError } from '@/lib/auth-utils';
 import { doc, setDoc, serverTimestamp, getDoc, updateDoc, collection, getDocs } from 'firebase/firestore';
 import { useRouter, usePathname } from 'next/navigation';
 
@@ -69,6 +70,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Global flag to prevent multiple auth listeners
 let authListenerSet = false;
+let authUnsubscribe: (() => void) | null = null;
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -103,16 +105,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [pathname, router, getRedirectPath]);
 
-  // Production-ready page exit detection with proper cleanup and error handling
+  // DISABLED: Page exit detection that was causing logout on refresh
+  // Users should stay logged in on browser refresh
+  // Only logout on explicit navigation to home page (handled below)
+  /*
   useEffect(() => {
     if (!user || typeof window === 'undefined') return;
 
     let isLoggingOut = false; // Prevent multiple simultaneous logouts
     let visibilityTimeout: NodeJS.Timeout | null = null;
     let isPageVisible = !document.hidden;
+    let isRefreshing = false; // Track if this is a refresh
 
     const handlePageExit = () => {
       if (isLoggingOut) return; // Prevent multiple calls
+      
+      // Don't logout on browser refresh - only on actual page exits
+      if (isRefreshing) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔄 Browser refresh detected - keeping user logged in');
+        }
+        return;
+      }
+      
       isLoggingOut = true;
 
       try {
@@ -166,17 +181,66 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const handlePageHide = () => {
       // pagehide is more reliable than beforeunload on mobile
+      // Check if this is a refresh by looking at performance navigation type
+      const navigationType = performance.navigation?.type || (performance as any).getEntriesByType?.('navigation')?.[0]?.type;
+      if (navigationType === 1) { // TYPE_RELOAD
+        isRefreshing = true;
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔄 Page hide detected as refresh - keeping user logged in');
+        }
+        return;
+      }
       handlePageExit();
     };
 
-    const handleBeforeUnload = () => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       // beforeunload is unreliable on mobile, but good for desktop
       if (navigator.userAgent.includes('Mobile')) return;
+      
+      // Check if this is a refresh by looking at the event
+      // If the user is pressing F5 or Ctrl+R, it's a refresh
+      if (event.type === 'beforeunload') {
+        // Check if this might be a refresh (not a navigation away)
+        const isRefresh = performance.navigation?.type === 1 || 
+                         (performance as any).getEntriesByType?.('navigation')?.[0]?.type === 1;
+        if (isRefresh) {
+          isRefreshing = true;
+          if (process.env.NODE_ENV === 'development') {
+            console.log('🔄 Before unload detected as refresh - keeping user logged in');
+          }
+          return;
+        }
+      }
       handlePageExit();
     };
 
     // Initialize page visible start time
     (window as any).pageVisibleStartTime = Date.now();
+    
+    // Add refresh detection using multiple methods
+    const detectRefresh = () => {
+      // Method 1: Check performance navigation type
+      const navigationType = performance.navigation?.type || (performance as any).getEntriesByType?.('navigation')?.[0]?.type;
+      if (navigationType === 1) { // TYPE_RELOAD
+        return true;
+      }
+      
+      // Method 2: Check if page is being refreshed (not navigated away)
+      const isRefresh = window.performance && 
+                       window.performance.getEntriesByType && 
+                       window.performance.getEntriesByType('navigation').length > 0 &&
+                       (window.performance.getEntriesByType('navigation')[0] as any).type === 'reload';
+      
+      return isRefresh;
+    };
+    
+    // Set refresh flag if this is a refresh
+    if (detectRefresh()) {
+      isRefreshing = true;
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔄 Page load detected as refresh - keeping user logged in');
+      }
+    }
     
     // Add event listeners with passive option where possible
     const eventOptions = { passive: true, capture: false };
@@ -203,8 +267,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     };
   }, [user]); // Only re-run when user changes
+  */
 
-  // Handle logout when navigating to home page
+  // Handle logout when navigating to home page - DISABLED for better UX
+  // This was causing users to be logged out unexpectedly when visiting the home page
+  // Commenting out this logic to prevent unexpected logouts
+  /*
   useEffect(() => {
     if (!user || typeof window === 'undefined') return;
 
@@ -249,16 +317,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     }
   }, [pathname, user, userProfile, loading]); // Include loading state to prevent race conditions
+  */
 
   useEffect(() => {
+    // Clean up existing listener if any
+    if (authUnsubscribe) {
+      console.log('🧹 Cleaning up existing auth listener...');
+      authUnsubscribe();
+      authUnsubscribe = null;
+    }
+    
     // Prevent multiple auth listeners
     if (authListenerSet) {
-      console.log('⚠️ Auth listener already set, skipping...');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Auth listener already set, skipping...');
+      }
       return;
     }
     
     authListenerSet = true;
-    console.log('🔧 Setting up auth state listener...');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Setting up auth state listener...');
+    }
     
     let isMounted = true; // Flag to prevent state updates after unmount
     let timeoutId: NodeJS.Timeout | null = null;
@@ -267,89 +347,75 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (!isMounted) return; // Prevent state updates if component unmounted
       
       setLoading(true);
-      console.log('🔄 Auth state changed:', userAuth ? `User: ${userAuth.email}` : 'No user');
-      console.log('🔄 Auth state change timestamp:', new Date().toISOString());
-      console.log('🔄 Current auth instance:', auth.app.name);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Auth state changed:', userAuth?.email || 'No user');
+      }
       
       // Set a timeout to prevent infinite loading
       timeoutId = setTimeout(() => {
         if (isMounted) {
-          console.warn('⚠️ Auth state change timeout - forcing loading to false');
+          console.warn('Auth state change timeout - forcing loading to false');
           setLoading(false);
         }
-      }, 15000); // 15 second timeout - increased for better persistence handling
+      }, 10000); // 10 second timeout
       
       try {
         if (userAuth) {
-          console.log('👤 User authenticated, fetching profile...');
+          if (process.env.NODE_ENV === 'development') {
+            console.log('User authenticated, fetching profile...');
+          }
           
-                    // Retry logic for fetching user profile
-                    const maxRetries = 3;
-                    let profile: UserProfile | null = null;
-                    
-                    for (let attempt = 1; attempt <= maxRetries && isMounted; attempt++) {
-                      try {
-                        const userDocRef = doc(db, 'users', userAuth.uid);
-                        const userDoc = await getDoc(userDocRef);
-                        
-                        if (!isMounted) return; // Check if still mounted
-                        
-                        if (userDoc.exists()) {
-                          profile = { uid: userDoc.id, ...userDoc.data() } as UserProfile;
-                          console.log(`✅ User profile loaded on attempt ${attempt}:`, profile.email, profile.role);
-                          break;
-                        } else {
-                          console.warn(`⚠️ User profile not found in Firestore on attempt ${attempt}`);
-                          // If this is the first attempt and profile doesn't exist, 
-                          // it might be a new user - don't retry immediately
-                          if (attempt === 1) {
-                            console.log('🔄 First attempt - user profile may not exist yet, waiting before retry...');
-                            await new Promise(resolve => setTimeout(resolve, 2000));
-                          }
-                        }
-                      } catch (error) {
-                        console.error(`❌ Error fetching user profile on attempt ${attempt}:`, error);
-                        if (attempt < maxRetries && isMounted) {
-                          const delay = Math.pow(2, attempt) * 1000;
-                          console.log(`⏳ Waiting ${delay}ms before retry...`);
-                          await new Promise(resolve => setTimeout(resolve, delay));
-                        }
-                      }
-                    }
-          
-                    if (!isMounted) return; // Check if still mounted before state updates
-                    
-                    setUser(userAuth);
-
-                    if (profile) {
-                      setUserProfile(profile);
-                      // Handle redirect inline to avoid dependency issues
-                      const authPages = ['/auth/signin', '/auth/signup', '/auth/forgot-password', '/auth/reset-password'];
-                      if (authPages.includes(pathname)) {
-                        const path = getRedirectPath(profile);
-                        console.log(`🔄 Redirecting to: ${path}`);
-                        router.push(path);
-                      }
-                    } else {
-                      // This case handles a user that exists in Firebase Auth but not in Firestore.
-                      // It could happen if the Firestore document creation failed during signup.
-                      console.error('❌ User exists in Firebase Auth but not in Firestore');
-                      setUserProfile(null);
-                      
-                      // Only redirect to signin if we're not already on an auth page
-                      const authPages = ['/auth/signin', '/auth/signup', '/auth/forgot-password', '/auth/reset-password'];
-                      if (!authPages.includes(pathname)) {
-                        router.push('/auth/signin');
-                      }
-                    }
+          try {
+            const userDocRef = doc(db, 'users', userAuth.uid);
+            const userDoc = await getDoc(userDocRef);
+            
+            if (!isMounted) return; // Check if still mounted
+            
+            setUser(userAuth);
+            
+            if (userDoc.exists()) {
+              const profile = { uid: userDoc.id, ...userDoc.data() } as UserProfile;
+              setUserProfile(profile);
+              
+              if (process.env.NODE_ENV === 'development') {
+                console.log(`Profile loaded: ${profile.email}`);
+              }
+              
+              // Handle redirect inline to avoid dependency issues
+              const authPages = ['/auth/signin', '/auth/signup', '/auth/forgot-password', '/auth/reset-password'];
+              if (authPages.includes(pathname)) {
+                const path = getRedirectPath(profile);
+                if (process.env.NODE_ENV === 'development') {
+                  console.log(`Redirecting to: ${path}`);
+                }
+                router.push(path);
+              }
+            } else {
+              // User exists in Firebase Auth but not in Firestore
+              console.error('User exists in Firebase Auth but not in Firestore');
+              setUserProfile(null);
+              
+              // Only redirect to signin if we're not already on an auth page
+              const authPages = ['/auth/signin', '/auth/signup', '/auth/forgot-password', '/auth/reset-password'];
+              if (!authPages.includes(pathname)) {
+                router.push('/auth/signin');
+              }
+            }
+          } catch (error) {
+            console.error('Error fetching user profile:', error);
+            setUser(userAuth);
+            setUserProfile(null);
+          }
         } else {
           if (!isMounted) return; // Check if still mounted
-          console.log('👤 No user authenticated');
+          if (process.env.NODE_ENV === 'development') {
+            console.log('No user authenticated');
+          }
           setUser(null);
           setUserProfile(null);
         }
       } catch (error) {
-        console.error('❌ Error in auth state change handler:', error);
+        console.error('Error in auth state change handler:', error);
         if (isMounted) {
           setUser(null);
           setUserProfile(null);
@@ -359,20 +425,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           // Clear timeout since we're done processing
           if (timeoutId) {
             clearTimeout(timeoutId);
+            timeoutId = null;
           }
           setLoading(false);
         }
       }
     });
 
+    // Store unsubscribe function globally for cleanup
+    authUnsubscribe = unsubscribe;
+    
     return () => {
       isMounted = false; // Mark as unmounted
       authListenerSet = false; // Reset flag for cleanup
       if (timeoutId) {
         clearTimeout(timeoutId);
+        timeoutId = null;
       }
       unsubscribe(); // Clean up listener
-      console.log('🧹 Auth listener cleaned up');
+      authUnsubscribe = null; // Clear global reference
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Auth listener cleaned up');
+      }
     };
   }, []); // Only run once on mount - don't recreate listener on pathname changes
 
@@ -413,41 +487,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
   
-  const signIn = async (email: string, pass: string) => {
-    const maxRetries = 3;
-    let lastError: any;
-    
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        console.log(`🔄 Sign in attempt ${attempt}/${maxRetries} for ${email}`);
-        const result = await signInWithEmailAndPassword(auth, email, pass);
-        console.log(`✅ Sign in successful on attempt ${attempt}`);
-        // Clear explicit logout flag since user is signing in
-        clearExplicitLogout();
-        return result;
-      } catch (error: any) {
-        lastError = error;
-        console.error(`❌ Sign in attempt ${attempt} failed:`, error.code, error.message);
-        
-        // Don't retry for certain errors
-        if (error.code === 'auth/user-not-found' || 
-            error.code === 'auth/wrong-password' || 
-            error.code === 'auth/invalid-email') {
-          throw error;
-        }
-        
-        // Wait before retrying (exponential backoff)
-        if (attempt < maxRetries) {
-          const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
-          console.log(`⏳ Waiting ${delay}ms before retry...`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-        }
-      }
-    }
-    
-    console.error(`❌ All ${maxRetries} sign in attempts failed`);
-    throw lastError;
-  };
+  const signIn = createAuthRetryWrapper(async (email: string, pass: string) => {
+    const result = await signInWithEmailAndPassword(auth, email, pass);
+    // Clear explicit logout flag since user is signing in
+    clearExplicitLogout();
+    return result;
+  }, 3);
   
   const signUpWithGoogle = async (role: string = 'borrower') => {
     const maxRetries = 3;
@@ -459,7 +504,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const result = await signInWithPopup(auth, googleProvider);
         const user = result.user;
         
-        console.log(`✅ Google sign in successful on attempt ${attempt} for user:`, user.email);
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`Google sign in: ${user.email}`);
+        }
         // Clear explicit logout flag since user is signing in
         clearExplicitLogout();
         
@@ -479,11 +526,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             };
             await setDoc(userDocRef, newProfile);
             setUserProfile(newProfile);
-            console.log(`✅ New user profile created for Google user:`, user.email);
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`New profile created: ${user.email}`);
+            }
         } else {
             const profile = userDoc.data() as UserProfile;
             setUserProfile(profile);
-            console.log(`✅ Existing user profile loaded for Google user:`, user.email);
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`Profile loaded: ${user.email}`);
+            }
         }
         
         return result;
@@ -511,57 +562,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     throw lastError;
   };
 
-  const signInWithGoogle = async () => {
-    const maxRetries = 3;
-    let lastError: any;
+  const signInWithGoogle = createAuthRetryWrapper(async () => {
+    console.log(`🔄 Google sign in attempt`);
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
     
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        console.log(`🔄 Google sign in attempt ${attempt}/${maxRetries}`);
-        const result = await signInWithPopup(auth, googleProvider);
-        const user = result.user;
-        
-        console.log(`✅ Google sign in successful on attempt ${attempt} for user:`, user.email);
-        // Clear explicit logout flag since user is signing in
-        clearExplicitLogout();
-        
-        const userDocRef = doc(db, 'users', user.uid);
-        const userDoc = await getDoc(userDocRef);
-        
-        if (!userDoc.exists()) {
-          // User doesn't exist in Firestore - this shouldn't happen for sign-in
-          console.error('❌ User exists in Firebase Auth but not in Firestore - this is a sign-in error');
-          throw new Error('Account not found. Please sign up first.');
-        } else {
-          const profile = userDoc.data() as UserProfile;
-          setUserProfile(profile);
-          console.log(`✅ Existing user profile loaded for Google user:`, user.email);
-        }
-        
-        return result;
-      } catch (error: any) {
-        lastError = error;
-        console.error(`❌ Google sign in attempt ${attempt} failed:`, error.code, error.message);
-        
-        // Don't retry for certain errors
-        if (error.code === 'auth/popup-closed-by-user' || 
-            error.code === 'auth/cancelled-popup-request' ||
-            error.code === 'auth/popup-blocked') {
-          throw error;
-        }
-        
-        // Wait before retrying (exponential backoff)
-        if (attempt < maxRetries) {
-          const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
-          console.log(`⏳ Waiting ${delay}ms before retry...`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-        }
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Google sign in: ${user.email}`);
+    }
+    // Clear explicit logout flag since user is signing in
+    clearExplicitLogout();
+    
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userDocRef);
+    
+    if (!userDoc.exists()) {
+      // User doesn't exist in Firestore - this shouldn't happen for sign-in
+      console.error('❌ User exists in Firebase Auth but not in Firestore - this is a sign-in error');
+      throw new Error('Account not found. Please sign up first.');
+    } else {
+      const profile = userDoc.data() as UserProfile;
+      setUserProfile(profile);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`Profile loaded: ${user.email}`);
       }
     }
     
-    console.error(`❌ All ${maxRetries} Google sign in attempts failed`);
-    throw lastError;
-  };
+    return result;
+  }, 3);
 
   const addPasswordToGoogleAccount = async (password: string) => {
     if (!user || !user.email) {
@@ -637,7 +665,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       router.push('/auth/signin');
       
       if (process.env.NODE_ENV === 'development') {
-        console.log('✅ User successfully logged out and redirected');
+        console.log('User logged out');
       }
       
     } catch (error) {
@@ -729,24 +757,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Debug function to help troubleshoot auth issues
   const debugAuthState = () => {
-    console.log('🔍 === AUTH DEBUG INFO ===');
-    console.log('Current user:', user ? {
-      uid: user.uid,
-      email: user.email,
-      emailVerified: user.emailVerified,
-      displayName: user.displayName,
-      metadata: {
-        creationTime: user.metadata.creationTime,
-        lastSignInTime: user.metadata.lastSignInTime
-      }
-    } : 'No user');
-    console.log('User profile:', userProfile);
-    console.log('Loading state:', loading);
-    console.log('Is admin:', isAdmin);
-    console.log('Current path:', pathname);
-    console.log('Firebase auth current user:', auth.currentUser);
-    console.log('Explicit logout flag:', typeof window !== 'undefined' ? localStorage.getItem('userExplicitlyLoggedOut') : 'N/A');
-    console.log('========================');
+    console.log('Auth Debug:', {
+      user: user?.email || 'No user',
+      profile: userProfile?.role || 'No profile',
+      loading,
+      path: pathname
+    });
   };
 
   // Function to force logout and clear all data (for admin/debugging purposes)
@@ -760,9 +776,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Function to clear authentication cache (for troubleshooting)
   const handleClearAuthCache = () => {
-    console.log('🧹 Manual auth cache clear initiated...');
     clearAuthCache();
-    console.log('✅ Auth cache cleared - you may need to sign in again');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Auth cache cleared');
+    }
   };
 
   // Function to clear all cache (nuclear option for troubleshooting)

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { UserApiService } from '@/lib/api-services';
-import { requireAuth, requireRole, getAuthenticatedUser } from '@/lib/auth-utils';
+import { requireAuth, requireRole, getAuthenticatedUser } from '@/lib/auth-utils-server';
 
 export async function GET(request: NextRequest) {
   try {
