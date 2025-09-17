@@ -346,7 +346,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, async (userAuth) => {
       if (!isMounted) return; // Prevent state updates if component unmounted
       
-      setLoading(true);
+      // Only set loading if we don't have a user yet or if user is changing
+      if (!user || user.uid !== userAuth?.uid) {
+        setLoading(true);
+      }
+      
       if (process.env.NODE_ENV === 'development') {
         console.log('Auth state changed:', userAuth?.email || 'No user');
       }
@@ -357,7 +361,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           console.warn('Auth state change timeout - forcing loading to false');
           setLoading(false);
         }
-      }, 10000); // 10 second timeout
+      }, 5000); // 5 second timeout - reduced for faster response
       
       try {
         if (userAuth) {
@@ -381,14 +385,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 console.log(`Profile loaded: ${profile.email}`);
               }
               
-              // Handle redirect inline to avoid dependency issues
+              // Handle redirect - always redirect if on auth pages, or if user just signed in
               const authPages = ['/auth/signin', '/auth/signup', '/auth/forgot-password', '/auth/reset-password'];
-              if (authPages.includes(pathname)) {
+              const shouldRedirect = authPages.includes(pathname) || !user; // Redirect if on auth page or if this is a new sign-in
+              
+              if (shouldRedirect) {
                 const path = getRedirectPath(profile);
                 if (process.env.NODE_ENV === 'development') {
-                  console.log(`Redirecting to: ${path}`);
+                  console.log(`Redirecting to: ${path} (from: ${pathname})`);
                 }
-                router.push(path);
+                // Use replace instead of push to prevent back button issues
+                router.replace(path);
               }
             } else {
               // User exists in Firebase Auth but not in Firestore
@@ -449,6 +456,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     };
   }, []); // Only run once on mount - don't recreate listener on pathname changes
+
+  // Handle redirects when user profile changes
+  useEffect(() => {
+    if (userProfile && !loading) {
+      const authPages = ['/auth/signin', '/auth/signup', '/auth/forgot-password', '/auth/reset-password'];
+      if (authPages.includes(pathname)) {
+        const path = getRedirectPath(userProfile);
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`Profile-based redirect to: ${path} (from: ${pathname})`);
+        }
+        router.replace(path);
+      }
+    }
+  }, [userProfile, loading, pathname, router, getRedirectPath]);
 
   const signUp = async (email: string, pass: string, fullName: string, role: string) => {
     try {

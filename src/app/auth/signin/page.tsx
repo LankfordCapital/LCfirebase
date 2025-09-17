@@ -125,8 +125,14 @@ export default function SignInPage() {
       }
       
       // AuthProvider will handle the redirect on successful sign-in
-      // Don't reset loading state here as redirect will happen
-      console.log('✅ Sign-in successful, waiting for redirect...');
+      // Set a timeout to reset loading state if redirect doesn't happen
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 3000); // 3 second timeout
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('✅ Sign-in successful, waiting for redirect...');
+      }
     } catch (error: any) {
       console.error('Sign-in error in component:', error);
       
@@ -147,8 +153,16 @@ export default function SignInPage() {
     
     try {
       await signInWithGoogle();
+      
       // AuthProvider will handle the redirect on successful sign-in
-      // Note: Don't set loading to false here as redirect will happen
+      // Set a timeout to reset loading state if redirect doesn't happen
+      setTimeout(() => {
+        setIsGoogleLoading(false);
+      }, 3000); // 3 second timeout
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('✅ Google sign-in successful, waiting for redirect...');
+      }
     } catch (error: any) {
       console.error('Google sign-in error in component:', error);
       
