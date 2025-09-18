@@ -10,8 +10,7 @@ runConfig:
   secrets:
     - variable: GEMINI_API_KEY
       secret: projects/lankford-lending/secrets/GEMINI_API_KEY
-    - variable: FIREBASE_SERVICE_ACCOUNT_KEY
-      secret: projects/lankford-lending/secrets/FIREBASE_SERVICE_ACCOUNT_KEY
+    # FIREBASE_SERVICE_ACCOUNT_KEY removed - using Application Default Credentials
     - variable: RESEND_API_KEY
       secret: projects/940157326397/secrets/RESEND_API_KEY
     - variable: PANGEA_API_TOKEN

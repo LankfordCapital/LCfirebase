@@ -38,13 +38,22 @@ export class BrokerDocumentAdminService {
         },
       });
 
-    // Generate download URL using signed URL
-    const [downloadURL] = await fileRef.getSignedUrl({
-      action: 'read',
-      expires: Date.now() + 365 * 24 * 60 * 60 * 1000, // 1 year from now
-    });
-    
-    console.log('Signed URL generated successfully');
+    // Generate download URL using hybrid approach (signed URL with fallback)
+    let downloadURL: string;
+    try {
+      // Try signed URL first (works with proper IAM permissions)
+      const [signedURL] = await fileRef.getSignedUrl({
+        action: 'read',
+        expires: Date.now() + 365 * 24 * 60 * 60 * 1000, // 1 year from now
+      });
+      downloadURL = signedURL;
+      console.log('Signed URL generated successfully');
+    } catch (signedUrlError) {
+      // Fallback to public URL if signed URL generation fails
+      console.log('Signed URL generation failed, using public URL fallback:', signedUrlError);
+      downloadURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(storagePath)}?alt=media`;
+      console.log('Public URL fallback generated');
+    }
 
       return { success: true, url: downloadURL, path: storagePath };
     } catch (error) {

@@ -19,8 +19,15 @@ if (getApps().length === 0) {
         if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
             // Option 1: From environment variable (JSON string)
             console.log('Loading Firebase Admin from environment variable');
-            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
-            credentialConfig = credential.cert(serviceAccount);
+            try {
+                const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+                credentialConfig = credential.cert(serviceAccount);
+                console.log('Service account loaded from environment variable');
+            } catch (parseError) {
+                console.error('Error parsing service account from environment:', parseError);
+                console.log('Falling back to application default credentials');
+                credentialConfig = credential.applicationDefault();
+            }
         } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
             // Option 2: From GOOGLE_APPLICATION_CREDENTIALS path
             console.log('Loading Firebase Admin from GOOGLE_APPLICATION_CREDENTIALS');
