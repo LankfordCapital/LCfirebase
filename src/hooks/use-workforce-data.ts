@@ -122,8 +122,8 @@ export function useWorkforceData() {
       
       if (result.success && Array.isArray(result.brokers)) {
         return result.brokers.map((broker: any) => ({
-          id: broker.id,
-          name: broker.name || 'Unknown Broker',
+          id: broker.id || broker.uid,
+          name: broker.fullName || broker.name || 'Unknown Broker',
           company: broker.company || 'No company',
           email: broker.email || 'No email',
           phone: broker.phone || 'No phone',
