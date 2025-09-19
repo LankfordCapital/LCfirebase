@@ -9,16 +9,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Save, Building, User, Mail, Phone, Percent, BarChart, DollarSign } from "lucide-react";
+import { ArrowLeft, Save, Building, User, Mail, Phone, Percent, BarChart, DollarSign, Loader2 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
+import { authenticatedGet, authenticatedPost } from '@/lib/api-client';
 
-// Mock Data
-const brokersData: { [key: string]: any } = {
-    "BRK-001": { name: "Alice Johnson", company: "Creative Capital", email: "alice.j@cc.com", phone: "555-987-6543", status: "Active", commissionTier: "Tier 2 - 1.5%", ytdVolume: 2100000, loansClosed: 15 },
-    "BRK-002": { name: "Bob Williams", company: "Mortgage Pro", email: "bob.w@mp.com", phone: "555-876-5432", status: "Active", commissionTier: "Tier 2 - 1.5%", ytdVolume: 3500000, loansClosed: 22 },
-    "BRK-003": { name: "Charlie Brown", company: "Prestige Lending", email: "charlie.b@pl.com", phone: "555-111-2222", status: "Probation", commissionTier: "Tier 1 - 1.0%", ytdVolume: 850000, loansClosed: 6 },
-    "BRK-004": { name: "Diana Prince", company: "Capital Partners", email: "diana.p@cp.com", phone: "555-765-4321", status: "Active", commissionTier: "Tier 3 - 2.0%", ytdVolume: 7200000, loansClosed: 35 },
-};
+interface BrokerData {
+    id: string;
+    name: string;
+    company: string;
+    email: string;
+    phone: string;
+    status: string;
+    commissionTier: string;
+    ytdVolume: number;
+    loansClosed: number;
+}
 
 export default function ManageBrokerPage() {
     const params = useParams();
@@ -26,28 +31,105 @@ export default function ManageBrokerPage() {
     const { toast } = useToast();
     const brokerId = params.brokerId as string;
     
-    const [broker, setBroker] = useState(brokersData[brokerId]);
+    const [broker, setBroker] = useState<BrokerData | null>(null);
     const [isSaving, setIsSaving] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleSave = () => {
+    // Fetch broker data
+    useEffect(() => {
+        const fetchBrokerData = async () => {
+            try {
+                setLoading(true);
+                const response = await authenticatedGet(`/api/workforce/broker-info?brokerId=${brokerId}`);
+                const result = await response.json();
+                
+                if (result.success && result.broker) {
+                    const brokerData = result.broker;
+                    setBroker({
+                        id: brokerData.id,
+                        name: brokerData.fullName || brokerData.name || 'Unknown Broker',
+                        company: brokerData.company || 'No company',
+                        email: brokerData.email || 'No email',
+                        phone: brokerData.phone || 'No phone',
+                        status: brokerData.status || 'Active',
+                        commissionTier: brokerData.commissionTier || 'Tier 1 - 1.0%',
+                        ytdVolume: brokerData.ytdVolume || 0,
+                        loansClosed: brokerData.loansClosed || 0
+                    });
+                } else {
+                    setError('Broker not found');
+                }
+            } catch (err) {
+                console.error('Error fetching broker data:', err);
+                setError('Failed to load broker information');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (brokerId) {
+            fetchBrokerData();
+        }
+    }, [brokerId]);
+
+    const handleSave = async () => {
+        if (!broker) return;
+        
         setIsSaving(true);
-        // Simulate API call to save broker data
-        setTimeout(() => {
-            // Here you would update your database
-            console.log("Saving broker data:", broker);
-            toast({
-                title: "Broker Updated",
-                description: `${broker.name}'s profile has been updated successfully.`,
+        try {
+            const response = await authenticatedPost('/api/workforce/update-broker', {
+                brokerId: broker.id,
+                updates: {
+                    fullName: broker.name,
+                    company: broker.company,
+                    email: broker.email,
+                    phone: broker.phone,
+                    status: broker.status,
+                    commissionTier: broker.commissionTier
+                }
             });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                toast({
+                    title: "Broker Updated",
+                    description: `${broker.name}'s profile has been updated successfully.`,
+                });
+            } else {
+                throw new Error(result.error || 'Failed to update broker');
+            }
+        } catch (err) {
+            console.error('Error updating broker:', err);
+            toast({
+                variant: 'destructive',
+                title: 'Error',
+                description: 'Failed to update broker information. Please try again.',
+            });
+        } finally {
             setIsSaving(false);
-        }, 1000);
+        }
     };
     
     const handleBrokerChange = (field: string, value: string) => {
         setBroker((prev: any) => ({ ...prev, [field]: value }));
     };
 
-    if (!broker) {
+    if (loading) {
+        return (
+            <div className="space-y-6">
+                <Button variant="outline" onClick={() => router.push('/workforce-office')} className="mb-4">
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
+                </Button>
+                <div className="flex items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                </div>
+            </div>
+        );
+    }
+
+    if (error || !broker) {
         return (
             <div>
                  <Button variant="outline" onClick={() => router.push('/workforce-office')} className="mb-4">
@@ -55,7 +137,7 @@ export default function ManageBrokerPage() {
                 </Button>
                 <div className="text-center">
                     <h2 className="text-xl font-semibold">Broker Not Found</h2>
-                    <p className="text-muted-foreground">The requested broker could not be found.</p>
+                    <p className="text-muted-foreground">{error || 'The requested broker could not be found.'}</p>
                 </div>
             </div>
         )

@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { useSearchParams } from 'next/navigation';
 
 // In a real application, this list would be dynamically generated
 // based on the user's loans, teams, etc.
@@ -43,12 +44,15 @@ interface UserProfile {
 export default function CommunicationsPage() {
     const { user, isAdmin, getAllUsers } = useAuth();
     const { toast } = useToast();
+    const searchParams = useSearchParams();
     const [channels, setChannels] = useState(initialChannels);
     const [selectedRoomId, setSelectedRoomId] = useState<string>('workforce-internal-chat');
     const [selectedRoomName, setSelectedRoomName] = useState<string>('internal-chat');
     const [newChannelName, setNewChannelName] = useState('');
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
     const [isManageDialogOpen, setIsManageDialogOpen] = useState(false);
+    const [brokerId, setBrokerId] = useState<string | null>(null);
+    const [brokerName, setBrokerName] = useState<string>('');
     
     // Member management state
     const [allUsers, setAllUsers] = useState<UserProfile[]>([]);
@@ -66,6 +70,59 @@ export default function CommunicationsPage() {
     const [isInviting, setIsInviting] = useState(false);
     
 
+
+    // Handle broker-specific communication
+    useEffect(() => {
+        const roomId = searchParams.get('roomId');
+        if (roomId) {
+            setBrokerId(roomId);
+            // Create a broker-specific channel if it doesn't exist
+            const brokerChannelId = `broker-${roomId}`;
+            const brokerChannelName = `Broker Communication`;
+            
+            // Check if broker channel already exists
+            const existingChannel = [...channels.team, ...channels.loans, ...channels.directMessages]
+                .find(channel => channel.id === brokerChannelId);
+            
+            if (!existingChannel) {
+                // Add broker channel to direct messages
+                const newBrokerChannel = {
+                    id: brokerChannelId,
+                    name: brokerChannelName,
+                    icon: <Briefcase className="h-4 w-4" />
+                };
+                
+                setChannels(prev => ({
+                    ...prev,
+                    directMessages: [...prev.directMessages, newBrokerChannel]
+                }));
+                
+                // Set as selected room
+                setSelectedRoomId(brokerChannelId);
+                setSelectedRoomName(brokerChannelName);
+            } else {
+                // Set existing broker channel as selected
+                setSelectedRoomId(brokerChannelId);
+                setSelectedRoomName(brokerChannelName);
+            }
+            
+            // Fetch broker name
+            fetchBrokerName(roomId);
+        }
+    }, [searchParams, channels.team, channels.loans, channels.directMessages]);
+
+    const fetchBrokerName = async (brokerId: string) => {
+        try {
+            const response = await fetch(`/api/workforce/broker-info?brokerId=${brokerId}`);
+            const result = await response.json();
+            
+            if (result.success && result.broker) {
+                setBrokerName(result.broker.fullName || result.broker.name || 'Unknown Broker');
+            }
+        } catch (err) {
+            console.error('Error fetching broker name:', err);
+        }
+    };
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -250,7 +307,16 @@ export default function CommunicationsPage() {
             {/* Main Chat Area */}
             <div className="flex flex-col">
                  <div className="flex items-center justify-between p-2 border-b mb-2">
-                    <h3 className="text-lg font-semibold">{selectedRoomName}</h3>
+                    <div>
+                        <h3 className="text-lg font-semibold">
+                            {brokerId && brokerName ? `Communication with ${brokerName}` : selectedRoomName}
+                        </h3>
+                        {brokerId && (
+                            <p className="text-sm text-muted-foreground">
+                                Broker ID: {brokerId}
+                            </p>
+                        )}
+                    </div>
                     {isAdmin && (
                          <Dialog open={isManageDialogOpen} onOpenChange={setIsManageDialogOpen}>
                             <DialogTrigger asChild>

@@ -13,6 +13,7 @@ import { ArrowLeft, Search, Filter, Loader2 } from "lucide-react";
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { authenticatedGet } from '@/lib/api-client';
 
 interface BrokerInfo {
   id: string;
@@ -57,25 +58,21 @@ export default function BrokerPipelinePage() {
     useEffect(() => {
         const fetchBrokerInfo = async () => {
             try {
-                const response = await fetch('/api/brokers');
+                const response = await authenticatedGet(`/api/workforce/broker-info?brokerId=${brokerId}`);
                 const result = await response.json();
                 
-                if (result.success && Array.isArray(result.brokers)) {
-                    const broker = result.brokers.find((b: any) => b.id === brokerId || b.uid === brokerId);
-                    if (broker) {
-                        setBrokerInfo({
-                            id: broker.id || broker.uid,
-                            name: broker.fullName || broker.name || 'Unknown Broker',
-                            company: broker.company || 'No company',
-                            email: broker.email || 'No email',
-                            phone: broker.phone || 'No phone',
-                            status: broker.status || 'Active'
-                        });
-                    } else {
-                        setError('Broker not found');
-                    }
+                if (result.success && result.broker) {
+                    const broker = result.broker;
+                    setBrokerInfo({
+                        id: broker.id || broker.uid,
+                        name: broker.fullName || broker.name || 'Unknown Broker',
+                        company: broker.company || 'No company',
+                        email: broker.email || 'No email',
+                        phone: broker.phone || 'No phone',
+                        status: broker.status || 'Active'
+                    });
                 } else {
-                    setError('Failed to load broker information');
+                    setError(result.error || 'Broker not found');
                 }
             } catch (err) {
                 console.error('Error fetching broker info:', err);
@@ -83,7 +80,9 @@ export default function BrokerPipelinePage() {
             }
         };
 
-        fetchBrokerInfo();
+        if (brokerId) {
+            fetchBrokerInfo();
+        }
     }, [brokerId]);
 
     // Fetch broker's loan applications
@@ -93,7 +92,7 @@ export default function BrokerPipelinePage() {
             
             try {
                 setLoading(true);
-                const response = await fetch(`/api/enhanced-loan-applications?action=getByBroker&brokerId=${brokerId}`);
+                const response = await authenticatedGet(`/api/enhanced-loan-applications?action=getByBroker&brokerId=${brokerId}`);
                 const result = await response.json();
                 
                 if (result.success && Array.isArray(result.data)) {
