@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { PlusCircle, Users, BarChart, DollarSign, MoreHorizontal, FileWarning, Search, Briefcase, UserPlus, Home, Mail, Phone, ArrowRight, Percent, Construction, MessageSquare, RefreshCw } from "lucide-react";
+import { PlusCircle, Users, BarChart, DollarSign, MoreHorizontal, FileWarning, Search, Briefcase, UserPlus, Home, Mail, Phone, ArrowRight, Percent, Construction, MessageSquare, RefreshCw, FileText, ExternalLink, Clock, CheckCircle, XCircle, AlertTriangle, Eye, Download, Maximize2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -19,6 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
 import { useWorkforceData } from "@/hooks/use-workforce-data";
+import { authenticatedGet, authenticatedPost, getAuthToken } from "@/lib/api-client";
 
 
 
@@ -141,6 +142,12 @@ function InviteUserDialog() {
 export default function WorkforceOfficePage() {
     const { data, loading, error, refreshData } = useWorkforceData();
     const [selectedLoan, setSelectedLoan] = useState<any>(null);
+    const [selectedBroker, setSelectedBroker] = useState<any>(null);
+    const [brokerDocuments, setBrokerDocuments] = useState<any[]>([]);
+    const [isLoadingDocuments, setIsLoadingDocuments] = useState(false);
+    const [approvalAction, setApprovalAction] = useState<'approve' | 'deny' | null>(null);
+    const [selectedDocument, setSelectedDocument] = useState<any>(null);
+    const [isViewingDocument, setIsViewingDocument] = useState(false);
 
     const formatCurrency = (amount: number) => {
         if (amount >= 1000000) {
@@ -149,6 +156,159 @@ export default function WorkforceOfficePage() {
             return `$${(amount / 1000).toFixed(0)}K`;
         }
         return `$${amount.toLocaleString()}`;
+    };
+
+    const loadBrokerDocuments = async (brokerId: string) => {
+        setIsLoadingDocuments(true);
+        console.log('Loading documents for broker:', brokerId);
+        try {
+            const response = await authenticatedGet('/api/workforce/broker-documents', { brokerId });
+            console.log('Response status:', response.status);
+            const result = await response.json();
+            console.log('API Response:', result);
+            
+            if (result.success && Array.isArray(result.documents)) {
+                console.log('Documents loaded:', result.documents.length);
+                setBrokerDocuments(result.documents);
+            } else {
+                console.error('Failed to load documents:', result.error);
+                setBrokerDocuments([]);
+            }
+        } catch (error) {
+            console.error('Error loading broker documents:', error);
+            setBrokerDocuments([]);
+        } finally {
+            setIsLoadingDocuments(false);
+        }
+    };
+
+    const handleDocumentApproval = async (documentIds: string[], action: 'approve' | 'deny') => {
+        try {
+            // Convert action to the correct status values
+            const status = action === 'approve' ? 'approved' : 'rejected';
+            const response = await authenticatedPost('/api/workforce/broker-documents', {
+                documentIds,
+                status: status,
+                notes: `${action === 'approve' ? 'Approved' : 'Rejected'} by workforce`
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                // Refresh the data to show updated document counts
+                await refreshData();
+                // Reload broker documents if a broker is selected
+                if (selectedBroker) {
+                    await loadBrokerDocuments(selectedBroker.id);
+                }
+                setApprovalAction(null);
+                // Close document viewer if viewing the document that was just approved/denied
+                if (selectedDocument && documentIds.includes(selectedDocument.id)) {
+                    setIsViewingDocument(false);
+                    setSelectedDocument(null);
+                }
+            } else {
+                console.error('Failed to update document status:', result.error);
+            }
+        } catch (error) {
+            console.error('Error updating document status:', error);
+        }
+    };
+
+    const handleViewDocument = (document: any) => {
+        setSelectedDocument(document);
+        setIsViewingDocument(true);
+    };
+
+    const handleDownloadDocument = async (documentFile: any) => {
+        try {
+            if (typeof window === 'undefined') {
+                console.log('Download URL:', documentFile.fileUrl);
+                return;
+            }
+
+            console.log('Downloading document:', {
+                id: documentFile.id,
+                fileName: documentFile.fileName,
+                fileUrl: documentFile.fileUrl
+            });
+
+            // Use server endpoint to bypass CORS issues
+            const downloadUrl = `/api/workforce/download-document?documentId=${documentFile.id}`;
+            
+            // Use fetch to get the file as a blob to ensure proper binary handling
+            const response = await fetch(downloadUrl, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${await getAuthToken()}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Download failed: ${response.status} ${response.statusText}`);
+            }
+
+            // Get the file as a blob
+            const blob = await response.blob();
+            console.log('Downloaded blob:', {
+                size: blob.size,
+                type: blob.type
+            });
+
+            // Create object URL and download
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = documentFile.fileName || documentFile.name || 'document';
+            link.style.display = 'none';
+            
+            // Add to DOM, trigger download, then clean up
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Clean up the object URL
+            window.URL.revokeObjectURL(url);
+            
+            console.log('Server endpoint download completed successfully');
+            
+        } catch (error) {
+            console.error('Download failed:', error);
+            // Fallback to direct link download
+            try {
+                const link = document.createElement('a');
+                link.href = documentFile.fileUrl;
+                link.download = documentFile.fileName || documentFile.name || 'document';
+                link.target = '_blank';
+                link.style.display = 'none';
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                console.log('Fallback download triggered');
+            } catch (fallbackError) {
+                console.error('Fallback download also failed:', fallbackError);
+            }
+        }
+    };
+
+    const getDocumentIcon = (fileName: string) => {
+        const extension = fileName.split('.').pop()?.toLowerCase();
+        switch (extension) {
+            case 'pdf':
+                return '📄';
+            case 'jpg':
+            case 'jpeg':
+            case 'png':
+            case 'gif':
+                return '🖼️';
+            case 'doc':
+            case 'docx':
+                return '📝';
+            default:
+                return '📄';
+        }
     };
 
     if (loading) {
@@ -425,6 +585,7 @@ export default function WorkforceOfficePage() {
                                 <TableHead>Company</TableHead>
                                 <TableHead>Active Loans</TableHead>
                                 <TableHead>Total Volume</TableHead>
+                                <TableHead>Documents</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead><span className="sr-only">Actions</span></TableHead>
                             </TableRow>
@@ -432,7 +593,7 @@ export default function WorkforceOfficePage() {
                         <TableBody>
                             {data.brokers.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                                         No brokers found
                                     </TableCell>
                                 </TableRow>
@@ -443,6 +604,38 @@ export default function WorkforceOfficePage() {
                                         <TableCell>{broker.company}</TableCell>
                                         <TableCell>{broker.activeLoans}</TableCell>
                                         <TableCell>{formatCurrency(broker.totalVolume)}</TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-2">
+                                                <FileText className="h-4 w-4 text-muted-foreground" />
+                                                <div className="flex flex-col">
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="text-sm font-medium">{broker.documentCount}</span>
+                                                        <span className="text-xs text-muted-foreground">docs</span>
+                                                    </div>
+                                                    {broker.pendingDocuments > 0 && (
+                                                        <div className="flex items-center gap-1 mt-1">
+                                                            <Clock className="h-3 w-3 text-amber-500" />
+                                                            <span className="text-xs text-amber-600 font-medium">
+                                                                {broker.pendingDocuments} pending
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="sm" 
+                                                    onClick={() => {
+                                                        setSelectedBroker(broker);
+                                                        loadBrokerDocuments(broker.id);
+                                                    }}
+                                                    className="h-6 w-6 p-0"
+                                                    title="Review documents"
+                                                >
+                                                    <AlertTriangle className="h-3 w-3 text-amber-500" />
+                                                    <span className="sr-only">Review documents</span>
+                                                </Button>
+                                            </div>
+                                        </TableCell>
                                         <TableCell>
                                             <Badge className="bg-green-500 hover:bg-green-600">{broker.status}</Badge>
                                         </TableCell>
@@ -476,6 +669,296 @@ export default function WorkforceOfficePage() {
             </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Broker Documents Review Dialog */}
+      <Dialog open={!!selectedBroker} onOpenChange={() => setSelectedBroker(null)}>
+        <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Review Documents - {selectedBroker?.name}</DialogTitle>
+            <DialogDescription>
+              Review and approve or deny broker documents for {selectedBroker?.company}.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {isLoadingDocuments ? (
+            <div className="flex items-center justify-center py-8">
+              <RefreshCw className="h-6 w-6 animate-spin mr-2" />
+              <span>Loading documents...</span>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {brokerDocuments.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No documents found for this broker.
+                </div>
+              ) : (
+                <>
+                  {/* Document Status Summary */}
+                  <div className="grid grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
+                    <div className="text-center">
+                      <div className="flex items-center justify-center gap-2 mb-1">
+                        <Clock className="h-4 w-4 text-amber-500" />
+                        <span className="text-sm font-medium">Pending</span>
+                      </div>
+                      <span className="text-2xl font-bold text-amber-600">
+                        {brokerDocuments.filter(doc => doc.status === 'pending').length}
+                      </span>
+                    </div>
+                    <div className="text-center">
+                      <div className="flex items-center justify-center gap-2 mb-1">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <span className="text-sm font-medium">Approved</span>
+                      </div>
+                      <span className="text-2xl font-bold text-green-600">
+                        {brokerDocuments.filter(doc => doc.status === 'approved').length}
+                      </span>
+                    </div>
+                    <div className="text-center">
+                      <div className="flex items-center justify-center gap-2 mb-1">
+                        <XCircle className="h-4 w-4 text-red-500" />
+                        <span className="text-sm font-medium">Rejected</span>
+                      </div>
+                      <span className="text-2xl font-bold text-red-600">
+                        {brokerDocuments.filter(doc => doc.status === 'rejected').length}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Documents List */}
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {brokerDocuments.map((document) => (
+                      <div key={document.id} className="border rounded-lg p-4">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-lg">{getDocumentIcon(document.fileName)}</span>
+                              <span className="font-medium">{document.name}</span>
+                              <Badge 
+                                variant={document.status === 'approved' ? 'default' : 
+                                        document.status === 'rejected' ? 'destructive' : 'secondary'}
+                                className={document.status === 'approved' ? 'bg-green-500 hover:bg-green-600' : 
+                                          document.status === 'rejected' ? 'bg-red-500 hover:bg-red-600' : 
+                                          'bg-amber-500 hover:bg-amber-600'}
+                              >
+                                {document.status}
+                              </Badge>
+                            </div>
+                            <div className="text-sm text-muted-foreground space-y-1">
+                              <p><span className="font-medium">File:</span> {document.fileName}</p>
+                              <p><span className="font-medium">Type:</span> {document.type}</p>
+                              <p><span className="font-medium">Size:</span> {(document.fileSize / 1024 / 1024).toFixed(2)} MB</p>
+                              <p><span className="font-medium">Uploaded:</span> {document.uploadedAt?.toDate?.()?.toLocaleDateString() || 'Unknown'}</p>
+                              {document.reviewedBy && (
+                                <p><span className="font-medium">Reviewed by:</span> {document.reviewedBy} on {document.reviewedAt?.toDate?.()?.toLocaleDateString()}</p>
+                              )}
+                              {document.notes && (
+                                <p><span className="font-medium">Notes:</span> {document.notes}</p>
+                              )}
+                            </div>
+                          </div>
+                          
+                          {/* Action Buttons */}
+                          <div className="flex flex-col gap-2">
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleViewDocument(document)}
+                                title="View Document"
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleDownloadDocument(document)}
+                                title="Download Document"
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
+                            </div>
+                            
+                            {/* Approval Actions */}
+                            {document.status === 'pending' && (
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleDocumentApproval([document.id], 'approve')}
+                                  className="bg-green-500 hover:bg-green-600"
+                                >
+                                  <CheckCircle className="h-4 w-4 mr-1" />
+                                  Approve
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => handleDocumentApproval([document.id], 'deny')}
+                                >
+                                  <XCircle className="h-4 w-4 mr-1" />
+                                  Deny
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Bulk Actions */}
+                  {brokerDocuments.filter(doc => doc.status === 'pending').length > 0 && (
+                    <div className="flex gap-2 pt-4 border-t">
+                      <Button
+                        onClick={() => {
+                          const pendingDocs = brokerDocuments.filter(doc => doc.status === 'pending');
+                          handleDocumentApproval(pendingDocs.map(doc => doc.id), 'approve');
+                        }}
+                        className="bg-green-500 hover:bg-green-600"
+                      >
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Approve All Pending
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={() => {
+                          const pendingDocs = brokerDocuments.filter(doc => doc.status === 'pending');
+                          handleDocumentApproval(pendingDocs.map(doc => doc.id), 'deny');
+                        }}
+                      >
+                        <XCircle className="h-4 w-4 mr-2" />
+                        Deny All Pending
+                      </Button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Document Viewer Dialog */}
+      <Dialog open={isViewingDocument} onOpenChange={setIsViewingDocument}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] w-[95vw] h-[95vh] p-0 flex flex-col">
+          <DialogHeader className="px-6 py-4 border-b flex-shrink-0">
+            <div className="flex items-center justify-between">
+              <div>
+                <DialogTitle className="flex items-center gap-2">
+                  <span className="text-lg">{selectedDocument && getDocumentIcon(selectedDocument.fileName)}</span>
+                  {selectedDocument?.name}
+                </DialogTitle>
+                <DialogDescription>
+                  {selectedDocument?.fileName} • {(selectedDocument?.fileSize / 1024 / 1024).toFixed(2)} MB
+                </DialogDescription>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge 
+                  variant={selectedDocument?.status === 'approved' ? 'default' : 
+                          selectedDocument?.status === 'rejected' ? 'destructive' : 'secondary'}
+                  className={selectedDocument?.status === 'approved' ? 'bg-green-500 hover:bg-green-600' : 
+                            selectedDocument?.status === 'rejected' ? 'bg-red-500 hover:bg-red-600' : 
+                            'bg-amber-500 hover:bg-amber-600'}
+                >
+                  {selectedDocument?.status}
+                </Badge>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => selectedDocument && handleDownloadDocument(selectedDocument)}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Download
+                </Button>
+              </div>
+            </div>
+          </DialogHeader>
+          
+          <div className="flex-1 p-4 min-h-0 overflow-hidden">
+            {selectedDocument && (
+              <div className="h-full flex flex-col gap-4">
+                {/* Document Viewer */}
+                <div className="flex-1 border rounded-lg overflow-hidden bg-white min-h-0">
+                  {selectedDocument.fileName.toLowerCase().includes('.pdf') ? (
+                    <iframe
+                      src={selectedDocument.fileUrl}
+                      className="w-full h-full border-0"
+                      title={selectedDocument.name}
+                    />
+                  ) : selectedDocument.fileName.toLowerCase().match(/\.(jpg|jpeg|png|gif)$/) ? (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-50 p-4">
+                      <div className="relative w-full h-full flex items-center justify-center">
+                        <img
+                          src={selectedDocument.fileUrl}
+                          alt={selectedDocument.name}
+                          className="max-w-full max-h-full object-contain shadow-sm rounded"
+                          style={{ 
+                            maxWidth: '100%', 
+                            maxHeight: '100%',
+                            width: 'auto',
+                            height: 'auto'
+                          }}
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.nextElementSibling.style.display = 'block';
+                          }}
+                        />
+                        <div className="hidden text-center p-8">
+                          <p className="text-muted-foreground mb-4">Unable to display image</p>
+                          <Button
+                            variant="outline"
+                            onClick={() => selectedDocument && handleDownloadDocument(selectedDocument)}
+                          >
+                            <Download className="h-4 w-4 mr-2" />
+                            Download to view
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                      <div className="text-center p-8">
+                        <FileText className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                        <p className="text-muted-foreground mb-4">
+                          Preview not available for this file type
+                        </p>
+                        <Button
+                          variant="outline"
+                          onClick={() => selectedDocument && handleDownloadDocument(selectedDocument)}
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          Download to view
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Document Actions */}
+                {selectedDocument.status === 'pending' && (
+                  <div className="flex justify-center gap-4 pt-4 border-t flex-shrink-0">
+                    <Button
+                      onClick={() => handleDocumentApproval([selectedDocument.id], 'approve')}
+                      className="bg-green-500 hover:bg-green-600"
+                      size="lg"
+                    >
+                      <CheckCircle className="h-5 w-5 mr-2" />
+                      Approve Document
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleDocumentApproval([selectedDocument.id], 'deny')}
+                      size="lg"
+                    >
+                      <XCircle className="h-5 w-5 mr-2" />
+                      Deny Document
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

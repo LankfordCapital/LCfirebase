@@ -122,6 +122,46 @@ export class BrokerDocumentAdminService {
   }
 
   /**
+   * Get all documents across all brokers (for workforce review)
+   */
+  async getAllDocuments(status?: 'pending' | 'approved' | 'rejected'): Promise<{ success: boolean; documents?: BrokerDocument[]; error?: string }> {
+    try {
+      let query = adminDb.collection(this.collectionName);
+      
+      // Add status filter if provided
+      if (status) {
+        query = query.where('status', '==', status);
+      }
+      
+      const querySnapshot = await query.get();
+
+      const documents: BrokerDocument[] = [];
+      querySnapshot.forEach((doc) => {
+        documents.push({
+          id: doc.id,
+          ...doc.data()
+        } as BrokerDocument);
+      });
+
+      // Sort by uploadedAt in descending order
+      documents.sort((a, b) => {
+        if (a.uploadedAt && b.uploadedAt) {
+          return b.uploadedAt.toMillis() - a.uploadedAt.toMillis();
+        }
+        return 0;
+      });
+
+      return { success: true, documents };
+    } catch (error) {
+      console.error('Error getting all documents:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to get documents' 
+      };
+    }
+  }
+
+  /**
    * Update document status
    */
   async updateDocumentStatus(

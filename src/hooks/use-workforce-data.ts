@@ -38,6 +38,10 @@ export interface WorkforceBroker {
   phone: string;
   activeLoans: number;
   totalVolume: number;
+  documentCount: number;
+  pendingDocuments: number;
+  approvedDocuments: number;
+  rejectedDocuments: number;
   status: string;
   createdAt: any;
   updatedAt: any;
@@ -111,6 +115,32 @@ export function useWorkforceData() {
     }
   }, []);
 
+  const getBrokerDocumentStats = useCallback(async (brokerId: string): Promise<{
+    total: number;
+    pending: number;
+    approved: number;
+    rejected: number;
+  }> => {
+    try {
+      const response = await authenticatedGet('/api/workforce/broker-documents', { brokerId });
+      const result = await response.json();
+      
+      if (result.success && Array.isArray(result.documents)) {
+        const stats = {
+          total: result.documents.length,
+          pending: result.documents.filter((doc: any) => doc.status === 'pending').length,
+          approved: result.documents.filter((doc: any) => doc.status === 'approved').length,
+          rejected: result.documents.filter((doc: any) => doc.status === 'rejected').length,
+        };
+        return stats;
+      }
+      return { total: 0, pending: 0, approved: 0, rejected: 0 };
+    } catch (error) {
+      console.error(`Error loading documents for broker ${brokerId}:`, error);
+      return { total: 0, pending: 0, approved: 0, rejected: 0 };
+    }
+  }, []);
+
   const loadBrokers = useCallback(async () => {
     try {
       const response = await fetch('/api/brokers', {
@@ -121,25 +151,37 @@ export function useWorkforceData() {
       const result = await response.json();
       
       if (result.success && Array.isArray(result.brokers)) {
-        return result.brokers.map((broker: any) => ({
-          id: broker.id || broker.uid,
-          name: broker.fullName || broker.name || 'Unknown Broker',
-          company: broker.company || 'No company',
-          email: broker.email || 'No email',
-          phone: broker.phone || 'No phone',
-          activeLoans: broker.activeLoans || 0,
-          totalVolume: broker.totalVolume || 0,
-          status: broker.status || 'Active',
-          createdAt: broker.createdAt,
-          updatedAt: broker.updatedAt,
-        }));
+        // Get document stats for all brokers in parallel
+        const brokersWithDocuments = await Promise.all(
+          result.brokers.map(async (broker: any) => {
+            const documentStats = await getBrokerDocumentStats(broker.id || broker.uid);
+            return {
+              id: broker.id || broker.uid,
+              name: broker.fullName || broker.name || 'Unknown Broker',
+              company: broker.company || 'No company',
+              email: broker.email || 'No email',
+              phone: broker.phone || 'No phone',
+              activeLoans: broker.activeLoans || 0,
+              totalVolume: broker.totalVolume || 0,
+              documentCount: documentStats.total,
+              pendingDocuments: documentStats.pending,
+              approvedDocuments: documentStats.approved,
+              rejectedDocuments: documentStats.rejected,
+              status: broker.status || 'Active',
+              createdAt: broker.createdAt,
+              updatedAt: broker.updatedAt,
+            };
+          })
+        );
+        
+        return brokersWithDocuments;
       }
       return [];
     } catch (error) {
       console.error('Error loading brokers:', error);
       return [];
     }
-  }, []);
+  }, [getBrokerDocumentStats]);
 
   const calculateSummary = useCallback((loanApplications: WorkforceLoanApplication[]) => {
     const activeClients = new Set(loanApplications.map(app => app.borrower.email)).size;
